@@ -28,7 +28,7 @@ if (data.category?.slug) {
     locale: lang,
     query: {
       "filters[categories][slug][$eq]": data.category.slug,
-      "pagination[limit]": String(data.limit || 3),
+      "pagination[limit]": String(data.limit || 10),
       //"populate[imagenDestacada]": "*",
       //"populate[badge][populate][icono]": "*",
     },

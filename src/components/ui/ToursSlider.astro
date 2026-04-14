@@ -9,26 +9,33 @@ interface Props {
 }
 
 const { tours, lang } = Astro.props;
+const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
 ---
 
-<div class="relative">
-  <!-- Slider Container - horizontal scroll -->
-  <div
-    class="flex gap-6 overflow-x-auto py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
-    id={`slider-${Math.random().toString(36).substr(2, 9)}`}
-  >
-    {
-      tours.map((tour) => (
-        <div class="flex-shrink-0 w-[85%] md:w-[45%] lg:w-[24%] snap-center">
-          <TourCard tour={tour} lang={lang} />
-        </div>
-      ))
-    }
+<div class="relative" data-tours-slider>
+  <div class="px-4 md:px-14">
+    <div class="overflow-hidden">
+    <!-- Slider Container - horizontal scroll -->
+      <div
+        class="flex gap-6 overflow-x-auto py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
+        id={`slider-${Math.random().toString(36).substr(2, 9)}`}
+        data-slider-track
+        data-original-count={tours.length}
+      >
+        {
+          loopedTours.map((tour) => (
+            <div class="flex-shrink-0 w-full md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-72px)/4)] snap-start">
+              <TourCard tour={tour} lang={lang} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
   </div>
 
   <!-- Navigation Arrows -->
   <button
-    class="slider-prev absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    class="slider-prev absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     aria-label="Ver tours anteriores"
   >
     <svg
@@ -46,7 +53,7 @@ const { tours, lang } = Astro.props;
   </button>
 
   <button
-    class="slider-next absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    class="slider-next absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     aria-label="Ver siguientes tours"
   >
     <svg
@@ -75,28 +82,109 @@ const { tours, lang } = Astro.props;
 
 <script>
   document.addEventListener("astro:page-load", () => {
-    const sliders = document.querySelectorAll("[id^='slider-']");
+    const sliderRoots = document.querySelectorAll("[data-tours-slider]");
 
-    sliders.forEach((slider) => {
-      const container = slider as HTMLElement;
-      const prevBtn = container.parentElement?.querySelector(
-        ".slider-prev",
-      ) as HTMLButtonElement;
-      const nextBtn = container.parentElement?.querySelector(
-        ".slider-next",
-      ) as HTMLButtonElement;
+    sliderRoots.forEach((root) => {
+      const sliderRoot = root as HTMLElement;
+      const container = sliderRoot.querySelector("[data-slider-track]") as HTMLElement | null;
+      const prevBtn = sliderRoot.querySelector(".slider-prev") as HTMLButtonElement | null;
+      const nextBtn = sliderRoot.querySelector(".slider-next") as HTMLButtonElement | null;
 
-      if (!prevBtn || !nextBtn) return;
+      if (!container || !prevBtn || !nextBtn || container.dataset.sliderInitialized === "true") return;
 
-      const scrollAmount = container.offsetWidth;
+      container.dataset.sliderInitialized = "true";
+
+      const slides = Array.from(container.children) as HTMLElement[];
+      const originalSlidesCount = Number(container.dataset.originalCount || slides.length);
+      const autoPlayDelay = 3500;
+      let autoPlay: ReturnType<typeof window.setInterval> | undefined;
+      let scrollAmount = 0;
+      let loopWidth = 0;
+      let isAdjustingScroll = false;
+
+      const calculateMetrics = () => {
+        const slideWidth = slides[0]?.getBoundingClientRect().width ?? container.offsetWidth;
+        const styles = window.getComputedStyle(container);
+        const gapValue = styles.columnGap || styles.gap || "0";
+        const gap = Number.parseFloat(gapValue);
+
+        scrollAmount = slideWidth + gap;
+        loopWidth = originalSlidesCount * scrollAmount;
+      };
+
+      const setScrollPosition = (left: number) => {
+        isAdjustingScroll = true;
+        container.scrollTo({ left, behavior: "auto" });
+        window.setTimeout(() => {
+          isAdjustingScroll = false;
+        }, 0);
+      };
+
+      const normalizeScroll = () => {
+        if (slides.length <= 1 || isAdjustingScroll) return;
+
+        if (container.scrollLeft >= loopWidth * 2 - scrollAmount / 2) {
+          setScrollPosition(container.scrollLeft - loopWidth);
+        } else if (container.scrollLeft < loopWidth - scrollAmount / 2) {
+          setScrollPosition(container.scrollLeft + loopWidth);
+        }
+      };
+
+      const moveSlider = (direction: 1 | -1) => {
+        normalizeScroll();
+        container.scrollBy({ left: scrollAmount * direction, behavior: "smooth" });
+        window.setTimeout(normalizeScroll, 450);
+      };
+
+      const stopAutoPlay = () => {
+        if (!autoPlay) return;
+        window.clearInterval(autoPlay);
+        autoPlay = undefined;
+      };
+
+      const startAutoPlay = () => {
+        if (slides.length <= 1 || autoPlay) return;
+        autoPlay = window.setInterval(() => {
+          moveSlider(1);
+        }, autoPlayDelay);
+      };
+
+      const handleResize = () => {
+        const currentIndex = scrollAmount > 0 ? Math.round(container.scrollLeft / scrollAmount) : 0;
+        calculateMetrics();
+        setScrollPosition(currentIndex * scrollAmount);
+        normalizeScroll();
+      };
+
+      calculateMetrics();
+
+      if (slides.length > 1) {
+        requestAnimationFrame(() => {
+          calculateMetrics();
+          setScrollPosition(loopWidth);
+        });
+      }
 
       prevBtn.addEventListener("click", () => {
-        container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        stopAutoPlay();
+        moveSlider(-1);
+        startAutoPlay();
       });
 
       nextBtn.addEventListener("click", () => {
-        container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        stopAutoPlay();
+        moveSlider(1);
+        startAutoPlay();
       });
+
+      container.addEventListener("scroll", normalizeScroll, { passive: true });
+      container.addEventListener("mouseenter", stopAutoPlay);
+      container.addEventListener("mouseleave", startAutoPlay);
+      container.addEventListener("focusin", stopAutoPlay);
+      container.addEventListener("focusout", startAutoPlay);
+      window.addEventListener("resize", handleResize);
+
+      startAutoPlay();
     });
   });
 </script>

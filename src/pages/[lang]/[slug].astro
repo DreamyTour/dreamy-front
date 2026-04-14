@@ -353,13 +353,18 @@ if (type === "tour") {
 let toursByCategory: Tour[] = [];
 
 // Tours para páginas (el middleware de tours populatea categories automáticamente)
-if (type === "page" && page?.category?.slug) {
+// Buscamos la categoría específica del destino (no "peru-tours" que es solo para agrupar)
+const pageDestinationCategory = page?.categories?.find(
+  (c: any) => c.slug !== "peru-tours"
+);
+
+if (type === "page" && pageDestinationCategory?.slug) {
   const response = await fetchApi<Tour[]>({
     endpoint: "tours",
     wrappedByKey: "data",
     locale: lang,
     query: {
-      "filters[categories][slug][$eq]": page.category.slug,
+      "filters[categories][slug][$eq]": pageDestinationCategory.slug,
       "pagination[limit]": "6",
     },
   });
@@ -478,7 +483,7 @@ const pageStats =
 }
 
 {
-  type === "tour" && (
+  type === "tour" && tour && (
     <TourLayout seo={seoProps} slugMap={slugMap}>
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12">
         <TourHero tour={tour} lang={lang} badges={tour.badge} />
@@ -532,7 +537,7 @@ const pageStats =
 }
 
 {
-  type === "page" && (
+  type === "page" && page && (
     <PageLayout seo={seoProps}>
       <script
         id="page-slug-map"
@@ -559,7 +564,7 @@ const pageStats =
             <div class="max-w-3xl">
               <div class="inline-flex items-center gap-3 rounded-sm border border-primary/15 bg-white/80 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-primary shadow-sm backdrop-blur-sm">
                 <span class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]" />
-                <span>{page.category?.nombre || pageCopy.eyebrow}</span>
+                <span>{page.categories?.find((c: any) => c.slug !== 'peru-tours')?.nombre || pageCopy.eyebrow}</span>
               </div>
 
               <div class="mt-6 space-y-5">
@@ -636,10 +641,10 @@ const pageStats =
               <div class="mb-8 flex justify-center md:mb-10">
                 <span class="inline-flex items-center gap-2 rounded-sm border border-secondary/15 bg-secondary/5 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-secondary">
                   <span class="h-2 w-2 rounded-full bg-secondary" />
-                  {page.category?.nombre || page.titulo}
+                  {page.categories?.find((c: any) => c.slug !== 'peru-tours')?.nombre || page.titulo}
                 </span>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+              <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {toursByCategory.map((tour) => (
                   <TourCard tour={tour} lang={lang} />
                 ))}

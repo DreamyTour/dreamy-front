@@ -39,7 +39,7 @@ export interface Page {
   video: Video
   content: string
   slug: string
-  category: Category
+  categories: Category[]
   seo?: SEO
   tituloPreguntas: string
   preguntasAcordeon: Pregunta[]

@@ -4,142 +4,302 @@ interface Props {
 }
 
 const { lang } = Astro.props;
-import mapSvg from '@/assets/svg/mapa-peru.svg?raw';
+import mapSvg from "@/assets/svg/mapa-peru.svg?raw";
 
-// Mock data for the interactive map
+// ====== i18n: Textos de la sección ======
+const copy = {
+  es: {
+    badge: "Guías de Viaje",
+    title: "Un Viaje a través de la",
+    titleHighlight: "Diversidad Infinita",
+    description:
+      "Perú no es un país, es un mundo por descubrir. Cada región es un universo único, con paisajes, culturas, gastronomía y tradiciones que desafían la imaginación.",
+    description2:
+      "Adéntrate en un territorio donde la geografía cambia cada cien kilómetros, donde puedes pasar de glaciares imponentes a selvas exuberantes.",
+    mapTitle: "Mapa Interactivo del Perú",
+    mapSubtitle: "Hacé clic en cualquier punto para explorar ese destino.",
+    cta: "Ver tours",
+  },
+  en: {
+    badge: "Travel Guides",
+    title: "A Journey through",
+    titleHighlight: "Infinite Diversity",
+    description:
+      "Peru is not just a country — it's a world waiting to be discovered. Each region is a unique universe of landscapes, cultures, cuisine and traditions beyond imagination.",
+    description2:
+      "Step into a territory where geography shifts every hundred kilometers, from towering glaciers to lush rainforests.",
+    mapTitle: "Interactive Peru Map",
+    mapSubtitle: "Click any point to explore that destination.",
+    cta: "View tours",
+  },
+  pt: {
+    badge: "Guias de Viagem",
+    title: "Uma Viagem através da",
+    titleHighlight: "Diversidade Infinita",
+    description:
+      "O Peru não é apenas um país — é um mundo a ser descoberto. Cada região é um universo único de paisagens, culturas, gastronomia e tradições além da imaginação.",
+    description2:
+      "Adentre um território onde a geografia muda a cada cem quilômetros, de glaciares imponentes a selvas exuberantes.",
+    mapTitle: "Mapa Interativo do Peru",
+    mapSubtitle: "Clique em qualquer ponto para explorar o destino.",
+    cta: "Ver passeios",
+  },
+} as const;
+
+const t = copy[lang as keyof typeof copy] ?? copy.es;
+
+// ====== Puntos del mapa con slug para linkear a las pages ======
 const mapPoints = [
   {
     id: "lima",
-    title: "Costa Central",
-    subtitle: "Lima & Paracas",
+    slug: "lima",
+    title: { es: "Costa Central", en: "Central Coast", pt: "Costa Central" },
+    subtitle: {
+      es: "Lima & Paracas",
+      en: "Lima & Paracas",
+      pt: "Lima & Paracas",
+    },
+    description: {
+      es: "La capital gastronómica y las maravillas del Pacífico.",
+      en: "The gastronomic capital and the wonders of the Pacific.",
+      pt: "A capital gastronômica e as maravilhas do Pacífico.",
+    },
     x: "45%",
     y: "65%",
-    description: "La capital gastronómica y las maravillas del Pacífico.",
-    icon: "lucide:utensils-crossed",
   },
   {
     id: "cusco",
-    title: "Andean Highlands",
-    subtitle: "Cusco & Valle Sagrado",
+    slug: "cusco",
+    title: {
+      es: "Tierras Altas Andinas",
+      en: "Andean Highlands",
+      pt: "Terras Altas Andinas",
+    },
+    subtitle: {
+      es: "Cusco & Valle Sagrado",
+      en: "Cusco & Sacred Valley",
+      pt: "Cusco & Vale Sagrado",
+    },
+    description: {
+      es: "El corazón del imperio Inca y maravillas de la ingeniería milenaria.",
+      en: "The heart of the Inca empire and wonders of millennial engineering.",
+      pt: "O coração do império Inca e maravilhas da engenharia milenar.",
+    },
     x: "59%",
     y: "70%",
-    description: "El corazón del imperio Inca y maravillas de la ingeniería milenaria.",
-    icon: "lucide:mountain",
   },
   {
     id: "iquitos",
-    title: "Amazon Basin",
-    subtitle: "Iquitos Jungle",
+    slug: "iquitos",
+    title: {
+      es: "Cuenca Amazónica",
+      en: "Amazon Basin",
+      pt: "Bacia Amazônica",
+    },
+    subtitle: {
+      es: "Selva de Iquitos",
+      en: "Iquitos Jungle",
+      pt: "Selva de Iquitos",
+    },
+    description: {
+      es: "Un ecosistema vibrante, hogar del río más caudaloso del mundo.",
+      en: "A vibrant ecosystem, home to the world's mightiest river.",
+      pt: "Um ecossistema vibrante, lar do rio mais caudaloso do mundo.",
+    },
     x: "55%",
     y: "25%",
-    description: "Un ecosistema vibrante, hogar del río más caudaloso del mundo.",
-    icon: "lucide:trees",
   },
   {
     id: "arequipa",
-    title: "Ruta Volcánica",
-    subtitle: "Arequipa & Colca",
+    slug: "arequipa",
+    title: { es: "Ruta Volcánica", en: "Volcanic Route", pt: "Rota Vulcânica" },
+    subtitle: {
+      es: "Arequipa & Colca",
+      en: "Arequipa & Colca",
+      pt: "Arequipa & Colca",
+    },
+    description: {
+      es: "La Ciudad Blanca custodiada por imponentes volcanes y cañones profundos.",
+      en: "The White City guarded by majestic volcanoes and deep canyons.",
+      pt: "A Cidade Branca guardada por vulcões majestosos e cânions profundos.",
+    },
     x: "55%",
     y: "80%",
-    description: "La Ciudad Blanca custodiada por imponentes volcanes y cañones profundos.",
-    icon: "lucide:volcano",
   },
   {
     id: "puno",
-    title: "Altiplano Místico",
-    subtitle: "Puno & Lago Titicaca",
+    slug: "puno",
+    title: {
+      es: "Altiplano Místico",
+      en: "Mystic Altiplano",
+      pt: "Altiplano Místico",
+    },
+    subtitle: {
+      es: "Puno & Lago Titicaca",
+      en: "Puno & Lake Titicaca",
+      pt: "Puno & Lago Titicaca",
+    },
+    description: {
+      es: "El lago navegable más alto del mundo y cuna de civilizaciones.",
+      en: "The world's highest navigable lake and cradle of civilizations.",
+      pt: "O lago navegável mais alto do mundo e berço de civilizações.",
+    },
     x: "68%",
     y: "75%",
-    description: "El lago navegable más alto del mundo y cuna de civilizaciones.",
-    icon: "lucide:waves",
-  }
+  },
 ];
 ---
 
-<section class="py-24 relative overflow-hidden bg-background">
+<section class="py-24 relative overflow-hidden bg-primary/5">
   <!-- Fondo sutil usando color neutral -->
-  <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-30 pointer-events-none"></div>
-  
+  <div
+    class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-30 pointer-events-none"
+  >
+  </div>
+
   <div class="container mx-auto px-4 md:px-6 relative z-10 w-full max-w-8xl">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-      
       <!-- Text Content (Left) -->
       <div class="lg:col-span-5 space-y-8">
-        <div class="flex items-center justify-center w-fit space-x-2 bg-secondary/10 px-4 py-2 rounded-full mb-2">
+        <div
+          class="flex items-center justify-center w-fit space-x-2 bg-secondary/10 px-4 py-2 rounded-full mb-2"
+        >
           <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
-          <span class="text-secondary text-sm font-semibold">Guías de Viaje</span>
+          <span class="text-secondary text-sm font-semibold">{t.badge}</span>
         </div>
-        
-        <h2 class="text-4xl md:text-5xl font-bold text-foreground leading-tight">
-          Un Viaje a través de la <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary">Diversidad Infinita</span>
+
+        <h2
+          class="text-4xl md:text-5xl font-bold text-foreground leading-tight"
+        >
+          {t.title}
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary"
+            >{t.titleHighlight}</span
+          >
         </h2>
-        
-        <div class="space-y-6 text-muted-foreground font-medium leading-relaxed">
-          <p>
-            Perú no es un país, es un mundo por descubrir. Cada región es un universo único, con paisajes, culturas, gastronomía y tradiciones que desafían la imaginación. Adéntrate en un territorio donde la geografía cambia cada cien kilómetros, donde puedes pasar de glaciares imponentes a selvas exuberantes, de antiguas ciudades incas a modernos centros culturales.
-          </p>
-          <p>
-            Esta guía de viaje te invita a descubrir un Perú más allá de las postales: un país de contrastes, de aventuras, de sabores inexplorados y de conexiones profundas con una tierra que guarda secretos milenarios.
-          </p>
+
+        <div
+          class="space-y-6 text-muted-foreground font-medium leading-relaxed"
+        >
+          <p>{t.description}</p>
+          <p>{t.description2}</p>
         </div>
       </div>
 
       <!-- Interactive Map Area (Right) -->
       <div class="lg:col-span-7 relative w-full perspective-1000">
-        <!-- Eliminamos overflow-hidden para que el tooltip pueda salirse libremente si lo necesita -->
-        <div class="bg-card backdrop-blur-sm border border-border rounded-3xl p-8 relative shadow-lg">
-          
+        <div
+          class="bg-white backdrop-blur-sm border border-border rounded-3xl p-8 relative shadow-lg"
+        >
           <div class="mb-8">
-            <h3 class="text-2xl font-bold text-foreground mb-2">Interactive Peru Discovery</h3>
-            <p class="text-muted-foreground text-sm max-w-sm">Explora nuestro mapa interactivo y descubre los destinos más icónicos del territorio peruano.</p>
+            <h3 class="text-2xl font-bold text-foreground mb-2">
+              {t.mapTitle}
+            </h3>
+            <p class="text-muted-foreground text-sm max-w-sm">
+              {t.mapSubtitle}
+            </p>
           </div>
 
           <!-- Semantic Map Container -->
-          <div class="relative w-full aspect-square md:aspect-[4/3] rounded-2xl bg-white border border-gray-100 shadow-inner mb-6 flex items-center justify-center">
-            
+          <div
+            class="relative w-full aspect-square md:aspect-[4/3] rounded-2xl bg-white border border-gray-100 shadow-inner mb-6 flex items-center justify-center"
+          >
             <!-- Map SVG -->
-            <div class="absolute inset-0 flex items-center justify-center p-8 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30" set:html={mapSvg} />
+            <div
+              class="absolute inset-0 flex items-center justify-center p-8 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30"
+              set:html={mapSvg}
+            />
 
-            <!-- Map Points with Tooltip Popups inside -->
-            {mapPoints.map((point) => (
-              <button 
-                class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
-                style={`left: ${point.x}; top: ${point.y};`}
-                aria-label={`Ver detalles de ${point.title}`}
-              >
-                <!-- Pulse effect -->
-                <span class="absolute inline-flex h-full w-full rounded-full bg-secondary opacity-30 -left-0 -top-0 group-hover:animate-ping"></span>
-                <span class="absolute inline-flex h-6 w-6 rounded-full bg-secondary/40 opacity-70 -left-1 -top-1 animate-pulse"></span>
-                
-                <!-- Core dot -->
-                <span class="relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-white shadow-md ring-4 ring-transparent transition-all group-hover:ring-secondary/30 group-hover:bg-primary group-hover:scale-125"></span>
-                
-                <!-- Hover Popup Card (Floating tooltips) -->
-                <div class="absolute bg-white bottom-full left-1/2 -translate-x-1/2 mb-4 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 p-4 rounded-xl shadow-2xl border border-border text-left pointer-events-none 
-                            before:absolute before:-bottom-2 before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-t-border 
-                            after:absolute after:-bottom-[7px] after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent after:border-t-card">
-                  <div class="flex items-start gap-4">
-                     <!-- Icon container -->
-                     <div class="h-10 w-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                     </div>
-                     <div>
-                       <h4 class="font-bold text-foreground text-sm leading-tight">{point.title}</h4>
-                       <span class="text-xs font-semibold text-secondary mb-1.5 block">{point.subtitle}</span>
-                       <p class="text-xs text-muted-foreground leading-relaxed line-clamp-3">{point.description}</p>
-                     </div>
-                  </div>
-                </div>
+            <!-- Map Points -->
+            {
+              mapPoints.map((point) => {
+                const pointTitle =
+                  point.title[lang as keyof typeof point.title] ??
+                  point.title.es;
+                const pointSubtitle =
+                  point.subtitle[lang as keyof typeof point.subtitle] ??
+                  point.subtitle.es;
+                const pointDesc =
+                  point.description[lang as keyof typeof point.description] ??
+                  point.description.es;
 
-              </button>
-            ))}
+                return (
+                  <a
+                    href={`/${lang}/${point.slug}`}
+                    class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
+                    style={`left: ${point.x}; top: ${point.y};`}
+                    aria-label={`${pointTitle} — ${pointSubtitle}`}
+                  >
+                    {/* Pulse rings - siempre visibles */}
+                    <span class="absolute -inset-2 rounded-full bg-secondary/25 animate-ping" />
+                    <span class="absolute -inset-1.5 rounded-full bg-secondary/30 animate-pulse" />
+
+                    {/* Core dot */}
+                    <span class="relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-white shadow-md ring-4 ring-transparent transition-all group-hover:ring-secondary/30 group-hover:bg-primary group-hover:scale-125" />
+
+                    {/* Hover Popup Card - sin pointer-events-none y con pb-bridge para mantener la zona de hover */}
+                    <div class="absolute bg-white bottom-full left-1/2 -translate-x-1/2 mb-0 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                      <div
+                        class="p-4 rounded-xl shadow-2xl border border-border text-left bg-white relative
+                                before:absolute before:-bottom-2 before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-t-border 
+                                after:absolute after:-bottom-[7px] after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent after:border-t-white"
+                      >
+                        <div class="flex items-start gap-4">
+                          {/* Icon container */}
+                          <div class="h-10 w-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="h-5 w-5 text-primary"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-foreground text-sm leading-tight">
+                              {pointTitle}
+                            </h4>
+                            <span class="text-xs font-semibold text-secondary mb-1.5 block">
+                              {pointSubtitle}
+                            </span>
+                            <p class="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                              {pointDesc}
+                            </p>
+                            {/* CTA dentro del tooltip */}
+                            <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-primary">
+                              {t.cta}
+                              <svg
+                                class="w-3 h-3 transition-transform group-hover:translate-x-0.5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })
+            }
           </div>
-          
         </div>
       </div>
-      
     </div>
   </div>
 </section>

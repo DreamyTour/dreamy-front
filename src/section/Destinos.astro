@@ -1,0 +1,141 @@
+---
+import type { Page } from "@/interface/page";
+import type { Lang } from "@/lib/i18n";
+import fetchApi from "@/lib/strapi";
+import { getThumbnailUrl } from "@/lib/helpers";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+// Fetch PAGES que tengan asignada la categoría "Peru Tours"
+// Cada page tiene 2 categorías: "peru-tours" (para agrupar acá) + su slug individual (cusco, lima, etc.)
+const response = await fetchApi<Page[]>({
+  endpoint: "pages",
+  wrappedByKey: "data",
+  locale: lang,
+  query: {
+    "filters[categories][slug][$eq]": "peru-tours",
+    "pagination[limit]": "10",
+    "populate[video][populate][thumbnail]": "*",
+    "populate[categories]": "*",
+  },
+});
+
+const pages = response && Array.isArray(response) ? response : [];
+---
+
+<section class="w-full py-20 md:py-28">
+  <div class="max-w-8xl mx-auto px-6">
+    <div class="mb-14 max-w-3xl text-left md:mb-16">
+      <div
+        class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
+      >
+        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+            clip-rule="evenodd"></path>
+        </svg>
+        Destinos en Perú
+      </div>
+
+      <h2
+        class="relative inline-block mb-2 text-3xl font-bold text-gray-900 md:text-4xl"
+      >
+        <span class="relative z-10"
+          >Descubre los mejores destinos dentro del Perú</span
+        >
+        <span
+          class="absolute bottom-0 left-0 h-3 w-24 rounded-full bg-secondary/30 -z-0 blur-sm"
+        ></span>
+      </h2>
+
+      <div class="mt-4 mb-6 flex items-center justify-start gap-3">
+        <div
+          class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary"
+        >
+        </div>
+        <div class="relative h-1.5 w-12 rounded-full bg-secondary">
+          <div
+            class="absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+          >
+          </div>
+        </div>
+        <div
+          class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary"
+        >
+        </div>
+      </div>
+
+      <p class="text-base leading-relaxed text-gray-600">
+        Explorá rutas icónicas, ciudades vibrantes y paisajes andinos con una
+        selección curada para inspirar tu próximo viaje.
+      </p>
+    </div>
+
+    {
+      pages.length > 0 ? (
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 xl:gap-6">
+          {pages.map((page) => {
+            const thumbnailUrl =
+              getThumbnailUrl(page.video?.thumbnail) ||
+              "/placeholder-image.jpg";
+
+            return (
+              <a
+                href={`/${lang}/${page.slug}`}
+                class="group relative flex min-h-[112px] overflow-hidden rounded-xl border border-gray-100 bg-white p-2 shadow-[0_4px_20px_rgb(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
+              >
+                {/* Left Side: Thumbnail */}
+                <div class="relative w-[84px] shrink-0 overflow-hidden rounded-xl sm:w-[92px]">
+                  <img
+                    src={thumbnailUrl}
+                    alt={page.titulo}
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 group-hover:opacity-0 transition-opacity" />
+                </div>
+
+                {/* Right Side: Content */}
+                <div class="flex min-w-0 flex-1 flex-col justify-center px-3 py-2 sm:px-4">
+                  <div class="space-y-2">
+                    <h3 class="line-clamp-2 text-[0.95rem] font-bold leading-tight text-gray-900 transition-colors duration-300">
+                      {page.titulo || (page as any).nombre}
+                    </h3>
+                  </div>
+
+                  <div class="mt-2 flex items-center gap-1.5 text-[0.8rem] font-semibold text-secondary">
+                    <span>Explorar</span>
+                    <svg
+                      class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="rounded-sm border border-border bg-card p-8 text-center shadow-sm">
+          <p class="font-medium text-muted-foreground">
+            No se encontraron pages con la categoría "Peru". Revisa el slug en
+            Strapi.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
