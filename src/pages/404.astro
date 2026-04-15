@@ -1,0 +1,189 @@
+---
+import Layout from "@/layouts/main.astro";
+import { DEFAULT_LANG, isValidLang, localizePath, type Lang } from "@/lib/i18n";
+
+const firstSegment = Astro.url.pathname.split("/").filter(Boolean)[0];
+const lang: Lang = isValidLang(firstSegment) ? firstSegment : DEFAULT_LANG;
+const homeHref = localizePath("/", lang);
+
+const contentByLang: Record<Lang, {
+  badge: string;
+  title: string;
+  description: string;
+  primaryCta: string;
+  secondaryCta: string;
+  countdownLabel: string;
+  cardTitle: string;
+  cardBody: string;
+  helpTitle: string;
+  helpBody: string;
+  panelTitle: string;
+  panelChips: [string, string, string];
+}> = {
+  en: {
+    badge: "Detour in the Andes",
+    title: "This route slipped off the map.",
+    description:
+      "The page you tried to reach is no longer here, changed course, or never existed. We’ll guide you back to the journey that matters.",
+    primaryCta: "Return to homepage",
+    secondaryCta: "Explore featured trips",
+    countdownLabel: "Automatic redirect in",
+    cardTitle: "Travel tip",
+    cardBody: "Start again from the homepage to find tours, destinations, and travel inspiration without losing your route.",
+    helpTitle: "Need a faster way back?",
+    helpBody: "Use the main menu or jump directly to the homepage with the button below.",
+    panelTitle: "404 shouldn’t be the end of the journey.",
+    panelChips: ["Peru", "Bolivia", "Tours"],
+  },
+  es: {
+    badge: "Desvío en los Andes",
+    title: "Esta ruta se salió del mapa.",
+    description:
+      "La página que quisiste abrir ya no está, cambió de rumbo o nunca existió. Te llevamos de vuelta al viaje que sí importa.",
+    primaryCta: "Volver al inicio",
+    secondaryCta: "Ver viajes destacados",
+    countdownLabel: "Redirección automática en",
+    cardTitle: "Tip de viaje",
+    cardBody: "Volvé al inicio para encontrar tours, destinos e inspiración de viaje sin perder el rumbo.",
+    helpTitle: "¿Querés volver más rápido?",
+    helpBody: "Podés usar el menú principal o ir directo al inicio con el botón de abajo.",
+    panelTitle: "Un 404 no debería ser el final del viaje.",
+    panelChips: ["Perú", "Bolivia", "Tours"],
+  },
+  pt: {
+    badge: "Desvio nos Andes",
+    title: "Essa rota saiu do mapa.",
+    description:
+      "A página que você tentou abrir não está mais aqui, mudou de direção ou nunca existiu. A gente te leva de volta para a jornada certa.",
+    primaryCta: "Voltar ao início",
+    secondaryCta: "Ver viagens em destaque",
+    countdownLabel: "Redirecionamento automático em",
+    cardTitle: "Dica de viagem",
+    cardBody: "Volte ao início para encontrar tours, destinos e inspiração sem perder o caminho.",
+    helpTitle: "Quer voltar mais rápido?",
+    helpBody: "Use o menu principal ou vá direto para a home com o botão abaixo.",
+    panelTitle: "Um 404 não deveria ser o fim da viagem.",
+    panelChips: ["Peru", "Bolívia", "Tours"],
+  },
+};
+
+const content = contentByLang[lang];
+const seoProps = {
+  title: `404 - ${content.title}`,
+  description: content.description,
+  type: "website" as const,
+  lang,
+  robots: "noindex, nofollow",
+};
+---
+
+<Layout seo={seoProps}>
+  <section class="relative isolate overflow-hidden bg-[radial-gradient(circle_at_top,_color-mix(in_oklab,var(--color-primary)_14%,white)_0%,white_42%,color-mix(in_oklab,var(--color-foreground)_6%,white)_100%)]">
+    <div class="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,_color-mix(in_oklab,var(--color-secondary)_22%,transparent)_0%,transparent_62%)]" aria-hidden="true"></div>
+    <div class="absolute -left-20 top-24 h-52 w-52 rounded-full bg-primary/12 blur-3xl" aria-hidden="true"></div>
+    <div class="absolute right-0 top-40 h-64 w-64 rounded-full bg-secondary/14 blur-3xl" aria-hidden="true"></div>
+
+    <div class="relative mx-auto flex min-h-[calc(100vh-220px)] max-w-7xl items-center px-6 py-16 md:px-10 lg:px-12">
+      <div class="grid w-full gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,420px)] lg:items-center">
+        <div class="max-w-2xl">
+          <span class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary shadow-sm backdrop-blur">
+            <span class="h-2 w-2 rounded-full bg-secondary"></span>
+            {content.badge}
+          </span>
+
+          <div class="mt-8 space-y-6">
+            <p class="text-sm font-semibold uppercase tracking-[0.45em] text-foreground/45">Error 404</p>
+            <h1 class="max-w-xl text-5xl font-black leading-none tracking-[-0.04em] text-foreground sm:text-6xl lg:text-7xl">
+              {content.title}
+            </h1>
+            <p class="max-w-xl text-lg leading-8 text-foreground/72 sm:text-xl">
+              {content.description}
+            </p>
+          </div>
+
+          <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+            <a
+              href={homeHref}
+              class="inline-flex items-center justify-center gap-3 rounded-full bg-secondary px-7 py-4 text-sm font-semibold text-white shadow-[0_18px_60px_-24px_color-mix(in_oklab,var(--color-secondary)_50%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary/90 hover:shadow-[0_24px_70px_-26px_color-mix(in_oklab,var(--color-secondary)_70%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
+            >
+              {content.primaryCta}
+              <span aria-hidden="true">→</span>
+            </a>
+            <a
+              href={`${homeHref}#main-content`}
+              class="inline-flex items-center justify-center gap-3 rounded-full border border-foreground/12 bg-white/80 px-7 py-4 text-sm font-semibold text-foreground backdrop-blur transition-all duration-300 hover:border-primary/25 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            >
+              {content.secondaryCta}
+            </a>
+          </div>
+
+          <div class="mt-8 inline-flex items-center gap-3 rounded-full border border-primary/10 bg-white/75 px-4 py-3 text-sm text-foreground/70 shadow-sm backdrop-blur">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">⏳</span>
+            <span>
+              {content.countdownLabel}
+              <strong class="ml-1 font-semibold text-foreground"><span id="redirect-countdown">8</span>s</strong>
+            </span>
+          </div>
+        </div>
+
+        <aside class="relative">
+          <div class="absolute inset-0 translate-x-3 translate-y-3 rounded-[2rem] bg-foreground/6 blur-2xl" aria-hidden="true"></div>
+          <div class="relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/82 p-6 shadow-[0_32px_100px_-44px_rgba(16,24,40,0.45)] backdrop-blur-xl sm:p-8">
+            <div class="absolute right-6 top-6 text-[8rem] font-black leading-none tracking-[-0.08em] text-primary/8 sm:text-[9rem]" aria-hidden="true">404</div>
+
+            <div class="relative z-10 space-y-6">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="rounded-[1.5rem] border border-primary/10 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--color-primary)_16%,white),white)] p-5">
+                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-primary/70">{content.cardTitle}</p>
+                  <p class="mt-3 text-sm leading-7 text-foreground/70">{content.cardBody}</p>
+                </div>
+                <div class="rounded-[1.5rem] border border-secondary/10 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-secondary)_10%,white),white)] p-5">
+                  <p class="text-xs font-semibold uppercase tracking-[0.28em] text-secondary/80">{content.helpTitle}</p>
+                  <p class="mt-3 text-sm leading-7 text-foreground/70">{content.helpBody}</p>
+                </div>
+              </div>
+
+              <div class="overflow-hidden rounded-[1.75rem] border border-foreground/8 bg-foreground px-6 py-6 text-white">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-white/55">Dreamy Tours</p>
+                    <p class="mt-3 max-w-xs text-2xl font-bold leading-tight">{content.panelTitle}</p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 pt-1" aria-hidden="true">
+                    <span class="h-3 w-3 rounded-full bg-primary"></span>
+                    <span class="h-3 w-3 rounded-full bg-secondary"></span>
+                    <span class="h-3 w-3 rounded-full bg-white/40"></span>
+                    <span class="h-3 w-3 rounded-full bg-white/70"></span>
+                  </div>
+                </div>
+                <div class="mt-6 grid grid-cols-3 gap-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+                  {content.panelChips.map((chip) => (
+                    <div class="rounded-2xl border border-white/10 bg-white/5 px-3 py-4">{chip}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline define:vars={{ homeHref }}>
+    let countdown = 8;
+    const countdownNode = document.getElementById("redirect-countdown");
+
+    const intervalId = window.setInterval(() => {
+      countdown -= 1;
+
+      if (countdownNode && countdown >= 0) {
+        countdownNode.textContent = String(countdown);
+      }
+
+      if (countdown <= 0) {
+        window.clearInterval(intervalId);
+        window.location.href = homeHref;
+      }
+    }, 1000);
+  </script>
+</Layout>

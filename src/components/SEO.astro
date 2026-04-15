@@ -10,6 +10,7 @@ export interface SEOProps {
   type?: "website" | "article";
   lang?: Lang;
   canonicalUrl?: string;
+  robots?: string;
   publishedTime?: string;
   author?: string;
   slugMap?: Record<string, string>; // Para traducciones de slug en hreflang
@@ -23,6 +24,7 @@ const {
   type = "website",
   lang = DEFAULT_LANG,
   canonicalUrl,
+  robots = "index, follow",
   publishedTime,
   author,
   slugMap,
@@ -195,8 +197,8 @@ const articleSchema = type === "article" ? {
 
 <!-- Additional SEO -->
 <meta name="author" content={author || "Turismo Perú Bolivia"} />
-<meta name="robots" content="index, follow" />
-<meta name="googlebot" content="index, follow" />
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
