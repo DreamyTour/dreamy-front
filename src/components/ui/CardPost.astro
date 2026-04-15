@@ -2,6 +2,7 @@
 import type { Blog } from "@/interface/blog";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
+import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
 
 interface Props {
   blog: Blog;
@@ -15,12 +16,14 @@ const { blog, lang, isFeatured = false, showDescription = false } = Astro.props;
 if (!blog) return null;
 
 const t = useTranslations(lang);
-
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-
-const mainImage = blog.portadaImage?.url
-  ? `${strapiUrl}${blog.portadaImage.url}`
-  : null;
+const mainImage = getImageUrl(blog.portadaImage, isFeatured ? "large" : "medium");
+const imageSrcSet = getImageSrcSet(blog.portadaImage, [
+  "thumbnail",
+  "small",
+  "medium",
+  "large",
+]);
+const imageAlt = getImageAlt(blog.portadaImage, blog.titulo);
 
 const category = blog.category_blogs?.[0]?.nombre || null;
 
@@ -101,12 +104,15 @@ const imageHeight = isFeatured ? "aspect-[16/9]" : "aspect-[4/3]";
 
     <div class:list={["relative overflow-hidden", imageHeight]}>
       {
-        mainImage ? (
+        mainImage && mainImage !== "/og-default.jpg" ? (
           <img
             src={mainImage}
-            alt={blog.portadaImage?.alternativeText ?? blog.titulo}
+            srcset={imageSrcSet || undefined}
+            sizes={isFeatured ? "(max-width: 1023px) 100vw, 66vw" : "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"}
+            alt={imageAlt}
             class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div class="flex h-full items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/10 to-primary/5">

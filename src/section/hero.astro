@@ -2,6 +2,8 @@
 import Button from "@/components/ui/button.astro";
 import type { Hero } from "@/interface/home";
 import type { Lang } from "@/lib/i18n";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 
 interface Props {
   data?: Hero;
@@ -11,13 +13,8 @@ interface Props {
 const { data } = Astro.props;
 if (!data) return;
 
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-const videoUrl = data.backgroundVideo?.url
-  ? `${strapiUrl}${data.backgroundVideo.url}`
-  : null;
-const badgeIconUrl = data.badgeIcon?.url
-  ? `${strapiUrl}${data.badgeIcon.url}`
-  : null;
+const videoUrl = getImageUrl(data.backgroundVideo);
+const badgeIconUrl = getImageUrl(data.badgeIcon);
 ---
 
 <section
@@ -25,15 +22,37 @@ const badgeIconUrl = data.badgeIcon?.url
 >
   {/* ──── Video de fondo ──── */}
   {
-    videoUrl && (
-      <video
-        class="absolute inset-0 w-full h-full object-cover"
-        src={videoUrl}
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
+    videoUrl !== "/og-default.jpg" ? (
+      <>
+        <img
+          src={backgroundImageMobile.src}
+          alt=""
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover md:hidden"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+        <video
+          class="absolute inset-0 hidden h-full w-full object-cover md:block"
+          src={videoUrl}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={backgroundImageMobile.src}
+        />
+      </>
+    ) : (
+      <img
+        src={backgroundImageMobile.src}
+        alt=""
+        aria-hidden="true"
+        class="absolute inset-0 h-full w-full object-cover"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
       />
     )
   }
@@ -53,14 +72,12 @@ const badgeIconUrl = data.badgeIcon?.url
     {
       data.badgeText && (
         <div class="hero-badge inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 mb-6">
-          {badgeIconUrl && (
+          {badgeIconUrl !== "/og-default.jpg" && (
             <img
               src={badgeIconUrl}
-              alt={
-                data.badgeIcon?.alternativeText ??
-                "iconos de seguridad del badge"
-              }
+              alt={getImageAlt(data.badgeIcon, "iconos de seguridad del badge")}
               class="w-4 h-4"
+              decoding="async"
             />
           )}
           <span class="text-xs font-semibold tracking-widest uppercase text-white">

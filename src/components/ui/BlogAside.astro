@@ -1,6 +1,6 @@
 ---
 import type { Lang } from "@/lib/i18n";
-import { getStrapiUrl } from "@/lib/helpers";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
 
 interface Category {
   slug: string;
@@ -23,8 +23,6 @@ interface Props {
 }
 
 const { categories, currentSlug, lang, socialLogos = [] } = Astro.props;
-
-const strapiUrl = getStrapiUrl();
 
 const formatUrl = (url: string) => url?.startsWith("http") ? url : `https://${url}`;
 ---
@@ -104,9 +102,11 @@ const formatUrl = (url: string) => url?.startsWith("http") ? url : `https://${ur
               >
                 {social.imagen?.url && (
                   <img
-                    src={`${strapiUrl}${social.imagen.url}`}
-                    alt={social.label || "Social"}
+                    src={getImageUrl(social.imagen)}
+                    alt={getImageAlt(social.imagen, social.label || "Social")}
                     class="h-8 w-8 object-contain"
+                    loading="lazy"
+                    decoding="async"
                   />
                 )}
                 <span class="text-sm font-medium text-white">

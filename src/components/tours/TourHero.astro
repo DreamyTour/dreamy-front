@@ -2,6 +2,7 @@
 import type { Tour, Badge } from "@/interface/tours";
 import type { Lang } from "@/lib/i18n";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
+import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
 
 interface Props {
   tour: Tour;
@@ -12,18 +13,24 @@ interface Props {
 const { tour, badges } = Astro.props;
 if (!tour) return;
 
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-
 // Extract array of image URLs
 const images = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada
-      .map((img) => (img?.url ? `${strapiUrl}${img.url}` : null))
-      .filter((url): url is string => Boolean(url))
-  : tour.imagenDestacada?.url
-    ? [`${strapiUrl}${tour.imagenDestacada.url}`]
-    : [];
+      .map((img) => ({
+        url: getImageUrl(img, "large"),
+        srcSet: getImageSrcSet(img, ["thumbnail", "small", "medium", "large"]),
+        alt: getImageAlt(img, tour.titulo),
+      }))
+      .filter((img) => img.url && img.url !== "/og-default.jpg")
+  : [];
 
-if (images.length === 0) images.push("/og-default.jpg");
+if (images.length === 0) {
+  images.push({
+    url: "/og-default.jpg",
+    srcSet: "",
+    alt: tour.titulo,
+  });
+}
 
 const mainImage = images[0];
 const subImage1 = images[1] || mainImage;
@@ -44,11 +51,14 @@ const hasBadges = badges && badges.length > 0;
       class="col-span-2 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
     >
       <img
-        src={mainImage}
-        alt={tour.titulo}
+        src={mainImage.url}
+        srcset={mainImage.srcSet || undefined}
+        sizes="(max-width: 767px) 100vw, 50vw"
+        alt={mainImage.alt}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
         loading="eager"
         fetchpriority="high"
+        decoding="async"
       />
       <div
         class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500"
@@ -61,10 +71,13 @@ const hasBadges = badges && badges.length > 0;
       class="col-span-1 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
     >
       <img
-        src={subImage1}
-        alt={`${tour.titulo} 1`}
+        src={subImage1.url}
+        srcset={subImage1.srcSet || undefined}
+        sizes="(max-width: 767px) 100vw, 25vw"
+        alt={subImage1.alt || `${tour.titulo} 1`}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
         loading="eager"
+        decoding="async"
       />
       <div
         class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500"
@@ -77,10 +90,13 @@ const hasBadges = badges && badges.length > 0;
       class="col-span-1 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
     >
       <img
-        src={subImage2}
-        alt={`${tour.titulo} 2`}
+        src={subImage2.url}
+        srcset={subImage2.srcSet || undefined}
+        sizes="(max-width: 767px) 100vw, 25vw"
+        alt={subImage2.alt || `${tour.titulo} 2`}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
         loading="eager"
+        decoding="async"
       />
       <div
         class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500"
@@ -98,11 +114,14 @@ const hasBadges = badges && badges.length > 0;
         images.slice(0, 3).map((img, i) => (
           <div class="w-[85vw] h-[320px] shrink-0 snap-center rounded-sm overflow-hidden relative shadow-sm">
             <img
-              src={img}
-              alt={i === 0 ? tour.titulo : `${tour.titulo} - Imagen ${i + 1}`}
+              src={img.url}
+              srcset={img.srcSet || undefined}
+              sizes="85vw"
+              alt={img.alt || (i === 0 ? tour.titulo : `${tour.titulo} - Imagen ${i + 1}`)}
               class="w-full h-full object-cover"
               width="320"
               height="320"
+              decoding="async"
             />
             {i === 2 && showGalleryButton && (
               <button

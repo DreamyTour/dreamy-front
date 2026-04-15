@@ -9,6 +9,16 @@ export interface Imagen {
   name: string;
   alternativeText: string | null;
   url: string;
+  width?: number;
+  height?: number;
+  formats?: Record<
+    string,
+    {
+      url: string;
+      width?: number;
+      height?: number;
+    }
+  >;
 }
 
 /** shared.link — link reutilizable con opciones de botón */

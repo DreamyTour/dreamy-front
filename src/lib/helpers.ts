@@ -1,21 +1,62 @@
 import type { Lang } from "./i18n";
+import type { Imagen } from "@/interface/common";
 
 const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "") || "http://localhost:1337";
+
+type ImageLike = Imagen | Imagen[] | null | undefined;
+
+function normalizeImage(image: unknown): Imagen | null {
+  if (!image) return null;
+
+  const imgObj = Array.isArray(image) ? image[0] : image;
+  if (!imgObj || typeof imgObj !== "object") return null;
+
+  return imgObj as Imagen;
+}
 
 /**
  * Get image URL from Strapi image object
  */
-export function getImageUrl(image: unknown, baseUrl?: string): string {
-  if (!image) return "/og-default.jpg";
-  
-  const imgObj = Array.isArray(image) ? image[0] : image;
-  if (!imgObj || typeof imgObj !== "object") return "/og-default.jpg";
-  
-  const url = (imgObj as { url?: string }).url;
+export function getImageUrl(
+  image: unknown,
+  formatOrBaseUrl?: string,
+  baseUrl?: string,
+): string {
+  const imgObj = normalizeImage(image);
+  if (!imgObj) return "/og-default.jpg";
+
+  const isFormatKey =
+    !!formatOrBaseUrl && !formatOrBaseUrl.startsWith("http") && !formatOrBaseUrl.startsWith("/");
+  const format = isFormatKey ? formatOrBaseUrl : undefined;
+  const resolvedBaseUrl = (isFormatKey ? baseUrl : formatOrBaseUrl) || strapiUrl;
+  const url = (format ? imgObj.formats?.[format]?.url : undefined) || imgObj.url;
+
   if (!url) return "/og-default.jpg";
-  
-  const resolvedBaseUrl = baseUrl || strapiUrl;
+
   return url.startsWith("http") ? url : `${resolvedBaseUrl}${url}`;
+}
+
+export function getImageAlt(image: ImageLike, fallback = ""): string {
+  return normalizeImage(image)?.alternativeText || fallback;
+}
+
+export function getImageSrcSet(image: ImageLike, formats?: string[]): string {
+  const imgObj = normalizeImage(image);
+  if (!imgObj?.formats) return "";
+
+  const candidates = Object.entries(imgObj.formats)
+    .filter(([key, format]) => {
+      if (!format?.url || !format?.width) return false;
+      return formats ? formats.includes(key) : true;
+    })
+    .sort(([, a], [, b]) => (a.width || 0) - (b.width || 0));
+
+  return candidates
+    .map(([, format]) => {
+      const url = format.url.startsWith("http") ? format.url : `${strapiUrl}${format.url}`;
+      return `${url} ${format.width}w`;
+    })
+    .join(", ");
 }
 
 /**
@@ -24,10 +65,10 @@ export function getImageUrl(image: unknown, baseUrl?: string): string {
 export function getThumbnailUrl(thumbnail: unknown): string | null {
   if (!thumbnail) return null;
   
-  const thumbObj = Array.isArray(thumbnail) ? thumbnail[0] : thumbnail;
+  const thumbObj = normalizeImage(thumbnail);
   if (!thumbObj || typeof thumbObj !== "object") return null;
-  
-  const url = (thumbObj as { url?: string }).url;
+
+  const url = thumbObj.url;
   if (!url) return null;
   
   return url.startsWith("http") ? url : `${strapiUrl}${url}`;

@@ -3,6 +3,7 @@ import type { Tour } from "@/interface/tours";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
+import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
 
 interface Props {
   tour: Tour;
@@ -14,14 +15,14 @@ const { tour, lang } = Astro.props;
 if (!tour) return null;
 
 const t = useTranslations(lang);
-
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-
-const imgObj = Array.isArray(tour.imagenDestacada)
-  ? tour.imagenDestacada[0]
-  : tour.imagenDestacada;
-
-const mainImage = imgObj?.url ? `${strapiUrl}${imgObj.url}` : null;
+const mainImage = getImageUrl(tour.imagenDestacada, "medium");
+const imageSrcSet = getImageSrcSet(tour.imagenDestacada, [
+  "thumbnail",
+  "small",
+  "medium",
+  "large",
+]);
+const imageAlt = getImageAlt(tour.imagenDestacada, tour.titulo);
 const primaryCategory = tour.categories?.[0]?.nombre;
 ---
 
@@ -45,12 +46,15 @@ const primaryCategory = tour.categories?.[0]?.nombre;
       )
     }
     {
-      mainImage ? (
+      mainImage && mainImage !== "/og-default.jpg" ? (
         <img
           src={mainImage}
-          alt={imgObj?.alternativeText ?? tour.titulo}
+          srcset={imageSrcSet || undefined}
+          sizes="(max-width: 767px) 100vw, (max-width: 1023px) calc((100vw - 24px) / 2), calc((100vw - 72px) / 4)"
+          alt={imageAlt}
           class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]"
           loading="lazy"
+          decoding="async"
         />
       ) : (
         <div class="flex h-full w-full items-center justify-center bg-slate-100 text-sm font-medium text-slate-400">
@@ -105,7 +109,7 @@ const primaryCategory = tour.categories?.[0]?.nombre;
                 />
               </div>
               <div class="min-w-0">
-                <p class="text-[0.7rem] font-medium text-slate-700 leading-[1.1] break-words line-clamp-2">
+                <p class="text-[1rem] font-medium text-slate-700 leading-[1.1] break-words line-clamp-2">
                   {b.content}
                 </p>
               </div>

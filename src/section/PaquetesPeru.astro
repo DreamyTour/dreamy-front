@@ -17,8 +17,6 @@ const t = useTranslations(lang);
 
 if (!data) return;
 
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-
 // Fetch tours by category slug
 let tours: Tour[] = [];
 if (data.category?.slug) {
@@ -51,7 +49,7 @@ const availabilityText = {
 }[lang] || { title: "Check Availability", subtitle: "Book your adventure" };
 ---
 
-<section class="w-full py-20 md:py-28">
+<section class="w-full py-16">
   <div class="max-w-8xl mx-auto px-6">
     <div
       class="mb-14 md:mb-20 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-between"

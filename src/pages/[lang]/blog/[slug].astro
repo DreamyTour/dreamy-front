@@ -7,7 +7,7 @@ import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
 import LiteYouTube from "@/components/LiteYouTube.astro";
 import TableOfContents from "@/components/ui/TableOfContents.astro";
-import { getImageUrl } from "@/lib/helpers";
+import { getImageAlt, getImageSrcSet, getImageUrl, getThumbnailUrl } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 
 // Generate SEO description from JSON blocks
@@ -85,15 +85,6 @@ function getYouTubeVideoId(url: string): string | null {
     if (match) return match[1];
   }
   return null;
-}
-
-// Get thumbnail URL from Strapi image
-function getThumbnailUrl(thumbnail: any): string | null {
-  if (!thumbnail?.url) return null;
-  const baseUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-  return thumbnail.url.startsWith("http")
-    ? thumbnail.url
-    : `${baseUrl}${thumbnail.url}`;
 }
 
 export async function getStaticPaths() {
@@ -467,8 +458,12 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                     <figure class="my-10 mx-auto">
                       <img
                         src={getImageUrl(block.image)}
-                        alt={block.image?.alternativeText || "Blog image"}
+                        srcset={getImageSrcSet(block.image, ["thumbnail", "small", "medium", "large"]) || undefined}
+                        sizes="(max-width: 1023px) 100vw, 75vw"
+                        alt={getImageAlt(block.image, "Blog image")}
                         class="w-full h-auto object-cover rounded-sm border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-900"
+                        loading="lazy"
+                        decoding="async"
                       />
                       {block.image?.caption && (
                         <figcaption class="text-center text-sm font-medium text-gray-500 dark:text-gray-400 mt-3">

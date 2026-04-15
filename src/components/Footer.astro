@@ -1,13 +1,12 @@
 ---
 import type { Footer as FooterType } from "@/interface/global";
-import { getStrapiUrl } from "@/lib/helpers";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
 
 interface Props {
   data?: FooterType;
 }
 
 const { data } = Astro.props;
-const strapiUrl = getStrapiUrl();
 
 const formatUrl = (url: string) => {
   // Si es URL externa (http/https), usarla tal cual
@@ -43,16 +42,16 @@ const formatUrl = (url: string) => {
             </div>
             <div class="flex flex-wrap justify-center items-center gap-6 md:gap-8">
               {data.certificaciones[0].premios.map((cert) => {
-                const imageUrl = cert.logo?.url
-                  ? `${strapiUrl}${cert.logo.url}`
-                  : null;
+                const imageUrl = getImageUrl(cert.logo);
                 return (
-                  imageUrl && (
+                  imageUrl !== "/og-default.jpg" && (
                     <div class="group w-32 h-24 md:w-40 md:h-28 flex items-center justify-center bg-white rounded-sm shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100">
                       <img
                         src={imageUrl}
-                        alt={cert.description || "Certificación"}
+                        alt={getImageAlt(cert.logo, cert.description || "Certificación")}
                         class="max-w-full max-h-full w-auto h-auto object-contain p-2"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   )
@@ -71,9 +70,10 @@ const formatUrl = (url: string) => {
         {
           data?.logo?.imagen?.url && (
             <img
-              src={`${strapiUrl}${data.logo.imagen.url}`}
-              alt={data.logo.imagen.alternativeText ?? data.logo.label}
+              src={getImageUrl(data.logo.imagen)}
+              alt={getImageAlt(data.logo.imagen, data.logo.label)}
               class="h-24 w-auto mb-8 mx-auto md:mx-0"
+              decoding="async"
             />
           )
         }
@@ -192,10 +192,11 @@ const formatUrl = (url: string) => {
                 >
                   {social.imagen?.url && (
                     <img
-                      src={`${strapiUrl}${social.imagen.url}`}
+                      src={getImageUrl(social.imagen)}
                       alt=""
                       aria-hidden="true"
                       class="h-8 w-auto"
+                      decoding="async"
                     />
                   )}
                 </a>

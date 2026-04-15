@@ -301,8 +301,6 @@ if (isRedirect && redirectTo) {
   return Astro.redirect(redirectTo, 301);
 }
 
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
-
 // ====== OBTENER TOUR ACTUAL CON CATEGORÍA ======
 // El middleware de Strapi ya hace el populate de categories automáticamente
 let tourWithCategory = tour;

@@ -5,6 +5,7 @@ interface Props {
 
 const { lang } = Astro.props;
 import mapSvg from "@/assets/svg/mapa-peru.svg?raw";
+import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 
 // ====== i18n: Textos de la sección ======
 const copy = {
@@ -17,7 +18,7 @@ const copy = {
     description2:
       "Adéntrate en un territorio donde la geografía cambia cada cien kilómetros, donde puedes pasar de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interactivo del Perú",
-    mapSubtitle: "Hacé clic en cualquier punto para explorar ese destino.",
+    mapSubtitle: "Haz clic en cualquier punto para explorar ese destino.",
     cta: "Ver tours",
   },
   en: {
@@ -148,9 +149,15 @@ const mapPoints = [
     y: "75%",
   },
 ];
+
+const leftColumnPoints = mapPoints.slice(0, Math.ceil(mapPoints.length / 2));
+const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
 ---
 
-<section class="py-24 relative overflow-hidden bg-primary/5">
+<section
+  class="py-16 relative overflow-hidden bg-primary/5 hidden lg:block"
+  data-peru-guide
+>
   <!-- Fondo sutil usando color neutral -->
   <div
     class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-30 pointer-events-none"
@@ -201,105 +208,214 @@ const mapPoints = [
           </div>
 
           <!-- Semantic Map Container -->
-          <div
-            class="relative w-full aspect-square md:aspect-[4/3] rounded-2xl bg-white border border-gray-100 shadow-inner mb-6 flex items-center justify-center"
-          >
-            <!-- Map SVG -->
-            <div
-              class="absolute inset-0 flex items-center justify-center p-8 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30"
-              set:html={mapSvg}
-            />
+          <div class="grid grid-cols-12 gap-4 items-start">
+            <div class="col-span-3 space-y-3">
+              {
+                leftColumnPoints.map((point) => {
+                  const pointTitle =
+                    point.title[lang as keyof typeof point.title] ??
+                    point.title.es;
+                  const pointSubtitle =
+                    point.subtitle[lang as keyof typeof point.subtitle] ??
+                    point.subtitle.es;
 
-            <!-- Map Points -->
-            {
-              mapPoints.map((point) => {
-                const pointTitle =
-                  point.title[lang as keyof typeof point.title] ??
-                  point.title.es;
-                const pointSubtitle =
-                  point.subtitle[lang as keyof typeof point.subtitle] ??
-                  point.subtitle.es;
-                const pointDesc =
-                  point.description[lang as keyof typeof point.description] ??
-                  point.description.es;
-
-                return (
-                  <a
-                    href={`/${lang}/${point.slug}`}
-                    class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
-                    style={`left: ${point.x}; top: ${point.y};`}
-                    aria-label={`${pointTitle} — ${pointSubtitle}`}
-                  >
-                    {/* Pulse rings - siempre visibles */}
-                    <span class="absolute -inset-2 rounded-full bg-secondary/25 animate-ping" />
-                    <span class="absolute -inset-1.5 rounded-full bg-secondary/30 animate-pulse" />
-
-                    {/* Core dot */}
-                    <span class="relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-white shadow-md ring-4 ring-transparent transition-all group-hover:ring-secondary/30 group-hover:bg-primary group-hover:scale-125" />
-
-                    {/* Hover Popup Card - sin pointer-events-none y con pb-bridge para mantener la zona de hover */}
-                    <div class="absolute bg-white bottom-full left-1/2 -translate-x-1/2 mb-0 w-72 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                      <div
-                        class="p-4 rounded-xl shadow-2xl border border-border text-left bg-white relative
-                                before:absolute before:-bottom-2 before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-t-border 
-                                after:absolute after:-bottom-[7px] after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent after:border-t-white"
-                      >
-                        <div class="flex items-start gap-4">
-                          {/* Icon container */}
-                          <div class="h-10 w-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-5 w-5 text-primary"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                          </div>
-                          <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-foreground text-sm leading-tight">
-                              {pointTitle}
-                            </h4>
-                            <span class="text-xs font-semibold text-secondary mb-1.5 block">
-                              {pointSubtitle}
-                            </span>
-                            <p class="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                              {pointDesc}
-                            </p>
-                            {/* CTA dentro del tooltip */}
-                            <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-primary">
-                              {t.cta}
-                              <svg
-                                class="w-3 h-3 transition-transform group-hover:translate-x-0.5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2.5"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            </span>
-                          </div>
+                  return (
+                    <a
+                      href={`/${lang}/${point.slug}`}
+                      class="guide-card group block rounded-xl border border-border/80 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
+                      aria-label={`${pointTitle} — ${pointSubtitle}`}
+                      data-point-trigger={point.id}
+                    >
+                      <div class="flex flex-col items-start gap-3">
+                        <div class="flex flex-col w-full">
+                          <h4 class="font-medium text-foreground text-[0.8rem] leading-tight">
+                            {pointTitle}
+                          </h4>
+                          <img
+                            src={backgroundImageMobile.src}
+                            alt=""
+                            aria-hidden="true"
+                            class="mt-2 mb-2 h-14 w-full rounded-lg object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <span class="text-[0.68rem] font-semibold text-secondary block">
+                            {pointSubtitle}
+                          </span>
                         </div>
                       </div>
-                    </div>
-                  </a>
-                );
-              })
-            }
+                    </a>
+                  );
+                })
+              }
+            </div>
+
+            <div
+              class="relative col-span-6 w-full aspect-square rounded-2xl bg-white border border-gray-100 shadow-inner flex items-center justify-center"
+            >
+              <!-- Map SVG -->
+              <div
+                class="absolute inset-0 flex items-center justify-center p-8 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30"
+                set:html={mapSvg}
+              />
+
+              <!-- Map Points -->
+              {
+                mapPoints.map((point) => {
+                  const pointTitle =
+                    point.title[lang as keyof typeof point.title] ??
+                    point.title.es;
+                  const pointSubtitle =
+                    point.subtitle[lang as keyof typeof point.subtitle] ??
+                    point.subtitle.es;
+
+                  return (
+                    <a
+                      href={`/${lang}/${point.slug}`}
+                      class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
+                      style={`left: ${point.x}; top: ${point.y};`}
+                      aria-label={`${pointTitle} — ${pointSubtitle}`}
+                      data-point-id={point.id}
+                    >
+                      <span class="pulse-ring pulse-ring--outer absolute -inset-1.5 rounded-full bg-secondary/25 animate-ping opacity-0 transition-[opacity,background-color] duration-200" />
+                      <span class="pulse-ring pulse-ring--inner absolute -inset-1 rounded-full bg-secondary/30 animate-pulse opacity-0 transition-[opacity,background-color] duration-200" />
+
+                      <span class="point-core relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-white shadow-md ring-4 ring-transparent transition-all group-hover:bg-primary" />
+                    </a>
+                  );
+                })
+              }
+            </div>
+
+            <div class="col-span-3 space-y-3">
+              {
+                rightColumnPoints.map((point) => {
+                  const pointTitle =
+                    point.title[lang as keyof typeof point.title] ??
+                    point.title.es;
+                  const pointSubtitle =
+                    point.subtitle[lang as keyof typeof point.subtitle] ??
+                    point.subtitle.es;
+
+                  return (
+                    <a
+                      href={`/${lang}/${point.slug}`}
+                      class="guide-card group block rounded-xl border border-border/80 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
+                      aria-label={`${pointTitle} — ${pointSubtitle}`}
+                      data-point-trigger={point.id}
+                    >
+                      <div class="flex flex-col items-start gap-3">
+                        <div class="flex flex-col w-full">
+                          <h4 class="font-medium text-foreground text-[0.8rem] leading-tight">
+                            {pointTitle}
+                          </h4>
+                          <img
+                            src={backgroundImageMobile.src}
+                            alt=""
+                            aria-hidden="true"
+                            class="mt-2 mb-2 h-14 w-full rounded-lg object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <span class="text-[0.68rem] font-semibold text-secondary block">
+                            {pointSubtitle}
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })
+              }
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const section = document.querySelector("[data-peru-guide]");
+    if (!section || section.dataset.initialized === "true") return;
+
+    section.dataset.initialized = "true";
+
+    const cards = section.querySelectorAll("[data-point-trigger]");
+    const points = section.querySelectorAll("[data-point-id]");
+    let activeId = null;
+
+    const clearActive = () => {
+      cards.forEach((card) => card.classList.remove("is-active"));
+      points.forEach((point) => point.classList.remove("is-active"));
+    };
+
+    const setActive = (id) => {
+      activeId = id;
+      clearActive();
+      const card = section.querySelector(`[data-point-trigger="${id}"]`);
+      const point = section.querySelector(`[data-point-id="${id}"]`);
+      card?.classList.add("is-active");
+      point?.classList.add("is-active");
+    };
+
+    const clearActiveIfCurrent = (id) => {
+      if (activeId !== id) return;
+      activeId = null;
+      clearActive();
+    };
+
+    cards.forEach((card) => {
+      const id = card.getAttribute("data-point-trigger");
+      if (!id) return;
+
+      card.addEventListener("mouseenter", () => setActive(id));
+      card.addEventListener("focusin", () => setActive(id));
+      card.addEventListener("mouseleave", () => clearActiveIfCurrent(id));
+      card.addEventListener("focusout", () => clearActiveIfCurrent(id));
+    });
+
+    points.forEach((point) => {
+      const id = point.getAttribute("data-point-id");
+      if (!id) return;
+
+      point.addEventListener("mouseenter", () => setActive(id));
+      point.addEventListener("focusin", () => setActive(id));
+      point.addEventListener("mouseleave", () => clearActiveIfCurrent(id));
+      point.addEventListener("focusout", () => clearActiveIfCurrent(id));
+    });
+  });
+</script>
+
+<style>
+  .guide-card.is-active {
+    transform: translateY(-0.25rem);
+    border-color: color-mix(in oklab, var(--secondary) 40%, transparent);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  .map-point.is-active .pulse-ring,
+  .map-point:hover .pulse-ring,
+  .map-point:focus-visible .pulse-ring {
+    opacity: 1;
+  }
+
+  .map-point.is-active .pulse-ring,
+  .map-point:hover .pulse-ring,
+  .map-point:focus-visible .pulse-ring,
+  .map-point.is-active .point-core,
+  .map-point:hover .point-core,
+  .map-point:focus-visible .point-core {
+    background: var(--primary);
+  }
+
+  .map-point.is-active .point-core,
+  .map-point:hover .point-core,
+  .map-point:focus-visible .point-core {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 0.14rem
+      color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+</style>

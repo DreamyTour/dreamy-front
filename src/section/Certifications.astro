@@ -1,6 +1,7 @@
 ---
 import type { Premio } from "@/interface/home";
 import type { Lang } from "@/lib/i18n";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
 
 interface Props {
   data?: Premio[];
@@ -12,8 +13,6 @@ const { data } = Astro.props;
 const premios: Premio[] = Array.isArray(data) ? data : [];
 
 if (premios.length === 0) return;
-
-const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "");
 
 // duplicamos el array para loop infinito
 const sliderData = [...premios, ...premios];
@@ -36,17 +35,18 @@ const sliderData = [...premios, ...premios];
   <div class="slider-track w-full">
     {
       sliderData.map((cert) => {
-        const imageUrl = cert.logo?.url ? `${strapiUrl}${cert.logo.url}` : null;
+        const imageUrl = getImageUrl(cert.logo);
 
         return (
           <div class="slide" title={cert.description}>
-            {imageUrl && (
+            {imageUrl !== "/og-default.jpg" && (
               <img 
                 src={imageUrl} 
-                alt={cert.description} 
+                alt={getImageAlt(cert.logo, cert.description)} 
                 loading="lazy"
                 width={cert.logo?.width}
                 height={cert.logo?.height}
+                decoding="async"
               />
             )}
           </div>
