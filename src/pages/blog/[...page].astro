@@ -3,13 +3,13 @@ import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
 import type { Blog, CategoryBlog } from "@/interface/blog";
 import CardPost from "@/components/ui/CardPost.astro";
-import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
+import { DEFAULT_LANG } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 
 export async function getStaticPaths({ paginate }: any) {
   const allPaths: any[] = [];
 
-  for (const lang of LANGS) {
+  for (const lang of [DEFAULT_LANG]) {
     const blogs = await fetchApi<Blog[]>({
       endpoint: "posts",
       wrappedByKey: "data",
@@ -29,7 +29,6 @@ export async function getStaticPaths({ paginate }: any) {
     const allCategories = cats && Array.isArray(cats) ? cats : [];
 
     const paginatedPaths = paginate(blogsList, {
-      params: { lang },
       pageSize: 9,
       props: { allCategories },
     });
@@ -41,7 +40,7 @@ export async function getStaticPaths({ paginate }: any) {
 }
 
 const { page, allCategories } = Astro.props;
-const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
+const lang = DEFAULT_LANG;
 const currentLang = lang;
 const blogsList = page.data;
 ---

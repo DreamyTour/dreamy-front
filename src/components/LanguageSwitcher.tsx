@@ -8,7 +8,7 @@ import {
   ComboboxList,
   ComboboxItem,
 } from "@/components/ui/combobox";
-import { LANGS, type Lang } from "@/lib/i18n";
+import { LANGS, type Lang, localizePath, stripLangPrefix } from "@/lib/i18n";
 
 const languageNames: Record<Lang, string> = {
   en: "Ingles",
@@ -25,7 +25,7 @@ export function LanguageSwitcher({ currentLang }: { currentLang: Lang }) {
     setValue(val as Lang);
 
     const pathname = window.location.pathname;
-    let newPathname = pathname;
+    const normalizedPath = stripLangPrefix(pathname);
 
     // Buscar mapa de slugs para tours localizados
     const tourSlugMapEl = document.getElementById("tour-slug-map");
@@ -36,8 +36,7 @@ export function LanguageSwitcher({ currentLang }: { currentLang: Lang }) {
         );
         const targetSlug = slugMap[val];
         if (targetSlug) {
-          newPathname = `/${val}/${targetSlug}`;
-          window.location.href = newPathname;
+          window.location.href = localizePath(`/${targetSlug}`, val as Lang);
           return;
         }
       } catch { }
@@ -52,8 +51,7 @@ export function LanguageSwitcher({ currentLang }: { currentLang: Lang }) {
         );
         const targetSlug = slugMap[val];
         if (targetSlug) {
-          newPathname = `/${val}/${targetSlug}`;
-          window.location.href = newPathname;
+          window.location.href = localizePath(`/${targetSlug}`, val as Lang);
           return;
         }
       } catch { }
@@ -68,27 +66,18 @@ export function LanguageSwitcher({ currentLang }: { currentLang: Lang }) {
         );
         const targetSlug = slugMap[val];
         if (targetSlug) {
-          // Cambiar tanto el prefijo de idioma como el slug: /es/blog/completo3 -> /en/blog/complete3
-          const currentLangMatch = pathname.match(/^\/([^/]+)(\/.*)$/);
-          if (currentLangMatch) {
-            newPathname = `/${val}${currentLangMatch[2].replace(/\/blog\/[^/]+$/, `/blog/${targetSlug}`)}`;
-          }
-          window.location.href = newPathname;
+          const blogPath = normalizedPath.replace(
+            /\/blog\/[^/]+$/,
+            `/blog/${targetSlug}`,
+          );
+          window.location.href = localizePath(blogPath, val as Lang);
           return;
         }
       } catch { }
     }
 
-    // Fallback: reemplazar solo el prefijo de idioma
-    const currentPrefix = LANGS.find(l => pathname.startsWith(`/${l}`) && (pathname.length === l.length + 1 || pathname.charAt(l.length + 1) === '/'));
-
-    if (currentPrefix) {
-      newPathname = pathname.replace(`/${currentPrefix}`, `/${val}`);
-    } else {
-      newPathname = `/${val}${pathname === '/' ? '' : pathname}`;
-    }
-
-    window.location.href = newPathname;
+    // Fallback: localiza la ruta actual sin asumir prefijo /en
+    window.location.href = localizePath(normalizedPath, val as Lang);
   };
 
   return (

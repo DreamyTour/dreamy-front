@@ -1,6 +1,7 @@
 ---
 import type { Lang } from "@/lib/i18n";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Category {
   slug: string;
@@ -41,7 +42,7 @@ const formatUrl = (url: string) => url?.startsWith("http") ? url : `https://${ur
     </h3>
     <div class="flex flex-col space-y-1">
       <a
-        href={`/${lang}/blog`}
+        href={rewriteUrl("/blog", lang)}
         class={`px-4 py-2.5 rounded-sm text-sm font-medium transition-all flex items-center justify-between border border-transparent
           ${!currentSlug 
             ? "bg-primary/10 text-primary font-semibold" 
@@ -65,7 +66,7 @@ const formatUrl = (url: string) => url?.startsWith("http") ? url : `https://${ur
           const isActive = currentSlug === cat.slug;
           return (
             <a
-              href={`/${lang}/blog/${cat.slug}`}
+              href={rewriteUrl(`/blog/${cat.slug}`, lang)}
               class={`px-4 py-2.5 rounded-sm text-sm font-medium transition-all flex items-center justify-between border border-transparent
                 ${
                   isActive

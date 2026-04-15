@@ -1,4 +1,5 @@
 import type { Lang } from "./i18n";
+import { rewriteUrl as rewriteLocalizedUrl } from "./i18n";
 import type { Imagen } from "@/interface/common";
 
 const strapiUrl = import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "") || "http://localhost:1337";
@@ -132,21 +133,7 @@ export function formatDate(dateString: string | null | undefined, locale: Lang =
  * Rewrite URL based on current language
  */
 export function rewriteUrl(url: string | undefined, currentLang: Lang): string {
-  if (!url) return "/";
-  
-  // External URLs
-  if (url.startsWith("http")) return url;
-  
-  // Root
-  if (url === "/") return `/${currentLang}`;
-  
-  // Already has language prefix
-  const langPattern = /^\/(en|es|pt)(\/|$)/;
-  if (langPattern.test(url)) {
-    return url.replace(/^\/(en|es|pt)/, `/${currentLang}`);
-  }
-  
-  return `/${currentLang}${url.startsWith("/") ? url : "/" + url}`;
+  return rewriteLocalizedUrl(url, currentLang);
 }
 
 /**

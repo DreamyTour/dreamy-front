@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import "@fontsource-variable/outfit";
+import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 
 import fetchApi from "@/lib/strapi";
@@ -14,7 +14,7 @@ import SEO from "@/components/SEO.astro";
 import type { SEOProps } from "@/components/SEO.astro";
 
 interface Props {
-  seo?: SEOProps;
+	seo?: SEOProps;
 }
 
 const { seo } = Astro.props;
@@ -30,25 +30,6 @@ const globalDataRaw = await fetchApi<Global>({
 	wrappedByKey: "data",
 	query: {
 		locale: currentLang,
-		populate: {
-			footer: {
-				populate: {
-					socialLogo: {
-						populate: ["imagen"],
-					},
-					logo: {
-						populate: ["imagen"],
-					},
-					certificaciones: {
-						populate: {
-							premios: {
-								populate: ["logo"],
-							},
-						},
-					},
-				},
-			},
-		},
 	},
 });
 
@@ -57,13 +38,14 @@ const globalData = rewriteMenuUrls(globalDataRaw, currentLang);
 
 // Default SEO values
 const defaultTitle = "Turismo Perú Bolivia - Tours y Paquetes Turísticos";
-const defaultDescription = "Explora los mejores tours y paquetes turísticos en Perú y Bolivia. Machu Picchu, Lago Titicaca, salar de Uyuni y más.";
+const defaultDescription =
+	"Explora los mejores tours y paquetes turísticos en Perú y Bolivia. Machu Picchu, Lago Titicaca, salar de Uyuni y más.";
 
 const seoProps = seo || {
-  title: defaultTitle,
-  description: defaultDescription,
-  type: "website" as const,
-  lang: currentLang,
+	title: defaultTitle,
+	description: defaultDescription,
+	type: "website" as const,
+	lang: currentLang,
 };
 ---
 
@@ -73,6 +55,7 @@ const seoProps = seo || {
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<ClientRouter />
+		<Font cssVariable="--font-outfit" preload />
 		<SEO {...seoProps} />
 	</head>
 	<body>
@@ -80,12 +63,12 @@ const seoProps = seo || {
 		<a href="#main-content" class="skip-link">
 			Saltar al contenido principal
 		</a>
-		
+
 		<Header data={globalData} lang={currentLang} />
 		<main id="main-content">
 			<slot />
 		</main>
-		<Footer data={globalData?.footer} />
+		<Footer data={globalData?.footer} lang={currentLang} />
 		<WhatsAppFloatingButton />
 	</body>
 </html>

@@ -4,6 +4,7 @@ import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
 import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   tour: Tour;
@@ -31,7 +32,7 @@ const primaryCategory = tour.categories?.[0]?.nombre;
 >
   {/* Image Container */}
   <a
-    href={`/${lang}/${tour.slug}`}
+    href={rewriteUrl(`/${tour.slug}`, lang)}
     tabindex="-1"
     aria-hidden="true"
     class="relative block w-full shrink-0 overflow-hidden border-b border-slate-200/70 aspect-[4/3]"
@@ -79,7 +80,7 @@ const primaryCategory = tour.categories?.[0]?.nombre;
     <h3
       class="mb-3 line-clamp-2 text-[1.26rem] font-semibold leading-[1.15] tracking-[-0.02em] text-slate-950 transition-colors duration-300 group-hover:text-secondary md:text-[1.42rem]"
     >
-      <a href={`/${lang}/${tour.slug}`} class="focus:outline-hidden">
+      <a href={rewriteUrl(`/${tour.slug}`, lang)} class="focus:outline-hidden">
         {tour.titulo}
       </a>
     </h3>
@@ -120,7 +121,7 @@ const primaryCategory = tour.categories?.[0]?.nombre;
     }
     <div class="mt-auto pt-1">
       <a
-        href={`/${lang}/${tour.slug}`}
+        href={rewriteUrl(`/${tour.slug}`, lang)}
         class="group/btn inline-flex w-full items-center justify-between gap-2 rounded-sm border border-primary/15 bg-primary px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/95 active:scale-[0.995]"
       >
         {t("tour.verItinerario")}

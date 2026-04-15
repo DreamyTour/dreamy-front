@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import fetchApi from "@/lib/strapi";
 import ToursSlider from "@/components/ui/ToursSlider.astro";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   data?: boliviaPaquetes;
@@ -27,8 +28,6 @@ if (data.category?.slug) {
     query: {
       "filters[categories][slug][$eq]": data.category.slug,
       "pagination[limit]": String(data.limit || 3),
-      "populate[imagenDestacada]": "*",
-      "populate[badge][populate][icono]": "*",
     },
   });
   tours = response && Array.isArray(response) ? response : [];
@@ -142,7 +141,7 @@ const availabilityText = {
               </div>
             </div>
             <a
-              href={`/${lang}/${data.category.slug}`}
+              href={rewriteUrl(`/${data.category.slug}`, lang)}
               aria-label={t("aria.verMasSeccion")}
               class="w-full flex justify-between items-center border-secondary border hover:text-white hover:bg-secondary text-secondary bg-secondary/10 font-semibold py-3.5 px-5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:border-transparent"
             >

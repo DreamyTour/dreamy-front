@@ -1,25 +1,13 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
 import CheckoutSummary from "@/components/checkout/CheckoutSummary";
-import { LOCALIZED_LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
-
-export function getStaticPaths() {
-  return LOCALIZED_LANGS.map((lang) => ({
-    params: { lang },
-  }));
-}
-
-const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
-
-if (lang === DEFAULT_LANG) {
-  return Astro.redirect("/checkout");
-}
+import { DEFAULT_LANG } from "@/lib/i18n";
 
 const seoProps = {
   title: "Checkout - Booking",
   description: "Complete your booking securely.",
   type: "website" as "website",
-  lang: lang,
+  lang: DEFAULT_LANG,
 };
 ---
 

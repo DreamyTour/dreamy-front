@@ -1,21 +1,15 @@
 ---
 import type { Footer as FooterType } from "@/interface/global";
+import type { Lang } from "@/lib/i18n";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   data?: FooterType;
+  lang: Lang;
 }
 
-const { data } = Astro.props;
-
-const formatUrl = (url: string) => {
-  // Si es URL externa (http/https), usarla tal cual
-  if (url?.startsWith("http")) return url;
-  // Usar la URL base del sitio actual (Astro.url.origin)
-  const baseUrl = Astro.url.origin;
-  // Si es una ruta relativa, agregarle el baseUrl
-  return `${baseUrl}${url.startsWith("/") ? url : "/" + url}`;
-};
+const { data, lang } = Astro.props;
 ---
 
 <footer class="bg-foreground text-white pb-8">
@@ -101,7 +95,7 @@ const formatUrl = (url: string) => {
               {data.destination.link.map((link) => (
                 <li>
                   <a
-                    href={formatUrl(link.url)}
+                    href={rewriteUrl(link.url, lang)}
                     class="text-gray-400 hover:text-white transition-colors text-sm"
                     target={link.isExternal ? "_blank" : "_self"}
                     rel={link.isExternal ? "noopener noreferrer" : ""}
@@ -130,7 +124,7 @@ const formatUrl = (url: string) => {
               {data.dreamyAbout.link.map((link) => (
                 <li>
                   <a
-                    href={formatUrl(link.url)}
+                    href={rewriteUrl(link.url, lang)}
                     class="text-gray-400 hover:text-white transition-colors text-sm"
                     target={link.isExternal ? "_blank" : "_self"}
                     rel={link.isExternal ? "noopener noreferrer" : ""}
@@ -157,7 +151,7 @@ const formatUrl = (url: string) => {
               {data.contact.link.map((link) => (
                 <li>
                   <a
-                    href={formatUrl(link.url)}
+                    href={rewriteUrl(link.url, lang)}
                     class="text-gray-400 hover:text-white transition-colors text-sm"
                     target={link.isExternal ? "_blank" : "_self"}
                     rel={link.isExternal ? "noopener noreferrer" : ""}
@@ -184,7 +178,7 @@ const formatUrl = (url: string) => {
             <div class="flex gap-4">
               {data.socialLogo.map((social) => (
                 <a
-                  href={formatUrl(social.url)}
+                  href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Síguenos en ${social.label || "red social"}`}

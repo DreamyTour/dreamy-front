@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/i18n";
 import type { sectionCardPost } from "@/interface/home";
 import { useTranslations } from "@/i18n/ui";
 import CardPost from "@/components/ui/CardPost.astro";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   data: sectionCardPost;
@@ -23,8 +24,6 @@ const posts = await fetchApi<Blog[]>({
   wrappedByKey: "data",
   locale: lang,
   query: {
-    //"populate[portadaImage]": "*",
-    //"populate[category_blogs]": "*",
     sort: "publishedAt:desc",
     "pagination[limit]": data.limit || 6,
   },
@@ -69,7 +68,7 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
         {/* Botón ver más */}
         <div class="text-center mt-12">
           <a
-            href={`/${lang}/blog`}
+            href={rewriteUrl("/blog", lang)}
             aria-label={t("aria.verMasSeccion")}
             class="inline-flex items-center gap-2 px-12 py-5 bg-transparent text-secondary font-bold text-lg rounded-full border-2 border-secondary hover:bg-secondary hover:text-white transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
           >

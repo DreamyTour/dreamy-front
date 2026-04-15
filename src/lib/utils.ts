@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { Lang } from "@/lib/i18n"
+import { rewriteUrl as rewriteLocalizedUrl } from "@/lib/i18n"
 import type { Global, MenuItem, Link } from "@/interface/global"
 
 export function cn(...inputs: ClassValue[]) {
@@ -8,23 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function rewriteUrl(url: string | undefined, currentLang: Lang): string {
-  if (!url || url === "#" || url.startsWith("http")) return url || "#";
-  
-  // Normalizar: asegurar que empiece con /
-  let normalized = url.startsWith("/") ? url : `/${url}`;
-  
-  const LANG_CODES = ["en", "es", "pt"];
-  
-  // 1. Si ya tiene un prefijo de idioma, lo reemplazamos si es necesario
-  for (const langCode of LANG_CODES) {
-    if (normalized === `/${langCode}` || normalized.startsWith(`/${langCode}/`)) {
-      if (langCode === currentLang) return normalized;
-      return normalized.replace(`/${langCode}`, `/${currentLang}`);
-    }
-  }
-  
-  // 2. Si no tiene prefijo, se lo agregamos
-  return `/${currentLang}${normalized === "/" ? "" : normalized}`;
+  return rewriteLocalizedUrl(url, currentLang);
 }
 
 export function rewriteMenuUrls<T extends Global>(

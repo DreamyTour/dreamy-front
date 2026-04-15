@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
+import { rewriteUrl } from "@/lib/utils";
 
 interface BookingFormProps {
   tourId: string | number;
@@ -48,7 +49,7 @@ export default function BookingForm({
     };
 
     window.localStorage.setItem("bookingCart", JSON.stringify(cartItem));
-    window.location.href = `/${lang}/checkout`;
+    window.location.href = rewriteUrl("/checkout", lang as any);
   };
 
   return (

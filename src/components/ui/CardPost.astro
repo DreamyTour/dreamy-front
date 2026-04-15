@@ -3,6 +3,7 @@ import type { Blog } from "@/interface/blog";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   blog: Blog;
@@ -90,7 +91,7 @@ const imageHeight = isFeatured ? "aspect-[16/9]" : "aspect-[4/3]";
 
 <article class:list={["group h-full", isFeatured && "lg:col-span-2"]}>
   <a
-    href={`/${lang}/blog/${blog.slug}`}
+    href={rewriteUrl(`/blog/${blog.slug}`, lang)}
     aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
     class:list={[
       "relative flex h-full flex-col overflow-hidden rounded-sm border border-primary/10 bg-white/95 text-slate-900 shadow-[0_18px_60px_rgba(7,25,23,0.08)] transition-all duration-500 ease-out hover:-translate-y-2 hover:border-secondary/30 hover:shadow-[0_30px_70px_rgba(7,25,23,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40",

@@ -1,13 +1,20 @@
 // @ts-check
 
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
+  fonts: [
+    {
+      name: 'Outfit',
+      cssVariable: '--font-outfit',
+      provider: fontProviders.fontsource(),
+    },
+  ],
 
   server: {
     allowedHosts: true,

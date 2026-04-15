@@ -141,7 +141,7 @@ export async function getStaticPaths() {
 
   const paths: any[] = [];
 
-  for (const lang of LANGS) {
+  for (const lang of [DEFAULT_LANG]) {
     const cats = await fetchApi<any[]>({
       endpoint: "category-blogs",
       wrappedByKey: "data",
@@ -151,7 +151,7 @@ export async function getStaticPaths() {
 
     for (const blog of allBlogsByLang[lang]) {
       paths.push({
-        params: { lang, slug: blog.slug },
+        params: { slug: blog.slug },
         props: {
           blog,
           lang,
@@ -161,50 +161,6 @@ export async function getStaticPaths() {
           relatedBlogs: relatedBlogsByLang[lang][blog.documentId] || [],
         },
       });
-    }
-  }
-
-  // FALLBACK: Redirect a DEFAULT_LANG si la página no existe en el idioma actual
-  const defaultLangBlogs = allBlogsByLang[DEFAULT_LANG] || [];
-  const allPathsBySlug: Record<string, string[]> = {};
-  
-  // Mapear qué slugs existen en qué idiomas
-  for (const path of paths) {
-    const slug = path.params.slug;
-    if (!allPathsBySlug[slug]) {
-      allPathsBySlug[slug] = [];
-    }
-    allPathsBySlug[slug].push(path.params.lang);
-  }
-
-  // Agregar redirects para slugs que NO existen en otros idiomas pero SÍ en DEFAULT_LANG
-  for (const lang of LANGS) {
-    if (lang === DEFAULT_LANG) continue;
-
-    const currentLangBlogs = allBlogsByLang[lang] || [];
-    const currentSlugs = new Set(currentLangBlogs.map((b: Blog) => b.slug));
-
-    for (const defaultBlog of defaultLangBlogs) {
-      if (!currentSlugs.has(defaultBlog.slug)) {
-        // Verificar que el slug existe en DEFAULT_LANG
-        const slugLanguages = allPathsBySlug[defaultBlog.slug] || [];
-        if (slugLanguages.length > 0 && slugLanguages.includes(DEFAULT_LANG)) {
-          // Crear redirect 301 al idioma por defecto
-          paths.push({
-            params: { lang, slug: defaultBlog.slug },
-            props: {
-              isRedirect: true,
-              redirectTo: `/${DEFAULT_LANG}/blog/${defaultBlog.slug}`,
-              blog: defaultBlog,
-              lang,
-              allCategories: [],
-              slugMap: slugsByDocId[defaultBlog.documentId] ?? {},
-              globalData: globalDataByLang[lang] || globalDataByLang[DEFAULT_LANG],
-              relatedBlogs: relatedBlogsByLang[DEFAULT_LANG][defaultBlog.documentId] || [],
-            },
-          });
-        }
-      }
     }
   }
 
@@ -218,14 +174,7 @@ const {
   slugMap, 
   globalData, 
   relatedBlogs,
-  isRedirect,
-  redirectTo
 } = Astro.props;
-
-// Redirect 301 si la página no existe en este idioma
-if (isRedirect && redirectTo) {
-  return Astro.redirect(redirectTo, 301);
-}
 
 const socialLogos =
   globalData?.footer?.socialLogo || globalData?.socialLogo || [];

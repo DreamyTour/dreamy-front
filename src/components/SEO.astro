@@ -1,6 +1,6 @@
 ---
 import type { Lang } from "@/lib/i18n";
-import { LANGS, DEFAULT_LANG } from "@/lib/i18n";
+import { LANGS, DEFAULT_LANG, localizePath, stripLangPrefix } from "@/lib/i18n";
 
 export interface SEOProps {
   title: string;
@@ -32,36 +32,22 @@ const {
 const siteUrl = Astro.site?.origin || "https://turismo-peru-bolivia.com";
 
 // Generate canonical URL
-const currentPath = Astro.url.pathname;
-const canonical = canonicalUrl || `${siteUrl}${currentPath}`;
+const currentPath = stripLangPrefix(Astro.url.pathname);
+const canonical = canonicalUrl || `${siteUrl}${localizePath(currentPath, lang)}`;
 
 // Generate full image URL
 const fullImageUrl = image.startsWith("http") ? image : `${siteUrl}${image}`;
 
-function translatePathForSlug(
-  path: string,
-  translatedSlug: string,
-  targetLang: string,
-): string {
+function translatePathForSlug(path: string, translatedSlug: string): string {
   if (path.includes("/blog/")) {
     const blogPath = path.replace(
       /\/blog\/[^/]+(?=\/|$)/,
       `/blog/${translatedSlug}`,
     );
-    return blogPath.replace(/^\/(en|es|pt)/, `/${targetLang}`);
+    return blogPath;
   }
 
-  const langMatch = path.match(/^\/(en|es|pt)(\/.*)$/);
-  if (langMatch) {
-    const rest = langMatch[2];
-    const translatedRest = rest.replace(
-      /\/[^/]+(?=\/|$)/,
-      `/${translatedSlug}`,
-    );
-    return `/${targetLang}${translatedRest}`;
-  }
-
-  return path.replace(/^\/(en|es|pt)/, `/${targetLang}`);
+  return path.replace(/\/[^/]+(?=\/|$)/, `/${translatedSlug}`);
 }
 
 // Get alternate language URLs for hreflang
@@ -70,24 +56,21 @@ const alternateUrls = LANGS.map((alternateLang) => {
   
   // Si hay un slugMap, usarlo para traducir el slug
   if (slugMap && slugMap[alternateLang]) {
-    urlPath = translatePathForSlug(urlPath, slugMap[alternateLang], alternateLang);
-  } else {
-    // Reemplazar el prefijo de idioma
-    urlPath = urlPath.replace(/^\/(en|es|pt)/, `/${alternateLang}`);
+    urlPath = translatePathForSlug(urlPath, slugMap[alternateLang]);
   }
   
   return {
     lang: alternateLang,
-    url: `${siteUrl}${urlPath}`,
+    url: `${siteUrl}${localizePath(urlPath, alternateLang)}`,
   };
 });
 
 // Calcular x-default (versión inglés sin prefijo de idioma)
 let xDefaultPath = currentPath;
 if (slugMap && slugMap["en"]) {
-  xDefaultPath = translatePathForSlug(xDefaultPath, slugMap["en"], "en");
+  xDefaultPath = translatePathForSlug(xDefaultPath, slugMap["en"]);
 }
-const xDefaultUrl = `${siteUrl}${xDefaultPath.replace(/^\/(en|es|pt)/, "")}`;
+const xDefaultUrl = `${siteUrl}${localizePath(xDefaultPath, DEFAULT_LANG)}`;
 
 // Schema.org JSON-LD
 const organizationSchema = {

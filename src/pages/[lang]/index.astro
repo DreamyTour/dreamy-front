@@ -11,29 +11,26 @@ import PeruGuide from "@/section/PeruGuide.astro";
 import PaquetesBolivia from "@/section/PaquetesBolivia.astro";
 import HomePost from "@/section/HomePost.astro";
 import Destinos from "@/section/Destinos.astro";
-import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
+import { DEFAULT_LANG, LOCALIZED_LANGS, isValidLang } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
 
 export function getStaticPaths() {
-  return LANGS.map((lang) => ({
+  return LOCALIZED_LANGS.map((lang) => ({
     params: { lang },
   }));
 }
 
 const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
 
+if (lang === DEFAULT_LANG) {
+  return Astro.redirect("/");
+}
+
 const homeData = await fetchApi<Home>({
   endpoint: "home",
   wrappedByKey: "data",
   query: {
     locale: lang,
-    "populate[hero][populate]": "*",
-    "populate[about][populate]": "*",
-    "populate[premios][populate][logo]": "*",
-    "populate[sectionMapi][populate][category]": "*",
-    "populate[peruPaquetes][populate][category]": "*",
-    "populate[boliviaPaquetes][populate][category]": "*",
-    "populate[cardPost]": "*",
   },
 });
 

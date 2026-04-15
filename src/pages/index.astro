@@ -1,5 +1,47 @@
 ---
+import Layout from "@/layouts/main.astro";
+import fetchApi from "@/lib/strapi";
+import type { Home } from "@/interface/home";
+import Hero from "@/section/hero.astro";
+import About from "@/section/About.astro";
+import Certifications from "@/section/Certifications.astro";
+import Machupicchu from "@/section/Machupicchu.astro";
+import PaquetesPeru from "@/section/PaquetesPeru.astro";
+import PeruGuide from "@/section/PeruGuide.astro";
+import PaquetesBolivia from "@/section/PaquetesBolivia.astro";
+import HomePost from "@/section/HomePost.astro";
+import Destinos from "@/section/Destinos.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
+import { buildSEOProps } from "@/lib/seo";
 
-return Astro.redirect(`/${DEFAULT_LANG}`);
+const lang = DEFAULT_LANG;
+
+const homeData = await fetchApi<Home>({
+  endpoint: "home",
+  wrappedByKey: "data",
+  query: {
+    locale: lang,
+  },
+});
+
+const seoProps = buildSEOProps({
+  seo: homeData?.seo,
+  fallbackTitle: "Turismo Perú Bolivia - Tours y Paquetes Turísticos",
+  fallbackDescription:
+    "Organiza tu viaje a Perú y Bolivia con los mejores tours: Machu Picchu, Lago Titicaca, Salar de Uyuni y más. Paquetes turísticos completos.",
+  type: "website",
+  lang,
+});
 ---
+
+<Layout seo={seoProps}>
+  <Hero data={homeData?.hero} lang={lang} />
+  <About data={homeData?.about} lang={lang} />
+  <Certifications data={homeData?.premios?.premios} lang={lang} />
+  <Machupicchu data={homeData?.sectionMapi} lang={lang} />
+  <PaquetesPeru data={homeData?.peruPaquetes} lang={lang} />
+  <PeruGuide lang={lang} />
+  <Destinos lang={lang} />
+  <PaquetesBolivia data={homeData?.boliviaPaquetes} lang={lang} />
+  <HomePost data={homeData?.cardPost} lang={lang} />
+</Layout>
