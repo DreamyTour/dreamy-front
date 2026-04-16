@@ -21,6 +21,7 @@ const homeData = await fetchApi<Home>({
   wrappedByKey: "data",
   query: {
     locale: lang,
+    populate: "*",
   },
 });
 

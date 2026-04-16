@@ -28,6 +28,7 @@ if (data.category?.slug) {
     query: {
       "filters[categories][slug][$eq]": data.category.slug,
       "pagination[limit]": String(data.limit || 3),
+      populate: "*",
     },
   });
   tours = response && Array.isArray(response) ? response : [];

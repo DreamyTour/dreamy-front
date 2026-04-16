@@ -20,6 +20,7 @@ const response = await fetchApi<Page[]>({
   query: {
     "filters[categories][slug][$eq]": "peru-tours",
     "pagination[limit]": "10",
+    populate: "*",
   },
 });
 

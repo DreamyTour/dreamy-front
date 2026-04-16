@@ -4,7 +4,7 @@ import Button from "@/components/ui/button.astro";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import type { Lang } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
-import { getStrapiUrl } from "@/lib/helpers";
+import { getImageUrl } from "@/lib/helpers";
 
 interface Props {
   data?: HeaderTopType;
@@ -41,7 +41,7 @@ const getLinkProps = (
         {
           data.logo.imagen && (
             <img
-              src={`${getStrapiUrl()}${data.logo.imagen.url}`}
+              src={getImageUrl(data.logo.imagen)}
               alt={data.logo.imagen.alternativeText ?? data.logo.label}
               width={data.logo.imagen.width}
               height={data.logo.imagen.height}

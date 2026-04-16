@@ -30,6 +30,7 @@ const globalDataRaw = await fetchApi<Global>({
 	wrappedByKey: "data",
 	query: {
 		locale: currentLang,
+		populate: "*",
 	},
 });
 

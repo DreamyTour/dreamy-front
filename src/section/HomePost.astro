@@ -26,6 +26,7 @@ const posts = await fetchApi<Blog[]>({
   query: {
     sort: "publishedAt:desc",
     "pagination[limit]": data.limit || 6,
+    populate: "*",
   },
 });
 

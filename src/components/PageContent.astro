@@ -1,0 +1,305 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import TourCard from "@/components/ui/TourCard.astro";
+import LiteYouTube from "@/components/LiteYouTube.astro";
+import type { SEOProps } from "@/components/SEO.astro";
+import type { Page } from "@/interface/page";
+import type { Tour } from "@/interface/tours";
+import type { Lang } from "@/lib/i18n";
+import { getYouTubeVideoId, getThumbnailUrl } from "@/lib/helpers";
+import { DEFAULT_LANG } from "@/lib/i18n";
+
+interface Props {
+  page: Page;
+  toursByCategory: Tour[];
+  pageSlugMap: Record<string, string>;
+  lang: Lang;
+  seoProps: SEOProps;
+}
+
+const { page, toursByCategory, pageSlugMap, lang, seoProps } = Astro.props;
+
+const pageVideoId =
+  page?.video?.videoUrl
+    ? getYouTubeVideoId(page.video.videoUrl)
+    : null;
+
+const pageVideoThumbnail =
+  page?.video?.thumbnail
+    ? getThumbnailUrl(page.video.thumbnail)
+    : null;
+
+const pageUiCopy = {
+  es: {
+    eyebrow: "Colección destacada",
+    experienceLabel: "Experiencia curada",
+    exploreCta: "Ver experiencias",
+    toursStat: "experiencias",
+  },
+  en: {
+    eyebrow: "Featured collection",
+    experienceLabel: "Curated experience",
+    exploreCta: "View experiences",
+    toursStat: "experiences",
+  },
+  pt: {
+    eyebrow: "Coleção em destaque",
+    experienceLabel: "Experiência curada",
+    exploreCta: "Ver experiências",
+    toursStat: "experiências",
+  },
+} as const;
+
+const pageCopy = pageUiCopy[lang] ?? pageUiCopy[DEFAULT_LANG];
+
+const pageStats =
+  toursByCategory.length > 0
+    ? [
+        {
+          value: `${toursByCategory.length}`,
+          label: pageCopy.toursStat,
+        },
+      ]
+    : [];
+---
+
+<PageLayout seo={seoProps}>
+  <script
+    id="page-slug-map"
+    type="application/json"
+    set:html={JSON.stringify(pageSlugMap)}
+  />
+  <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12">
+    <section class="relative isolate overflow-hidden rounded-sm border border-primary/10 bg-white shadow-[0_32px_90px_-48px_rgba(31,41,55,0.38)]">
+      {pageVideoThumbnail && (
+        <img
+          src={pageVideoThumbnail}
+          alt=""
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover opacity-20"
+          loading="eager"
+          fetchpriority="high"
+        />
+      )}
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,191,129,0.26),transparent_42%),radial-gradient(circle_at_top_right,rgba(220,123,66,0.18),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86)_54%,rgba(240,247,243,0.96))]" />
+      <div class="absolute left-0 top-0 h-40 w-40 -translate-x-10 -translate-y-10 rounded-full bg-primary/10 blur-3xl" />
+      <div class="absolute bottom-0 right-0 h-52 w-52 translate-x-16 translate-y-14 rounded-full bg-secondary/10 blur-3xl" />
+
+      <div class="relative grid gap-10 px-6 py-8 md:px-10 md:py-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:gap-12 lg:px-14 lg:py-14">
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center gap-3 rounded-sm border border-primary/15 bg-white/80 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-primary shadow-sm backdrop-blur-sm">
+            <span class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]" />
+            <span>{page.categories?.find((c: any) => c.slug !== 'peru-tours')?.nombre || pageCopy.eyebrow}</span>
+          </div>
+
+          <div class="mt-6 space-y-5">
+            <span class="block text-xs font-semibold uppercase tracking-[0.38em] text-secondary/80">
+              {pageCopy.experienceLabel}
+            </span>
+            <h1 class="max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-gray-900 sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
+              {page.titulo}
+            </h1>
+            {page.content && (
+              <p class="max-w-3xl text-base leading-8 text-gray-700 md:pt-1 md:text-lg lg:max-w-2xl lg:text-[1.08rem]">
+                {page.content}
+              </p>
+            )}
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a
+              href="#category-tours"
+              class="inline-flex items-center justify-center rounded-sm bg-primary px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_35px_-18px_rgba(79,191,129,0.7)] transition-transform duration-300 hover:-translate-y-0.5 hover:bg-primary/90"
+            >
+              {pageCopy.exploreCta}
+            </a>
+          </div>
+
+          <div class="mt-8 grid gap-3 sm:grid-cols-2">
+            {pageStats.map((stat) => (
+              <div class="rounded-sm border border-white/70 bg-white/75 px-4 py-4 shadow-[0_18px_45px_-30px_rgba(31,41,55,0.35)] backdrop-blur-sm">
+                <p class="text-2xl font-semibold tracking-[-0.03em] text-gray-900">
+                  {stat.value}
+                </p>
+                <p class="mt-1 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-gray-500">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute -left-4 top-8 hidden h-24 w-24 rounded-full border border-primary/15 bg-primary/10 blur-2xl lg:block" />
+          <div class="absolute -bottom-8 right-6 hidden h-24 w-24 rounded-full border border-secondary/20 bg-secondary/10 blur-2xl lg:block" />
+
+          {pageVideoId ? (
+            <div
+              id="category-video"
+              class="relative overflow-hidden rounded-sm border border-white/70 bg-white/80 p-3 shadow-[0_30px_70px_-34px_rgba(31,41,55,0.45)] backdrop-blur-md"
+            >
+              <div class="overflow-hidden rounded-sm bg-white/95">
+                <LiteYouTube
+                  videoId={pageVideoId}
+                  title={page.titulo || "Video"}
+                  backgroundImage={pageVideoThumbnail || undefined}
+                  withShadowImage={!!pageVideoThumbnail}
+                />
+              </div>
+            </div>
+          ) : (
+            <div class="relative overflow-hidden rounded-sm border border-white/70 bg-white/80 p-8 shadow-[0_30px_70px_-34px_rgba(31,41,55,0.45)] backdrop-blur-md">
+              <div class="rounded-sm border border-dashed border-primary/20 bg-gradient-to-br from-primary/8 via-white to-secondary/8 px-8 py-14 text-center">
+                <p class="text-base leading-7 text-gray-600">
+                  {page.description || page.content}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    {toursByCategory.length > 0 && (
+      <section id="category-tours" class="w-full py-10 md:py-12">
+        <div class="max-w-8xl mx-auto px-6">
+          <div class="mb-8 flex justify-center md:mb-10">
+            <span class="inline-flex items-center gap-2 rounded-sm border border-secondary/15 bg-secondary/5 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-secondary">
+              <span class="h-2 w-2 rounded-full bg-secondary" />
+              {page.categories?.find((c: any) => c.slug !== 'peru-tours')?.nombre || page.titulo}
+            </span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {toursByCategory.map((tour) => (
+              <TourCard tour={tour} lang={lang} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {page.tituloPreguntas &&
+      page.preguntasAcordeon &&
+      page.preguntasAcordeon.length > 0 && (
+        <section class="w-full py-16">
+          <div class="max-w-8xl mx-auto px-6">
+            <div class="mx-auto mb-10 max-w-3xl text-center">
+              <h2 class="text-3xl font-semibold tracking-[-0.04em] text-gray-900 md:text-4xl">
+                {page.tituloPreguntas}
+              </h2>
+              <div class="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {page.preguntasAcordeon.map((pregunta: any) => (
+                <details class="group overflow-hidden rounded-sm border border-gray-200/80 bg-white shadow-[0_22px_50px_-38px_rgba(31,41,55,0.45)] transition-colors duration-300 open:border-primary/20 open:bg-primary/[0.02]">
+                  <summary class="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden md:px-6">
+                    <span class="font-semibold text-gray-800 text-sm md:text-base text-left">
+                      {pregunta.titulo}
+                    </span>
+                    <span class="flex h-10 w-10 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary transition-transform duration-200 group-open:rotate-180">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </span>
+                  </summary>
+                  <div class="border-t border-primary/10 px-5 pb-5 pt-4 md:px-6 md:pb-6">
+                    {pregunta.contenido &&
+                      Array.isArray(pregunta.contenido) && (
+                        <div class="space-y-3">
+                          {pregunta.contenido.map(
+                            (block: any, blockIndex: number) => {
+                              if (block.type === "paragraph") {
+                                return (
+                                  <p
+                                    key={blockIndex}
+                                    class="text-base leading-7 text-gray-600"
+                                  >
+                                    {(block.children || [])
+                                      .map((child: any) => child.text || "")
+                                      .join("")}
+                                  </p>
+                                );
+                              }
+                              if (block.type === "heading") {
+                                const level = block.level;
+                                const headingText = (block.children || [])
+                                  .map((child: any) => child.text || "")
+                                  .join("");
+                                if (level === 1) {
+                                  return (
+                                    <h1
+                                      key={blockIndex}
+                                      class="text-xl font-bold text-gray-900"
+                                    >
+                                      {headingText}
+                                    </h1>
+                                  );
+                                }
+                                if (level === 2) {
+                                  return (
+                                    <h2
+                                      key={blockIndex}
+                                      class="text-lg font-bold text-gray-900"
+                                    >
+                                      {headingText}
+                                    </h2>
+                                  );
+                                }
+                                return (
+                                  <h3
+                                    key={blockIndex}
+                                    class="text-base font-semibold text-gray-800"
+                                  >
+                                    {headingText}
+                                  </h3>
+                                );
+                              }
+                              if (block.type === "list") {
+                                const format = block.format;
+                                const ListTag =
+                                  format === "ordered" ? "ol" : "ul";
+                                return (
+                                  <ListTag
+                                    key={blockIndex}
+                                    class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 text-gray-600 space-y-1`}
+                                  >
+                                    {(block.children || []).map(
+                                      (listItem: any, i: number) => (
+                                        <li key={i} class="text-gray-600">
+                                          {(listItem.children || [])
+                                            .map(
+                                              (child: any) =>
+                                                child.text || "",
+                                            )
+                                            .join("")}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ListTag>
+                                );
+                              }
+                              return null;
+                            },
+                          )}
+                        </div>
+                      )}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+  </div>
+</PageLayout>

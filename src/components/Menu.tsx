@@ -14,7 +14,7 @@ import {
 import { Menu, X, ChevronDown } from "lucide-react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { rewriteUrl } from "@/lib/utils";
-import { getStrapiUrl } from "@/lib/helpers";
+import { getImageUrl } from "@/lib/helpers";
 
 interface MainMenuProps {
   menu: MenuType;
@@ -160,7 +160,7 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
               >
                 {logo.imagen && (
                   <img
-                    src={`${getStrapiUrl()}${logo.imagen.url}`}
+                    src={getImageUrl(logo.imagen)}
                     alt={logo.imagen.alternativeText ?? logo.label ?? "Logo"}
                     className="h-10 w-auto"
                   />
