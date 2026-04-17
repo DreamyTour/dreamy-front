@@ -10,7 +10,6 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 // SSG + SSR for API routes
 export default defineConfig({
-  site: 'https://dreamy.tours',
   adapter: cloudflare(),
 
   fonts: [
