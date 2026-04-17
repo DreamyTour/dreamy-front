@@ -10,7 +10,6 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 // SSG + SSR for API routes
 export default defineConfig({
-  output: 'hybrid',
   adapter: cloudflare(),
 
   fonts: [
