@@ -49,16 +49,6 @@ export interface Contact {
   titulo: string;
   link: Link[];
 }
-export interface Premio {
-  id: number;
-  description: string;
-  logo: Imagen;
-}
-
-export interface Certifications {
-  id: number;
-  premios: Premio[];
-}
 
 export interface Footer {
   id: number;
@@ -69,7 +59,6 @@ export interface Footer {
   destination: Destination;
   dreamyAbout: DreamyAbout;
   contact: Contact;
-  certificaciones: Certifications;
 }
 
 export interface Global {

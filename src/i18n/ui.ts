@@ -11,6 +11,7 @@ export const ui = {
     "aria.leerArticulo": "Leer artículo",
     "aria.verMasSeccion": "Ver más en esta sección",
     "section.premiosCertificaciones": "Premios y Certificaciones",
+    "section.weArePartOf": "Somos Parte De",
     "section.sinTours": "Próximamente agregaremos tours en esta sección.",
   },
   en: {
@@ -22,6 +23,7 @@ export const ui = {
     "aria.leerArticulo": "Read article",
     "aria.verMasSeccion": "View more in this section",
     "section.premiosCertificaciones": "Awards and Certifications",
+    "section.weArePartOf": "We Are Part Of",
     "section.sinTours": "Tours coming soon to this section.",
   },
   pt: {
@@ -33,6 +35,7 @@ export const ui = {
     "aria.leerArticulo": "Ler artigo",
     "aria.verMasSeccion": "Ver mais nesta seção",
     "section.premiosCertificaciones": "Prêmios e Certificações",
+    "section.weArePartOf": "Fazemos Parte De",
     "section.sinTours": "Em breve adicionaremos tours nesta seção.",
   },
 } as const;

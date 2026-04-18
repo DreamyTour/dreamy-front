@@ -1,4 +1,5 @@
 ---
+import Certification from "@/components/Certification.astro";
 import type { Footer as FooterType } from "@/interface/global";
 import type { Lang } from "@/lib/i18n";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
@@ -13,52 +14,7 @@ const { data, lang } = Astro.props;
 ---
 
 <footer class="bg-foreground text-white pb-8">
-  {/* Slider de Certificaciones */}
-  {
-    data?.certificaciones &&
-      Array.isArray(data.certificaciones) &&
-      data.certificaciones.length > 0 &&
-      data.certificaciones[0]?.premios && (
-        <div class="bg-white py-10 -mt-8 mb-12">
-          <div class="max-w-8xl mx-auto px-6">
-            <div class="text-center mb-8">
-              <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 relative inline-block">
-                <span class="relative z-10">We Are Part Of</span>
-                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
-              </h2>
-              <div class="flex items-center justify-center gap-3 mt-4">
-                <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
-                <div class="w-12 h-1.5 bg-secondary rounded-full relative">
-                  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full" />
-                </div>
-                <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
-              </div>
-            </div>
-            <div class="flex flex-wrap justify-center items-center gap-6 md:gap-8">
-              {data.certificaciones[0].premios.map((cert) => {
-                const imageUrl = getImageUrl(cert.logo);
-                return (
-                  imageUrl !== "/og-default.jpg" && (
-                    <div class="group w-32 h-24 md:w-40 md:h-28 flex items-center justify-center bg-white rounded-sm shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden border border-gray-100">
-                      <img
-                        src={imageUrl}
-                        alt={getImageAlt(
-                          cert.logo,
-                          cert.description || "Certificación",
-                        )}
-                        class="max-w-full max-h-full w-auto h-auto object-contain p-2"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  )
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )
-  }
+  <Certification lang={lang} />
 
   <div class="container mx-auto px-4 pt-12">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">

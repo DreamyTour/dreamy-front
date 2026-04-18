@@ -1,0 +1,118 @@
+---
+import Image from "astro/components/Image.astro";
+import { useTranslations } from "@/i18n/ui";
+import type { Lang } from "@/lib/i18n";
+import TurismoRegistrada from "@/assets/certification/agencia-viajes-turismo-registrada.svg";
+import Caltur from "@/assets/certification/certificado-caltur.avif";
+import Gercetur from "@/assets/certification/certificado-gercetur.avif";
+import MarcaPeru from "@/assets/certification/certificado-marca-peru.svg";
+import Mincetur from "@/assets/certification/certificado-mincetur.webp";
+import TripAdvisor from "@/assets/certification/certificado-tripadvisor.svg";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const certifications = [
+  {
+    logo: TurismoRegistrada,
+    nombre: "Agencia de Viajes y Turismo Registrada",
+    alt: "Logo Agencia de Viajes y Turismo Registrada",
+    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+  },
+  {
+    logo: Caltur,
+    nombre: "Certificado Caltur",
+    alt: "Logo Certificado Caltur",
+    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    bgColor: "bg-white",
+  },
+  {
+    logo: Gercetur,
+    nombre: "Certificado Gercetur",
+    alt: "Logo Certificado Gercetur",
+    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    bgColor: "bg-white",
+  },
+  {
+    logo: MarcaPeru,
+    nombre: "Certificado Marca Peru",
+    alt: "Logo Certificado Marca Peru",
+    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+  },
+  {
+    logo: Mincetur,
+    nombre: "Certificado Mincetur",
+    alt: "Logo Certificado Mincetur",
+    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+  },
+  {
+    logo: TripAdvisor,
+    nombre: "Certificado TripAdvisor",
+    alt: "Logo Certificado TripAdvisor",
+    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+  },
+];
+---
+
+<section class="bg-white py-10 -mt-8 mb-12">
+  <div class="max-w-8xl mx-auto px-6 lg:px-8">
+    <div class="text-center mb-8">
+      <h2
+        class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 relative inline-block"
+      >
+        <span class="relative z-10">{t("section.weArePartOf")}</span>
+        <span
+          class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm"
+        ></span>
+      </h2>
+      <div class="flex items-center justify-center gap-3 mt-4">
+        <div
+          class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary"
+        >
+        </div>
+        <div class="w-12 h-1.5 bg-secondary rounded-full relative">
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full"
+          >
+          </div>
+        </div>
+        <div
+          class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary"
+        >
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-8">
+      <div
+        id="certification"
+        class="grid grid-cols-6 gap-12 w-full mx
+        -auto items-center justify-center mx-auto"
+      >
+        {
+          certifications.map((certification) => (
+            <div class="flex justify-center items-center group hover:scale-110 transition-transform duration-300 ease-in-out">
+              <Image
+                src={certification.logo}
+                alt={certification.alt}
+                class={`max-w-full max-h-full object-contain filter transition-transform duration-300 ${certification.size}`}
+                format="webp"
+                loading="lazy"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #certification {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+</style>
