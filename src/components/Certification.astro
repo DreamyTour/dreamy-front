@@ -1,13 +1,12 @@
 ---
-import Image from "astro/components/Image.astro";
 import { useTranslations } from "@/i18n/ui";
 import type { Lang } from "@/lib/i18n";
-import TurismoRegistrada from "@/assets/certification/agencia-viajes-turismo-registrada.svg";
+import TurismoRegistrada from "@/assets/certification/agencia-viajes-turismo-registrada.svg?url";
 import Caltur from "@/assets/certification/certificado-caltur.avif";
 import Gercetur from "@/assets/certification/certificado-gercetur.avif";
-import MarcaPeru from "@/assets/certification/certificado-marca-peru.svg";
-import Mincetur from "@/assets/certification/certificado-mincetur.webp";
-import TripAdvisor from "@/assets/certification/certificado-tripadvisor.svg";
+import MarcaPeru from "@/assets/certification/certificado-marca-peru.svg?url";
+import Mincetur from "@/assets/certification/certificado-mincetur.svg?url";
+import TripAdvisor from "@/assets/certification/certificado-tripadvisor.svg?url";
 
 interface Props {
   lang: Lang;
@@ -21,39 +20,45 @@ const certifications = [
     logo: TurismoRegistrada,
     nombre: "Agencia de Viajes y Turismo Registrada",
     alt: "Logo Agencia de Viajes y Turismo Registrada",
-    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    size: "h-12 w-auto md:h-14 lg:h-16",
+    isSvg: true,
   },
   {
     logo: Caltur,
     nombre: "Certificado Caltur",
     alt: "Logo Certificado Caltur",
-    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    size: "h-12 w-auto md:h-14 lg:h-16",
     bgColor: "bg-white",
+    isSvg: false,
   },
   {
     logo: Gercetur,
     nombre: "Certificado Gercetur",
     alt: "Logo Certificado Gercetur",
-    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    size: "h-12 w-auto md:h-14 lg:h-16",
     bgColor: "bg-white",
+    isSvg: false,
   },
   {
     logo: MarcaPeru,
     nombre: "Certificado Marca Peru",
     alt: "Logo Certificado Marca Peru",
-    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    size: "h-12 w-auto md:h-14 lg:h-16",
+    isSvg: true,
   },
   {
     logo: Mincetur,
     nombre: "Certificado Mincetur",
     alt: "Logo Certificado Mincetur",
-    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    size: "h-12 w-auto md:h-14 lg:h-16",
+    isSvg: true,
   },
   {
     logo: TripAdvisor,
     nombre: "Certificado TripAdvisor",
     alt: "Logo Certificado TripAdvisor",
-    size: "w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-auto",
+    size: "h-12 w-auto md:h-14 lg:h-16",
+    isSvg: true,
   },
 ];
 ---
@@ -90,17 +95,15 @@ const certifications = [
     <div class="flex flex-col gap-8">
       <div
         id="certification"
-        class="grid grid-cols-6 gap-12 w-full mx
-        -auto items-center justify-center mx-auto"
+        class="grid grid-cols-3 md:grid-cols-6 gap-8 w-full mx-auto items-center justify-center"
       >
         {
           certifications.map((certification) => (
             <div class="flex justify-center items-center group hover:scale-110 transition-transform duration-300 ease-in-out">
-              <Image
-                src={certification.logo}
+              <img
+                src={certification.logo.src || certification.logo}
                 alt={certification.alt}
-                class={`max-w-full max-h-full object-contain filter transition-transform duration-300 ${certification.size}`}
-                format="webp"
+                class={certification.size}
                 loading="lazy"
               />
             </div>
@@ -113,6 +116,12 @@ const certifications = [
 
 <style>
   #certification {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    #certification {
+      grid-template-columns: repeat(6, 1fr);
+    }
   }
 </style>
