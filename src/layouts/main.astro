@@ -5,7 +5,7 @@ import { ClientRouter } from "astro:transitions";
 
 import fetchApi from "@/lib/strapi";
 import type { Global } from "@/interface/global";
-import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
+import { LANGS, DEFAULT_LANG, isValidLang, type Lang } from "@/lib/i18n";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton.astro";
@@ -15,14 +15,16 @@ import type { SEOProps } from "@/components/SEO.astro";
 
 interface Props {
 	seo?: SEOProps;
+	lang?: Lang;
 }
 
-const { seo } = Astro.props;
+const { seo, lang: langProp } = Astro.props;
 
 // 1. Detectamos el idioma desde los params de la vista de forma automática
-const currentLang = isValidLang(Astro.params.lang)
+// o desde la prop que se pasa desde la página
+const currentLang = langProp || (isValidLang(Astro.params.lang)
 	? Astro.params.lang
-	: DEFAULT_LANG;
+	: DEFAULT_LANG);
 
 // 2. Obtenemos toda la data de la barra superior/footer y se la inyectamos
 const globalDataRaw = await fetchApi<Global>({

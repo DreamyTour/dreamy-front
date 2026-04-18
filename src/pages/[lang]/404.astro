@@ -2,8 +2,7 @@
 import Layout from "@/layouts/main.astro";
 import { DEFAULT_LANG, isValidLang, localizePath, type Lang } from "@/lib/i18n";
 
-const firstSegment = Astro.url.pathname.split("/").filter(Boolean)[0];
-const lang: Lang = isValidLang(firstSegment) ? firstSegment : DEFAULT_LANG;
+const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
 const homeHref = localizePath("/", lang);
 
 const contentByLang: Record<
@@ -33,7 +32,7 @@ const contentByLang: Record<
       "La página que buscas no existe o se mudó. Te llevamos de vuelta al camino correcto.",
     primaryCta: "Volver al inicio",
     secondaryCta: "Explorar viajes",
-    countdownLabel: "Redirect en",
+    countdownLabel: "Redirección en",
   },
   pt: {
     badge: "Desvio nos Andes",
@@ -56,7 +55,7 @@ const seoProps = {
 };
 ---
 
-<Layout seo={seoProps} lang={lang}>
+<Layout seo={seoProps}>
   <section
     class="relative min-h-[calc(100vh-220px)] flex items-center justify-center px-6 py-16"
   >
