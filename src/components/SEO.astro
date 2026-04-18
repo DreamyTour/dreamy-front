@@ -31,11 +31,12 @@ const {
 } = Astro.props;
 
 //Get site URL from astro.config
-const siteUrl = Astro.site?.origin || "https://turismo-peru-bolivia.com";
+const siteUrl = Astro.site?.origin || "https://dreamy.tours";
 
 // Generate canonical URL
 const currentPath = stripLangPrefix(Astro.url.pathname);
-const canonical = canonicalUrl || `${siteUrl}${localizePath(currentPath, lang)}`;
+const canonical =
+  canonicalUrl || `${siteUrl}${localizePath(currentPath, lang)}`;
 
 // Generate full image URL
 const fullImageUrl = image.startsWith("http") ? image : `${siteUrl}${image}`;
@@ -55,12 +56,12 @@ function translatePathForSlug(path: string, translatedSlug: string): string {
 // Get alternate language URLs for hreflang
 const alternateUrls = LANGS.map((alternateLang) => {
   let urlPath = currentPath;
-  
+
   // Si hay un slugMap, usarlo para traducir el slug
   if (slugMap && slugMap[alternateLang]) {
     urlPath = translatePathForSlug(urlPath, slugMap[alternateLang]);
   }
-  
+
   return {
     lang: alternateLang,
     url: `${siteUrl}${localizePath(urlPath, alternateLang)}`,
@@ -78,42 +79,43 @@ const xDefaultUrl = `${siteUrl}${localizePath(xDefaultPath, DEFAULT_LANG)}`;
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "TravelAgency",
-  "name": "Turismo Perú Bolivia",
-  "description": description || "Agencia de tours y paquetes turísticos en Perú y Bolivia",
-  "url": siteUrl,
-  "logo": `${siteUrl}/logo.png`,
-  "image": fullImageUrl,
-  "address": {
+  name: "Dreamy Tours",
+  description:
+    description || "Agencia de tours y paquetes turísticos en Perú y Bolivia",
+  url: siteUrl,
+  logo: `${siteUrl}/logo.png`,
+  image: fullImageUrl,
+  address: {
     "@type": "PostalAddress",
-    "addressCountry": "PE",
-    "addressLocality": "Cusco",
-    "addressRegion": "Cusco"
+    addressCountry: "PE",
+    addressLocality: "Cusco",
+    addressRegion: "Cusco",
   },
-  "contactPoint": {
+  contactPoint: {
     "@type": "ContactPoint",
-    "telephone": "+51999999999",
-    "contactType": "reservations",
-    "availableLanguage": ["Spanish", "English", "Portuguese"]
+    telephone: " +51969787221",
+    contactType: "reservations",
+    availableLanguage: ["Spanish", "English", "Portuguese"],
   },
-  "sameAs": [
-    "https://www.facebook.com/turismoperubolivia",
-    "https://www.instagram.com/turismoperubolivia",
-    "https://wa.me/51999999999"
-  ]
+  sameAs: [
+    "https://www.facebook.com/dreamytours/",
+    "https://www.instagram.com/dreamy_tours",
+    "https://wa.me/51969787221",
+  ],
 };
 
 // Breadcrumb schema
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
-  "itemListElement": [
+  itemListElement: [
     {
       "@type": "ListItem",
-      "position": 1,
-      "name": "Inicio",
-      "item": siteUrl
-    }
-  ]
+      position: 1,
+      name: "Inicio",
+      item: siteUrl,
+    },
+  ],
 };
 
 // Add current page to breadcrumb if not home
@@ -121,42 +123,47 @@ if (currentPath !== "/") {
   const currentPage = title.split(" - ")[0] || title;
   breadcrumbSchema.itemListElement.push({
     "@type": "ListItem",
-    "position": 2,
-    "name": currentPage,
-    "item": canonical
+    position: 2,
+    name: currentPage,
+    item: canonical,
   });
 }
 
 // Article schema for blog posts
-const articleSchema = type === "article" ? {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": title,
-  "description": description,
-  "image": fullImageUrl,
-  "datePublished": publishedTime,
-  "author": {
-    "@type": "Organization",
-    "name": author || "Turismo Perú Bolivia"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Turismo Perú Bolivia",
-    "logo": {
-      "@type": "ImageObject",
-      "url": `${siteUrl}/logo.png`
-    }
-  }
-} : null;
+const articleSchema =
+  type === "article"
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: title,
+        description: description,
+        image: fullImageUrl,
+        datePublished: publishedTime,
+        author: {
+          "@type": "Organization",
+          name: author || "Dreamy Tours",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Dreamy Tours",
+          logo: {
+            "@type": "ImageObject",
+            url: `${siteUrl}/logo.png`,
+          },
+        },
+      }
+    : null;
 ---
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonical} />
 
 <!-- Alternate Languages (hreflang) -->
-{alternateUrls.map((alt) => (
-  <link rel="alternate" hreflang={alt.lang} href={alt.url} />
-))}
+{
+  alternateUrls.map((alt) => (
+    <link rel="alternate" hreflang={alt.lang} href={alt.url} />
+  ))
+}
 
 <!-- Default to English if no hreflang matches -->
 <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
@@ -176,17 +183,23 @@ const articleSchema = type === "article" ? {
 <meta property="og:locale" content={lang} />
 
 {/* Alternate locales for OG */}
-{alternateUrls.map((alt) => (
-  <meta property="og:locale:alternate" content={alt.lang} />
-))}
+{
+  alternateUrls.map((alt) => (
+    <meta property="og:locale:alternate" content={alt.lang} />
+  ))
+}
 
 {/* Article specific meta tags */}
-{type === "article" && (
-  <>
-    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
-    {author && <meta property="article:author" content={author} />}
-  </>
-)}
+{
+  type === "article" && (
+    <>
+      {publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )}
+      {author && <meta property="article:author" content={author} />}
+    </>
+  )
+}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
@@ -204,6 +217,19 @@ const articleSchema = type === "article" ? {
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
 <!-- Schema.org JSON-LD -->
-<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
-{articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />}
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(organizationSchema)}
+/>
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(breadcrumbSchema)}
+/>
+{
+  articleSchema && (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(articleSchema)}
+    />
+  )
+}
