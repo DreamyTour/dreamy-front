@@ -1,16 +1,18 @@
 ---
 import Layout from "@/layouts/main.astro";
 import type { SEOProps } from "@/components/SEO.astro";
+import type { Lang } from "@/lib/i18n";
 
 interface Props {
   slugMap?: Record<string, string>;
   seo?: SEOProps;
+  lang?: Lang;
 }
 
-const { slugMap, seo } = Astro.props;
+const { slugMap, seo, lang } = Astro.props;
 ---
 
-<Layout seo={seo}>
+<Layout seo={seo} lang={lang}>
   <slot />
 </Layout>
 
