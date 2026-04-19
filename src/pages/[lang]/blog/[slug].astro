@@ -247,7 +247,7 @@ const tocHeadings = extractHeadings(blog.contenido);
 const firstH2Index = findFirstH2Index(blog.contenido);
 ---
 
-<Layout seo={seoProps}>
+<Layout seo={seoProps} lang={lang}>
   {/* Hero Image con título, categoría y fecha como fondo */}
   {
     blog.portadaImage ? (

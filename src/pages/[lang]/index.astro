@@ -44,7 +44,7 @@ const seoProps = buildSEOProps({
 });
 ---
 
-<Layout seo={seoProps}>
+<Layout seo={seoProps} lang={lang}>
   <Hero data={homeData?.hero} lang={lang} />
   <About data={homeData?.about} lang={lang} />
   <Certifications data={homeData?.premios?.premios} lang={lang} />
