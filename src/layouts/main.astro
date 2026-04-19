@@ -22,9 +22,13 @@ const { seo, lang: langProp } = Astro.props;
 
 // 1. Detectamos el idioma desde los params de la vista de forma automática
 // o desde la prop que se pasa desde la página
-const currentLang = langProp || (isValidLang(Astro.params.lang)
-	? Astro.params.lang
-	: DEFAULT_LANG);
+let currentLang: Lang = DEFAULT_LANG;
+
+if (langProp && isValidLang(langProp)) {
+	currentLang = langProp;
+} else if (Astro.params?.lang && isValidLang(Astro.params.lang as string)) {
+	currentLang = Astro.params.lang as Lang;
+}
 
 // 2. Obtenemos toda la data de la barra superior/footer y se la inyectamos
 const globalDataRaw = await fetchApi<Global>({
