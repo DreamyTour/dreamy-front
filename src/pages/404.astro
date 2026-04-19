@@ -2,64 +2,58 @@
 import Layout from "@/layouts/main.astro";
 import {
   DEFAULT_LANG,
-  isValidLang,
-  localizePath,
   LANGS,
+  localizePath,
   type Lang,
 } from "@/lib/i18n";
 
-function getLangFromPath(pathname: string): Lang {
-  const segments = pathname.split("/").filter(Boolean);
-  const firstSegment = segments[0];
-  if (firstSegment && LANGS.includes(firstSegment as Lang)) {
-    return firstSegment as Lang;
+function detectLangFromUrl(urlPathname: string): Lang {
+  const segments = urlPathname.split("/").filter(Boolean);
+  const first = segments[0]?.toLowerCase();
+  if (first && LANGS.includes(first as Lang)) {
+    return first as Lang;
   }
   return DEFAULT_LANG;
 }
 
-function getLangFromHeader(acceptLang: string | null): Lang {
-  if (!acceptLang) return DEFAULT_LANG;
-  const lang = acceptLang.split(",")[0]?.split("-")[0];
-  if (isValidLang(lang)) {
-    return lang;
+function detectLangFromHeader(acceptLanguage: string | null): Lang {
+  if (!acceptLanguage) return DEFAULT_LANG;
+  const lang = acceptLanguage.split(",")[0]?.split("-")[0]?.toLowerCase();
+  if (lang && LANGS.includes(lang as Lang)) {
+    return lang as Lang;
   }
   return DEFAULT_LANG;
 }
 
-const lang = getLangFromPath(Astro.url.pathname);
+const { pathname } = Astro.url;
+const lang = detectLangFromUrl(pathname);
 const homeHref = localizePath("/", lang);
 
-const contentByLang: Record<
-  Lang,
-  {
-    badge: string;
-    title: string;
-    description: string;
-    primaryCta: string;
-    countdownLabel: string;
-  }
-> = {
+const contentByLang: Record<Lang, {
+  badge: string;
+  title: string;
+  description: string;
+  primaryCta: string;
+  countdownLabel: string;
+}> = {
   en: {
     badge: "Detour in the Andes",
     title: "Lost in the mountains?",
-    description:
-      "The page you're looking for doesn't exist or has moved. Let's get you back on the right path.",
+    description: "The page you're looking for doesn't exist or has moved. Let's get you back on the right path.",
     primaryCta: "Go back home",
     countdownLabel: "Redirect in",
   },
   es: {
     badge: "Desvío en los Andes",
     title: "¿Te perdiste en la montaña?",
-    description:
-      "La página que buscas no existe o se mudó. Te llevamos de vuelta al camino correcto.",
+    description: "La página que buscas no existe o se mudó. Te llevamos de vuelta al camino correcto.",
     primaryCta: "Volver al inicio",
-    countdownLabel: "Redirect en",
+    countdownLabel: "Redirección en",
   },
   pt: {
     badge: "Desvio nos Andes",
     title: "Perdido nas montanhas?",
-    description:
-      "A página que você procura não existe ou mudou de lugar. Vamos te colocar de volta no caminho certo.",
+    description: "A página que você procura não existe ou mudou de lugar. Vamos te colocar de volta no caminho certo.",
     primaryCta: "Voltar ao início",
     countdownLabel: "Redirecionamento em",
   },
@@ -76,26 +70,16 @@ const seoProps = {
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <section
-    class="relative min-h-[calc(100vh-220px)] flex items-center justify-center px-6 py-16"
-  >
+  <section class="relative min-h-[calc(100vh-220px)] flex items-center justify-center px-6 py-16">
     <div class="max-w-2xl w-full text-center">
-      <span
-        class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary shadow-sm backdrop-blur"
-      >
+      <span class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary shadow-sm backdrop-blur">
         <span class="h-2 w-2 rounded-full bg-secondary"></span>
         {content.badge}
       </span>
 
       <div class="mt-12 space-y-6">
-        <p
-          class="text-sm font-semibold uppercase tracking-[0.45em] text-foreground/45"
-        >
-          Error 404
-        </p>
-        <h1
-          class="text-6xl md:text-8xl font-black tracking-[-0.04em] text-foreground"
-        >
+        <p class="text-sm font-semibold uppercase tracking-[0.45em] text-foreground/45">Error 404</p>
+        <h1 class="text-6xl md:text-8xl font-black tracking-[-0.04em] text-foreground">
           {content.title}
         </h1>
         <p class="text-lg text-foreground/70 max-w-md mx-auto">
@@ -104,27 +88,17 @@ const seoProps = {
       </div>
 
       <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-        <a
-          href={homeHref}
-          class="inline-flex items-center justify-center gap-3 rounded-full bg-secondary px-7 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary/90"
-        >
+        <a href={homeHref} class="inline-flex items-center justify-center gap-3 rounded-full bg-secondary px-7 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary/90">
           {content.primaryCta}
           <span aria-hidden="true">→</span>
         </a>
       </div>
 
-      <div
-        class="mt-8 inline-flex items-center gap-3 rounded-full border border-primary/10 bg-white/75 px-4 py-3 text-sm text-foreground/70 shadow-sm backdrop-blur"
-      >
-        <span
-          class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary"
-          >⏳</span
-        >
+      <div class="mt-8 inline-flex items-center gap-3 rounded-full border border-primary/10 bg-white/75 px-4 py-3 text-sm text-foreground/70 shadow-sm backdrop-blur">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">⏳</span>
         <span>
           {content.countdownLabel}
-          <strong class="ml-1 font-semibold text-foreground"
-            ><span id="redirect-countdown">8</span>s</strong
-          >
+          <strong class="ml-1 font-semibold text-foreground"><span id="redirect-countdown">8</span>s</strong>
         </span>
       </div>
     </div>
@@ -133,14 +107,11 @@ const seoProps = {
   <script is:inline define:vars={{ homeHref }}>
     let countdown = 8;
     const countdownNode = document.getElementById("redirect-countdown");
-
     const intervalId = window.setInterval(() => {
       countdown -= 1;
-
       if (countdownNode && countdown >= 0) {
         countdownNode.textContent = String(countdown);
       }
-
       if (countdown <= 0) {
         window.clearInterval(intervalId);
         window.location.href = homeHref;
