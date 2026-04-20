@@ -14,15 +14,98 @@ const colors = {
 };
 
 // Países con códigos telefónicos
-const paises = [
-  ...countriesData.map((c: any) => ({ nombre: c.nameES, codigo: c.phoneCode })).sort((a: any, b: any) => a.nombre.localeCompare(b.nombre)),
-  { nombre: 'Otro', codigo: '' }
-];
+const i18n = {
+  es: {
+    personalInfo: 'INFORMACIÓN PERSONAL',
+    names: 'Nombres',
+    namesPh: 'Tu nombre completo',
+    country: 'País',
+    countryPh: 'Selecciona tu país',
+    email: 'Email',
+    emailPh: 'tu@email.com',
+    whatsapp: 'WhatsApp',
+    tripDetails: 'DETALLES DEL VIAJE',
+    adults: 'N° Adultos',
+    minors: 'N° Menores',
+    date: 'Fecha de Viaje',
+    langGuide: 'Idioma del Guiado',
+    hotelCat: 'Categoría de Hotel',
+    messageLabel: 'Cuéntanos más sobre tu viaje soñado',
+    messagePh: 'Lugares que no quieres perder, detalles adicionales, tours que te interesan, etc.',
+    sending: '⏳ Enviando...',
+    sent: '✅ Enviado',
+    errorBtn: '❌ Error',
+    submitText: 'Solicitar Cotización',
+    alertSuccess: '¡Gracias por contactarnos! Te responderemos en breve.',
+    alertError: 'Hubo un error al enviar tu solicitud. Por favor intente nuevamente.',
+    otherCountry: 'Otro',
+    hotelCatList: ['2 Estrellas', '3 Estrellas', '4 Estrellas', '5 Estrellas', 'No específico']
+  },
+  en: {
+    personalInfo: 'PERSONAL INFORMATION',
+    names: 'Full Name',
+    namesPh: 'Your full name',
+    country: 'Country',
+    countryPh: 'Select your country',
+    email: 'Email',
+    emailPh: 'you@email.com',
+    whatsapp: 'WhatsApp',
+    tripDetails: 'TRIP DETAILS',
+    adults: 'N° Adults',
+    minors: 'N° Minors',
+    date: 'Travel Date',
+    langGuide: 'Guided Language',
+    hotelCat: 'Hotel Category',
+    messageLabel: 'Tell us more about your dream trip',
+    messagePh: "Places you don't want to miss, additional details, tours of interest, etc.",
+    sending: '⏳ Sending...',
+    sent: '✅ Sent',
+    errorBtn: '❌ Error',
+    submitText: 'Request Quote',
+    alertSuccess: 'Thank you for contacting us! We will reply shortly.',
+    alertError: 'There was an error sending your request. Please try again.',
+    otherCountry: 'Other',
+    hotelCatList: ['2 Stars', '3 Stars', '4 Stars', '5 Stars', 'Not specified']
+  },
+  pt: {
+    personalInfo: 'INFORMAÇÃO PESSOAL',
+    names: 'Nome Completo',
+    namesPh: 'Seu nome completo',
+    country: 'País',
+    countryPh: 'Selecione o seu país',
+    email: 'Email',
+    emailPh: 'seu@email.com',
+    whatsapp: 'WhatsApp',
+    tripDetails: 'DETALHES DA VIAGEM',
+    adults: 'Nº Adultos',
+    minors: 'Nº Menores',
+    date: 'Data de Viagem',
+    langGuide: 'Idioma do Guia',
+    hotelCat: 'Categoria do Hotel',
+    messageLabel: 'Conte-nos mais sobre a viagem dos seus sonhos',
+    messagePh: 'Lugares que não quer perder, detalhes adicionais, passeios de interesse, etc.',
+    sending: '⏳ Enviando...',
+    sent: '✅ Enviado',
+    errorBtn: '❌ Erro',
+    submitText: 'Solicitar Orçamento',
+    alertSuccess: 'Obrigado por nos contatar! Responderemos em breve.',
+    alertError: 'Houve um erro ao enviar a sua solicitação. Por favor, tente novamente.',
+    otherCountry: 'Outro',
+    hotelCatList: ['2 Estrelas', '3 Estrelas', '4 Estrelas', '5 Estrelas', 'Não específico']
+  }
+};
 
-const idiomas = ['Español', 'English', 'Português', 'Français', 'Deutsch', 'Italiano'];
-const categoriasHotel = ['2 Estrellas', '3 Estrellas', '4 Estrellas', '5 Estrellas', 'No específico'];
+const idiomasList = ['Español', 'English', 'Português', 'Français', 'Deutsch', 'Italiano'];
 
-export default function PlaneaTuViaje() {
+export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'pt' }) {
+  const t = i18n[lang] || i18n['es'];
+
+  // Cargar lista de países según idioma (idealmente traduciríamos country name pero usamos nameES por ahora)
+  const paises = [
+    ...countriesData.map((c: any) => ({ nombre: c.nameES, codigo: c.phoneCode })).sort((a: any, b: any) => a.nombre.localeCompare(b.nombre)),
+    { nombre: t.otherCountry, codigo: '' }
+  ];
+
   const [formData, setFormData] = useState({
     nombres: '',
     pais: '',
@@ -30,8 +113,8 @@ export default function PlaneaTuViaje() {
     adultos: '1',
     menores: '0',
     fechaViaje: '',
-    idioma: 'Español',
-    categoriaHotel: 'No específico',
+    idioma: idiomasList[0],
+    categoriaHotel: t.hotelCatList[4],
     mensaje: ''
   });
 
@@ -64,7 +147,7 @@ export default function PlaneaTuViaje() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...formData, codigoPais })
+        body: JSON.stringify({ ...formData, codigoPais, formLanguage: lang })
       });
 
       const result = await response.json();
@@ -78,19 +161,19 @@ export default function PlaneaTuViaje() {
           adultos: '1',
           menores: '0',
           fechaViaje: '',
-          idioma: 'Español',
-          categoriaHotel: 'No específico',
+          idioma: idiomasList[0],
+          categoriaHotel: t.hotelCatList[4],
           mensaje: ''
         });
         setCodigoPais('51');
-        alert('¡Gracias por contactarnos! Te responderemos en breve.');
+        alert(t.alertSuccess);
       } else {
         throw new Error(result.error || 'Error en el envío');
       }
     } catch (error) {
       console.error('Error:', error);
       setSubmitStatus('error');
-      alert('Hubo un error al enviar tu solicitud. Por favor intente nuevamente.');
+      alert(t.alertError);
     } finally {
       setIsSubmitting(false);
     }
@@ -133,7 +216,7 @@ export default function PlaneaTuViaje() {
               01
             </span>
             <h3 className="text-lg font-semibold" style={{ color: colors.foreground }}>
-              INFORMACIÓN PERSONAL
+              {t.personalInfo}
             </h3>
           </div>
           <div className="hidden h-px flex-1 bg-stone-100 md:block" />
@@ -142,7 +225,7 @@ export default function PlaneaTuViaje() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              Nombres <span className="text-red-500">*</span>
+              {t.names} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -152,13 +235,13 @@ export default function PlaneaTuViaje() {
               required
               style={inputStyle}
               className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-              placeholder="Tu nombre completo"
+              placeholder={t.namesPh}
             />
           </div>
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              País <span className="text-red-500">*</span>
+              {t.country} <span className="text-red-500">*</span>
             </label>
             <select
               name="pais"
@@ -168,7 +251,7 @@ export default function PlaneaTuViaje() {
               style={inputStyle}
               className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
-              <option value="">Selecciona tu país</option>
+              <option value="">{t.countryPh}</option>
               {paises.map(pais => (
                 <option key={pais.nombre} value={pais.nombre}>{pais.nombre}</option>
               ))}
@@ -177,7 +260,7 @@ export default function PlaneaTuViaje() {
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              Email <span className="text-red-500">*</span>
+              {t.email} <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -187,13 +270,13 @@ export default function PlaneaTuViaje() {
               required
               style={inputStyle}
               className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-              placeholder="tu@email.com"
+              placeholder={t.emailPh}
             />
           </div>
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              WhatsApp
+              {t.whatsapp}
             </label>
             <div className="flex overflow-hidden rounded-sm shadow-sm">
               <span
@@ -222,7 +305,7 @@ export default function PlaneaTuViaje() {
               02
             </span>
             <h3 className="text-lg font-semibold" style={{ color: colors.foreground }}>
-              DETALLES DEL VIAJE
+              {t.tripDetails}
             </h3>
           </div>
           <div className="hidden h-px flex-1 bg-stone-100 md:block" />
@@ -231,7 +314,7 @@ export default function PlaneaTuViaje() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              N° Adultos
+              {t.adults}
             </label>
             <input
               type="number"
@@ -246,7 +329,7 @@ export default function PlaneaTuViaje() {
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              N° Menores
+              {t.minors}
             </label>
             <input
               type="number"
@@ -261,7 +344,7 @@ export default function PlaneaTuViaje() {
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              Fecha de Viaje
+              {t.date}
             </label>
             <input
               type="date"
@@ -275,7 +358,7 @@ export default function PlaneaTuViaje() {
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              Idioma del Guiado
+              {t.langGuide}
             </label>
             <select
               name="idioma"
@@ -284,7 +367,7 @@ export default function PlaneaTuViaje() {
               style={inputStyle}
               className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
-              {idiomas.map(idioma => (
+              {idiomasList.map(idioma => (
                 <option key={idioma} value={idioma}>{idioma}</option>
               ))}
             </select>
@@ -292,7 +375,7 @@ export default function PlaneaTuViaje() {
 
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-              Categoría de Hotel
+              {t.hotelCat}
             </label>
             <select
               name="categoriaHotel"
@@ -301,7 +384,7 @@ export default function PlaneaTuViaje() {
               style={inputStyle}
               className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
-              {categoriasHotel.map(cat => (
+              {t.hotelCatList.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
@@ -311,16 +394,16 @@ export default function PlaneaTuViaje() {
         {/* Mensaje */}
         <div className="mt-5">
           <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
-            Cuéntanos más sobre tu viaje soñado
+            {t.messageLabel}
           </label>
           <textarea
-            name="men"
+            name="mensaje"
             value={formData.mensaje}
             onChange={handleChange}
             rows={4}
             style={inputStyle}
             className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-            placeholder="Lugares que no quieres perder, detalles adicionales, tours que te interesan, etc."
+            placeholder={t.messagePh}
           ></textarea>
         </div>
       </section>
@@ -332,7 +415,7 @@ export default function PlaneaTuViaje() {
           style={buttonStyle()}
           className="w-full rounded-sm px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] transition-all shadow-[0_18px_36px_rgba(15,23,42,0.14)] hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(15,23,42,0.18)] disabled:cursor-not-allowed disabled:opacity-75"
         >
-          {isSubmitting ? '⏳ Enviando...' : submitStatus === 'success' ? '✅ Enviado' : submitStatus === 'error' ? '❌ Error' : 'Solicitar Cotización'}
+          {isSubmitting ? t.sending : submitStatus === 'success' ? t.sent : submitStatus === 'error' ? t.errorBtn : t.submitText}
         </button>
       </div>
     </form>
