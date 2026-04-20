@@ -1,17 +1,21 @@
 ---
+export const prerender = false;
+
 import Layout from "@/layouts/main.astro";
 import { DEFAULT_LANG, LANGS, type Lang } from "@/lib/i18n";
 
 /**
- * Esta página es ESTÁTICA (prerenderizada en build time).
- * NO hay request real en el servidor — Cloudflare Pages sirve
- * este HTML estático ante cualquier 404.
- *
- * Por eso la detección de idioma se hace 100% en el cliente,
- * leyendo window.location.pathname.
+ * 404 Page (SSR)
+ * Detectamos el idioma desde la URL en el servidor y renderizamos los textos correspondientes.
  */
 
-const defaultLang: Lang = DEFAULT_LANG;
+const pathname = Astro.url.pathname;
+const firstSegment = pathname.split("/").filter(Boolean)[0];
+let lang: Lang = DEFAULT_LANG;
+
+if (firstSegment && ["es", "en", "pt"].includes(firstSegment)) {
+  lang = firstSegment as Lang;
+}
 
 type ContentShape = {
   badge: string;
@@ -48,73 +52,19 @@ const contentByLang: Record<Lang, ContentShape> = {
   },
 };
 
-// El servidor siempre renderiza el idioma por defecto.
-// El cliente lo sobreescribe si detecta otro idioma en la URL.
-const fallback = contentByLang[defaultLang];
+const content = contentByLang[lang];
+const homeUrl = lang === DEFAULT_LANG ? "/" : `/${lang}/`;
 
 const seoProps = {
-  title: `404 - ${fallback.title}`,
-  description: fallback.description,
+  title: `404 - ${content.title}`,
+  description: content.description,
   type: "website" as const,
-  lang: defaultLang,
+  lang: lang,
   robots: "noindex, nofollow",
 };
 ---
 
-<Layout seo={seoProps} lang={defaultLang}>
-  <!--
-    Script SÍNCRONO ejecutado antes de la sección visual.
-    Detecta el idioma en el cliente desde window.location.pathname
-    y parchea el DOM apenas está listo — cero flash de idioma incorrecto.
-  -->
-  <script is:inline define:vars={{ contentByLang, validLangs: LANGS, defaultLang }}>
-    (function () {
-      function detectLang(pathname) {
-        var seg = pathname.split("/").filter(Boolean);
-        var first = (seg[0] || "").toLowerCase();
-        return validLangs.includes(first) ? first : defaultLang;
-      }
-
-      function buildHome(lang) {
-        return lang === defaultLang ? "/" : "/" + lang + "/";
-      }
-
-      var lang = detectLang(window.location.pathname);
-      var c = contentByLang[lang];
-      var home = buildHome(lang);
-
-      // Compartimos con el script de countdown
-      window.__404_lang__ = lang;
-      window.__404_home__ = home;
-
-      // Actualizamos el <html lang> inmediatamente
-      document.documentElement.lang = lang;
-
-      // Parchamos el DOM apenas esté disponible
-      function patch() {
-        var badge    = document.getElementById("404-badge");
-        var title    = document.getElementById("404-title");
-        var desc     = document.getElementById("404-desc");
-        var cta      = document.getElementById("404-cta");
-        var label    = document.getElementById("404-countdown-label");
-        var homeLink = document.getElementById("404-home-link");
-
-        if (badge)    badge.textContent = c.badge;
-        if (title)    title.textContent = c.title;
-        if (desc)     desc.textContent  = c.description;
-        if (cta)      cta.textContent   = c.primaryCta;
-        if (label)    label.textContent = c.countdownLabel;
-        if (homeLink) homeLink.href     = home;
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", patch);
-      } else {
-        patch(); // Por View Transitions: el DOM ya puede estar listo
-      }
-    })();
-  </script>
-
+<Layout seo={seoProps} lang={lang}>
   <section
     class="relative min-h-[calc(100vh-220px)] flex items-center justify-center px-6 py-16"
   >
@@ -124,7 +74,7 @@ const seoProps = {
         class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary shadow-sm backdrop-blur"
       >
         <span class="h-2 w-2 rounded-full bg-secondary"></span>
-        <span id="404-badge">{fallback.badge}</span>
+        <span>{content.badge}</span>
       </span>
 
       <!-- Copy principal -->
@@ -135,27 +85,24 @@ const seoProps = {
           Error 404
         </p>
         <h1
-          id="404-title"
           class="text-6xl md:text-8xl font-black tracking-[-0.04em] text-foreground"
         >
-          {fallback.title}
+          {content.title}
         </h1>
         <p
-          id="404-desc"
           class="text-lg text-foreground/70 max-w-md mx-auto"
         >
-          {fallback.description}
+          {content.description}
         </p>
       </div>
 
       <!-- CTA -->
       <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
         <a
-          id="404-home-link"
-          href="/"
+          href={homeUrl}
           class="inline-flex items-center justify-center gap-3 rounded-full bg-secondary px-7 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary/90"
         >
-          <span id="404-cta">{fallback.primaryCta}</span>
+          <span>{content.primaryCta}</span>
           <span aria-hidden="true">→</span>
         </a>
       </div>
@@ -166,10 +113,9 @@ const seoProps = {
       >
         <span
           class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary"
-          >⏳</span
-        >
+        >⏳</span>
         <span>
-          <span id="404-countdown-label">{fallback.countdownLabel}</span>
+          <span>{content.countdownLabel}</span>
           <strong class="ml-1 font-semibold text-foreground"
             ><span id="redirect-countdown">8</span>s</strong
           >
@@ -178,10 +124,9 @@ const seoProps = {
     </div>
   </section>
 
-  <!-- Countdown + redirect — se ejecuta después del DOM -->
-  <script is:inline>
+  <!-- Countdown + redirect -->
+  <script is:inline define:vars={{ homeUrl }}>
     document.addEventListener("DOMContentLoaded", function () {
-      var home = window.__404_home__ || "/";
       var countdown = 8;
       var node = document.getElementById("redirect-countdown");
 
@@ -190,7 +135,7 @@ const seoProps = {
         if (node && countdown >= 0) node.textContent = String(countdown);
         if (countdown <= 0) {
           window.clearInterval(id);
-          window.location.href = home;
+          window.location.href = homeUrl;
         }
       }, 1000);
     });
