@@ -5,27 +5,33 @@ lang: "es"
 seo:
   metaTitle: "Libro de Reclamaciones | Turismo Perú Bolivia"
   metaDescription: "Libro de Reclamaciones - Turismo Perú Bolivia"
+slugs:
+  es: "libro-reclamaciones"
+  en: "complaints-book"
+  pt: "livro-de-reclamacoes"
+---
+import LibroReclamaciones from "@/components/LibroReclamaciones";
+
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 my-6">
+
+> 📖 **Estimados usuarios**, el Libro de Reclamaciones es exclusivamente a la insatisfacción o disconformidad del usuario respecto a un servicio brindado por **DREAMY TOURS**. Los campos que se presentan son obligatorios para poder realizar su reclamo.
+
+> «Conforme a lo establecido en el Código de Protección y Defensa del Consumidor este establecimiento cuenta con un Libro de Reclamaciones a tu disposición Solicitalo para registrar una queja o reclamo»
+
+</div>
+
 ---
 
-# Libro de Reclamaciones
+<div class="bg-white rounded-sm shadow-lg p-8 border border-gray-200">
 
-Tu opinión es importante para nosotros. Si tienes alguna reclamación o sugerencia, por favor escríbenos.
+<LibroReclamaciones client:visible />
 
-## Canales de Contacto
+</div>
 
-- **Email**: clientes@turismo-peru-bolivia.com
-- **Teléfono**: +51 123 456 789
-- **Dirección**: Av. Principal 123, Lima, Perú
+---
 
-## Proceso de Reclamación
+<div class="bg-blue-50 border-l-4 border-blue-500 p-6 my-8">
 
-1. Envíanos tu reclamación por cualquiera de los canales mencionados
-2. Recibirás un acuse de recibo dentro de las 24 horas
-3. Investigaremos tu caso y te responderemos en un máximo de 5 días hábiles
+> 📌 **Nota:** Su reclamo será respondido en un plazo máximo de 30 días hábiles conforme a la normativa vigente.
 
-## Derechos del Cliente
-
-- Ser atendido con cortesía y respeto
-- Recibir información clara sobre nuestros servicios
-- Obtener respuesta a tus consultas en tiempo razonable
-- La privacidad de tus datos personales
+</div>

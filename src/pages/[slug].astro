@@ -48,128 +48,23 @@ export async function getStaticPaths() {
     props: unknown;
   }> = [];
 
-  // ✅ MDX PAGES - dynamic imports
-  const mdxImports = [
-    {
-      key: "es/codigo-esnna",
-      import: () => import("@/content/pages/es/codigo-esnna.mdx"),
-    },
-    {
-      key: "es/libro-reclamaciones",
-      import: () => import("@/content/pages/es/libro-reclamaciones.mdx"),
-    },
-    {
-      key: "es/politicas-privacidad",
-      import: () => import("@/content/pages/es/politicas-privacidad.mdx"),
-    },
-    {
-      key: "es/nuestros-clientes",
-      import: () => import("@/content/pages/es/nuestros-clientes.mdx"),
-    },
-    {
-      key: "es/igualdad-genero",
-      import: () => import("@/content/pages/es/igualdad-genero.mdx"),
-    },
-    {
-      key: "es/sobre-nosotros",
-      import: () => import("@/content/pages/es/sobre-nosotros.mdx"),
-    },
-    {
-      key: "es/terminos-condiciones",
-      import: () => import("@/content/pages/es/terminos-condiciones.mdx"),
-    },
-    {
-      key: "es/metodos-pago",
-      import: () => import("@/content/pages/es/metodos-pago.mdx"),
-    },
-    {
-      key: "en/codigo-esnna",
-      import: () => import("@/content/pages/en/codigo-esnna.mdx"),
-    },
-    {
-      key: "en/libro-reclamaciones",
-      import: () => import("@/content/pages/en/libro-reclamaciones.mdx"),
-    },
-    {
-      key: "en/politicas-privacidad",
-      import: () => import("@/content/pages/en/politicas-privacidad.mdx"),
-    },
-    {
-      key: "en/nuestros-clientes",
-      import: () => import("@/content/pages/en/nuestros-clientes.mdx"),
-    },
-    {
-      key: "en/igualdad-genero",
-      import: () => import("@/content/pages/en/igualdad-genero.mdx"),
-    },
-    {
-      key: "en/sobre-nosotros",
-      import: () => import("@/content/pages/en/sobre-nosotros.mdx"),
-    },
-    {
-      key: "en/terminos-condiciones",
-      import: () => import("@/content/pages/en/terminos-condiciones.mdx"),
-    },
-    {
-      key: "en/metodos-pago",
-      import: () => import("@/content/pages/en/metodos-pago.mdx"),
-    },
-    {
-      key: "en/planea-tu-viaje",
-      import: () => import("@/content/pages/en/planea-tu-viaje.mdx"),
-    },
-    {
-      key: "es/planea-tu-viaje",
-      import: () => import("@/content/pages/es/planea-tu-viaje.mdx"),
-    },
-    {
-      key: "pt/planea-tu-viaje",
-      import: () => import("@/content/pages/pt/planea-tu-viaje.mdx"),
-    },
-    {
-      key: "pt/codigo-esnna",
-      import: () => import("@/content/pages/pt/codigo-esnna.mdx"),
-    },
-    {
-      key: "pt/libro-reclamaciones",
-      import: () => import("@/content/pages/pt/libro-reclamaciones.mdx"),
-    },
-    {
-      key: "pt/politicas-privacidad",
-      import: () => import("@/content/pages/pt/politicas-privacidad.mdx"),
-    },
-    {
-      key: "pt/nuestros-clientes",
-      import: () => import("@/content/pages/pt/nuestros-clientes.mdx"),
-    },
-    {
-      key: "pt/igualdad-genero",
-      import: () => import("@/content/pages/pt/igualdad-genero.mdx"),
-    },
-    {
-      key: "pt/sobre-nosotros",
-      import: () => import("@/content/pages/pt/sobre-nosotros.mdx"),
-    },
-    {
-      key: "pt/terminos-condiciones",
-      import: () => import("@/content/pages/pt/terminos-condiciones.mdx"),
-    },
-    {
-      key: "pt/metodos-pago",
-      import: () => import("@/content/pages/pt/metodos-pago.mdx"),
-    },
-  ];
+  // ✅ MDX PAGES - dynamic globs
+  const mdxPages = import.meta.glob("@/content/pages/**/*.mdx");
 
-  for (const mdx of mdxImports) {
-    const mod = await mdx.import();
-    const [lang, slug] = mdx.key.split("/");
+  for (const path in mdxPages) {
+    const mod = (await mdxPages[path]()) as any;
+    const subpath = path.split("/content/pages/")[1].replace(".mdx", "");
+    const [lang, slug] = subpath.split("/");
+
     if (lang !== DEFAULT_LANG) continue;
+
     paths.push({
       params: { slug },
       props: {
         type: "mdx",
         mdxComponent: mod,
         mdxFrontmatter: mod.frontmatter || {},
+        pageSlugMap: mod.frontmatter.slugs || {},
       },
     });
   }
@@ -426,6 +321,11 @@ const pageStats =
 {
   type === "mdx" && mdxComponent && (
     <Layout seo={seoProps} lang={lang}>
+      <script
+        id="page-slug-map"
+        type="application/json"
+        set:html={JSON.stringify(pageSlugMap || {})}
+      />
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-12">
         <div class="mb-14 md:mb-20 text-center">
           <h1 class="text-3xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-6 relative inline-block">
