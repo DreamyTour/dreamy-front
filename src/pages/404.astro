@@ -89,9 +89,7 @@ const seoProps = {
         >
           {content.title}
         </h1>
-        <p
-          class="text-lg text-foreground/70 max-w-md mx-auto"
-        >
+        <p class="text-lg text-foreground/70 max-w-md mx-auto">
           {content.description}
         </p>
       </div>
@@ -113,11 +111,12 @@ const seoProps = {
       >
         <span
           class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary"
-        >⏳</span>
+          >⏳</span
+        >
         <span>
           <span>{content.countdownLabel}</span>
           <strong class="ml-1 font-semibold text-foreground"
-            ><span id="redirect-countdown">8</span>s</strong
+            ><span id="redirect-countdown">5</span>s</strong
           >
         </span>
       </div>
@@ -126,8 +125,8 @@ const seoProps = {
 
   <!-- Countdown + redirect -->
   <script is:inline define:vars={{ homeUrl }}>
-    document.addEventListener("DOMContentLoaded", function () {
-      var countdown = 8;
+    (function () {
+      var countdown = 5;
       var node = document.getElementById("redirect-countdown");
 
       var id = window.setInterval(function () {
@@ -138,6 +137,6 @@ const seoProps = {
           window.location.href = homeUrl;
         }
       }, 1000);
-    });
+    })();
   </script>
 </Layout>
