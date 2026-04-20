@@ -137,6 +137,14 @@ const seoProps = {
           window.location.href = homeUrl;
         }
       }, 1000);
+
+      // Limpieza oficial de Astro View Transitions: si el usuario hace clic 
+      // en un enlace (ej: logo) se aborta el intervalo de inmediato.
+      var cleanup = function() {
+        window.clearInterval(id);
+        document.removeEventListener("astro:before-preparation", cleanup);
+      };
+      document.addEventListener("astro:before-preparation", cleanup);
     })();
   </script>
 </Layout>
