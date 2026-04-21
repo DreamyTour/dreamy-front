@@ -6,11 +6,584 @@
 /* Clases de typography solo para contenido MDX */
 @layer components {
   .mdx-content {
-    @apply prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-base prose-p:leading-relaxed prose-p:text-gray-600 prose-a:text-primary hover:prose-a:text-green-800 prose-ul:text-base prose-ol:text-base prose-li:text-gray-600;
+    --tw-prose-body: var(--muted-foreground);
+    --tw-prose-headings: var(--foreground);
+    --tw-prose-lead: color-mix(in oklab, var(--muted-foreground) 88%, white 12%);
+    --tw-prose-links: var(--primary);
+    --tw-prose-bold: var(--foreground);
+    --tw-prose-counters: color-mix(in oklab, var(--muted-foreground) 88%, white 12%);
+    --tw-prose-bullets: color-mix(in oklab, var(--primary) 40%, var(--border) 60%);
+    --tw-prose-hr: color-mix(in oklab, var(--border) 100%, transparent);
+    --tw-prose-quotes: var(--foreground);
+    --tw-prose-quote-borders: color-mix(in oklab, var(--primary) 26%, white);
+    --tw-prose-captions: var(--muted-foreground);
+    --tw-prose-code: var(--foreground);
+    --tw-prose-pre-code: oklch(0.97 0.01 150);
+    --tw-prose-pre-bg: color-mix(in oklab, var(--foreground) 90%, transparent);
+    --tw-prose-th-borders: color-mix(in oklab, var(--border) 100%, transparent);
+    --tw-prose-td-borders: color-mix(in oklab, var(--border) 82%, white 18%);
+    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.03em] prose-p:text-[1.04rem] prose-p:leading-8 prose-a:font-semibold prose-a:no-underline hover:prose-a:text-secondary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-r-sm prose-blockquote:border-l-4 prose-blockquote:bg-primary/[0.04] prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-sm prose-img:shadow-[0_24px_70px_-44px_color-mix(in_oklab,var(--foreground)_28%,transparent)] prose-h2:mt-16 prose-h2:text-3xl prose-h2:md:text-4xl prose-h3:mt-12 prose-h3:text-2xl prose-h4:mt-10 prose-h4:text-xl;
   }
 
   .mdx-content-dark {
     @apply prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-white prose-p:text-base prose-p:leading-relaxed prose-p:text-gray-300 prose-a:text-primary hover:prose-a:text-green-400 prose-ul:text-base prose-ol:text-base prose-li:text-gray-300;
+  }
+}
+
+.content-shell {
+  background:
+    radial-gradient(circle at top left, color-mix(in oklab, var(--primary) 14%, transparent), transparent 32%),
+    radial-gradient(circle at top right, color-mix(in oklab, var(--secondary) 12%, transparent), transparent 30%),
+    linear-gradient(180deg, color-mix(in oklab, var(--muted) 55%, white) 0%, var(--background) 38%, color-mix(in oklab, var(--primary) 3%, white) 100%);
+}
+
+.content-shell--mdx {
+  background: var(--background);
+}
+
+.content-hero-title {
+  color: #ffffff;
+}
+
+.content-article {
+  color: var(--foreground);
+}
+
+.content-article :where(.not-prose) {
+  margin-block: clamp(1.75rem, 1.3rem + 1.6vw, 3rem);
+}
+
+.content-article :where(.not-prose:first-child) {
+  margin-top: 0;
+}
+
+.content-article :where(.not-prose:last-child) {
+  margin-bottom: 0;
+}
+
+.content-article :where(section, h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 7rem;
+}
+
+.content-article :is(h1, h2, h3, h4, h5, h6, strong, blockquote) {
+  color: var(--foreground);
+}
+
+.content-article :is(p, li, figcaption, small) {
+  color: var(--muted-foreground);
+}
+
+.content-article :is(hr) {
+  border-color: color-mix(in oklab, var(--border) 100%, transparent);
+}
+
+.content-article :is(.bg-white, .bg-white\/80, .bg-white\/95) {
+  background-color: color-mix(in oklab, var(--background) 88%, var(--primary) 12%);
+}
+
+.content-article :is(.bg-muted, .bg-muted\/30, .bg-muted\/50, .bg-slate-50) {
+  background-color: color-mix(in oklab, var(--muted) 82%, white 18%);
+}
+
+.content-article :is(.border-gray-200, .border-border) {
+  border-color: color-mix(in oklab, var(--border) 100%, transparent);
+}
+
+.content-article :is(.text-gray-900, .text-slate-900, .text-foreground) {
+  color: var(--foreground);
+}
+
+.content-article :is(.text-gray-800) {
+  color: color-mix(in oklab, var(--foreground) 88%, var(--muted-foreground) 12%);
+}
+
+.content-article :is(.text-gray-600, .text-slate-600, .text-slate-500, .text-muted-foreground) {
+  color: var(--muted-foreground);
+}
+
+.content-article :is(.shadow-lg, .shadow-xl, .shadow-2xl, .shadow-sm, .hover\:shadow-md:hover, .hover\:shadow-lg:hover) {
+  box-shadow: 0 24px 60px -42px color-mix(in oklab, var(--foreground) 28%, transparent);
+}
+
+.about-page .about-surface {
+  background: var(--background);
+}
+
+.about-page .about-band {
+  background: var(--muted);
+  border-block: 1px solid var(--border);
+}
+
+.about-page .about-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.about-page .about-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.about-page .about-card-highlight {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.about-page .about-stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.legal-page .legal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.legal-page .legal-accent-icon {
+  color: var(--primary);
+}
+
+.payment-page {
+  --payment-bg: var(--background);
+  --payment-border: var(--border);
+  --payment-text: var(--foreground);
+  --payment-muted: var(--muted-foreground);
+  --payment-bg-subtle: var(--muted);
+}
+
+.payment-page .payment-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.payment-page .payment-option-card {
+  background: var(--payment-bg);
+  border: 1px solid var(--payment-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.payment-page .option-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-foreground);
+}
+
+.payment-page .option-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--payment-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.payment-page .option-description {
+  font-size: 0.8125rem;
+  color: var(--payment-muted);
+  margin: 0;
+  line-height: 1.4;
+  display: none;
+}
+
+.payment-page .payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.payment-page .payment-card {
+  background: var(--payment-bg);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  border: 1px solid var(--border);
+}
+
+.payment-page .bank-card-wrapper {
+  position: relative;
+}
+
+.payment-page .bank-card-glow {
+  position: absolute;
+  inset: -1rem;
+  background: radial-gradient(circle, color-mix(in oklab, var(--primary) 15%, transparent) 0%, transparent 70%);
+  border-radius: 2rem;
+  filter: blur(1rem);
+  opacity: 0.5;
+  transition: opacity 0.7s ease;
+}
+
+.payment-page .bank-card-wrapper:hover .bank-card-glow {
+  opacity: 1;
+}
+
+.payment-page .bank-card-visual {
+  position: relative;
+  aspect-ratio: 1.586;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  color: var(--foreground);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, white);
+}
+
+.payment-page .interbank-card {
+  background: linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 80%, var(--secondary)) 100%);
+  color: var(--primary-foreground);
+}
+
+.payment-page .bcp-card {
+  background: linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 80%, var(--secondary)) 100%);
+  color: var(--primary-foreground);
+}
+
+.payment-page .bank-logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(0.5rem);
+}
+
+.payment-page .bank-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.payment-page .bank-card-chip-grid {
+  width: 3rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.9) 100%);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  border: 1px solid color-mix(in oklab, var(--border) 50%, white);
+}
+
+.payment-page .chip-cell {
+  border: 0.5px solid rgba(0,0,0,0.1);
+}
+
+.payment-page .bank-card-number {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.95);
+}
+
+.payment-page .bank-card-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.6);
+}
+
+.payment-page .bank-card-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.95);
+}
+
+.payment-page .bank-card-footer-info {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.payment-page .footer-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.payment-page .footer-info-row:last-child {
+  border-bottom: none;
+  background: var(--muted);
+}
+
+.payment-page .footer-info-label {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.payment-page .footer-info-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.payment-page .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--payment-border);
+}
+
+.payment-page .card-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.payment-page .brand-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  background: var(--payment-bg-subtle);
+  color: var(--payment-text);
+}
+
+.payment-page .brand-icon.brand-paypal {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.75rem;
+}
+
+.payment-page .brand-icon.brand-izipay {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  font-size: 0.625rem;
+}
+
+.payment-page .brand-icon.brand-bank {
+  background: var(--white, var(--background));
+  border: 1px solid var(--payment-border);
+  color: var(--primary);
+}
+
+.payment-page .brand-icon.brand-transfer {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.payment-page .brand-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--payment-text);
+  margin: 0;
+}
+
+.payment-page .brand-type {
+  font-size: 0.8125rem;
+  color: var(--payment-muted);
+  margin: 0;
+}
+
+.payment-page .secure-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  background: var(--payment-bg-subtle);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--payment-text);
+}
+
+.payment-page .currency-badge {
+  background: var(--payment-bg-subtle);
+  color: var(--payment-text);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  letter-spacing: 0.025em;
+}
+
+.payment-page .card-fee {
+  font-size: 0.875rem;
+  color: var(--payment-muted);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.payment-page .card-button {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+
+.payment-page .card-button:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.payment-page .account-details {
+  border: 1px solid var(--payment-border);
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.payment-page .account-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--payment-border);
+}
+
+.payment-page .account-row:last-child {
+  border-bottom: none;
+}
+
+.payment-page .account-label {
+  font-size: 0.8125rem;
+  color: var(--payment-muted);
+}
+
+.payment-page .account-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--payment-text);
+}
+
+.payment-page .account-value.mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+
+.payment-page .account-address {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--payment-muted);
+  padding: 1rem;
+  border-top: 1px solid var(--payment-border);
+  background: var(--payment-bg-subtle);
+}
+
+.payment-page .transfer-details {
+  border: 1px solid var(--payment-border);
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.payment-page .transfer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--payment-border);
+}
+
+.payment-page .transfer-row:last-child {
+  border-bottom: none;
+}
+
+.payment-page .transfer-label {
+  font-size: 0.875rem;
+  color: var(--payment-muted);
+}
+
+.payment-page .transfer-value {
+  font-weight: 600;
+  color: var(--payment-text);
+}
+
+.payment-page .transfer-value.mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.payment-page .payment-footer {
+  border-top: 1px solid var(--payment-border);
+  padding-top: 2rem;
+  margin-top: 1rem;
+}
+
+.payment-page .footer-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.payment-page .footer-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--payment-muted);
+}
+
+.payment-page .footer-item svg {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .payment-page .payment-options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-page .payment-option-card {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .payment-page .payment-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-page .footer-items {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
   }
 }
 

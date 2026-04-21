@@ -149,15 +149,8 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const {
-  type,
-  tour,
-  page,
-  slugMap,
-  pageSlugMap,
-  mdxComponent,
-  mdxFrontmatter,
-} = Astro.props as Props;
+const { type, tour, page, slugMap, pageSlugMap, mdxComponent, mdxFrontmatter } =
+  Astro.props as Props;
 const lang = DEFAULT_LANG;
 
 // ====== OBTENER TOUR ACTUAL CON CATEGORÍA ======
@@ -307,6 +300,26 @@ const pageUiCopy = {
 
 const pageCopy = pageUiCopy[lang] ?? pageUiCopy[DEFAULT_LANG];
 
+const mdxUiCopy = {
+  es: {
+    eyebrow: "Dreamy Guide",
+  },
+  en: {
+    eyebrow: "Dreamy Guide",
+  },
+  pt: {
+    eyebrow: "Dreamy Guide",
+  },
+} as const;
+
+const mdxCopy = mdxUiCopy[lang] ?? mdxUiCopy[DEFAULT_LANG];
+
+const heroImage =
+  (mdxFrontmatter.heroImage as string | undefined) ||
+  "/imagenes/sobre_nosotros.avif";
+const heroImageAlt =
+  (mdxFrontmatter.heroImageAlt as string | undefined) || "Dreamy Tours";
+
 const pageStats =
   type === "page" && page
     ? [
@@ -326,24 +339,50 @@ const pageStats =
         type="application/json"
         set:html={JSON.stringify(pageSlugMap || {})}
       />
-      <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-12">
-        <div class="mb-14 md:mb-20 text-center">
-          <h1 class="text-3xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-6 relative inline-block">
-            <span class="relative z-10">{mdxFrontmatter.title}</span>
-            <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
-          </h1>
-          <div class="flex items-center justify-center gap-3 mt-4">
-            <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
-            <div class="w-12 h-1.5 bg-secondary rounded-full relative">
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full" />
-            </div>
-            <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
-          </div>
-        </div>
+      <div class="content-shell content-shell--mdx max-w-8xl mx-auto px-4 py-8 md:px-6 md:py-10 lg:px-8 lg:py-12">
+        <section class="content-hero content-hero--mdx relative isolate overflow-hidden rounded-sm lg:h-[500px]">
+          <img
+            src={heroImage}
+            alt={heroImageAlt}
+            class="absolute inset-0 w-full object-cover lg:h-[500px]"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
 
-        <article class="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-base prose-p:leading-relaxed prose-p:text-gray-600 prose-a:text-primary hover:prose-a:text-green-800 prose-ul:text-base prose-ol:text-base prose-li:text-gray-600">
-          {mdxComponent?.default ? <mdxComponent.default /> : null}
-        </article>
+          <div class="relative px-6 py-10 text-center md:px-10 md:py-14 lg:px-14 lg:py-16 lg:absolute lg:bottom-0 lg:left-0 lg:right-0">
+            <div class="mx-auto max-w-4xl">
+              <div class="inline-flex items-center gap-3 rounded-sm border border-white/20 bg-black/50 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-white shadow-sm backdrop-blur-sm">
+                <span class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]" />
+                <span>{mdxCopy.eyebrow}</span>
+              </div>
+
+              <h1 class="content-hero-title mt-6 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
+                {mdxFrontmatter.title}
+              </h1>
+
+              {mdxFrontmatter.description && (
+                <p class="mx-auto mt-6 max-w-3xl text-base leading-8 text-white/80 md:text-lg lg:text-[1.08rem]">
+                  {mdxFrontmatter.description}
+                </p>
+              )}
+
+              <div class="mt-8 flex items-center justify-center gap-3">
+                <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary/70" />
+                <div class="relative h-1.5 w-12 rounded-full bg-secondary">
+                  <div class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary" />
+                </div>
+                <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary/70" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="relative mx-auto -mt-4 max-w-7xl md:-mt-8">
+          <article class="content-article mdx-content max-w-none sm:px-7 sm:py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
+            {mdxComponent?.default ? <mdxComponent.default /> : null}
+          </article>
+        </div>
       </div>
     </Layout>
   )

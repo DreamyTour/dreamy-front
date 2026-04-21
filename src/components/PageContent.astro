@@ -69,8 +69,8 @@ const pageStats =
     type="application/json"
     set:html={JSON.stringify(pageSlugMap)}
   />
-  <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12">
-    <section class="relative isolate overflow-hidden rounded-sm border border-primary/10 bg-white shadow-[0_32px_90px_-48px_rgba(31,41,55,0.38)]">
+  <div class="content-shell max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12">
+    <section class="content-hero relative isolate overflow-hidden rounded-sm">
       {pageVideoThumbnail && (
         <img
           src={pageVideoThumbnail}
@@ -81,13 +81,13 @@ const pageStats =
           fetchpriority="high"
         />
       )}
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,191,129,0.26),transparent_42%),radial-gradient(circle_at_top_right,rgba(220,123,66,0.18),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,255,255,0.86)_54%,rgba(240,247,243,0.96))]" />
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_oklab,var(--primary)_24%,transparent),transparent_42%),radial-gradient(circle_at_top_right,color-mix(in_oklab,var(--secondary)_16%,transparent),transparent_38%),linear-gradient(135deg,color-mix(in_oklab,var(--background)_95%,var(--primary)_5%),color-mix(in_oklab,var(--background)_90%,var(--secondary)_10%)_54%,color-mix(in_oklab,var(--muted)_70%,white))]" />
       <div class="absolute left-0 top-0 h-40 w-40 -translate-x-10 -translate-y-10 rounded-full bg-primary/10 blur-3xl" />
       <div class="absolute bottom-0 right-0 h-52 w-52 translate-x-16 translate-y-14 rounded-full bg-secondary/10 blur-3xl" />
 
       <div class="relative grid gap-10 px-6 py-8 md:px-10 md:py-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:gap-12 lg:px-14 lg:py-14">
         <div class="max-w-3xl">
-          <div class="inline-flex items-center gap-3 rounded-sm border border-primary/15 bg-white/80 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-primary shadow-sm backdrop-blur-sm">
+          <div class="inline-flex items-center gap-3 rounded-sm border border-primary/15 bg-background/85 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-primary shadow-sm backdrop-blur-sm">
             <span class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]" />
             <span>{page.categories?.find((c: any) => c.slug !== 'peru-tours')?.nombre || pageCopy.eyebrow}</span>
           </div>
@@ -96,11 +96,11 @@ const pageStats =
             <span class="block text-xs font-semibold uppercase tracking-[0.38em] text-secondary/80">
               {pageCopy.experienceLabel}
             </span>
-            <h1 class="max-w-3xl text-4xl font-semibold tracking-[-0.04em] text-gray-900 sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
+            <h1 class="content-hero-title max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
               {page.titulo}
             </h1>
             {page.content && (
-              <p class="max-w-3xl text-base leading-8 text-gray-700 md:pt-1 md:text-lg lg:max-w-2xl lg:text-[1.08rem]">
+              <p class="max-w-3xl text-base leading-8 text-muted-foreground md:pt-1 md:text-lg lg:max-w-2xl lg:text-[1.08rem]">
                 {page.content}
               </p>
             )}
@@ -117,11 +117,11 @@ const pageStats =
 
           <div class="mt-8 grid gap-3 sm:grid-cols-2">
             {pageStats.map((stat) => (
-              <div class="rounded-sm border border-white/70 bg-white/75 px-4 py-4 shadow-[0_18px_45px_-30px_rgba(31,41,55,0.35)] backdrop-blur-sm">
-                <p class="text-2xl font-semibold tracking-[-0.03em] text-gray-900">
+              <div class="rounded-sm border border-border/80 bg-background/80 px-4 py-4 shadow-[0_18px_45px_-30px_color-mix(in_oklab,var(--foreground)_22%,transparent)] backdrop-blur-sm">
+                <p class="text-2xl font-semibold tracking-[-0.03em] text-foreground">
                   {stat.value}
                 </p>
-                <p class="mt-1 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-gray-500">
+                <p class="mt-1 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-muted-foreground">
                   {stat.label}
                 </p>
               </div>
@@ -136,9 +136,9 @@ const pageStats =
           {pageVideoId ? (
             <div
               id="category-video"
-              class="relative overflow-hidden rounded-sm border border-white/70 bg-white/80 p-3 shadow-[0_30px_70px_-34px_rgba(31,41,55,0.45)] backdrop-blur-md"
+              class="relative overflow-hidden rounded-sm border border-border/70 bg-background/80 p-3 shadow-[0_30px_70px_-34px_color-mix(in_oklab,var(--foreground)_28%,transparent)] backdrop-blur-md"
             >
-              <div class="overflow-hidden rounded-sm bg-white/95">
+              <div class="overflow-hidden rounded-sm bg-background/95">
                 <LiteYouTube
                   videoId={pageVideoId}
                   title={page.titulo || "Video"}
@@ -148,9 +148,9 @@ const pageStats =
               </div>
             </div>
           ) : (
-            <div class="relative overflow-hidden rounded-sm border border-white/70 bg-white/80 p-8 shadow-[0_30px_70px_-34px_rgba(31,41,55,0.45)] backdrop-blur-md">
+            <div class="relative overflow-hidden rounded-sm border border-border/70 bg-background/80 p-8 shadow-[0_30px_70px_-34px_color-mix(in_oklab,var(--foreground)_28%,transparent)] backdrop-blur-md">
               <div class="rounded-sm border border-dashed border-primary/20 bg-gradient-to-br from-primary/8 via-white to-secondary/8 px-8 py-14 text-center">
-                <p class="text-base leading-7 text-gray-600">
+                <p class="text-base leading-7 text-muted-foreground">
                   {page.description || page.content}
                 </p>
               </div>
@@ -184,16 +184,16 @@ const pageStats =
         <section class="w-full py-16">
           <div class="max-w-8xl mx-auto px-6">
             <div class="mx-auto mb-10 max-w-3xl text-center">
-              <h2 class="text-3xl font-semibold tracking-[-0.04em] text-gray-900 md:text-4xl">
+              <h2 class="text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
                 {page.tituloPreguntas}
               </h2>
               <div class="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               {page.preguntasAcordeon.map((pregunta: any) => (
-                <details class="group overflow-hidden rounded-sm border border-gray-200/80 bg-white shadow-[0_22px_50px_-38px_rgba(31,41,55,0.45)] transition-colors duration-300 open:border-primary/20 open:bg-primary/[0.02]">
+                <details class="group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)] transition-colors duration-300 open:border-primary/20 open:bg-primary/[0.02]">
                   <summary class="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden md:px-6">
-                    <span class="font-semibold text-gray-800 text-sm md:text-base text-left">
+                    <span class="text-left text-sm font-semibold text-foreground md:text-base">
                       {pregunta.titulo}
                     </span>
                     <span class="flex h-10 w-10 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary transition-transform duration-200 group-open:rotate-180">
@@ -223,7 +223,7 @@ const pageStats =
                                 return (
                                   <p
                                     key={blockIndex}
-                                    class="text-base leading-7 text-gray-600"
+                                    class="text-base leading-7 text-muted-foreground"
                                   >
                                     {(block.children || [])
                                       .map((child: any) => child.text || "")
@@ -240,7 +240,7 @@ const pageStats =
                                   return (
                                     <h1
                                       key={blockIndex}
-                                      class="text-xl font-bold text-gray-900"
+                                      class="text-xl font-bold text-foreground"
                                     >
                                       {headingText}
                                     </h1>
@@ -250,7 +250,7 @@ const pageStats =
                                   return (
                                     <h2
                                       key={blockIndex}
-                                      class="text-lg font-bold text-gray-900"
+                                      class="text-lg font-bold text-foreground"
                                     >
                                       {headingText}
                                     </h2>
@@ -259,7 +259,7 @@ const pageStats =
                                 return (
                                   <h3
                                     key={blockIndex}
-                                    class="text-base font-semibold text-gray-800"
+                                    class="text-base font-semibold text-foreground"
                                   >
                                     {headingText}
                                   </h3>
@@ -272,11 +272,11 @@ const pageStats =
                                 return (
                                   <ListTag
                                     key={blockIndex}
-                                    class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 text-gray-600 space-y-1`}
+                                    class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
                                   >
                                     {(block.children || []).map(
                                       (listItem: any, i: number) => (
-                                        <li key={i} class="text-gray-600">
+                                        <li key={i} class="text-muted-foreground">
                                           {(listItem.children || [])
                                             .map(
                                               (child: any) =>
