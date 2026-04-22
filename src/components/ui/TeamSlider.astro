@@ -14,44 +14,66 @@ interface Props {
 }
 
 const { members, department } = Astro.props;
-const sliderId = `team-slider-${department.replace(/\s/g, '-').toLowerCase()}`;
+const sliderId = `team-slider-${department.replace(/\s/g, "-").toLowerCase()}`;
 ---
 
 <div class="relative group" data-slider-id={sliderId}>
   <!-- Slider Container -->
-  <div 
+  <div
     id={sliderId}
     class="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-2"
     style="scrollbar-width: none; -ms-overflow-style: none; height: 420px;"
   >
-    {members.map((member) => (
-      <div class="shrink-0 snap-start w-[280px] md:w-[300px] h-full">
-        <TeamCard 
-          name={member.name} 
-          role={member.role} 
-          department={member.department}
-          image={member.image}
-        />
-      </div>
-    ))}
+    {
+      members.map((member) => (
+        <div class="shrink-0 snap-start w-[280px] md:w-[300px] h-full">
+          <TeamCard
+            name={member.name}
+            role={member.role}
+            department={member.department}
+            image={member.image}
+          />
+        </div>
+      ))
+    }
   </div>
 
   <!-- Navigation Arrows -->
-  <button 
+  <button
     class="team-prev opacity-0 group-hover:opacity-100 transition-opacity absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg border border-border flex items-center justify-center hover:bg-muted transition-colors z-10"
     aria-label="Previous slide"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m15 18-6-6 6-6"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m15 18-6-6 6-6"></path>
     </svg>
   </button>
-  
-  <button 
+
+  <button
     class="team-next opacity-0 group-hover:opacity-100 transition-opacity absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-12 h-12 bg-white rounded-full shadow-lg border border-border flex items-center justify-center hover:bg-muted transition-colors z-10"
     aria-label="Next slide"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m9 18 6-6-6-6"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m9 18 6-6-6-6"></path>
     </svg>
   </button>
 </div>
@@ -63,19 +85,24 @@ const sliderId = `team-slider-${department.replace(/\s/g, '-').toLowerCase()}`;
 </style>
 
 <script>
-  document.querySelectorAll('[data-slider-id]').forEach((slider) => {
-    const container = slider.querySelector('.overflow-x-auto');
-    const prevBtn = slider.querySelector('.team-prev');
-    const nextBtn = slider.querySelector('.team-next');
-    
-    if (container && prevBtn && nextBtn) {
-      prevBtn.addEventListener('click', () => {
-        container.scrollBy({ left: -320, behavior: 'smooth' });
-      });
-      
-      nextBtn.addEventListener('click', () => {
-        container.scrollBy({ left: 320, behavior: 'smooth' });
-      });
-    }
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll("[data-slider-id]").forEach((slider) => {
+      if (slider.dataset.initialized) return;
+      slider.dataset.initialized = "true";
+
+      const container = slider.querySelector(".overflow-x-auto");
+      const prevBtn = slider.querySelector(".team-prev");
+      const nextBtn = slider.querySelector(".team-next");
+
+      if (container && prevBtn && nextBtn) {
+        prevBtn.addEventListener("click", () => {
+          container.scrollBy({ left: -320, behavior: "smooth" });
+        });
+
+        nextBtn.addEventListener("click", () => {
+          container.scrollBy({ left: 320, behavior: "smooth" });
+        });
+      }
+    });
   });
 </script>
