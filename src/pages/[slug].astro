@@ -340,11 +340,11 @@ const pageStats =
         set:html={JSON.stringify(pageSlugMap || {})}
       />
       <div class="content-shell content-shell--mdx max-w-8xl mx-auto px-4 py-8 md:px-6 md:py-10 lg:px-8 lg:py-12">
-        <section class="content-hero content-hero--mdx relative isolate overflow-hidden rounded-sm lg:h-[500px]">
+        <section class="content-hero content-hero--mdx relative isolate overflow-hidden rounded-sm h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
           <img
             src={heroImage}
             alt={heroImageAlt}
-            class="absolute inset-0 w-full object-cover lg:h-[500px]"
+            class="hero-bg-img"
             loading="eager"
             fetchpriority="high"
           />

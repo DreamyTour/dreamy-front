@@ -415,17 +415,17 @@ const pageStats =
         set:html={JSON.stringify(pageSlugMap || {})}
       />
       <div class="content-shell content-shell--mdx max-w-8xl mx-auto px-4 py-8 md:px-6 md:py-10 lg:px-8 lg:py-12">
-        <section class="content-hero content-hero--mdx relative isolate overflow-hidden rounded-sm lg:h-[500px]">
+        <section class="content-hero content-hero--mdx relative isolate overflow-hidden rounded-sm h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
           <img
             src={heroImage}
             alt={heroImageAlt}
-            class="absolute inset-0 w-full object-cover lg:h-[500px]"
+            class="hero-bg-img"
             loading="eager"
             fetchpriority="high"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent -z-10" />
 
-          <div class="relative px-6 py-10 text-center md:px-10 md:py-14 lg:px-14 lg:py-16 lg:absolute lg:bottom-0 lg:left-0 lg:right-0">
+          <div class="relative w-full px-6 py-10 text-center md:px-10 md:py-14 lg:px-14 lg:py-16">
             <div class="mx-auto max-w-4xl">
               <div class="inline-flex items-center gap-3 rounded-sm border border-white/20 bg-black/50 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-white shadow-sm backdrop-blur-sm">
                 <span class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]" />
