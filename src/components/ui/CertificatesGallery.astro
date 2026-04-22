@@ -92,7 +92,7 @@ const { certificates } = Astro.props;
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("astro:page-load", () => {
     const certificateTriggers = document.querySelectorAll(
       ".certificate-trigger",
     );

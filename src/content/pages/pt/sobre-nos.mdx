@@ -5,7 +5,7 @@ lang: "pt"
 heroImage: "/imagenes/sobre_nosotros.avif"
 heroImageAlt: "Sobre Nós - Dreamy Tours"
 seo:
-  metaTitle: "Sobre Nós | Turismo Peru Bolívia"
+  metaTitle: "Sobre Nós | Turismo Peru Bolivia"
   metaDescription: "Sobre Nós Dreamy Tours - Experiências turísticas personalizadas"
 slugs:
   es: "sobre-nosotros"
@@ -13,283 +13,194 @@ slugs:
   pt: "sobre-nos"
 ---
 import TeamSlider from "@/components/ui/TeamSlider.astro";
+import CertificatesGallery from "@/components/ui/CertificatesGallery.astro";
 
-<div class="about-page">
-
-{/* Intro Section */}
-<section class="py-24 px-6 md:px-12 max-w-5xl mx-auto">
-  <div class="grid md:grid-cols-2 gap-16 items-center">
-    <div class="space-y-6">
-      <span class="text-primary font-bold tracking-widest uppercase text-sm">O Nosso Legado</span>
-      <h2 class="text-4xl font-extrabold text-foreground leading-tight">
-        Excelência Reconhecida no Turismo
-      </h2>
-      <p class="text-lg text-muted-foreground leading-relaxed">
-        Somos uma agência reconhecida no setor do turismo, oferecendo uma atenção personalizada. DREAMY TOURS distingue-se por excursões tradicionais, ética, responsabilidade social e segurança.
-      </p>
-      <div class="pt-4">
-        <div class="flex items-center gap-4 p-6 bg-muted rounded-sm border border-border">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary w-10 h-10">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
-            <path d="m9 12 2 2 4-4"/>
-          </svg>
-          <div>
-            <h4 class="font-bold text-lg">Ética & Segurança</h4>
-            <p class="text-sm text-muted-foreground">Comprometidos com o seu bem-estar e o patrimônio local.</p>
-          </div>
+<div class="about-page mx-auto max-w-7xl px-6 md:px-12">
+  <section class="about-surface">
+    <div class="mx-auto w-full">
+      <div class="pt-10">
+        <div class="w-full space-y-6">
+        <p class="font-bold leading-8 text-black text-lg">"Somos uma empresa reconhecida no setor turístico, com o firme propósito de oferecer aos nossos clientes atenção personalizada durante todas as nossas viagens"</p>
+          <p class="text-base leading-8 text-black">
+            DREAMY TOURS se destaca por oferecer um serviço diferente e fora do tradicional, tanto na organização quanto nas excursions. Operamos com princípios de ética e responsabilidade social, promovemos o desenvolvimento e bem-estar da nossa equipe, e mantemos um compromisso contínuo com a segurança nas nossas operações e o respeito pelo meio ambiente.
+          </p>
+          <p class="text-base leading-8 text-muted-foreground">
+            Hoje em dia temos uma equipe de profissionais dedicados ao atendimento ao cliente, ajudando os nossos clientes a transformar os seus sonhos de viajar e descobrir outras culturas em experiências memoráveis.
+          </p>
         </div>
       </div>
     </div>
-    <div class="relative">
-      <div class="aspect-square rounded-3xl overflow-hidden shadow-2xl">
-        <img 
-          class="w-full h-full object-cover" 
-          data-alt="um guia de turismo peruano profissional explicando a história a um pequeno grupo de viajantes num sítio arqueológico antigo" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhtZvrJie6AYfwb_M_39UkU886yB-Q9XCESUb3i90-_Tv55hXyQwqiRKx5mVoP749Mr_2gGlcyseA4tttwcGKwX9s7NLmnchfQjgv3_kOMqBGsn3Ul_CvNe0MmUvEJrz359UMAd-oiNC_aHMroxpf4GbtLhhPvi86diDyXDM5cHLMrOcSFyQN2Oeqk3PDdtk-QL892qm8yDE4aA7ID1j9U-phffQneeXtAJso75D3kTKqJiBIVOTwQ3h8XGZXGWVSBK__AEokpMF0"
-        />
-      </div>
-      <div class="about-stat-card absolute -bottom-6 -left-6 hidden max-w-xs rounded-sm p-8 shadow-xl lg:block">
-        <p class="text-primary text-3xl font-black mb-1">100%</p>
-        <p class="text-sm font-bold text-muted-foreground">Atenção Personalizada para cada Viajante</p>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
-{/* Features Bento Grid */}
-<section class="about-surface py-24">
-  <div class="px-6 md:px-12 max-w-7xl mx-auto">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-foreground">Por que escolher a Dreamy Tours?</h2>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Feature 1 */}
-      <div class="about-card p-8 rounded-sm hover:shadow-lg transition-shadow">
-        <div class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-            <circle cx="12" cy="8" r="6"/>
-            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3">Qualidade</h3>
-        <p class="text-muted-foreground">Padrões de serviço premium para viajantes exigentes que procuram o melhor.</p>
+  <section class="about pt-16">
+    <div class="mx-auto max-w-7xl">
+      <div class="mb-10 max-w-3xl md:mb-12 not-prose">
+        <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-black md:text-4xl">
+          Nossa Essência
+        </h2>
       </div>
 
-      {/* Feature 2 */}
-      <div class="about-card p-8 rounded-sm hover:shadow-lg transition-shadow">
-        <div class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
-            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3">Experiências</h3>
-        <p class="text-muted-foreground">Aventuras inesquecíveis pelo coração da cultura e paisagem andina.</p>
-      </div>
-
-{/* Feature 3 - Destacado */}
-      <div class="about-card p-8 rounded-sm md:row-span-2 flex flex-col justify-center">
-        <div class="w-12 h-12 bg-muted rounded-sm flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-foreground">
-            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-            <line x1="16" x2="16" y1="2" y2="6"/>
-            <line x1="8" x2="8" y1="2" y2="6"/>
-            <line x1="3" x2="21" y1="10" y2="10"/>
-          </svg>
-        </div>
-        <h3 class="text-2xl font-bold mb-3">Nós Desenhamos Sua Viagem</h3>
-        <p class="opacity-90 text-lg">Itinerários gerados de acordo com os seus interesses específicos, orçamento e ritmo de viagem.</p>
-      </div>
-
-      {/* Feature 4 */}
-      <div class="about-card p-8 rounded-sm hover:shadow-lg transition-shadow">
-        <div class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3">Atendimento Personalizado</h3>
-        <p class="text-muted-foreground">Apoio dedicado por especialistas locais, disponíveis para o ajudar em qualquer momento.</p>
-      </div>
-
-      {/* Feature 5 */}
-      <div class="about-card p-8 rounded-sm hover:shadow-lg transition-shadow">
-        <div class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-            <path d="M8 6h13"/>
-            <path d="M8 12h13"/>
-            <path d="M8 18h13"/>
-            <path d="M3 6h.01"/>
-            <path d="M3 12h.01"/>
-            <path d="M3 18h.01"/>
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3">Viagens sob Medida</h3>
-        <p class="text-muted-foreground">Viagens pensadas especialmente para garantir que tudo saia como você sonhou.</p>
-      </div>
-
-      {/* Feature 6 */}
-      <div class="about-card p-8 rounded-sm hover:shadow-lg transition-shadow md:col-span-2">
-        <div class="flex items-center gap-6">
-          <div class="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-lg border border-emerald-300/70 p-8">
+          <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3 4.5 6.8v5.7c0 4.7 3.1 7.7 7.5 8.9 4.4-1.2 7.5-4.2 7.5-8.9V6.8L12 3Z"/>
+              <path d="m9.7 12.1 1.5 1.5 3.1-3.2"/>
             </svg>
           </div>
-          <div>
-            <h3 class="text-xl font-bold mb-1">Pagamento Seguro</h3>
-            <p class="text-muted-foreground">Garantimos um processamento de pagamentos 100% encriptado e seguro.</p>
+          <h3 class="mt-0 text-[1.65rem] font-semibold tracking-[-0.02em] text-foreground">Missão</h3>
+          <p class="mt-4 text-sm text-muted-foreground">
+            Oferecer um serviço de qualidade e confiabilidade, para alcançar a plena satisfação dos nossos clientes com os nossos pacotes turísticos que permitirão conhecer e desfrutar as maravilhas do nosso Peru, além disso contamos com a equipe de trabalho especializada e a tecnologia propícia para oferecer um serviço personalizado que supere as expectativas dos nossos clientes.
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-sky-300/70 p-8">
+          <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"/>
+              <circle cx="12" cy="12" r="2.5"/>
+              <path d="M12 6V3"/>
+            </svg>
           </div>
+          <h3 class="mt-0 text-[1.65rem] font-semibold tracking-[-0.02em] text-foreground">Visão</h3>
+          <p class="mt-4 text-sm leading-normal text-muted-foreground">
+            Ser até 2023 uma agência de viagens líder no mercado turístico da cidade de Cusco, nacional e internacional, com produtos inovadores de acordo com as necessidades e exigências dos nossos clientes, como operador turístico que contribui junto com as comunidades ao desenvolvimento socioeconômico.
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-amber-300/80 p-8">
+          <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20.5s-6-4-6-9.1A4.2 4.2 0 0 1 10.2 7c.8 0 1.4.2 1.8.7.4-.5 1-.7 1.8-.7a4.2 4.2 0 0 1 4.2 4.4c0 5.1-6 9.1-6 9.1Z"/>
+              <path d="M10 12h4"/>
+              <path d="M12 10v4"/>
+            </svg>
+          </div>
+          <h3 class="mt-0 text-[1.65rem] font-semibold tracking-[-0.02em] text-foreground">Valores</h3>
+          <p class="mt-4 text-base leading-7 text-muted-foreground">
+            Valorizamos a transmissão de costumes e tradições dos nossos ancestrais, treinando os nossos colaboradores (pessoal administrativo, guias, cozinheiros, carregadores, acarreadores e motoristas) na forma correta de interagir em situações inesperadas como emergências (primeiros socorros), manejo apropriado de alimentos, o nível de segurança na condução e transferência do participante.
+          </p>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-{/* Our Essence Section */}
-<section class="py-24 bg-muted/50">
-  <div class="px-6 md:px-12 max-w-7xl mx-auto">
-    <div class="grid md:grid-cols-3 gap-12">
-      <div class="space-y-4">
-        <div class="text-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-          </svg>
-        </div>
-        <h3 class="text-2xl font-black tracking-tight">Missão</h3>
-        <p class="text-muted-foreground leading-relaxed">
-          Qualidade e confiabilidade, total satisfação, atendimento personalizado superando as expectativas. Respeito à cultura e ao ambiente.
-        </p>
-      </div>
-
-      <div class="space-y-4">
-        <div class="text-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </div>
-        <h3 class="text-2xl font-black tracking-tight">Visão</h3>
-        <p class="text-muted-foreground leading-relaxed">
-          Sermos a agência líder de viagens em Cusco; oferecendo produtos inovadores e promovendo o desenvolvimento socioeconômico com as comunidades.
-        </p>
-      </div>
-
-      <div class="space-y-4">
-        <div class="text-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-          </svg>
-        </div>
-        <h3 class="text-2xl font-black tracking-tight">Nossos Valores</h3>
-        <p class="text-muted-foreground leading-relaxed">
-          Transmissão de costumes, treinar colaboradores (guias, chefs, carregadores), garantindo a gestão adequada de alimentos e a segurança.
-        </p>
-      </div>
+  <section class="pt-16">
+    <div class="not-prose">
+      <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-black md:text-4xl">
+        Nossa Filosofia
+      </h2>
     </div>
-  </div>
-</section>
+    <p>
+      Dreamy Tours, se importa com viagens responsáveis, baseadas no respeito pelas pessoas e destinos onde operamos, bem como fazer uma viagem ética e consciente pelos nossos visitantes, que dado as características deste segmento mostram grande interesse na interação com a "Vida Real" dos destinos que visitam e, portanto, escolhem um tipo de viagem na qual não são cúmplices na sua destruição e exploração.
+    </p>
+  </section>
 
-{/* Philosophy Section */}
-<section class="about-band py-24">
-  <div class="px-6 md:px-12 max-w-4xl mx-auto text-center">
-    <div class="text-primary mb-8 opacity-30">
-      <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
-      </svg>
+  <section class="pt-16 ">
+    <div class="not-prose">
+      <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-black md:text-4xl">
+        Sobre as Licenças e Autorizações da Dreamy Tours
+      </h2>
     </div>
-    <blockquote class="text-3xl md:text-4xl font-bold text-foreground leading-snug mb-8">
-      "Na Dreamy Tours, apostamos por viagens responsáveis, respeitando a cultura, as pessoas e garantindo impactos positivos."
-    </blockquote>
-    <div class="w-16 h-1 bg-primary mx-auto"></div>
-  </div>
-</section>
-
-{/* Our Team Section */}
-<section class="about-surface py-24">
-  <div class="px-6 md:px-12 max-w-7xl mx-auto">
-    <div class="text-center mb-16">
-      <span class="text-primary font-bold tracking-widest uppercase text-sm">Nossos Profissionais</span>
-      <h2 class="text-3xl md:text-4xl font-extrabold text-foreground mt-2">Conheça a Nossa Equipe</h2>
-      <p class="text-muted-foreground mt-4 max-w-2xl mx-auto">
-        Uma equipe altamente treinada e comprometida para tornar sua experiência inesquecível.
+      <p class="mt-6 text-base leading-7 text-muted-foreground">
+        Dreamy Tours - Agência de Viagens e Operador Turístico, cumpre com todos os principais requisitos e licenças para operar e oferecer os diversos serviços do turismo em todo o território peruano.
       </p>
-    </div>
+      <p class="mt-4 text-base leading-7 text-muted-foreground">
+        As instituições mencionadas a seguir são as encarregadas de regular a indústria turística no Peru e estamos subscriptos a elas da seguinte maneira:
+      </p>
 
-    {/* Single Slider with all team members */}
-    <TeamSlider 
-      members={[
-        { name: "Maria Elena Garcia", role: "Gerente Geral", department: "Administração", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop" },
-        { name: "Carlos Mendoza", role: "Chefe de Vendas", department: "Vendas", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop" },
-        { name: "Ana Lucia Quispe", role: "Consultora de Viagens", department: "Vendas", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop" },
-        { name: "Roberto Huanca", role: "Consultor de Reservas", department: "Vendas", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop" },
-        { name: "Patricia Flores", role: "Contadora", department: "Finanças", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=500&fit=crop" },
-        { name: "Luis Alberto Ramos", role: "Assistente Financeiro", department: "Finanças", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop" },
-        { name: "Jorge Luis Diaz", role: "Coordenador de Transfers", department: "Transfer", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop" },
-        { name: "Walter Ccoscco", role: "Operador de Frota", department: "Transfer", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop" },
-        { name: "Kevin Rodriguez", role: "Desenvolvedor Web", department: "Sistemas", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop" },
-        { name: "Diego Fernando", role: "Suporte Técnico", department: "Sistemas", image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=500&fit=crop" },
-        { name: "Alexis Puma", role: "Especialista TI", department: "Sistemas", image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=500&fit=crop" },
-        { name: "César Huillca", role: "Administrador de Sistemas", department: "Sistemas", image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=500&fit=crop" }
-      ]} 
-      department="Equipe"
-    />
-  </div>
-</section>
+      <div class="mt-8 space-y-4">
+        <div class="flex items-center gap-4">
+          <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 21h18"/>
+              <path d="M4 10h16"/>
+              <path d="M6 6l6-3 6 3"/>
+              <path d="M6 10v8"/>
+              <path d="M10 10v8"/>
+              <path d="M14 10v8"/>
+              <path d="M18 10v8"/>
+            </svg>
+          </div>
+          <p class="text-sm leading-7 text-muted-foreground">
+            Contamos com a autorização da DIRCETUR (Direção Regional de Comércio Exterior e Turismo de Cusco), uma organização governamental que promove a competição, sustentabilidade e diversificação dos produtos exportáveis peruanos, turismo e artesanato.
+          </p>
+        </div>
 
-{/* Licenses and Authorizations */}
-<section class="py-24">
-  <div class="px-6 md:px-12 max-w-7xl mx-auto">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-extrabold mb-4">Certificação Oficial</h2>
-      <p class="text-muted-foreground">Somos um operador de turismo formal, credenciado e devidamente licenciado.</p>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-      <div class="about-card flex flex-col items-center p-8 rounded-sm grayscale hover:grayscale-0 transition-all">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mb-4">
-          <path d="M3 21h18"/>
-          <path d="M3 10h18"/>
-          <path d="M5 6l7-3 7 3"/>
-          <path d="M4 10v11"/>
-          <path d="M20 10v11"/>
-          <path d="M8 14v3"/>
-          <path d="M12 14v3"/>
-          <path d="M16 14v3"/>
-        </svg>
-        <span class="font-bold text-sm tracking-widest uppercase">DIRCETUR</span>
-      </div>
-      <div class="about-card flex flex-col items-center p-8 rounded-sm grayscale hover:grayscale-0 transition-all">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mb-4">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M2 12h20"/>
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-        </svg>
-        <span class="font-bold text-sm tracking-widest uppercase">PROMPERU</span>
-      </div>
-      <div class="about-card col-span-2 flex flex-col items-center rounded-sm p-8 grayscale hover:grayscale-0 transition-all md:col-span-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mb-4">
-          <line x1="12" x2="12" y1="2" y2="22"/>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-        <span class="font-bold text-sm tracking-widest uppercase">SUNAT</span>
-        <span class="text-[10px] mt-1 text-muted-foreground">RUC: 20609347318</span>
-      </div>
-      <div class="about-card col-span-2 flex flex-col items-center rounded-sm p-8 grayscale hover:grayscale-0 transition-all md:col-span-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mb-4">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="m22 2-2.24 2.24"/>
-          <path d="M15.5 6.5 18 4"/>
-        </svg>
-        <span class="font-bold text-sm tracking-widest uppercase">LICENSED</span>
-      </div>
-    </div>
-  </div>
-</section>
+        <div class="flex items-center gap-4 ">
+          <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M3 12h18"/>
+              <path d="M12 3a15 15 0 0 1 0 18"/>
+              <path d="M12 3a15 15 0 0 0 0 18"/>
+            </svg>
+          </div>
+          <p class="text-sm leading-7 text-muted-foreground">
+            Estamos subscriptos à PROMPERU (Comissão de Promoção do Peru para as Exportações e Turismo), uma instituição pertencente ao Ministério de Comércio Exterior e Turismo do nosso país.
+          </p>
+        </div>
 
+        <div class="flex items-center gap-4 ">
+          <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2v20"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"/>
+            </svg>
+          </div>
+          <p class="text-sm leading-7 text-muted-foreground">
+            Estamos registrados na SUNAT (Superintendência Nacional de Administração Tributária), uma instituição adjunta ao Ministério de Economia e Finanças do Peru, o nosso número de RUC é 20609347318.
+          </p>
+        </div>
+      </div>
+  </section>
+
+  <section class="about-surface not-prose pt-8">
+    <div class="mx-auto w-full">
+      <div class="mb-12 md:mb-16">
+        <div class="max-w-3xl">
+          <span class="text-[0.72rem] font-semibold uppercase tracking-[0.3em] text-primary">Nossos Profissionais</span>
+          <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
+           Conheça a equipe por trás de cada viagem
+          </h2>
+          <p class="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
+            Uma equipe dedicada focada em fazer com que cada itinerário se sinta pessoal, organizado e inesquecível.
+          </p>
+        </div>
+      </div>
+
+      <TeamSlider
+        members={[
+          { name: "Maria Elena Garcia", role: "Gerente Geral", department: "Administracao", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop" },
+          { name: "Carlos Mendoza", role: "Chefe de Vendas", department: "Vendas", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop" },
+          { name: "Ana Lucia Quispe", role: "Assessora de Viagens", department: "Vendas", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop" },
+          { name: "Roberto Huanca", role: "Assessor de Reservas", department: "Vendas", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop" },
+          { name: "Patricia Flores", role: "Contadora", department: "Financas", image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=500&fit=crop" },
+          { name: "Luis Alberto Ramos", role: "Assistente Financeiro", department: "Financas", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop" },
+          { name: "Jorge Luis Diaz", role: "Coordenador de Transfer", department: "Transfer", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop" },
+          { name: "Walter Ccoscco", role: "Operador de Frota", department: "Transfer", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop" },
+          { name: "Kevin Rodriguez", role: "Desenvolvedor Web", department: "Sistemas", image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=500&fit=crop" },
+          { name: "Diego Fernando", role: "Suporte Tecnico", department: "Sistemas", image: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=500&fit=crop" },
+          { name: "Alexis Puma", role: "Especialista IT", department: "Sistemas", image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=500&fit=crop" },
+          { name: "Cesar Huillca", role: "Administrador de Sistemas", department: "Sistemas", image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&h=500&fit=crop" }
+        ]}
+        department="Equipe"
+      />
+    </div>
+  </section>
+  <section class="pt-16">
+    <div class="not-prose mb-6">
+      <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-black md:text-4xl">Certificações</h2>
+    </div>
+      <CertificatesGallery
+        certificates={[
+          { src: "/imagenes/certificados/gercetur.webp", title: "Autorização DIRCETUR" },
+          { src: "/imagenes/certificados/mincetur-dreamy.webp", title: "Registro MINCETUR" },
+          { src: "/imagenes/certificados/ficha-ruc.webp", title: "Registro RUC" },
+          { src: "/imagenes/certificados/licencia-dreamy.webp", title: "Licença de Operação" },
+          { src: "/imagenes/certificados/fertificado-inspeccion.webp", title: "Certificado de Inspeção" },
+        ]}
+      />
+
+  </section>
 </div>
