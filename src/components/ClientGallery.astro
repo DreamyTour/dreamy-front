@@ -1,58 +1,57 @@
 ---
-import imagen39 from "@/assets/clientes/39.webp";
+import fetchApi from "@/lib/strapi";
+import type { GaleriaResponse } from "@/interface/galeria";
+import { getImageUrl } from "@/lib/helpers";
 
 interface Props {
-  totalImages: number;
+  totalImages?: number;
+  lang?: string;
 }
 
-const { totalImages } = Astro.props;
+const props = Astro.props;
+const totalImages = props.totalImages || 20;
+const lang = props.lang || "en";
 
-// Gallery items - all same size
-const galleryItems = [
-  {
-    img: imagen39,
-    alt: "Clientes satisfechos de Dreamy Tours en tour por Machu Picchu",
+// Fetch de Strapi - ordenar por createdAt descendente, limit 20
+const galleryData = await fetchApi<GaleriaResponse>({
+  endpoint: "galeria",
+  locale: lang,
+  query: {
+    sort: "createdAt:desc",
+    "pagination[limit]": totalImages.toString(),
+    populate: {
+      imagen: {
+        populate: "*",
+      },
+    },
   },
-  {
-    img: imagen39,
-    alt: "Grupo de turistas explorando Cusco con guía profesional",
-  },
-  { img: imagen39, alt: "Aventura en el Lago Titicaca Bolivia" },
-  { img: imagen39, alt: "Viajeros disfrutando del Salar de Uyuni" },
-  { img: imagen39, alt: "Tour por la selva amazónica del Perú" },
-  { img: imagen39, alt: "Experiencia única en las líneas de Nazca" },
-  { img: imagen39, alt: "Aventura en el Cañón del Colca Arequipa" },
-  { img: imagen39, alt: "Viajeros en la montaña de los 7 colores" },
-  { img: imagen39, alt: "Tour por las ruinas de Chan Chan" },
-  { img: imagen39, alt: "Experiencia de senderismo en Huaraz" },
-  { img: imagen39, alt: "Viaje por las lagunas de Huascarán" },
-  { img: imagen39, alt: "Aventura en la Reserva Nacional de Tambopata" },
-  { img: imagen39, alt: "Tour por las comunidades caravaneras del lago Junín" },
-  { img: imagen39, alt: "Experiencia cultural en comunidades nativas" },
-  { img: imagen39, alt: "Viaje de aventura en el Manu" },
-  { img: imagen39, alt: "Tour de gastronomía Peruana en Lima" },
-  { img: imagen39, alt: "Aventura en el Tren a Machu Picchu" },
-  { img: imagen39, alt: "Clientes satisfechos regreso del Valle Sagrado" },
-  { img: imagen39, alt: "Experiencia única en las termas de Chivay" },
-  { img: imagen39, alt: "Viaje grupal por las maravillas del Perú y Bolivia" },
-];
+});
+
+// Procesar las imágenes - usar getImageUrl
+const galleryItems = galleryData?.data?.map((item) => ({
+  img: getImageUrl(item.attributes.imagen) || "",
+  alt: item.attributes.alt || "",
+})) || [];
+
+// Filtrar items válidos
+const validItems = galleryItems.filter((item) => item.img);
+const totalValidImages = validItems.length;
 ---
 
-<div class="grid grid-cols-3 gap-3 mb-12">
-  {
-    galleryItems.slice(0, totalImages).map((item, index) => (
+{
+validItems.length > 0 ? (
+  <div class="grid grid-cols-3 gap-3 mb-12">
+    {validItems.map((item, index) => (
       <button
         type="button"
         class="relative overflow-hidden group cursor-pointer rounded-sm aspect-square w-full !p-0 border-0"
-        style={`background-image: url('${item.img.src}'); background-size: cover !important; background-position: center; background-repeat: no-repeat;`}
-        data-src={item.img.src}
+        style={`background-image: url('${item.img}'); background-size: cover !important; background-position: center; background-repeat: no-repeat;`}
+        data-src={item.img}
         data-alt={item.alt}
         onclick={`openLightbox(${index})`}
       >
-        {/* Gradient overlay */}
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Zoom icon */}
         <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div class="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center">
             <svg
@@ -71,11 +70,14 @@ const galleryItems = [
           </div>
         </div>
       </button>
-    ))
-  }
-</div>
+    ))}
+  </div>
+) : (
+  <div class="text-center py-12 text-muted-foreground">
+    <p>Gallery coming soon...</p>
+  </div>
+)}
 
-{/* Lightbox Modal */}
 <div
   id="lightbox"
   class="fixed inset-0 bg-black/95 z-50 hidden items-center justify-center p-4"
@@ -91,7 +93,6 @@ const galleryItems = [
     &times;
   </button>
 
-  {/* Navigation arrows */}
   <button
     type="button"
     class="absolute left-4 text-white/60 hover:text-white p-3 hover:bg-white/10 rounded-full transition-all z-50"
@@ -138,7 +139,7 @@ const galleryItems = [
 
 <script is:inline>
   let currentIndex = 0;
-  const totalImages = 20;
+  const totalImages = {totalValidImages};
 
   function openLightbox(index) {
     currentIndex = index;

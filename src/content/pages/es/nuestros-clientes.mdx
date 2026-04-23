@@ -13,14 +13,80 @@ slugs:
   pt: "nossos-clientes"
 ---
 
-Los que se fueron… pero con nosotros 😎
-
-No solo empacaron maletas… ¡Empacaron sueños, ganas y muchísima buena vibra!
-
-Esta es nuestra galería de aventureros reales, esos que dijeron "sí a viajar" y vivieron cada destino con emoción.
-
-Gracias por hacer de cada tour una historia digna de contar, ¡ustedes son los verdaderos influencers del camino!
-
 import ClientGallery from "@/components/ClientGallery.astro";
 
-<ClientGallery totalImages={20} />
+<div class="content-page max-w-7xl mx-auto px-4 md:px-8 py-12">
+
+  {/* Hero Text Section */}
+  <div class="text-center mb-12 not-prose">
+    <p class="font-bold leading-8 text-black text-xl text-center m-0">No solo empacaron maletas… ¡Empacaron sueños, ganas y muchísima buena vibra!</p>
+    <p class="text-base leading-8 text-center m-0 mt-4">Esta es nuestra galería de aventureros reales, esos que dijeron "sí a viajar" y vivieron cada destino con emoción.</p>
+    <p class="text-base leading-8 text-center m-0">Gracias por hacer de cada tour una historia digna de contar, ¡ustedes son los verdaderos influencers del camino!</p>
+  </div>
+
+  {/* Stats Section */}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 not-prose">
+    <div class="text-center p-6 bg-primary/5 rounded-lg">
+      <div class="text-4xl font-bold text-primary">500+</div>
+      <div class="text-sm text-muted-foreground mt-2">Viajeros Felices</div>
+    </div>
+    <div class="text-center p-6 bg-secondary/10 rounded-lg">
+      <div class="text-4xl font-bold text-secondary">50+</div>
+      <div class="text-sm text-muted-foreground mt-2">Destinos</div>
+    </div>
+    <div class="text-center p-6 bg-primary/5 rounded-lg">
+      <div class="text-4xl font-bold text-primary">98%</div>
+      <div class="text-sm text-muted-foreground mt-2">Tasa de Satisfacción</div>
+    </div>
+    <div class="text-center p-6 bg-secondary/10 rounded-lg">
+      <div class="text-4xl font-bold text-secondary">15+</div>
+      <div class="text-sm text-muted-foreground mt-2">Años de Experiencia</div>
+    </div>
+  </div>
+
+  {/* Testimonials Preview */}
+  <div class="mb-16 not-prose">
+    <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-black md:text-4xl">Lo Que Dicen Nuestros Viajeros</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="p-6 rounded-lg border border-border bg-card">
+        <div class="flex gap-1 mb-4">
+          {[...Array(5)].map(() => (
+            <svg class="w-5 h-5 text-secondary fill-secondary" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          ))}
+        </div>
+        <p class="text-sm italic">"¡Una experiencia inolvidable! El equipo lo hizo muy fácil y los tours fueron.incansables. ¡Machu Picchu supers todas las expectativas!"</p>
+        <p class="text-sm font-semibold mt-4">- Sarah Johnson, EE.UU.</p>
+      </div>
+      <div class="p-6 rounded-lg border border-border bg-card">
+        <div class="flex gap-1 mb-4">
+          {[...Array(5)].map(() => (
+            <svg class="w-5 h-5 text-secondary fill-secondary" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          ))}
+        </div>
+        <p class="text-sm italic">"¡La mejor decisión que tomamos! Servicio profesional, guías con mucho conocimiento y destinos increíbles. ¡Ya planeamos nuestro próximo viaje!"</p>
+        <p class="text-sm font-semibold mt-4">- Marco Rossi, Italia</p>
+      </div>
+      <div class="p-6 rounded-lg border border-border bg-card">
+        <div class="flex gap-1 mb-4">
+          {[...Array(5)].map(() => (
+            <svg class="w-5 h-5 text-secondary fill-secondary" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          ))}
+        </div>
+        <p class="text-sm italic">"¡Paisajes absolutamente impresionantes y tours muy bien organizados. Los guías sabían todo sobre cada lugar. ¡Muy recomendado!"</p>
+        <p class="text-sm font-semibold mt-4">- Emma Thompson, Reino Unido</p>
+      </div>
+    </div>
+  </div>
+
+{/* Gallery Section */}
+  <div class="mb-12 not-prose">
+    <h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-black md:text-4xl">Galería de Nuestros Aventureros</h2>
+    <ClientGallery totalImages={20} lang="es" />
+  </div>
+</div>
