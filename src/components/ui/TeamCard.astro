@@ -10,10 +10,20 @@ const { name, role, department, image } = Astro.props;
 
 const departmentColors: Record<string, string> = {
   Administración: "bg-amber-500",
+  Administracao: "bg-amber-500",
   Ventas: "bg-emerald-500",
   Finanzas: "bg-blue-500",
+  Financas: "bg-blue-500",
   Transfer: "bg-violet-500",
   Sistemas: "bg-rose-500",
+  IT: "bg-rose-500",
+  TI: "bg-rose-500",
+  Operaciones: "bg-cyan-500",
+  Operacoes: "bg-cyan-500",
+  Operations: "bg-cyan-500",
+  Contabilidad: "bg-indigo-500",
+  Contabilidade: "bg-indigo-500",
+  Accounting: "bg-indigo-500",
 };
 
 const bgColor = departmentColors[department] || "bg-primary";
