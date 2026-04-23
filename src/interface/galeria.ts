@@ -1,17 +1,19 @@
 import type { Imagen } from "./common";
 
-export interface Galeria {
+export interface GaleriaItem {
   id: number;
   attributes: {
-    imagen: Imagen | null;
     alt: string;
-    createdAt: string;
-    updatedAt: string;
+    imagen: Imagen[];
   };
 }
 
 export interface GaleriaResponse {
-  data: Galeria[];
+  data: {
+    id: number;
+    locale: string;
+    galeria: GaleriaItem[];
+  }[];
   meta: {
     pagination?: {
       page: number;

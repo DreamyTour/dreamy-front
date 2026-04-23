@@ -1,6 +1,6 @@
 ---
 import fetchApi from "@/lib/strapi";
-import type { GaleriaResponse } from "@/interface/galeria";
+import type { GaleriaResponse, GaleriaItem } from "@/interface/galeria";
 import { getImageUrl } from "@/lib/helpers";
 
 interface Props {
@@ -18,23 +18,35 @@ const galleryData = await fetchApi<GaleriaResponse>({
   locale: lang,
   query: {
     sort: "createdAt:desc",
-    "pagination[limit]": totalImages.toString(),
+    "pagination[limit]": "1",
     populate: {
-      imagen: {
-        populate: "*",
+      galeria: {
+        populate: {
+          imagen: {
+            populate: "*",
+          },
+        },
       },
     },
   },
 });
 
-// Procesar las imágenes - usar getImageUrl
-const galleryItems = galleryData?.data?.map((item) => ({
-  img: getImageUrl(item.attributes.imagen) || "",
-  alt: item.attributes.alt || "",
-})) || [];
+// Extraer las imágenes del array galeria
+const galeriaItems = galleryData?.data?.[0]?.galeria || [];
+const validItems: { img: string; alt: string }[] = [];
 
-// Filtrar items válidos
-const validItems = galleryItems.filter((item) => item.img);
+galeriaItems.forEach((item: GaleriaItem) => {
+  if (item.attributes.imagen && item.attributes.imagen.length > 0) {
+    const img = getImageUrl(item.attributes.imagen[0]) || "";
+    if (img) {
+      validItems.push({
+        img,
+        alt: item.attributes.alt || "",
+      });
+    }
+  }
+});
+
 const totalValidImages = validItems.length;
 ---
 
