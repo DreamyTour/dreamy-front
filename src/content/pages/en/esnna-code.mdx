@@ -14,12 +14,13 @@ slugs:
 ---
 
 import Button from "@/components/ui/button.astro";
+import CertificatesGallery from "@/components/ui/CertificatesGallery.astro";
 
 ## CODE OF CONDUCT AGAINST THE SEXUAL EXPLOITATION OF CHILDREN AND ADOLESCENTS
 
 By virtue of Law No. 28251; Law against sexual abuse and exploitation", which incorporated user-client crimes and sexual exploitation of children and adolescents in the field of tourism; We consider the **MINIMUM COMMITMENTS THAT ALL TOURIST SERVICE PROVIDERS MUST ASSUME** in order to counteract the sexual exploitation of children and adolescents in travel and tourism, tourism service providers will adopt a Code of Conduct that their legal representatives, directors, and directors must observe, administrators, employees and contractors linked to the provision of tourist services, in order to make effective the obligations contemplated in Law 28251, as well as to prevent the conduct typified in the same law and also that incorporates the following minimum control measures:
 
-<div class="bg-red-50 border-l-4 border-red-500 p-6 my-8">
+<div class="bg-secondary/5 border-l-4 border-secondary p-6 my-8">
 
 - Refrain from expressly or surreptitiously offering plans for the sexual exploitation of children and adolescents in tourism promotion programs and tourism plans.
 - Refrain from giving information to tourists, directly or through an intermediary, about places from where they coordinate or where commercial sexual exploitation of children and adolescents is practiced.
@@ -41,19 +42,10 @@ By virtue of Law No. 28251; Law against sexual abuse and exploitation", which in
 
 ## Certifications
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
-
-<div class="bg-white rounded-sm shadow-lg p-6 border border-gray-200">
-
-- **Certification 1:** [Place certificate image here]
-
-</div>
-
-<div class="bg-white rounded-sm shadow-lg p-6 border border-gray-200">
-
-- **Certification 2:** [Place certificate image here]
-
-</div>
-
-</div>
+<CertificatesGallery
+  certificates={[
+    { src: "/imagenes/certificados/codigo-esnna.avif", title: "ESNNA Code" },
+    { src: "/imagenes/certificados/turismo-responsable.avif", title: "Responsible Tourism" },
+  ]}
+/>
 

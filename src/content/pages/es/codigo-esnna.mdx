@@ -14,6 +14,7 @@ slugs:
 ---
 
 import Button from "@/components/ui/button.astro";
+import CertificatesGallery from "@/components/ui/CertificatesGallery.astro";
 
 ## CÓDIGO DE CONDUCTA CONTRA LA EXPLOTACIÓN SEXUAL DE NIÑOS, NIÑAS Y ADOLESCENTES
 
@@ -41,18 +42,9 @@ En virtud de la Ley N° 28251; "Ley contra el abuso y la explotación sexual", q
 
 ## Certificaciones
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
-
-<div class="bg-white rounded-sm shadow-lg p-6 border border-gray-200">
-
-- **Certificación 1:** [Coloca la imagen del certificado aquí]
-
-</div>
-
-<div class="bg-white rounded-sm shadow-lg p-6 border border-gray-200">
-
-- **Certificación 2:** [Coloca la imagen del certificado aquí]
-
-</div>
-
-</div>
+<CertificatesGallery
+  certificates={[
+    { src: "/imagenes/certificados/codigo-esnna.avif", title: "Código ESNNA" },
+    { src: "/imagenes/certificados/turismo-responsable.avif", title: "Turismo Responsable" },
+  ]}
+/>
