@@ -22,7 +22,7 @@
     --tw-prose-pre-bg: var(--muted);
     --tw-prose-th-borders: var(--border);
     --tw-prose-td-borders: var(--border);
-    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.03em] prose-p:text-[1rem] prose-p:leading-7 prose-a:font-semibold prose-a:no-underline hover:prose-a:text-secondary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-r-sm prose-blockquote:border-l-4 prose-blockquote:bg-primary/[0.04] prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-sm prose-img:shadow-[0_24px_70px_-44px_color-mix(in_oklab,var(--foreground)_28%,transparent)] prose-h3:mt-12 prose-h3:text-2xl prose-h4:mt-10 prose-h4:text-xl;
+    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.03em] prose-p:text-[1rem] prose-p:leading-7 prose-a:font-semibold prose-p:text-foreground prose-a:no-underline hover:prose-a:text-secondary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-r-sm prose-blockquote:border-l-4 prose-blockquote:bg-primary/[0.04] prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-sm prose-img:shadow-[0_24px_70px_-44px_color-mix(in_oklab,var(--foreground)_28%,transparent)] prose-h3:mt-4 prose-h3:text-2xl prose-h4:mt-4 prose-h4:text-xl;
   }
 
   .content-page {
@@ -42,7 +42,7 @@
     --tw-prose-pre-bg: var(--muted);
     --tw-prose-th-borders: var(--border);
     --tw-prose-td-borders: var(--border);
-    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.04em] prose-headings:text-black prose-p:text-base prose-p:leading-8 prose-p:text-foreground/80 prose-a:font-semibold prose-a:no-underline hover:prose-a:text-primary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-sm prose-blockquote:border-l-4 prose-blockquote:bg-muted prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-lg prose-h3:mt-12 prose-h3:text-3xl prose-h3:font-semibold prose-h3:tracking-[-0.04em] prose-h4:mt-10 prose-h4:text-xl;
+    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.04em] prose-headings:text-black prose-p:text-base prose-p:leading-8 prose-p:text-foreground prose-a:font-semibold prose-a:no-underline hover:prose-a:text-primary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-sm prose-blockquote:border-l-4 prose-blockquote:bg-muted prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-lg prose-h3:mt-12 prose-h3:text-3xl prose-h3:font-semibold prose-h3:tracking-[-0.04em] prose-h4:mt-10 prose-h4:text-xl;
   }
 
 }
@@ -61,6 +61,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
 }
 
 .content-hero-title {
