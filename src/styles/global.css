@@ -95,6 +95,10 @@
   background-color: color-mix(in oklab, var(--background) 88%, var(--primary) 12%);
 }
 
+.content-article .certificates-gallery :is(.bg-white, .bg-white\/80, .bg-white\/95) {
+  background-color: white;
+}
+
 .content-article :is(.bg-muted, .bg-muted\/30, .bg-muted\/50, .bg-slate-50) {
   background-color: color-mix(in oklab, var(--muted) 82%, white 18%);
 }
