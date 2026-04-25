@@ -93,7 +93,7 @@
 }
 
 .content-article :is(.bg-white, .bg-white\/80, .bg-white\/95) {
-  background-color: color-mix(in oklab, var(--background) 88%, var(--primary) 12%);
+  background-color: white;
 }
 
 .content-article .certificates-gallery :is(.bg-white, .bg-white\/80, .bg-white\/95) {

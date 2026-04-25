@@ -3,17 +3,6 @@
 import { useState } from 'react';
 import countriesData from '@/data/countries.json';
 
-// Colores del theme (definidos en global.css)
-const colors = {
-  primary: 'oklch(0.66 0.18 148)',
-  secondary: 'oklch(0.62 0.22 20)',
-  primaryForeground: '#ffffff',
-  muted: 'oklch(0.92 0.02 240)',
-  border: 'oklch(0.9 0.01 240)',
-  foreground: 'oklch(0.16 0.06 150)',
-};
-
-// Países con códigos telefónicos
 const i18n = {
   es: {
     personalInfo: 'INFORMACIÓN PERSONAL',
@@ -180,28 +169,25 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
   };
 
   const inputStyle = {
-    borderColor: colors.border,
-    color: colors.foreground,
     backgroundColor: 'rgba(255,255,255,0.88)',
   };
 
   const buttonStyle = () => {
     if (submitStatus === 'success') {
-      return { background: 'linear-gradient(to right, #22c55e, #16a34a)', color: '#fff' };
+      return { background: 'linear-gradient(to right, #22c55e, #16a34a)' };
     }
     if (submitStatus === 'error') {
-      return { background: 'linear-gradient(to right, #ef4444, #dc2626)', color: '#fff' };
+      return { background: 'linear-gradient(to right, #ef4444, #dc2626)' };
     }
     return {
-      background: `linear-gradient(to right, ${colors.primary}, oklch(0.6 0.15 148))`,
-      color: colors.primaryForeground
+      background: 'linear-gradient(to right, var(--primary), oklch(0.6 0.15 148))',
     };
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-8 rounded-sm border border-stone-200/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,248,246,0.98))] p-5 shadow-[0_20px_60px_rgba(15,23,42,0.06)] md:p-8"
+      className="space-y-8 rounded-sm p-5  md:p-8"
     >
       <div className="flex items-center gap-3 pb-5">
         <div className="h-[2px] w-12 rounded-full bg-primary/70" />
@@ -209,13 +195,13 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
       </div>
 
       {/* INFORMACION PERSONAL */}
-      <section className="rounded-sm bg-white/80 p-5 shadow-[0_12px_32px_rgba(15,23,42,0.04)] md:p-6">
+      <section className="bg-white rounded-sm p-5 shadow-[0_12px_32px_rgba(15,23,42,0.04)] md:p-6">
         <div className="mb-5 flex items-end justify-between gap-4 pb-4">
           <div>
             <span className="mb-2 inline-flex text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-400">
               01
             </span>
-            <h3 className="text-lg font-semibold" style={{ color: colors.foreground }}>
+            <h3 className="text-lg font-semibold text-foreground">
               {t.personalInfo}
             </h3>
           </div>
@@ -224,32 +210,34 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="nombres" className="mb-2 block text-sm font-medium text-foreground">
               {t.names} <span className="text-red-500">*</span>
             </label>
             <input
+              id="nombres"
               type="text"
               name="nombres"
               value={formData.nombres}
               onChange={handleChange}
               required
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
               placeholder={t.namesPh}
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="pais" className="mb-2 block text-sm font-medium text-foreground">
               {t.country} <span className="text-red-500">*</span>
             </label>
             <select
+              id="pais"
               name="pais"
               value={formData.pais}
               onChange={(e) => handlePaisChange(e.target.value)}
               required
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
               <option value="">{t.countryPh}</option>
               {paises.map(pais => (
@@ -259,37 +247,38 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
               {t.email} <span className="text-red-500">*</span>
             </label>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
               placeholder={t.emailPh}
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="telefono" className="mb-2 block text-sm font-medium text-foreground">
               {t.whatsapp}
             </label>
             <div className="flex overflow-hidden rounded-sm shadow-sm">
               <span
-                className="flex items-center border border-r-0 px-4 py-3 text-sm font-medium"
-                style={{ borderColor: colors.border, backgroundColor: colors.muted, color: colors.foreground }}
+                className="flex items-center border border-r-0 border-border px-4 py-3 text-sm font-medium bg-muted text-foreground"
               >
                 +{codigoPais || '51'}
               </span>
               <input
+                id="telefono"
                 type="tel"
                 name="telefono"
                 style={{ ...inputStyle, borderLeft: 'none', borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-                className="w-full rounded-r-sm border px-4 py-3 text-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                className="w-full rounded-r-sm border border-border px-4 py-3 text-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
                 placeholder="999 999 999"
               />
             </div>
@@ -298,13 +287,13 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
       </section>
 
       {/* DETALLES DEL VIAJE */}
-      <section className="rounded-sm bg-white/80 p-5 shadow-[0_12px_32px_rgba(15,23,42,0.04)] md:p-6">
+      <section className="bg-white/80 rounded-sm p-5 shadow-[0_12px_32px_rgba(15,23,42,0.04)] md:p-6">
         <div className="mb-5 flex items-end justify-between gap-4 pb-4">
           <div>
             <span className="mb-2 inline-flex text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-400">
               02
             </span>
-            <h3 className="text-lg font-semibold" style={{ color: colors.foreground }}>
+            <h3 className="text-lg font-semibold text-foreground">
               {t.tripDetails}
             </h3>
           </div>
@@ -313,59 +302,63 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="adultos" className="mb-2 block text-sm font-medium text-foreground">
               {t.adults}
             </label>
             <input
+              id="adultos"
               type="number"
               name="adultos"
               value={formData.adultos}
               onChange={handleChange}
               min="1"
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="menores" className="mb-2 block text-sm font-medium text-foreground">
               {t.minors}
             </label>
             <input
+              id="menores"
               type="number"
               name="menores"
               value={formData.menores}
               onChange={handleChange}
               min="0"
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="fechaViaje" className="mb-2 block text-sm font-medium text-foreground">
               {t.date}
             </label>
             <input
+              id="fechaViaje"
               type="date"
               name="fechaViaje"
               value={formData.fechaViaje}
               onChange={handleChange}
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="idioma" className="mb-2 block text-sm font-medium text-foreground">
               {t.langGuide}
             </label>
             <select
+              id="idioma"
               name="idioma"
               value={formData.idioma}
               onChange={handleChange}
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
               {idiomasList.map(idioma => (
                 <option key={idioma} value={idioma}>{idioma}</option>
@@ -374,15 +367,16 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+            <label htmlFor="categoriaHotel" className="mb-2 block text-sm font-medium text-foreground">
               {t.hotelCat}
             </label>
             <select
+              id="categoriaHotel"
               name="categoriaHotel"
               value={formData.categoriaHotel}
               onChange={handleChange}
               style={inputStyle}
-              className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             >
               {t.hotelCatList.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
@@ -393,16 +387,17 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
 
         {/* Mensaje */}
         <div className="mt-5">
-          <label className="mb-2 block text-sm font-medium" style={{ color: colors.foreground }}>
+          <label htmlFor="mensaje" className="mb-2 block text-sm font-medium text-foreground">
             {t.messageLabel}
           </label>
           <textarea
+            id="mensaje"
             name="mensaje"
             value={formData.mensaje}
             onChange={handleChange}
             rows={4}
             style={inputStyle}
-            className="w-full rounded-sm border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+            className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
             placeholder={t.messagePh}
           ></textarea>
         </div>
@@ -413,7 +408,7 @@ export default function PlaneaTuViaje({ lang = 'es' }: { lang?: 'es' | 'en' | 'p
           type="submit"
           disabled={isSubmitting}
           style={buttonStyle()}
-          className="w-full rounded-sm px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] transition-all shadow-[0_18px_36px_rgba(15,23,42,0.14)] hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(15,23,42,0.18)] disabled:cursor-not-allowed disabled:opacity-75"
+          className="w-full rounded-sm px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground transition-all shadow-[0_18px_36px_rgba(15,23,42,0.14)] hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(15,23,42,0.18)] disabled:cursor-not-allowed disabled:opacity-75"
         >
           {isSubmitting ? t.sending : submitStatus === 'success' ? t.sent : submitStatus === 'error' ? t.errorBtn : t.submitText}
         </button>
