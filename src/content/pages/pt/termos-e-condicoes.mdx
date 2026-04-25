@@ -13,195 +13,124 @@ slugs:
   pt: "termos-e-condicoes"
 ---
 
-<div class="max-w-5xl mx-auto">
-  {/* Warning Banner */}
-  <div class="mb-12 p-6 lg:p-8 bg-muted rounded-sm border-l-8 border-primary flex items-start gap-4 shadow-sm">
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary shrink-0">
+<div class="w-full mx-auto">
+  {/* Notice Banner */}
+  <div class="inline-flex items-center mb-10 p-2 bg-amber-50 border border-amber-200 rounded-lg gap-4 ">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-600 shrink-0">
       <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
       <line x1="12" x2="12" y1="9" y2="13"/>
       <line x1="12" x2="12.01" y1="17" y2="17"/>
     </svg>
-    <p class="font-bold text-muted-foreground italic text-lg leading-snug">
-      O sistema peruano de serviços e produções é diferente do seu país, recomendamos que você leia atentamente.
-    </p>
+    <div>
+      <p class="text-[1.2rem] text-foreground font-semibold">Aviso</p>
+      <p class="text-[1rem] text-foreground mt-1">O sistema peruano de serviços e produções é diferente do seu país, recomendamos que leia com atenção.</p>
+    </div>
   </div>
 
-  {/* Content Grid: Bento Style */}
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {/* Section 1: Software */}
-    <section class="lg:col-span-2 bg-muted/30 border border-border p-8 rounded-sm flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
-      <div class="flex items-center gap-3 mb-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary p-2 bg-primary/10 rounded-lg">
-          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-        <h2 class="text-xl font-bold tracking-tight uppercase">01. Políticas de Programação</h2>
-      </div>
-      <p class="text-muted-foreground leading-relaxed">
-        Nossas atividades são planejadas minuciosamente para oferecer a melhor experiência possível. No entanto, por razões operacionais, o roteiro deve ser considerado um <span class="text-primary font-semibold">guia básico</span>. A ordem das visitas pode variar de acordo com as condições climáticas, logística local ou disponibilidade, sempre priorizando a segurança e satisfação do cliente.
+  {/* SOFTWARE */}
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-sm font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-md">01</span>
+      <h2 class="font-bold text-foreground">Software</h2>
+    </div>
+    <div>
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        Os programas de atividades são planejados com muito cuidado, embora, por razões operacionais, possa ser necessário alterar a ordem dos ativados no itinerário ou a rota específica (conhecimento prévio do cliente) e, embora esses casos possam ser excepcionais, o itinerário em geral, deve ser considerado apenas como um guia básico.
       </p>
-    </section>
+    </div>
+  </div>
 
-    {/* Section 3: Rates */}
-    <section class="bg-primary/10 border border-border p-8 rounded-sm shadow-lg lg:row-span-2">
-      <div class="flex items-center gap-3 mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary p-2 bg-primary/10 rounded-lg">
-          <line x1="12" x2="12" y1="2" y2="22"/>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-        <h2 class="text-xl font-bold tracking-tight uppercase">03. Políticas de Tarifas</h2>
-      </div>
-      <ul class="space-y-6">
-        <li class="flex flex-col border-b border-border pb-4">
-          <span class="text-sm text-muted-foreground mb-1">Moeda</span>
-          <span class="font-bold text-lg">Preços em USD ($)</span>
-        </li>
-        <li class="flex flex-col border-b border-border pb-4">
-          <span class="text-sm text-muted-foreground mb-1">Bebês</span>
-          <span class="font-bold">0 - 2 Anos (Grátis*)</span>
-        </li>
-        <li class="flex flex-col border-b border-border pb-4">
-          <span class="text-sm text-muted-foreground mb-1">Crianças</span>
-          <span class="font-bold">3 - 10 Anos (Tarifa Reduzida)</span>
-        </li>
-        <li class="flex flex-col border-b border-border pb-4">
-          <span class="text-sm text-muted-foreground mb-1">Adultos</span>
-          <span class="font-bold">11+ Anos (Tarifa Completa)</span>
-        </li>
-        <li class="p-4 bg-muted rounded-lg text-sm italic">
-          *Exclusões de feriados aplicam-se para datas específicas de pico.
-        </li>
+  {/* RESPONSIBILITY */}
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-sm font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-md">02</span>
+      <h2 class="font-bold text-foreground">Responsabilidade</h2>
+    </div>
+    <div class="space-y-6">
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        Em todas as viagens, a Dreamy Tours atua em nome dos nossos clientes, organizando os meios de transporte, acomodação ou outros serviços turísticos necessários em seu nome, para que não assumimos responsabilidade em caso de acidentes, perdas, atrasos ou interferências durante o percurso devido a força maior ou outros eventos que não envolvam nossa responsabilidade, especialmente em relação a programas e horários.
+      </p>
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        É responsabilidade do passageiro ter todos os requisitos necessários para sua viagem, como: vistos, passaportes, se estiver estudando ter seu cartão ISIC atualizado, portar o cartão de imigração andino (TAM) emitido pelo Departamento de Migração, vacinas, autorizações para menores de idade, etc., pois, se não os tiver à mão, pode causar atrasos, cancelamentos de serviços, pagamento de impostos (IGV), entre outros contratempos.
+      </p>
+      <ul class="text-[1rem] text-foreground space-y-3">
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>A Dreamy Tours se reserva o direito de alterar, modificar, cancelar o itinerário de qualquer viagem, por razões de segurança, como: fenômenos naturais, problemas políticos, epidemias e/ou circunstâncias além da nossa organização. Nestes casos, não haverá reembolso da nossa empresa.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Pedimos que nos informe antes de contratar nossos serviços sobre a existência de tais limitações, a fim de recomendar serviços específicos que atendam esses impedimentos.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Também nos reservamos o direito de limitar a participação de qualquer um dos nossos passageiros nas atividades que considerarmos apropriadas, devido à segurança do grupo.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Não podemos levar um passageiro doente em uma excursão que represente um risco potencial para esse passageiro e para a integridade do grupo (isso pode ser avaliado pelo guia no início do tour).</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Não podemos levar passageiros embriagados ou em estado perigoso que ameace o desenvolvimento do tour, a saúde do grupo e do próprio passageiro.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Nossa empresa não se responsabiliza por doenças contraídas, deficiências físicas e/ou mentais que possam endanger a saúde ou integridade do passageiro ou terceiros durante o desenvolvimento do tour contratado, ou que impliquem uma limitação ou impedimento na prestação dos nossos serviços de viagem. Portanto, a Empresa NÃO reconhecerá nenhuma reclamação ou devolução pelos conceitos aforementioned, incluindo casos em que nenhum problema seja manifestado sob condições normais.</span></li>
       </ul>
-    </section>
+    </div>
+  </div>
 
-    {/* Section 2: Responsibility */}
-    <section class="lg:col-span-2 bg-muted/30 border border-border p-8 rounded-sm shadow-sm">
-      <div class="flex items-center gap-3 mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary p-2 bg-primary/10 rounded-lg">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
-          <path d="m9 12 2 2 4-4"/>
-        </svg>
-        <h2 class="text-xl font-bold tracking-tight uppercase">02. Responsabilidade</h2>
-      </div>
-      <div class="grid md:grid-cols-2 gap-8">
-        <div>
-          <h3 class="font-bold text-primary mb-3">Responsabilidade da Agência</h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            Dreamy Tours atua como intermediário em nome dos clientes. Não somos responsáveis por atrasos, acidentes ou perdas causados por <span class="italic">força maior</span>, greves ou ações governamentais.
-          </p>
-        </div>
-        <div>
-          <h3 class="font-bold text-primary mb-3">Responsabilidade do Passageiro</h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            Os passageiros devem possuir Passaportes válidos, Vistos, cartões ISIC (se aplicável) e vacinas necessárias. É dever do viajante cumprir os regulamentos peruanos.
-          </p>
-        </div>
-      </div>
-    </section>
+  {/* TRAVEL INSURANCE */}
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-sm font-bold uppercase tracking-widest text-secondary bg-secondary/10 px-3 py-1.5 rounded-md">03</span>
+      <h2 class="font-bold text-foreground">Seguro de Viagem</h2>
+    </div>
+    <div>
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        É altamente recomendado contratar um seguro de vida que cubra acidentes, despesas médicas e repatriação de emergência, incluindo ambulâncias aéreas e de resgate. Também recomendamos que cubra cancelamentos e bagagem perdida. Envie uma cópia do seu seguro através de redes sociais (email ou WhatsApp) ou fisicamente ao nosso escritório.
+      </p>
+    </div>
+  </div>
 
-    {/* Section 4 & 5: Reservations & Cancellations */}
-    <section class="lg:col-span-3 grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-      {/* Reservation Side */}
-      <div class="lg:col-span-4 bg-muted/30 border border-border p-8 rounded-sm flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-3 mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary p-2 bg-primary/10 rounded-lg">
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-              <line x1="16" x2="16" y1="2" y2="6"/>
-              <line x1="8" x2="8" y1="2" y2="6"/>
-              <line x1="3" x2="21" y1="10" y2="10"/>
-              <path d="m9 16 2 2 4-4"/>
-            </svg>
-            <h2 class="text-xl font-bold tracking-tight uppercase">04. Reservas</h2>
-          </div>
-          <p class="text-muted-foreground mb-6 text-sm">
-            Todas as reservas exigem uma confirmação formal por e-mail.
-          </p>
-          <div class="p-4 bg-muted rounded-sm mb-6">
-            <p class="text-xs uppercase tracking-widest text-muted-foreground opacity-60 mb-1">E-mail de Contato</p>
-            <p class="font-bold text-primary">info@dreamy.tours</p>
-          </div>
-        </div>
-        <div class="bg-primary/10 border border-border p-6 rounded-sm">
-          <p class="text-sm text-muted-foreground mb-1">Depósito Inicial</p>
-          <p class="text-3xl font-black">USD 150.00</p>
-          <p class="text-xs mt-2 text-muted-foreground">Taxa de processamento não reembolsável</p>
-        </div>
+  {/* PRICES */}
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-sm font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-md">04</span>
+      <h2 class="font-bold text-foreground">Preços</h2>
+    </div>
+    <div class="space-y-4">
+      <ul class="text-[1rem] text-foreground space-y-2">
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Todas as tarifas são expressas em dólares americanos (opcional para câmbio de moeda) e são programadas por pessoa.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Todas as nossas tarifas estão sujeitas a disponibilidade e alterações.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Crianças menores de 02 e 11 meses são consideradas INF (bebês), não pagam por nenhum serviço e não têm direito a comida, cama ou assento nas partidas.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Crianças de 3 a 10 anos e 11 meses são consideradas CHD (criança), têm uma tarifa especial e compartilham quarto com seus pais.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Acima de 11 anos são consideradas adultos.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>Menores devem viajar com documento de identidade.</span></li>
+        <li class="flex items-start gap-2"><span class="text-primary mt-1">•</span><span>As tarifas não se aplicam para feriados, Páscoa, fins de semana longos, feriados nacionais, Natal ou Ano Novo.</span></li>
+      </ul>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="p-4 bg-gradient-to-br from-white to-muted border border-border rounded-lg"><span class="text-sm text-foreground font-medium block mb-1">Moeda</span><span class="font-bold text-lg text-foreground">USD ($)</span></div>
+        <div class="p-4 bg-gradient-to-br from-white to-muted border border-border rounded-lg"><span class="text-sm text-foreground font-medium block mb-1">Bebês</span><span class="font-bold text-lg text-foreground">0-2 anos</span><span class="text-xs text-muted-foreground block">(Grátis)</span></div>
+        <div class="p-4 bg-gradient-to-br from-white to-muted border border-border rounded-lg"><span class="text-sm text-foreground font-medium block mb-1">Crianças</span><span class="font-bold text-lg text-foreground">3-10 anos</span><span class="text-xs text-muted-foreground block">(Tarifa Especial)</span></div>
+        <div class="p-4 bg-gradient-to-br from-white to-muted border border-border rounded-lg"><span class="text-sm text-foreground font-medium block mb-1">Adultos</span><span class="font-bold text-lg text-foreground">11+ anos</span><span class="text-xs text-muted-foreground block">(Tarifa Completa)</span></div>
       </div>
+    </div>
+  </div>
 
-      {/* Table Side */}
-      <div class="lg:col-span-8 bg-muted/30 border border-border p-8 rounded-sm overflow-hidden">
-        <div class="flex items-center gap-3 mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary p-2 bg-primary/10 rounded-lg">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="8" x2="16" y1="15" y2="15"/>
-            <line x1="9" x2="9" y1="9" y2="15"/>
-            <line x1="15" x2="15" y1="9" y2="15"/>
-          </svg>
-          <h2 class="text-xl font-bold tracking-tight uppercase">05. Política de Cancelamento</h2>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-separate border-spacing-y-2">
-            <thead>
-              <tr class="text-xs uppercase tracking-widest text-muted-foreground opacity-60">
-                <th class="pb-4 px-4">Período de Aviso</th>
-                <th class="pb-4 px-4">Taxa de Cancelamento</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="bg-muted rounded-lg">
-                <td class="py-4 px-4 font-bold rounded-l-xl">30+ Dias</td>
-                <td class="py-4 px-4 font-medium text-primary rounded-r-xl">$150 (Depósito)</td>
-              </tr>
-              <tr class="bg-muted rounded-lg">
-                <td class="py-4 px-4 font-bold rounded-l-xl">15 - 10 Dias</td>
-                <td class="py-4 px-4 font-medium text-primary rounded-r-xl">60% do Total</td>
-              </tr>
-              <tr class="bg-muted rounded-lg">
-                <td class="py-4 px-4 font-bold rounded-l-xl">9 - 7 Dias</td>
-                <td class="py-4 px-4 font-medium text-primary rounded-r-xl">80% do Total</td>
-              </tr>
-              <tr class="bg-red-600 rounded-lg">
-                <td class="py-4 px-4 font-bold rounded-l-xl text-white">Menos de 6 Dias</td>
-                <td class="py-4 px-4 font-black text-white rounded-r-xl">100% (Sem Reembolso)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+  {/* BOOKINGS */}
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-sm font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-md">05</span>
+      <h2 class="font-bold text-foreground">Reservas</h2>
+    </div>
+    <div class="space-y-4">
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        Nenhuma reserva pode ser considerada, enquanto não existir confirmação escrita e cancellation do valor acordado pelo viajante ou qualquer outra empresa mediadora na compra. Também, em alguns casos especiais e mesmo tendo feito o respective depósito monetário, deve-se aguardar a reconfirmação da reserva devido a restrições ou condições regulatórias no país de um fornecedor de serviços.
+      </p>
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        Todas as reservas devem ser feitas por e-mail para <span class="font-semibold text-primary">info@dreamy.tours</span>, você também deve nos enviar seus dados pessoais, como: nomes, sobrenomes, números de passaporte, nacionalidade e data de nascimento.
+      </p>
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        O preço dos serviços turísticos e/ou pacotes oferecidos pela nossa empresa são expressos em dólares americanos, cujo valor final será acordado entre o cliente e nosso departamento de reservas via e-mail info@dreamy.tours
+      </p>
+    </div>
+  </div>
 
-    {/* Section 6: Reprogramming */}
-    <section class="lg:col-span-3 bg-muted/30 border border-border p-8 rounded-sm relative overflow-hidden group">
-      <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full group-hover:scale-110 transition-transform"></div>
-      <div class="flex items-center gap-3 mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary p-2 bg-primary/10 rounded-lg">
-          <path d="M16 3h5v5"/>
-          <path d="M8 3H3v5"/>
-          <path d="M12 7v10"/>
-          <path d="M12 17v4"/>
-          <path d="m3 17 5.3-5.3"/>
-          <path d="m14.7 5.3 5.3 5.3"/>
-        </svg>
-        <h2 class="text-xl font-bold tracking-tight uppercase">06. Reprogramação e Reembolsos</h2>
-      </div>
-      <div class="flex flex-col lg:flex-row gap-8 items-center">
-        <div class="flex-grow">
-          <p class="text-muted-foreground leading-relaxed max-w-3xl">
-            Qualquer solicitação de reprogramação deve ser enviada por escrito. Embora nos esforcemos para acomodar as alterações, elas estão sujeitas à disponibilidade e possíveis sobretaxas de fornecedores terceirizados (hotéis, trens, ingressos). Não há reembolsos para serviços não utilizados devido a desistência voluntária do passageiro.
-          </p>
-        </div>
-        <div class="shrink-0">
-          <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-primary-foreground">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m16 2-2.3 2.3a3 3 0 0 1 0 4.3L16 11"/>
-              <path d="M7 12h.01"/>
-              <path d="M16 22 7.7 13.7a3 3 0 0 1 0-4.3L16 2"/>
-              <path d="M12 19v-2"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </section>
+  {/* BOOKING CHANGES */}
+  <div class="mb-10">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-sm font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-md">06</span>
+      <h2 class="font-bold text-foreground">Alterações de Reserva – Itinerário – Datas – Participantes</h2>
+    </div>
+    <div>
+      <p class="text-[1rem] text-foreground leading-relaxed">
+        Alterações de reserva, itinerário, datas e participantes serão aceitas conforme disponibilidade e o correspondente pagamento de multas e despesas administrativas.
+      </p>
+    </div>
   </div>
 </div>
