@@ -1,0 +1,13 @@
+{
+	"files": {
+		"includes": ["**/*.{ts,tsx,js,jsx}"],
+		"experimentalScannerIgnores": [
+			"**/*.astro",
+			"**/*.md",
+			"**/*.mdx",
+			"node_modules",
+			"dist",
+			"build"
+		]
+	}
+}

@@ -17,7 +17,10 @@ const { blog, lang, isFeatured = false, showDescription = false } = Astro.props;
 if (!blog) return null;
 
 const t = useTranslations(lang);
-const mainImage = getImageUrl(blog.portadaImage, isFeatured ? "large" : "medium");
+const mainImage = getImageUrl(
+  blog.portadaImage,
+  isFeatured ? "large" : "medium",
+);
 const imageSrcSet = getImageSrcSet(blog.portadaImage, [
   "thumbnail",
   "small",
@@ -62,8 +65,7 @@ function extractPlainText(value: unknown): string {
 
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
-    const ownText =
-      typeof record.text === "string" ? record.text : "";
+    const ownText = typeof record.text === "string" ? record.text : "";
     const childrenText = extractPlainText(record.children);
 
     return [ownText, childrenText]
@@ -109,7 +111,11 @@ const imageHeight = isFeatured ? "aspect-[16/9]" : "aspect-[4/3]";
           <img
             src={mainImage}
             srcset={imageSrcSet || undefined}
-            sizes={isFeatured ? "(max-width: 1023px) 100vw, 66vw" : "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"}
+            sizes={
+              isFeatured
+                ? "(max-width: 1023px) 100vw, 66vw"
+                : "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
+            }
             alt={imageAlt}
             class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
             loading="lazy"

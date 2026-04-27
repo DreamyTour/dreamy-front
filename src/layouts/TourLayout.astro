@@ -16,10 +16,12 @@ const { slugMap, seo, lang } = Astro.props;
   <slot />
 </Layout>
 
-{slugMap && (
-  <script
-    id="tour-slug-map"
-    type="application/json"
-    set:html={JSON.stringify(slugMap)}
-  />
-)}
+{
+  slugMap && (
+    <script
+      id="tour-slug-map"
+      type="application/json"
+      set:html={JSON.stringify(slugMap)}
+    />
+  )
+}

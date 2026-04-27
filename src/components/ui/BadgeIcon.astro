@@ -7,23 +7,223 @@ interface Props {
 
 const { title = "", content = "", className = "size-6" } = Astro.props;
 
-const searchStr = `${title} ${content}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const searchStr = `${title} ${content}`
+  .toLowerCase()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "");
 
 let iconType = "default";
-if (searchStr.includes("duracion") || searchStr.includes("duration") || searchStr.includes("tiempo") || searchStr.includes("dia") || searchStr.includes("day") || searchStr.includes("hora") || searchStr.includes("hour")) iconType = "duration";
-else if (searchStr.includes("dificultad") || searchStr.includes("difficulty") || searchStr.includes("nivel") || searchStr.includes("level")) iconType = "difficulty";
-else if (searchStr.includes("grupo") || searchStr.includes("group") || searchStr.includes("tamano") || searchStr.includes("persona") || searchStr.includes("pax")) iconType = "group";
-else if (searchStr.includes("altitud") || searchStr.includes("altura") || searchStr.includes("altitude") || searchStr.includes("msnm")) iconType = "altitude";
-else if (searchStr.includes("guia") || searchStr.includes("guide") || searchStr.includes("idioma") || searchStr.includes("language")) iconType = "guide";
-else if (searchStr.includes("transporte") || searchStr.includes("transport") || searchStr.includes("bus") || searchStr.includes("tren") || searchStr.includes("vuelo")) iconType = "transport";
-else if (searchStr.includes("comida") || searchStr.includes("meal") || searchStr.includes("alimentacion") || searchStr.includes("desayuno") || searchStr.includes("almuerzo") || searchStr.includes("cena")) iconType = "meals";
+if (
+  searchStr.includes("duracion") ||
+  searchStr.includes("duration") ||
+  searchStr.includes("tiempo") ||
+  searchStr.includes("dia") ||
+  searchStr.includes("day") ||
+  searchStr.includes("hora") ||
+  searchStr.includes("hour")
+)
+  iconType = "duration";
+else if (
+  searchStr.includes("dificultad") ||
+  searchStr.includes("difficulty") ||
+  searchStr.includes("nivel") ||
+  searchStr.includes("level")
+)
+  iconType = "difficulty";
+else if (
+  searchStr.includes("grupo") ||
+  searchStr.includes("group") ||
+  searchStr.includes("tamano") ||
+  searchStr.includes("persona") ||
+  searchStr.includes("pax")
+)
+  iconType = "group";
+else if (
+  searchStr.includes("altitud") ||
+  searchStr.includes("altura") ||
+  searchStr.includes("altitude") ||
+  searchStr.includes("msnm")
+)
+  iconType = "altitude";
+else if (
+  searchStr.includes("guia") ||
+  searchStr.includes("guide") ||
+  searchStr.includes("idioma") ||
+  searchStr.includes("language")
+)
+  iconType = "guide";
+else if (
+  searchStr.includes("transporte") ||
+  searchStr.includes("transport") ||
+  searchStr.includes("bus") ||
+  searchStr.includes("tren") ||
+  searchStr.includes("vuelo")
+)
+  iconType = "transport";
+else if (
+  searchStr.includes("comida") ||
+  searchStr.includes("meal") ||
+  searchStr.includes("alimentacion") ||
+  searchStr.includes("desayuno") ||
+  searchStr.includes("almuerzo") ||
+  searchStr.includes("cena")
+)
+  iconType = "meals";
 ---
 
-{iconType === 'duration' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
-{iconType === 'difficulty' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>}
-{iconType === 'group' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-{iconType === 'altitude' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>}
-{iconType === 'guide' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>}
-{iconType === 'transport' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>}
-{iconType === 'meals' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>}
-{iconType === 'default' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={className}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>}
+{
+  iconType === "duration" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </>
+    </svg>
+  )
+}
+{
+  iconType === "difficulty" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <path d="M3 3v18h18" />
+        <path d="m19 9-5 5-4-4-3 3" />
+      </>
+    </svg>
+  )
+}
+{
+  iconType === "group" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </>
+    </svg>
+  )
+}
+{
+  iconType === "altitude" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+    </svg>
+  )
+}
+{
+  iconType === "guide" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+        <path d="M2 12h20" />
+      </>
+    </svg>
+  )
+}
+{
+  iconType === "transport" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+        <path d="M15 18H9" />
+        <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+        <circle cx="17" cy="18" r="2" />
+        <circle cx="7" cy="18" r="2" />
+      </>
+    </svg>
+  )
+}
+{
+  iconType === "meals" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+        <path d="M7 2v20" />
+        <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+      </>
+    </svg>
+  )
+}
+{
+  iconType === "default" && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class={className}
+    >
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    </svg>
+  )
+}

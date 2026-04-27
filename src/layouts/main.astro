@@ -14,8 +14,8 @@ import SEO from "@/components/SEO.astro";
 import type { SEOProps } from "@/components/SEO.astro";
 
 interface Props {
-	seo?: SEOProps;
-	lang?: Lang;
+  seo?: SEOProps;
+  lang?: Lang;
 }
 
 const { seo, lang: langProp } = Astro.props;
@@ -25,19 +25,19 @@ const { seo, lang: langProp } = Astro.props;
 let currentLang: Lang = DEFAULT_LANG;
 
 if (langProp && isValidLang(langProp)) {
-	currentLang = langProp;
+  currentLang = langProp;
 } else if (Astro.params?.lang && isValidLang(Astro.params.lang as string)) {
-	currentLang = Astro.params.lang as Lang;
+  currentLang = Astro.params.lang as Lang;
 }
 
 // 2. Obtenemos toda la data de la barra superior/footer y se la inyectamos
 const globalDataRaw = await fetchApi<Global>({
-	endpoint: "global",
-	wrappedByKey: "data",
-	query: {
-		locale: currentLang,
-		populate: "*",
-	},
+  endpoint: "global",
+  wrappedByKey: "data",
+  query: {
+    locale: currentLang,
+    populate: "*",
+  },
 });
 
 // 3. Reescribimos las URLs del menú para que coincidan con el idioma actual
@@ -46,36 +46,36 @@ const globalData = rewriteMenuUrls(globalDataRaw, currentLang);
 // Default SEO values
 const defaultTitle = "Turismo Perú Bolivia - Tours y Paquetes Turísticos";
 const defaultDescription =
-	"Explora los mejores tours y paquetes turísticos en Perú y Bolivia. Machu Picchu, Lago Titicaca, salar de Uyuni y más.";
+  "Explora los mejores tours y paquetes turísticos en Perú y Bolivia. Machu Picchu, Lago Titicaca, salar de Uyuni y más.";
 
 const seoProps = seo || {
-	title: defaultTitle,
-	description: defaultDescription,
-	type: "website" as const,
-	lang: currentLang,
+  title: defaultTitle,
+  description: defaultDescription,
+  type: "website" as const,
+  lang: currentLang,
 };
 ---
 
 <html lang={currentLang}>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<ClientRouter />
-		<Font cssVariable="--font-outfit" preload />
-		<SEO {...seoProps} />
-	</head>
-	<body>
-		<!-- Skip Link para accesibilidad (WCAG 2.4.1) -->
-		<a href="#main-content" class="skip-link">
-			Saltar al contenido principal
-		</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <ClientRouter />
+    <Font cssVariable="--font-outfit" preload />
+    <SEO {...seoProps} />
+  </head>
+  <body>
+    <!-- Skip Link para accesibilidad (WCAG 2.4.1) -->
+    <a href="#main-content" class="skip-link">
+      Saltar al contenido principal
+    </a>
 
-		<Header data={globalData} lang={currentLang} />
-		<main id="main-content">
-			<slot />
-		</main>
-		<Footer data={globalData?.footer} lang={currentLang} />
-		<WhatsAppFloatingButton />
-	</body>
+    <Header data={globalData} lang={currentLang} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer data={globalData?.footer} lang={currentLang} />
+    <WhatsAppFloatingButton />
+  </body>
 </html>

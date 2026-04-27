@@ -7,7 +7,12 @@ import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
 import LiteYouTube from "@/components/LiteYouTube.astro";
 import TableOfContents from "@/components/ui/TableOfContents.astro";
-import { getImageAlt, getImageSrcSet, getImageUrl, getThumbnailUrl } from "@/lib/helpers";
+import {
+  getImageAlt,
+  getImageSrcSet,
+  getImageUrl,
+  getThumbnailUrl,
+} from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 
 // Generate SEO description from JSON blocks
@@ -44,9 +49,9 @@ function generateSlug(text: string): string {
 // Extract all H2 headings from content for TOC
 function extractHeadings(blocks: any[]): { id: string; text: string }[] {
   if (!blocks || !Array.isArray(blocks)) return [];
-  
+
   const headings: { id: string; text: string }[] = [];
-  
+
   for (const block of blocks) {
     if (block.type === "heading" && block.level === 2) {
       const text = block.children?.map((c: any) => c.text).join("") || "";
@@ -56,20 +61,20 @@ function extractHeadings(blocks: any[]): { id: string; text: string }[] {
       });
     }
   }
-  
+
   return headings;
 }
 
 // Find the index of the first H2 in the content
 function findFirstH2Index(blocks: any[]): number {
   if (!blocks || !Array.isArray(blocks)) return -1;
-  
+
   for (let i = 0; i < blocks.length; i++) {
     if (blocks[i].type === "heading" && blocks[i].level === 2) {
       return i;
     }
   }
-  
+
   return -1;
 }
 
@@ -115,14 +120,15 @@ export async function getStaticPaths() {
       const categories = blog.category_blogs || [];
       // Get posts in same categories (excluding current)
       const relatedPosts = allBlogsByLang[lang]
-        .filter(b => 
-          b.documentId !== blog.documentId && // Not the same post
-          b.category_blogs?.some((cat: any) => 
-            categories.some((c: any) => c.documentId === cat.documentId)
-          )
+        .filter(
+          (b) =>
+            b.documentId !== blog.documentId && // Not the same post
+            b.category_blogs?.some((cat: any) =>
+              categories.some((c: any) => c.documentId === cat.documentId),
+            ),
         )
         .slice(0, 3); // Max 3 related posts
-      
+
       relatedBlogsByLang[lang][blog.documentId] = relatedPosts;
     }
   }
@@ -167,14 +173,8 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { 
-  blog, 
-  lang, 
-  allCategories, 
-  slugMap, 
-  globalData, 
-  relatedBlogs,
-} = Astro.props;
+const { blog, lang, allCategories, slugMap, globalData, relatedBlogs } =
+  Astro.props;
 
 const socialLogos =
   globalData?.footer?.socialLogo || globalData?.socialLogo || [];
@@ -292,7 +292,7 @@ const firstH2Index = findFirstH2Index(blog.contenido);
       <article class="w-full lg:w-[70%] xl:w-[75%] mx-auto lg:mx-0">
         {/* Tabla de Contenidos */}
         <TableOfContents headings={tocHeadings} />
-        
+
         <div class="w-full text-foreground">
           {
             blog.contenido && Array.isArray(blog.contenido) ? (
@@ -326,7 +326,9 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                 }
                 if (block.type === "heading") {
                   const Tag = `h${block.level}` as any;
-                  const headingText = block.children?.map((child: any) => child.text).join("") || "";
+                  const headingText =
+                    block.children?.map((child: any) => child.text).join("") ||
+                    "";
                   const headingId = generateSlug(headingText);
                   return (
                     <Tag
@@ -392,7 +394,14 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                     <figure class="my-10 mx-auto">
                       <img
                         src={getImageUrl(block.image)}
-                        srcset={getImageSrcSet(block.image, ["thumbnail", "small", "medium", "large"]) || undefined}
+                        srcset={
+                          getImageSrcSet(block.image, [
+                            "thumbnail",
+                            "small",
+                            "medium",
+                            "large",
+                          ]) || undefined
+                        }
                         sizes="(max-width: 1023px) 100vw, 75vw"
                         alt={getImageAlt(block.image, "Blog image")}
                         class="h-auto w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
@@ -407,8 +416,14 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                     </figure>
                   );
                 }
-                if (block.type === "component" && (block.__component === "shared.video" || block.component === "shared.video")) {
-                  const videoId = getYouTubeVideoId(block.videoURL || block.videoUrl);
+                if (
+                  block.type === "component" &&
+                  (block.__component === "shared.video" ||
+                    block.component === "shared.video")
+                ) {
+                  const videoId = getYouTubeVideoId(
+                    block.videoURL || block.videoUrl,
+                  );
                   if (videoId) {
                     const thumbnailUrl = getThumbnailUrl(block.thumbnail);
                     return (
@@ -446,8 +461,8 @@ const firstH2Index = findFirstH2Index(blog.contenido);
       </article>
 
       {/* Sidebar Right */}
-      <BlogAside 
-        categories={allCategories} 
+      <BlogAside
+        categories={allCategories}
         currentSlug={blog.category_blogs?.[0]?.slug}
         lang={lang}
         socialLogos={socialLogos}
@@ -456,28 +471,36 @@ const firstH2Index = findFirstH2Index(blog.contenido);
   </div>
 
   {/* Posts Relacionados */}
-  {relatedBlogs && relatedBlogs.length > 0 && (
-    <section class="max-w-8xl mx-auto mt-12 border-t border-border px-4 py-16 md:px-8 lg:py-20">
-      <div class="text-center mb-10">
-        <h2 class="relative mb-6 inline-block text-2xl font-bold text-foreground md:text-3xl">
-          <span class="relative z-10">{lang === "es" ? "Posts Relacionados" : lang === "pt" ? "Posts Relacionados" : "Related Posts"}</span>
-          <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
-        </h2>
-        <div class="flex items-center justify-center gap-3 mt-4">
-          <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
-          <div class="w-12 h-1.5 bg-secondary rounded-full relative">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full" />
+  {
+    relatedBlogs && relatedBlogs.length > 0 && (
+      <section class="max-w-8xl mx-auto mt-12 border-t border-border px-4 py-16 md:px-8 lg:py-20">
+        <div class="text-center mb-10">
+          <h2 class="relative mb-6 inline-block text-2xl font-bold text-foreground md:text-3xl">
+            <span class="relative z-10">
+              {lang === "es"
+                ? "Posts Relacionados"
+                : lang === "pt"
+                  ? "Posts Relacionados"
+                  : "Related Posts"}
+            </span>
+            <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
+          </h2>
+          <div class="flex items-center justify-center gap-3 mt-4">
+            <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
+            <div class="w-12 h-1.5 bg-secondary rounded-full relative">
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full" />
+            </div>
+            <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
           </div>
-          <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
         </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {relatedBlogs.map((relatedBlog: Blog) => (
-          <CardPost blog={relatedBlog} lang={lang} />
-        ))}
-      </div>
-    </section>
-  )}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {relatedBlogs.map((relatedBlog: Blog) => (
+            <CardPost blog={relatedBlog} lang={lang} />
+          ))}
+        </div>
+      </section>
+    )
+  }
 </Layout>
 
 {

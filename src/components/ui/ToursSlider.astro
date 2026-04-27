@@ -15,7 +15,7 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
 <div class="relative" data-tours-slider>
   <div class="px-4 md:px-14">
     <div class="overflow-hidden">
-    <!-- Slider Container - horizontal scroll -->
+      <!-- Slider Container - horizontal scroll -->
       <div
         class="flex gap-6 overflow-x-auto py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
         id={`slider-${Math.random().toString(36).substr(2, 9)}`}
@@ -86,16 +86,30 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
 
     sliderRoots.forEach((root) => {
       const sliderRoot = root as HTMLElement;
-      const container = sliderRoot.querySelector("[data-slider-track]") as HTMLElement | null;
-      const prevBtn = sliderRoot.querySelector(".slider-prev") as HTMLButtonElement | null;
-      const nextBtn = sliderRoot.querySelector(".slider-next") as HTMLButtonElement | null;
+      const container = sliderRoot.querySelector(
+        "[data-slider-track]",
+      ) as HTMLElement | null;
+      const prevBtn = sliderRoot.querySelector(
+        ".slider-prev",
+      ) as HTMLButtonElement | null;
+      const nextBtn = sliderRoot.querySelector(
+        ".slider-next",
+      ) as HTMLButtonElement | null;
 
-      if (!container || !prevBtn || !nextBtn || container.dataset.sliderInitialized === "true") return;
+      if (
+        !container ||
+        !prevBtn ||
+        !nextBtn ||
+        container.dataset.sliderInitialized === "true"
+      )
+        return;
 
       container.dataset.sliderInitialized = "true";
 
       const slides = Array.from(container.children) as HTMLElement[];
-      const originalSlidesCount = Number(container.dataset.originalCount || slides.length);
+      const originalSlidesCount = Number(
+        container.dataset.originalCount || slides.length,
+      );
       const autoPlayDelay = 3500;
       let autoPlay: ReturnType<typeof window.setInterval> | undefined;
       let scrollAmount = 0;
@@ -103,7 +117,8 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
       let isAdjustingScroll = false;
 
       const calculateMetrics = () => {
-        const slideWidth = slides[0]?.getBoundingClientRect().width ?? container.offsetWidth;
+        const slideWidth =
+          slides[0]?.getBoundingClientRect().width ?? container.offsetWidth;
         const styles = window.getComputedStyle(container);
         const gapValue = styles.columnGap || styles.gap || "0";
         const gap = Number.parseFloat(gapValue);
@@ -132,7 +147,10 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
 
       const moveSlider = (direction: 1 | -1) => {
         normalizeScroll();
-        container.scrollBy({ left: scrollAmount * direction, behavior: "smooth" });
+        container.scrollBy({
+          left: scrollAmount * direction,
+          behavior: "smooth",
+        });
         window.setTimeout(normalizeScroll, 450);
       };
 
@@ -150,7 +168,10 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
       };
 
       const handleResize = () => {
-        const currentIndex = scrollAmount > 0 ? Math.round(container.scrollLeft / scrollAmount) : 0;
+        const currentIndex =
+          scrollAmount > 0
+            ? Math.round(container.scrollLeft / scrollAmount)
+            : 0;
         calculateMetrics();
         setScrollPosition(currentIndex * scrollAmount);
         normalizeScroll();

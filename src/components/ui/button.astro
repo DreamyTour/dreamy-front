@@ -18,6 +18,12 @@ const classes =
     : "inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 bg-[#2a2624] !text-white border border-white/20 hover:bg-[#3a3634] hover:shadow-lg";
 ---
 
-<a href={href} target={target} rel={rel} class={classes} style={`color: ${type === "PRIMARY" ? "white" : "white"}`}>
+<a
+  href={href}
+  target={target}
+  rel={rel}
+  class={classes}
+  style={`color: ${type === "PRIMARY" ? "white" : "white"}`}
+>
   {label}
 </a>

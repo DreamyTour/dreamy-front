@@ -8,68 +8,68 @@ import type { Link, Logo, Imagen } from "./common";
 export type { Imagen, Link, Logo, StrapiResponse } from "./common";
 
 export interface TopBar {
-  id: number;
-  isVisible: boolean;
-  text: string;
-  link: Link;
+	id: number;
+	isVisible: boolean;
+	text: string;
+	link: Link;
 }
 
 export interface HeaderTop {
-  id: number;
-  logo: Logo;
-  headerLink: Link[];
-  button: Link[];
+	id: number;
+	logo: Logo;
+	headerLink: Link[];
+	button: Link[];
 }
 
 export interface MenuItem {
-  id: number;
-  link: Link;
-  item: Link[];
+	id: number;
+	link: Link;
+	item: Link[];
 }
 
 export interface Menu {
-  id: number;
-  menuItems: MenuItem[];
+	id: number;
+	menuItems: MenuItem[];
 }
 
 export interface Destination {
-  id: number;
-  titulo: string;
-  link: Link[];
+	id: number;
+	titulo: string;
+	link: Link[];
 }
 
 export interface DreamyAbout {
-  id: number;
-  titulo: string;
-  link: Link[];
+	id: number;
+	titulo: string;
+	link: Link[];
 }
 
 export interface Contact {
-  id: number;
-  titulo: string;
-  link: Link[];
+	id: number;
+	titulo: string;
+	link: Link[];
 }
 
 export interface Footer {
-  id: number;
-  logo: Logo;
-  content: string;
-  socialTitle: string;
-  socialLogo: Logo[];
-  destination: Destination;
-  dreamyAbout: DreamyAbout;
-  contact: Contact;
+	id: number;
+	logo: Logo;
+	content: string;
+	socialTitle: string;
+	socialLogo: Logo[];
+	destination: Destination;
+	dreamyAbout: DreamyAbout;
+	contact: Contact;
 }
 
 export interface Global {
-  id: number;
-  documentId: string;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  locale: string;
-  topBar: TopBar;
-  headerTop: HeaderTop;
-  menu: Menu;
-  footer: Footer;
+	id: number;
+	documentId: string;
+	createdAt: string;
+	updatedAt: string;
+	publishedAt: string;
+	locale: string;
+	topBar: TopBar;
+	headerTop: HeaderTop;
+	menu: Menu;
+	footer: Footer;
 }
