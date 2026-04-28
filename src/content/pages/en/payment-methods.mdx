@@ -15,7 +15,7 @@ slugs:
 
 import Button from "@/components/ui/button.astro";
 
-<div class="payment-page">
+<div class="payment-page max-w-7xl mx-auto px-4 md:px-8 py-12">
 
 Dreamy Tours operates under high-quality service standards, offering the best tour packages throughout Peru and Bolivia, and boasts a team of professionals dedicated to customer service. To provide you with a better experience and with your safety and comfort in mind, we offer the following payment methods.
 
@@ -39,7 +39,7 @@ Dreamy Tours operates under high-quality service standards, offering the best to
       </svg>
     </div>
     <h3 class="option-title">Prepaid</h3>
-    <p class="option-description">Your reservation will be confirmed with an advance payment of 50% of the total cost of the reserved service.</p>
+    <p class="option-description text-black">Your reservation will be confirmed with an advance payment of 50% of the total cost of the reserved service.</p>
   </div>
   <div class="payment-option-card">
     <div class="option-icon">
@@ -83,19 +83,14 @@ Dreamy Tours operates under high-quality service standards, offering the best to
   </div>
 </div>
 
-<div class="not-prose mb-12 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+<div class="mb-12 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
   <Button
     label="+51 969 787221"
     href="https://wa.me/51969787221"
     type="PRIMARY"
     isExternal={true}
   />
-  <Button
-    label="Contact via Email"
-    href="mailto:info@dreamy.tours"
-    type="PRIMARY"
-    isExternal={true}
-  />
+  <a class="text-white bg-secondary py-3 px-6 rounded-full hover:bg-secondary/80 transition-colors duration-200" target="_blank" rel="noopener noreferrer" href="https://mail.google.com/mail/?view=cm&to=info@dreamy.tours">Contact by email</a>
 </div>
 
 ---
@@ -120,7 +115,7 @@ Dreamy Tours operates under high-quality service standards, offering the best to
         height="20"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="currentColor"
+        stroke="var(--color-primary)"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -150,7 +145,7 @@ Dreamy Tours operates under high-quality service standards, offering the best to
         height="20"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="currentColor"
+        stroke="var(--color-primary)"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -331,15 +326,15 @@ Dreamy Tours operates under high-quality service standards, offering the best to
 <div class="payment-footer">
   <div class="footer-items">
     <div class="footer-item">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       <span>Secure Payments</span>
     </div>
     <div class="footer-item">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
       <span>24/7 Support</span>
     </div>
     <div class="footer-item">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       <span>Verified Company</span>
     </div>
   </div>

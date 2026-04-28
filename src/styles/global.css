@@ -649,9 +649,11 @@ html {
   --popover-foreground: oklch(0.178 0 0);
 
   /* Brand */
-  --primary: oklch(0.66 0.18 148);
+  --primary: oklch(0.5725 0.2303 27.19);
+  /*--secondary: oklch(0.8713 0.1885 108.75);*/
+  --secondary: oklch(0.66 0.18 148);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.62 0.22 20);
+  /*--secondary: oklch(0.62 0.22 20);*/
   --secondary-foreground: oklch(1 0 0);
 
   /* Neutral support */
