@@ -42,20 +42,14 @@ const getLinkProps = (
     <div class="group">
       <a
         href={logoUrl}
-        target={data.logo.isExternal ? "_blank" : "_self"}
-        rel={data.logo.isExternal ? "noopener noreferrer" : undefined}
+        target={data.logo?.isExternal ? "_blank" : "_self"}
+        rel={data.logo?.isExternal ? "noopener noreferrer" : undefined}
       >
-        {
-          data.logo.imagen && (
-            <img
-              src={getImageUrl(data.logo.imagen)}
-              alt={data.logo.imagen.alternativeText ?? data.logo.label}
-              width={data.logo.imagen.width}
-              height={data.logo.imagen.height}
-              class="h-16 w-auto group-hover:scale-105 duration-300 transition-transform"
-            />
-          )
-        }
+        <img
+          src="/logo-dreamytours.svg"
+          alt={data.logo?.label ?? "Dreamy Tours"}
+          class="h-16 w-auto group-hover:scale-105 duration-300 transition-transform"
+        />
       </a>
     </div>
     <div class="flex flex-col items-end">
