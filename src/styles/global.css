@@ -1,50 +1,53 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Clases de typography solo para contenido MDX */
+/* Estilos centralizados para contenido MDX - consistencia con el proyecto */
 @layer components {
-  .mdx-content {
-    --tw-prose-body: var(--muted-foreground);
-    --tw-prose-headings: var(--foreground);
-    --tw-prose-lead: var(--muted-foreground);
-    --tw-prose-links: var(--primary);
-    --tw-prose-bold: var(--foreground);
-    --tw-prose-counters: var(--muted-foreground);
-    --tw-prose-bullets: var(--border);
-    --tw-prose-hr: var(--border);
-    --tw-prose-quotes: var(--foreground);
-    --tw-prose-quote-borders: var(--border);
-    --tw-prose-captions: var(--muted-foreground);
-    --tw-prose-code: var(--foreground);
-    --tw-prose-pre-code: var(--foreground);
-    --tw-prose-pre-bg: var(--muted);
-    --tw-prose-th-borders: var(--border);
-    --tw-prose-td-borders: var(--border);
-    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.03em] prose-p:text-[1rem] prose-p:leading-7 prose-a:font-semibold prose-p:text-foreground prose-a:no-underline hover:prose-a:text-secondary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-r-sm prose-blockquote:border-l-4 prose-blockquote:bg-primary/[0.04] prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-sm prose-img:shadow-[0_24px_70px_-44px_color-mix(in_oklab,var(--foreground)_28%,transparent)] prose-h2:text-3xl prose-h2:mt-0 prose-h2:mb-2 prose-h3:mt-4 prose-h3:text-2xl prose-h4:mt-4 prose-h4:text-xl;
+  .mdx-text h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-4;
   }
 
-  .content-page {
-    --tw-prose-body: var(--foreground);
-    --tw-prose-headings: var(--foreground);
-    --tw-prose-lead: var(--muted-foreground);
-    --tw-prose-links: var(--primary);
-    --tw-prose-bold: var(--foreground);
-    --tw-prose-counters: var(--muted-foreground);
-    --tw-prose-bullets: var(--border);
-    --tw-prose-hr: var(--border);
-    --tw-prose-quotes: var(--foreground);
-    --tw-prose-quote-borders: var(--primary);
-    --tw-prose-captions: var(--muted-foreground);
-    --tw-prose-code: var(--foreground);
-    --tw-prose-pre-code: var(--foreground);
-    --tw-prose-pre-bg: var(--muted);
-    --tw-prose-th-borders: var(--border);
-    --tw-prose-td-borders: var(--border);
-    @apply prose prose-lg max-w-none prose-headings:font-semibold prose-headings:tracking-[-0.04em] prose-headings:text-black prose-p:text-base prose-p:leading-8 prose-p:text-foreground prose-a:font-semibold prose-a:no-underline hover:prose-a:text-primary prose-strong:font-semibold prose-hr:my-12 prose-ul:text-base prose-ol:text-base prose-li:my-1.5 prose-li:leading-8 prose-blockquote:rounded-sm prose-blockquote:border-l-4 prose-blockquote:bg-muted prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:font-medium prose-figure:my-10 prose-img:rounded-lg prose-h2:text-3xl prose-h2:mt-0 prose-h2:mb-2 prose-h3:mt-12 prose-h3:text-3xl prose-h3:font-semibold prose-h3:tracking-[-0.04em] prose-h4:mt-10 prose-h4:text-xl;
+  .mdx-text h2 {
+    @apply text-2xl md:text-3xl font-bold text-foreground mb-6;
   }
-
+  
+  .mdx-text h3 {
+    @apply text-xl font-semibold text-foreground mb-4;
+  }
+  
+  .mdx-text h4 {
+    @apply text-lg font-semibold text-foreground mb-3;
+  }
+  
+  .mdx-text p {
+    @apply text-base leading-relaxed text-foreground mb-4 !text-base;
+  }
+  
+  .mdx-text ul, 
+  .mdx-text ol {
+    @apply mb-4 pl-6 text-base;
+  }
+  
+  .mdx-text li {
+    @apply mb-2 leading-relaxed;
+  }
+  
+  .mdx-text a {
+    @apply text-primary font-semibold no-underline hover:text-secondary;
+  }
+  
+  .mdx-text blockquote {
+    @apply border-l-4 border-primary pl-4 py-2 my-4 bg-primary/5;
+  }
+  
+  .mdx-text hr {
+    @apply my-8 border-border;
+  }
+  
+  .mdx-text img {
+    @apply rounded-sm my-6;
+  }
 }
 
 .content-shell--mdx {
