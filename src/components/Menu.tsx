@@ -164,7 +164,7 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 							className="block"
 						>
 							<img
-								src="/logofinal.svg"
+								src="/logo-dreamytours.svg"
 								alt={logo?.label ?? "Logo"}
 								className="h-10 w-auto"
 							/>
