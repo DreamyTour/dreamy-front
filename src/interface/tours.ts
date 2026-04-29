@@ -29,7 +29,7 @@ export interface Badge {
 export interface Timeline {
 	day: string;
 	titulo: string;
-	itemsDay: string;
+	itemsDay: StrapiBlock[];
 }
 export interface Acordeon {
 	titulo: string;
@@ -75,7 +75,7 @@ export interface Tour {
 	id: number;
 	documentId: string;
 	titulo: string;
-	content: string;
+	content: StrapiBlock[];
 	slug: string;
 	priceTour?: number;
 	imagenDestacada: Imagen[];

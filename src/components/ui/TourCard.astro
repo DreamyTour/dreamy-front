@@ -3,7 +3,7 @@ import type { Tour } from "@/interface/tours";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
-import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { getImageAlt, getImageSrcSet, getImageUrl, extractTextFromBlocks } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -88,7 +88,7 @@ const primaryCategory = tour.categories?.[0]?.nombre;
     {
       tour.content && (
         <p class="mb-5 text-[0.85rem] text-slate-600 line-clamp-2 leading-relaxed">
-          {tour.content}
+          {extractTextFromBlocks(tour.content)}
         </p>
       )
     }

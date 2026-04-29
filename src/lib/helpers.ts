@@ -105,18 +105,39 @@ export function getYouTubeVideoId(
 }
 
 /**
+ * Extract plain text from Strapi blocks
+ */
+export function extractTextFromBlocks(blocks: unknown): string {
+	if (!Array.isArray(blocks)) return typeof blocks === "string" ? blocks : "";
+	return blocks
+		.map((block) => {
+			if (block?.children && Array.isArray(block.children)) {
+				return block.children.map((child: any) => child.text || "").join("");
+			}
+			return "";
+		})
+		.filter(Boolean)
+		.join(" ");
+}
+
+/**
  * Generate meta description from content
  */
 export function generateDescription(content: unknown, maxLength = 160): string {
 	if (!content) return "";
 
-	const contentStr =
-		typeof content === "string" ? content : JSON.stringify(content);
-	const plainText = contentStr
-		.replace(/<[^>]*>/g, "")
-		.replace(/&[^;]+;/g, " ")
-		.replace(/\s+/g, " ")
-		.trim();
+	let plainText = "";
+	if (Array.isArray(content)) {
+		plainText = extractTextFromBlocks(content);
+	} else {
+		const contentStr =
+			typeof content === "string" ? content : JSON.stringify(content);
+		plainText = contentStr
+			.replace(/<[^>]*>/g, "")
+			.replace(/&[^;]+;/g, " ")
+			.replace(/\s+/g, " ")
+			.trim();
+	}
 
 	if (plainText.length <= maxLength) return plainText;
 	return plainText.substring(0, maxLength).trim() + "...";

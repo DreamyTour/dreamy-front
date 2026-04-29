@@ -2,7 +2,7 @@
 import type { Tour, Badge } from "@/interface/tours";
 import type { Lang } from "@/lib/i18n";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
-import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { getImageAlt, getImageSrcSet, getImageUrl, extractTextFromBlocks } from "@/lib/helpers";
 
 interface Props {
   tour: Tour;
@@ -164,7 +164,7 @@ const hasBadges = badges && badges.length > 0;
         <p
           class="text-base leading-relaxed text-muted-foreground md:text-[1.05rem]"
         >
-          {tour.content}
+          {extractTextFromBlocks(tour.content)}
         </p>
       </div>
 
