@@ -315,10 +315,10 @@ const mdxUiCopy = {
 const mdxCopy = mdxUiCopy[lang] ?? mdxUiCopy[DEFAULT_LANG];
 
 const heroImage =
-  (mdxFrontmatter.heroImage as string | undefined) ||
+  (mdxFrontmatter?.heroImage as string | undefined) ||
   "/imagenes/sobre_nosotros.avif";
 const heroImageAlt =
-  (mdxFrontmatter.heroImageAlt as string | undefined) || "Dreamy Tours";
+  (mdxFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
 
 const pageStats =
   type === "page" && page
