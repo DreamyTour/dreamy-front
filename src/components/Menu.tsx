@@ -1,13 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import type {
-	Menu as MenuType,
-	MenuItem,
-	Link,
-	Logo,
-} from "@/interface/global";
-import type { Lang } from "@/lib/i18n";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
 	NavigationMenu,
 	NavigationMenuContent,
@@ -16,10 +10,16 @@ import {
 	NavigationMenuList,
 	NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { LanguageSwitcher } from "./LanguageSwitcher";
-import { rewriteUrl } from "@/lib/utils";
+import type {
+	Link,
+	Logo,
+	MenuItem,
+	Menu as MenuType,
+} from "@/interface/global";
 import { getImageUrl } from "@/lib/helpers";
+import type { Lang } from "@/lib/i18n";
+import { rewriteUrl } from "@/lib/utils";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 interface MainMenuProps {
 	menu: MenuType;
@@ -157,22 +157,18 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 				<div className="flex items-center justify-between px-4 py-3 bg-background">
 					{/* Logo a la derecha */}
 					<div className="flex-1 flex">
-						{logo && (
-							<a
-								href={logoUrl}
-								target={logo.isExternal ? "_blank" : "_self"}
-								rel={logo.isExternal ? "noopener noreferrer" : undefined}
-								className="block"
-							>
-								{logo.imagen && (
-									<img
-										src={getImageUrl(logo.imagen)}
-										alt={logo.imagen.alternativeText ?? logo.label ?? "Logo"}
-										className="h-10 w-auto"
-									/>
-								)}
-							</a>
-						)}
+						<a
+							href={logoUrl}
+							target={logo?.isExternal ? "_blank" : "_self"}
+							rel={logo?.isExternal ? "noopener noreferrer" : undefined}
+							className="block"
+						>
+							<img
+								src="/logofinal.svg"
+								alt={logo?.label ?? "Logo"}
+								className="h-10 w-auto"
+							/>
+						</a>
 					</div>
 					{/* Idioma al medio */}
 					<div className="flex-1 flex justify-center">
