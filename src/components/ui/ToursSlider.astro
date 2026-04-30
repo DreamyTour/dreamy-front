@@ -10,7 +10,9 @@ interface Props {
 }
 
 const { tours, lang } = Astro.props;
-const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
+// Solo hacemos el bucle infinito si hay más de 3 tours (para que no parezcan repetidos en pantalla)
+const shouldLoop = tours.length > 3;
+const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
 ---
 
 <div class="relative" data-tours-slider>
@@ -22,6 +24,7 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
         id={`slider-${Math.random().toString(36).substr(2, 9)}`}
         data-slider-track
         data-original-count={tours.length}
+        data-is-looped={shouldLoop ? "true" : "false"}
       >
         {
           loopedTours.map((tour) => (
@@ -88,8 +91,10 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
 
       const slides = Array.from(container.children) as HTMLElement[];
       const originalSlidesCount = Number(
-        container.dataset.originalCount || slides.length,
+        container.dataset.originalCount || slides.length
       );
+      const isLooped = container.dataset.isLooped === "true";
+      
       const autoPlayDelay = 3500;
       let autoPlay: ReturnType<typeof window.setInterval> | undefined;
       let scrollAmount = 0;
@@ -116,7 +121,7 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
       };
 
       const normalizeScroll = () => {
-        if (slides.length <= 1 || isAdjustingScroll) return;
+        if (!isLooped || slides.length <= 1 || isAdjustingScroll) return;
 
         if (container.scrollLeft >= loopWidth * 2 - scrollAmount / 2) {
           setScrollPosition(container.scrollLeft - loopWidth);
@@ -141,7 +146,7 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
       };
 
       const startAutoPlay = () => {
-        if (slides.length <= 1 || autoPlay) return;
+        if (!isLooped || slides.length <= 1 || autoPlay) return;
         autoPlay = window.setInterval(() => {
           moveSlider(1);
         }, autoPlayDelay);
@@ -159,7 +164,7 @@ const loopedTours = tours.length > 1 ? [...tours, ...tours, ...tours] : tours;
 
       calculateMetrics();
 
-      if (slides.length > 1) {
+      if (isLooped && slides.length > 1) {
         requestAnimationFrame(() => {
           calculateMetrics();
           setScrollPosition(loopWidth);
