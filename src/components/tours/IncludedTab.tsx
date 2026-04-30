@@ -9,22 +9,33 @@ interface IncludedTabProps {
 function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 	if (!content || !Array.isArray(content)) return null;
 
+	const renderTextNodes = (children: any[]) => {
+		return children.map((child, i) => {
+			if (!child.text) return null;
+			let textElement: React.ReactNode = child.text;
+			if (child.bold) textElement = <strong key={`bold-${i}`}>{textElement}</strong>;
+			if (child.italic) textElement = <em key={`em-${i}`}>{textElement}</em>;
+			if (child.underline) textElement = <u key={`u-${i}`}>{textElement}</u>;
+			if (child.strikethrough) textElement = <s key={`s-${i}`}>{textElement}</s>;
+			if (child.code) textElement = <code key={`code-${i}`} className="bg-gray-100 px-1 rounded text-sm">{textElement}</code>;
+			
+			return <React.Fragment key={i}>{textElement}</React.Fragment>;
+		});
+	};
+
 	return (
 		<div className="space-y-4">
 			{content.map((block, blockIndex) => {
 				if (block.type === "heading") {
 					const level = (block as { level?: number }).level;
-					const headingText = (block.children || [])
-						.map((child: StrapiBlockChild, i: number) => child.text || "")
-						.join("");
-
+					
 					if (level === 3) {
 						return (
 							<h3
 								key={blockIndex}
 								className="text-lg font-bold text-gray-900 mb-2 mt-4"
 							>
-								{headingText}
+								{renderTextNodes(block.children || [])}
 							</h3>
 						);
 					}
@@ -33,7 +44,7 @@ function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 							key={blockIndex}
 							className="text-base font-semibold text-gray-800 mb-2 mt-3"
 						>
-							{headingText}
+							{renderTextNodes(block.children || [])}
 						</h4>
 					);
 				}
@@ -78,12 +89,7 @@ function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 											{style.icon}
 										</span>
 										<span className="text-base text-gray-700">
-											{(listItem.children || [])
-												.map(
-													(child: StrapiBlockChild, j: number) =>
-														child.text || "",
-												)
-												.join("")}
+											{renderTextNodes(listItem.children || [])}
 										</span>
 									</li>
 								),
@@ -98,9 +104,7 @@ function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 							key={blockIndex}
 							className="mb-2 text-base leading-relaxed text-gray-600"
 						>
-							{(block.children || [])
-								.map((child: StrapiBlockChild, i: number) => child.text || "")
-								.join("")}
+							{renderTextNodes(block.children || [])}
 						</p>
 					);
 				}
@@ -111,9 +115,7 @@ function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 							key={blockIndex}
 							className="border-l-4 border-primary pl-4 italic text-base text-gray-600 my-2"
 						>
-							{(block.children || [])
-								.map((child: StrapiBlockChild, i: number) => child.text || "")
-								.join("")}
+							{renderTextNodes(block.children || [])}
 						</blockquote>
 					);
 				}

@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { Acordeon as AcordeonType } from "@/interface/tours";
+import { ChevronIcon } from "@/components/icons/NavigationIcons";
 
 interface ItineraryTabProps {
 	items: AcordeonType[];
@@ -20,6 +21,20 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 	const AcordeonContent = ({ content }: { content: any[] }) => {
 		if (!content || !Array.isArray(content)) return null;
 
+		const renderTextNodes = (children: any[]) => {
+			return children.map((child, i) => {
+				if (!child.text) return null;
+				let textElement: React.ReactNode = child.text;
+				if (child.bold) textElement = <strong key={`bold-${i}`}>{textElement}</strong>;
+				if (child.italic) textElement = <em key={`em-${i}`}>{textElement}</em>;
+				if (child.underline) textElement = <u key={`u-${i}`}>{textElement}</u>;
+				if (child.strikethrough) textElement = <s key={`s-${i}`}>{textElement}</s>;
+				if (child.code) textElement = <code key={`code-${i}`} className="bg-gray-100 px-1 rounded text-sm">{textElement}</code>;
+				
+				return <React.Fragment key={i}>{textElement}</React.Fragment>;
+			});
+		};
+
 		return (
 			<div className="space-y-2">
 				{content.map((block: any, blockIndex: number) => {
@@ -27,28 +42,23 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 						return (
 							<p
 								key={blockIndex}
-								className="text-base leading-relaxed text-gray-600"
+								className="text-base leading-relaxed text-foreground/80"
 							>
-								{(block.children || [])
-									.map((child: any, i: number) => child.text || "")
-									.join("")}
+								{renderTextNodes(block.children || [])}
 							</p>
 						);
 					}
 
 					if (block.type === "heading") {
 						const level = block.level;
-						const headingText = (block.children || [])
-							.map((child: any, i: number) => child.text || "")
-							.join("");
-
+						
 						if (level === 1) {
 							return (
 								<h1
 									key={blockIndex}
 									className="text-xl font-bold text-gray-900"
 								>
-									{headingText}
+									{renderTextNodes(block.children || [])}
 								</h1>
 							);
 						}
@@ -58,7 +68,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 									key={blockIndex}
 									className="text-lg font-bold text-gray-900"
 								>
-									{headingText}
+									{renderTextNodes(block.children || [])}
 								</h2>
 							);
 						}
@@ -67,7 +77,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 								key={blockIndex}
 								className="text-base font-semibold text-gray-800"
 							>
-								{headingText}
+								{renderTextNodes(block.children || [])}
 							</h3>
 						);
 					}
@@ -83,9 +93,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 							>
 								{(block.children || []).map((listItem: any, i: number) => (
 									<li key={i} className="text-gray-600">
-										{(listItem.children || [])
-											.map((child: any, j: number) => child.text || "")
-											.join("")}
+										{renderTextNodes(listItem.children || [])}
 									</li>
 								))}
 							</ListTag>
@@ -105,20 +113,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 					{item.titulo}
 				</span>
 				<span className="text-gray-400 transition-transform duration-200 group-open:rotate-180">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						className="w-5 h-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
+					<ChevronIcon className="w-5 h-5" />
 				</span>
 			</summary>
 			<div className="px-4 md:px-5 pb-4 md:pb-5">
