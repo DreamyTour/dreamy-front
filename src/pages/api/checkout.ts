@@ -71,8 +71,8 @@ export const POST: APIRoute = async ({ request }) => {
 		// 1. Enviar Email con Resend solo si esta configurado
 		if (resend && contactInfo.email) {
 			const { data: emailData, error: resendError } = await resend.emails.send({
-				from: "Reservas Turismoperu <reservas@turismoperu.com.pe>",
-				to: ["info@turismoperu.com.pe"],
+				from: "Reservas Dreamy Tours <info@dreamy.tours>",
+				to: ["info@dreamy.tours"],
 				//bcc: [contactInfo.email], // Se enviará una copia a la agencia
 				subject: `Reserva Confirmada: ${cart.tourName}`,
 				replyTo: contactInfo.email,
