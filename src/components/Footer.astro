@@ -116,45 +116,45 @@ const { data, lang } = Astro.props;
             )
           }
           {
-            data?.contact?.link && data.contact.link.length > 0 && (
-              <ul class="flex flex-col gap-4">
-                {data.contact.link.map((link, index) => (
-                  <li>
-                    {index < 5 ? (
-                      <a
-                        href={rewriteUrl(link.url, lang)}
-                        class="group flex items-start gap-4 text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
-                        target={link.isExternal ? "_blank" : "_self"}
-                        rel={link.isExternal ? "noopener noreferrer" : ""}
-                      >
-                        <span class="mt-0.5 shrink-0 text-white group-hover:text-white/80 transition-colors duration-300">
-                          {/* Email */}
-                          {index === 0 && (
-                            <EmailIcon className="size-5" />
-                          )}
-                          {/* WhatsApp */}
-                          {index === 1 && (
-                            <WhatsAppIcon className="size-5" />
-                          )}
-                          {/* Phone */}
-                          {index === 2 && (
-                            <PhoneIcon className="size-5" />
-                          )}
-                          {/* Location */}
-                          {(index === 3 || index === 4) && (
-                            <LocationIcon className="size-5" />
-                          )}
-                        </span>
-                        <span class="leading-relaxed">{link.label}</span>
-                      </a>
-                    ) : (
-                      <span class="text-white text-[0.9rem] italic">{link.label}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )
-          }
+  data?.contact?.link && data.contact.link.length > 0 && (
+    <ul class="flex flex-col gap-4">
+      {data.contact.link.map((link, index) => {
+        const content = (
+          <>
+            <span class="mt-0.5 shrink-0 text-white">
+              {index === 0 && <EmailIcon className="size-5" />}
+              {index === 1 && <WhatsAppIcon className="size-5" />}
+              {index === 2 && <PhoneIcon className="size-5" />}
+              {(index === 3 || index === 4) && (
+                <LocationIcon className="size-5" />
+              )}
+            </span>
+            <span class="leading-relaxed">{link.label}</span>
+          </>
+        );
+
+        return (
+          <li>
+            {index < 2 ? (
+              <a
+                href={rewriteUrl(link.url, lang)}
+                class="group flex items-start gap-4 text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
+                target={link.isExternal ? "_blank" : "_self"}
+                rel={link.isExternal ? "noopener noreferrer" : ""}
+              >
+                {content}
+              </a>
+            ) : (
+              <span class="flex items-start gap-4 text-white text-[0.95rem]">
+                {content}
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  )
+}
         </div>
       </div>
 
