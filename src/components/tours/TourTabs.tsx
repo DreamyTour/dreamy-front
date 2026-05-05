@@ -15,12 +15,49 @@ interface Props {
 }
 
 export default function TourTabs({ tour, children }: Props) {
-	const [activeTab, setActiveTab] = React.useState("overview");
-	const [isStuck, setIsStuck] = React.useState(false);
-
 	const tab = tour?.tab;
 
+	const hasOverview = Boolean(
+		tab?.overview?.titulo &&
+			Array.isArray(tab.overview.timeline) &&
+			tab.overview.timeline.length > 0,
+	);
+	const hasItinerary = Boolean(
+		tab?.itinerary?.titulo &&
+			Array.isArray(tab.itinerary.acordeon) &&
+			tab.itinerary.acordeon.length > 0,
+	);
+	const hasIncluded = Boolean(tab?.included?.titulo);
+	const hasInformation = Boolean(
+		tab?.information?.titulo &&
+			Array.isArray(tab.information.acordeon) &&
+			tab.information.acordeon.length > 0,
+	);
+	const hasPrice = Boolean(
+		tab?.price && (tab.price.titulo || tab.price.contenido),
+	);
+	const visibleTabs = React.useMemo(
+		() =>
+			[
+				hasOverview && "overview",
+				hasItinerary && "itinerary",
+				hasIncluded && "included",
+				hasInformation && "information",
+				hasPrice && "price",
+			].filter(Boolean) as string[],
+		[hasOverview, hasItinerary, hasIncluded, hasInformation, hasPrice],
+	);
+	const defaultActiveTab = visibleTabs[0] ?? "overview";
+	const [activeTab, setActiveTab] = React.useState(defaultActiveTab);
+	const [isStuck, setIsStuck] = React.useState(false);
+
 	const tabsRef = React.useRef<HTMLDivElement>(null);
+
+	React.useEffect(() => {
+		if (!visibleTabs.includes(activeTab)) {
+			setActiveTab(defaultActiveTab);
+		}
+	}, [activeTab, defaultActiveTab, visibleTabs]);
 
 	React.useEffect(() => {
 		let ticking = false;
@@ -80,21 +117,6 @@ export default function TourTabs({ tour, children }: Props) {
 			});
 		});
 	};
-
-	const hasOverview =
-		tab.overview &&
-		tab.overview.timeline &&
-		Array.isArray(tab.overview.timeline);
-	const hasItinerary =
-		tab.itinerary &&
-		tab.itinerary.acordeon &&
-		Array.isArray(tab.itinerary.acordeon);
-	const hasIncluded = tab.included && tab.included.titulo;
-	const hasInformation =
-		tab.information &&
-		tab.information.acordeon &&
-		Array.isArray(tab.information.acordeon);
-	const hasPrice = tab.price && (tab.price.titulo || tab.price.contenido);
 
 	// Iconos simples para las pestañas
 	const renderIcon = (type: string) => {
@@ -270,7 +292,10 @@ export default function TourTabs({ tour, children }: Props) {
 
 				{/* Itinerary */}
 				{hasItinerary && tab.itinerary.titulo && (
-					<details className="border border-gray-200 rounded-sm overflow-hidden group">
+					<details
+						open={!hasOverview}
+						className="border border-gray-200 rounded-sm overflow-hidden group"
+					>
 						<summary className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors cursor-pointer list-none">
 							<span className="font-semibold text-gray-800">
 								{tab.itinerary.titulo}

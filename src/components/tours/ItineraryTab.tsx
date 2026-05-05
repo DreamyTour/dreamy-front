@@ -1,6 +1,6 @@
 import * as React from "react";
-import type { Acordeon as AcordeonType, StrapiBlock } from "@/interface/tours";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
+import type { Acordeon as AcordeonType } from "@/interface/tours";
 import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface ItineraryTabProps {
@@ -11,13 +11,19 @@ export default function ItineraryTab({ items }: ItineraryTabProps) {
 	return (
 		<div className="space-y-3">
 			{items.map((item, index) => (
-				<AccordionItem key={index} item={item} />
+				<AccordionItem key={index} item={item} defaultOpen={index === 0} />
 			))}
 		</div>
 	);
 }
 
-function AccordionItem({ item }: { item: AcordeonType }) {
+function AccordionItem({
+	item,
+	defaultOpen,
+}: {
+	item: AcordeonType;
+	defaultOpen: boolean;
+}) {
 	// Componente para renderizar blocks del acordeón
 	const AcordeonContent = ({ content }: { content: any[] }) => {
 		if (!content || !Array.isArray(content)) return null;
@@ -108,7 +114,10 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 	};
 
 	return (
-		<details className="group border border-gray-200 rounded-sm overflow-hidden">
+		<details
+			open={defaultOpen}
+			className="group border border-gray-200 rounded-sm overflow-hidden"
+		>
 			<summary className="w-full flex items-center justify-between p-4 md:p-5 bg-white hover:bg-gray-50 transition-colors duration-200 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
 				<span className="font-semibold text-gray-800 text-sm md:text-base text-left">
 					{item.titulo}
