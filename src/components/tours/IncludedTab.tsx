@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { StrapiBlock, StrapiBlockChild } from "@/interface/tours";
+import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface IncludedTabProps {
 	contenido: StrapiBlock[];
@@ -23,9 +24,11 @@ function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 		});
 	};
 
+	const normalizedContent = React.useMemo(() => normalizeLists(content), [content]);
+
 	return (
 		<div className="space-y-4">
-			{content.map((block, blockIndex) => {
+			{normalizedContent.map((block, blockIndex) => {
 				if (block.type === "heading") {
 					const level = (block as { level?: number }).level;
 					
@@ -52,10 +55,10 @@ function IncludedBlocks({ content }: { content: StrapiBlock[] }) {
 				if (block.type === "list") {
 					let headingIndex = 0;
 					for (let i = blockIndex - 1; i >= 0; i--) {
-						if (content[i].type === "heading") {
-							const lvl = (content[i] as { level?: number }).level;
+						if (normalizedContent[i].type === "heading") {
+							const lvl = (normalizedContent[i] as { level?: number }).level;
 							if (lvl === 2 || lvl === 3) {
-								headingIndex = content
+								headingIndex = normalizedContent
 									.slice(0, i)
 									.filter(
 										(b: StrapiBlock) =>

@@ -1,6 +1,7 @@
 import * as React from "react";
-import type { Acordeon as AcordeonType } from "@/interface/tours";
+import type { Acordeon as AcordeonType, StrapiBlock } from "@/interface/tours";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
+import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface ItineraryTabProps {
 	items: AcordeonType[];
@@ -30,14 +31,15 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 				if (child.underline) textElement = <u key={`u-${i}`}>{textElement}</u>;
 				if (child.strikethrough) textElement = <s key={`s-${i}`}>{textElement}</s>;
 				if (child.code) textElement = <code key={`code-${i}`} className="bg-gray-100 px-1 rounded text-sm">{textElement}</code>;
-				
 				return <React.Fragment key={i}>{textElement}</React.Fragment>;
 			});
 		};
 
+		const normalized = React.useMemo(() => normalizeLists(content), [content]);
+
 		return (
 			<div className="space-y-2">
-				{content.map((block: any, blockIndex: number) => {
+				{normalized.map((block: any, blockIndex: number) => {
 					if (block.type === "paragraph") {
 						return (
 							<p
@@ -51,7 +53,6 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 
 					if (block.type === "heading") {
 						const level = block.level;
-						
 						if (level === 1) {
 							return (
 								<h1

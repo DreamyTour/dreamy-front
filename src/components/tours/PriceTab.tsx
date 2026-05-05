@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { StrapiBlock, StrapiBlockChild } from "@/interface/tours";
+import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface PriceTabProps {
 	contenido: StrapiBlock[];
@@ -22,9 +23,11 @@ function PriceBlocks({ content }: { content: StrapiBlock[] }) {
 		});
 	};
 
+	const normalizedContent = React.useMemo(() => normalizeLists(content), [content]);
+
 	return (
 		<div className="space-y-4">
-			{content.map((block, blockIndex) => {
+			{normalizedContent.map((block, blockIndex) => {
 				if (block.type === "heading") {
 					const level = (block as { level?: number }).level;
 					

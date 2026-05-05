@@ -4,10 +4,12 @@ import type {
 	StrapiBlockChild,
 	Timeline,
 } from "@/interface/tours";
+import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface OverviewTabProps {
 	timeline: Timeline[];
 }
+
 
 export default function OverviewTab({ timeline }: OverviewTabProps) {
 	// Componente para renderizar itemsDay con bullet verde
@@ -23,14 +25,15 @@ export default function OverviewTab({ timeline }: OverviewTabProps) {
 				if (child.underline) textElement = <u key={`u-${i}`}>{textElement}</u>;
 				if (child.strikethrough) textElement = <s key={`s-${i}`}>{textElement}</s>;
 				if (child.code) textElement = <code key={`code-${i}`} className="bg-gray-100 px-1 rounded text-sm">{textElement}</code>;
-				
 				return <React.Fragment key={i}>{textElement}</React.Fragment>;
 			});
 		};
 
+		const normalized = React.useMemo(() => normalizeLists(content), [content]);
+
 		return (
 			<div className="space-y-4">
-				{content.map((block, blockIndex) => {
+				{normalized.map((block, blockIndex) => {
 					if (block.type === "heading") {
 						return (
 							<h4
