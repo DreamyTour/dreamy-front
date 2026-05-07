@@ -79,12 +79,18 @@ export async function getStaticPaths() {
       endpoint: "tours",
       wrappedByKey: "data",
       locale: lang,
+      query: {
+        "pagination[pageSize]": "100",
+      },
     });
 
     const pages = await fetchApi<Page[]>({
       endpoint: "pages",
       wrappedByKey: "data",
       locale: lang,
+      query: {
+        "pagination[pageSize]": "100",
+      },
     });
 
     allToursByLang[lang] =
