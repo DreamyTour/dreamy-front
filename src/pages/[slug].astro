@@ -153,22 +153,9 @@ const lang = DEFAULT_LANG;
 
 // ====== OBTENER TOUR ACTUAL CON CATEGORÍA ======
 // El middleware de Strapi ya hace el populate de categories automáticamente
+// Nota: Eliminamos la petición innecesaria que volvía a descargar el tour, 
+// ya que 'tour' ya viene con todos los datos desde getStaticPaths.
 let tourWithCategory = tour;
-
-if (type === "tour" && tour?.slug) {
-  const tourResponse = await fetchApi<Tour[]>({
-    endpoint: "tours",
-    wrappedByKey: "data",
-    locale: lang,
-    query: {
-      "filters[slug][$eq]": tour.slug,
-    },
-  });
-
-  if (tourResponse && Array.isArray(tourResponse) && tourResponse.length > 0) {
-    tourWithCategory = tourResponse[0];
-  }
-}
 
 // ====== OBTENER TOURS RELACIONADOS ======
 let toursRelated: Tour[] = [];

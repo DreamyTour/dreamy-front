@@ -95,26 +95,31 @@ export async function fetchAllStrapi<T>({
 	const pageCount = firstPageRes.meta?.pagination?.pageCount || 1;
 
 	if (pageCount > 1) {
-		const fetchPromises: Promise<void>[] = [];
-		for (let page = 2; page <= pageCount; page++) {
-			fetchPromises.push(
-				fetchApi<{ data: T[] }>({
-					endpoint,
-					locale,
-					query: {
-						...query,
-						"pagination[page]": page,
-						"pagination[pageSize]": pageSize,
-					},
-				}).then((res) => {
-					if (res.data && Array.isArray(res.data)) {
-						allData.push(...res.data);
-					}
-				})
-			);
-		}
+		const CONCURRENCY_LIMIT = 5; // Evita saturar el servidor de Strapi
+		for (let i = 2; i <= pageCount; i += CONCURRENCY_LIMIT) {
+			const batchPromises: Promise<void>[] = [];
+			
+			for (let page = i; page < i + CONCURRENCY_LIMIT && page <= pageCount; page++) {
+				batchPromises.push(
+					fetchApi<{ data: T[] }>({
+						endpoint,
+						locale,
+						query: {
+							...query,
+							"pagination[page]": page,
+							"pagination[pageSize]": pageSize,
+						},
+					}).then((res) => {
+						if (res.data && Array.isArray(res.data)) {
+							allData.push(...res.data);
+						}
+					})
+				);
+			}
 
-		await Promise.all(fetchPromises);
+			// Espera a que termine este lote antes de empezar el siguiente
+			await Promise.all(batchPromises);
+		}
 	}
 
 	return allData;
