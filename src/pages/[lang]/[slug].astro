@@ -2,7 +2,7 @@
 import TourLayout from "@/layouts/TourLayout.astro";
 import PageContent from "@/components/PageContent.astro";
 import Layout from "@/layouts/main.astro";
-import fetchApi from "@/lib/strapi";
+import fetchApi, { fetchAllStrapi } from "@/lib/strapi";
 import { dedupeLocalizedDocuments } from "@/lib/utils";
 import type { Tour } from "@/interface/tours";
 import type { Page } from "@/interface/page";
@@ -76,22 +76,14 @@ export async function getStaticPaths() {
 
   for (const lang of LANGS) {
     // El middleware de Strapi ya hace el populate de categories automáticamente
-    const tours = await fetchApi<Tour[]>({
+    const tours = await fetchAllStrapi<Tour>({
       endpoint: "tours",
-      wrappedByKey: "data",
       locale: lang,
-      query: {
-        "pagination[pageSize]": "100",
-      },
     });
 
-    const pages = await fetchApi<Page[]>({
+    const pages = await fetchAllStrapi<Page>({
       endpoint: "pages",
-      wrappedByKey: "data",
       locale: lang,
-      query: {
-        "pagination[pageSize]": "100",
-      },
     });
 
     allToursByLang[lang] =
