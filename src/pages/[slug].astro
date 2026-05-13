@@ -199,13 +199,11 @@ const pageDestinationCategory =
     : undefined);
 
 if (type === "page" && pageDestinationCategory?.slug) {
-  const response = await fetchApi<Tour[]>({
+  const response = await fetchAllStrapi<Tour>({
     endpoint: "tours",
-    wrappedByKey: "data",
     locale: lang,
     query: {
       "filters[categories][slug][$eq]": pageDestinationCategory.slug,
-      "pagination[limit]": "6",
     },
   });
   toursByCategory = response && Array.isArray(response) ? response : [];
