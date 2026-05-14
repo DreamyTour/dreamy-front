@@ -12,6 +12,13 @@ interface Props {
 }
 
 const { data, lang } = Astro.props;
+
+const whatsappUrl = "https://wa.me/51969787221";
+const isWhatsAppLink = (label?: string, url?: string) =>
+  /whatsapp/i.test(label || "") ||
+  /(?:wa\.me|api\.whatsapp\.com|whatsapp\.com)/i.test(url || "");
+const normalizeWhatsAppUrl = (label?: string, url?: string) =>
+  isWhatsAppLink(label, url) ? whatsappUrl : url;
 ---
 
 <footer class="relative overflow-hidden bg-[#0c5936] text-white pt-8 pb-12">
@@ -62,7 +69,10 @@ const { data, lang } = Astro.props;
                 {data.destination.link.map((link) => (
                   <li>
                     <a
-                      href={rewriteUrl(link.url, lang)}
+                      href={rewriteUrl(
+                        normalizeWhatsAppUrl(link.label, link.url) || "",
+                        lang,
+                      )}
                       class="group inline-flex items-center text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
                       target={link.isExternal ? "_blank" : "_self"}
                       rel={link.isExternal ? "noopener noreferrer" : ""}
@@ -91,7 +101,10 @@ const { data, lang } = Astro.props;
                 {data.dreamyAbout.link.map((link) => (
                   <li>
                     <a
-                      href={rewriteUrl(link.url, lang)}
+                      href={rewriteUrl(
+                        normalizeWhatsAppUrl(link.label, link.url) || "",
+                        lang,
+                      )}
                       class="group inline-flex items-center text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
                       target={link.isExternal ? "_blank" : "_self"}
                       rel={link.isExternal ? "noopener noreferrer" : ""}
@@ -137,7 +150,10 @@ const { data, lang } = Astro.props;
           <li>
             {index < 2 ? (
               <a
-                href={rewriteUrl(link.url, lang)}
+                href={rewriteUrl(
+                  normalizeWhatsAppUrl(link.label, link.url) || "",
+                  lang,
+                )}
                 class="group flex items-start gap-4 text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
                 target={link.isExternal ? "_blank" : "_self"}
                 rel={link.isExternal ? "noopener noreferrer" : ""}
@@ -178,7 +194,7 @@ const { data, lang } = Astro.props;
               }
               {data.socialLogo.map((social) => (
                 <a
-                  href={social.url}
+                  href={normalizeWhatsAppUrl(social.label, social.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Síguenos en ${social.label || "red social"}`}

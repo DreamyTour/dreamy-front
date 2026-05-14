@@ -164,7 +164,7 @@ const pageStats =
                   ?.nombre || page.titulo}
               </span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 ">
               {toursByCategory.map((tour) => (
                 <TourCard tour={tour} lang={lang} />
               ))}
