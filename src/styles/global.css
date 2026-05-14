@@ -67,10 +67,6 @@
   object-position: top center;
 }
 
-.content-hero-title {
-  color: #ffffff;
-}
-
 .content-article {
   color: var(--foreground);
 }

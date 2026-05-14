@@ -30,19 +30,16 @@ const pageVideoThumbnail = page?.video?.thumbnail
 const pageUiCopy = {
   es: {
     eyebrow: "Colección destacada",
-    experienceLabel: "Experiencia curada",
     exploreCta: "Ver experiencias",
     toursStat: "experiencias",
   },
   en: {
     eyebrow: "Featured collection",
-    experienceLabel: "Curated experience",
     exploreCta: "View experiences",
     toursStat: "experiences",
   },
   pt: {
     eyebrow: "Coleção em destaque",
-    experienceLabel: "Experiência curada",
     exploreCta: "Ver experiências",
     toursStat: "experiências",
   },
@@ -70,56 +67,13 @@ const pageStats =
   <div
     class="content-shell max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12"
   >
-    <section class="content-hero relative isolate overflow-hidden rounded-sm">
-      {
-        pageVideoThumbnail && (
-          <img
-            src={pageVideoThumbnail}
-            alt=""
-            aria-hidden="true"
-            class="absolute inset-0 h-full w-full object-cover opacity-20"
-            loading="eager"
-            fetchpriority="high"
-          />
-        )
-      }
+    <section class="content-hero relative isolate bg-background pt-4 pb-8 md:pt-6 md:pb-12">
       <div
-        class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_oklab,var(--primary)_24%,transparent),transparent_42%),radial-gradient(circle_at_top_right,color-mix(in_oklab,var(--secondary)_16%,transparent),transparent_38%),linear-gradient(135deg,color-mix(in_oklab,var(--background)_95%,var(--primary)_5%),color-mix(in_oklab,var(--background)_90%,var(--secondary)_10%)_54%,color-mix(in_oklab,var(--muted)_70%,white))]"
-      >
-      </div>
-      <div
-        class="absolute left-0 top-0 h-40 w-40 -translate-x-10 -translate-y-10 rounded-full bg-primary/10 blur-3xl"
-      >
-      </div>
-      <div
-        class="absolute bottom-0 right-0 h-52 w-52 translate-x-16 translate-y-14 rounded-full bg-secondary/10 blur-3xl"
-      >
-      </div>
-
-      <div
-        class="relative grid gap-10 px-6 py-8 md:px-10 md:py-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:gap-12 lg:px-14 lg:py-14"
+        class="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16"
       >
         <div class="max-w-3xl">
-          <div
-            class="inline-flex items-center gap-3 rounded-sm border border-primary/15 bg-background/85 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-primary shadow-sm backdrop-blur-sm"
-          >
-            <span
-              class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]"
-            ></span>
-            <span
-              >{
-                page.categories?.find((c: any) => c.slug !== "peru-tours")
-                  ?.nombre || pageCopy.eyebrow
-              }</span
-            >
-          </div>
 
           <div class="mt-6 space-y-5">
-            <span
-              class="block text-xs font-semibold uppercase tracking-[0.38em] text-secondary/80"
-            >
-              {pageCopy.experienceLabel}
-            </span>
             <h1
               class="content-hero-title max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]"
             >
@@ -127,32 +81,33 @@ const pageStats =
             </h1>
             {
               page.content && (
-                <p class="max-w-3xl text-base leading-8 text-muted-foreground md:pt-1 md:text-lg lg:max-w-2xl lg:text-[1.08rem]">
+                <p class="max-w-3xl text-base leading-8 text-muted-foreground md:pt-1 lg:max-w-2xl lg:text-[1.08rem]">
                   {page.content}
                 </p>
               )
             }
           </div>
 
-          <div class="mt-8 flex flex-wrap gap-3">
+          <div class="mt-8 flex flex-wrap items-center gap-6 sm:gap-8">
             <a
               href="#category-tours"
-              class="inline-flex items-center justify-center rounded-sm bg-primary px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_35px_-18px_rgba(79,191,129,0.7)] transition-transform duration-300 hover:-translate-y-0.5 hover:bg-primary/90"
+              class="group inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30"
             >
               {pageCopy.exploreCta}
+              <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
             </a>
-          </div>
 
-          <div class="mt-8 grid gap-3 sm:grid-cols-2">
             {
               pageStats.map((stat) => (
-                <div class="rounded-sm border border-border/80 bg-background/80 px-4 py-4 shadow-[0_18px_45px_-30px_color-mix(in_oklab,var(--foreground)_22%,transparent)] backdrop-blur-sm">
-                  <p class="text-2xl font-semibold tracking-[-0.03em] text-foreground">
-                    {stat.value}
-                  </p>
-                  <p class="mt-1 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-muted-foreground">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background shadow-sm">
+                    <span class="text-[1.05rem] font-bold text-foreground">{stat.value}</span>
+                  </div>
+                  <span class="text-sm font-medium tracking-wide text-muted-foreground capitalize">
                     {stat.label}
-                  </p>
+                  </span>
                 </div>
               ))
             }
