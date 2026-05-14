@@ -40,6 +40,8 @@ interface Props {
   pageSlugMap?: Record<string, string>;
   mdxComponent?: any;
   mdxFrontmatter?: MdxFrontmatter;
+  toursRelated?: Tour[];
+  toursByCategory?: Tour[];
 }
 
 export async function getStaticPaths() {
@@ -103,12 +105,22 @@ export async function getStaticPaths() {
 
   for (const lang of [DEFAULT_LANG]) {
     for (const tour of allToursByLang[lang]) {
+      const categorySlug = tour?.categories?.[0]?.slug;
+      let toursRelated = allToursByLang[lang].filter(t => t.slug !== tour.slug);
+      if (categorySlug) {
+        toursRelated = toursRelated.filter(t => 
+          t.categories?.some((c: any) => c.slug === categorySlug)
+        );
+      }
+      toursRelated = toursRelated.slice(0, 3);
+
       paths.push({
         params: { slug: tour.slug },
         props: {
           type: "tour",
           tour,
           slugMap: slugsByDocId[tour.documentId] ?? {},
+          toursRelated,
         },
       });
     }
@@ -134,12 +146,23 @@ export async function getStaticPaths() {
       pageSlugsByDocId[page.documentId] = {};
     }
     pageSlugsByDocId[page.documentId][DEFAULT_LANG] = page.slug;
+    const pageDestinationCategory = page?.categories?.find((c: any) => c.slug !== "peru-tours") ??
+      (page?.slug ? { slug: page.slug, nombre: page.titulo } : undefined);
+
+    let toursByCategory: Tour[] = [];
+    if (pageDestinationCategory?.slug) {
+      toursByCategory = allToursByLang[DEFAULT_LANG].filter(t => 
+        t.categories?.some((c: any) => c.slug === pageDestinationCategory.slug)
+      );
+    }
+
     paths.push({
       params: { slug: page.slug },
       props: {
         type: "page",
         page,
         pageSlugMap: pageSlugsByDocId[page.documentId] ?? {},
+        toursByCategory,
       },
     });
   }
@@ -147,7 +170,7 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { type, tour, page, slugMap, pageSlugMap, mdxComponent, mdxFrontmatter } =
+const { type, tour, page, slugMap, pageSlugMap, mdxComponent, mdxFrontmatter, toursRelated = [], toursByCategory = [] } =
   Astro.props as Props;
 const lang = DEFAULT_LANG;
 
@@ -157,57 +180,8 @@ const lang = DEFAULT_LANG;
 // ya que 'tour' ya viene con todos los datos desde getStaticPaths.
 let tourWithCategory = tour;
 
-// ====== OBTENER TOURS RELACIONADOS ======
-let toursRelated: Tour[] = [];
-
-if (type === "tour") {
-  // Obtener la primera categoría del tour actual para filtrar relacionados
-  const categorySlug = tourWithCategory?.categories?.[0]?.slug;
-
-  const query: Record<string, string> = {
-    "filters[slug][$ne]": tour.slug, // Excluir tour actual
-    "pagination[limit]": "3",
-  };
-
-  // Si tiene categoría, filtrar por ella
-  if (categorySlug) {
-    query["filters[categories][slug][$eq]"] = categorySlug;
-  }
-
-  const response = await fetchApi<Tour[]>({
-    endpoint: "tours",
-    wrappedByKey: "data",
-    locale: lang,
-    query,
-  });
-
-  toursRelated = response && Array.isArray(response) ? response : [];
-}
-
-// ====== OBTENER TOURS POR CATEGORÍA (PARA PÁGINAS) ======
-let toursByCategory: Tour[] = [];
-
-// Tours para páginas (el middleware de tours populatea categories automáticamente)
-// Buscamos la categoría específica del destino (no "peru-tours" que es solo para agrupar)
-const pageDestinationCategory =
-  page?.categories?.find((c: any) => c.slug !== "peru-tours") ??
-  (type === "page" && page?.slug
-    ? {
-        slug: page.slug,
-        nombre: page.titulo,
-      }
-    : undefined);
-
-if (type === "page" && pageDestinationCategory?.slug) {
-  const response = await fetchAllStrapi<Tour>({
-    endpoint: "tours",
-    locale: lang,
-    query: {
-      "filters[categories][slug][$eq]": pageDestinationCategory.slug,
-    },
-  });
-  toursByCategory = response && Array.isArray(response) ? response : [];
-}
+// Los arrays toursRelated y toursByCategory ahora vienen listos desde getStaticPaths 
+// haciendo el filtrado en la memoria y evitando 500+ peticiones a la API durante el build.
 
 // ====== CHECK INCA TRAIL CATEGORY ======
 const isIncaTrail = tourWithCategory?.categories?.some(
