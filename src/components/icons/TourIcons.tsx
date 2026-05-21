@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 
 export function OverviewIcon(props: React.SVGProps<SVGSVGElement>) {
 	return (
@@ -10,6 +10,8 @@ export function OverviewIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="M10 10h.01" />
@@ -31,6 +33,8 @@ export function ItineraryIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<circle cx="6" cy="19" r="3" />
@@ -50,6 +54,8 @@ export function IncludedIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<line x1="8" y1="6" x2="21" y2="6" />
@@ -72,6 +78,8 @@ export function InformationIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<circle cx="12" cy="12" r="10" />
@@ -91,6 +99,8 @@ export function PriceIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />

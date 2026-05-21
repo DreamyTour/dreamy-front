@@ -1,16 +1,16 @@
 ---
 import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
-import type { Home } from "@/interface/home";
-import Hero from "@/section/hero.astro";
-import About from "@/section/About.astro";
-import Certifications from "@/section/Certifications.astro";
-import Machupicchu from "@/section/Machupicchu.astro";
-import PaquetesPeru from "@/section/PaquetesPeru.astro";
-import PeruGuide from "@/section/PeruGuide.astro";
-import PaquetesBolivia from "@/section/PaquetesBolivia.astro";
-import HomePost from "@/section/HomePost.astro";
-import Destinos from "@/section/Destinos.astro";
+import type { Home } from "@/types/home";
+import Hero from "@/components/sections/Hero.astro";
+import About from "@/components/sections/About.astro";
+import Certifications from "@/components/sections/Certifications.astro";
+import Machupicchu from "@/components/sections/Machupicchu.astro";
+import PaquetesPeru from "@/components/sections/PaquetesPeru.astro";
+import PeruGuide from "@/components/sections/PeruGuide.astro";
+import PaquetesBolivia from "@/components/sections/PaquetesBolivia.astro";
+import HomePost from "@/components/sections/HomePost.astro";
+import Destinos from "@/components/sections/Destinos.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
 

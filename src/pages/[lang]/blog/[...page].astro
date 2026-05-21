@@ -1,13 +1,33 @@
 ---
 import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
-import type { Blog, CategoryBlog } from "@/interface/blog";
+import type { Blog, CategoryBlog } from "@/types/blog";
 import CardPost from "@/components/ui/CardPost.astro";
 import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 
-export async function getStaticPaths({ paginate }: any) {
-  const allPaths: any[] = [];
+type PaginatedPage = {
+  data: Blog[];
+  currentPage: number;
+  lastPage: number;
+  url: { prev?: string | null; next?: string | null };
+};
+type BlogListProps = {
+  page: PaginatedPage;
+  allCategories: CategoryBlog[];
+};
+type Paginate = (
+  data: Blog[],
+  options: {
+    params?: Record<string, string>;
+    pageSize: number;
+    props?: Record<string, unknown>;
+  },
+) => unknown[];
+
+export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
+  const allPaths: unknown[] = [];
 
   for (const lang of LANGS) {
     const blogs = await fetchApi<Blog[]>({
@@ -21,7 +41,7 @@ export async function getStaticPaths({ paginate }: any) {
 
     const blogsList = blogs && Array.isArray(blogs) ? blogs : [];
 
-    const cats = await fetchApi<any[]>({
+    const cats = await fetchApi<CategoryBlog[]>({
       endpoint: "category-blogs",
       wrappedByKey: "data",
       locale: lang,
@@ -40,9 +60,10 @@ export async function getStaticPaths({ paginate }: any) {
   return allPaths;
 }
 
-const { page, allCategories } = Astro.props;
-const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
-const currentLang = lang;
+const { page, allCategories } = Astro.props as BlogListProps;
+const routeParams = Astro.params as { lang?: string };
+const lang = isValidLang(routeParams.lang) ? routeParams.lang : DEFAULT_LANG;
+const currentLang: Lang = lang;
 const blogsList = page.data;
 ---
 
@@ -88,7 +109,7 @@ const blogsList = page.data;
 
         {
           allCategories &&
-            allCategories.map((cat: any) => (
+            allCategories.map((cat: CategoryBlog) => (
               <a
                 href={rewriteUrl(`/blog/${cat.slug}`, lang)}
                 class="px-5 py-2 rounded-full text-sm font-medium transition-all shadow-sm 

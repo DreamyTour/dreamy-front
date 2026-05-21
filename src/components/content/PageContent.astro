@@ -1,10 +1,10 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
 import TourCard from "@/components/ui/TourCard.astro";
-import LiteYouTube from "@/components/LiteYouTube.astro";
-import type { SEOProps } from "@/components/SEO.astro";
-import type { Page } from "@/interface/page";
-import type { Tour } from "@/interface/tours";
+import LiteYouTube from "@/components/content/LiteYouTube.astro";
+import type { SEOProps } from "@/components/layout/SEO.astro";
+import type { Category, Page, Pregunta, StrapiBlock, StrapiBlockChild } from "@/types/page";
+import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import { getYouTubeVideoId, getThumbnailUrl } from "@/lib/helpers";
 import { DEFAULT_LANG } from "@/lib/i18n";
@@ -59,7 +59,7 @@ const pageStats =
 ---
 
 <PageLayout seo={seoProps} lang={lang}>
-  <script
+  <script is:inline
     id="page-slug-map"
     type="application/json"
     set:html={JSON.stringify(pageSlugMap)}
@@ -143,7 +143,7 @@ const pageStats =
               <div class="relative overflow-hidden rounded-sm border border-border/70 bg-background/80 p-8 shadow-[0_30px_70px_-34px_color-mix(in_oklab,var(--foreground)_28%,transparent)] backdrop-blur-md">
                 <div class="rounded-sm border border-dashed border-primary/20 bg-gradient-to-br from-primary/8 via-white to-secondary/8 px-8 py-14 text-center">
                   <p class="text-base leading-7 text-muted-foreground">
-                    {page.description || page.content}
+                    {page.content}
                   </p>
                 </div>
               </div>
@@ -160,7 +160,7 @@ const pageStats =
             <div class="mb-8 flex justify-center md:mb-10">
               <span class="inline-flex items-center gap-2 rounded-sm border border-secondary/15 bg-secondary/5 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-secondary">
                 <span class="h-2 w-2 rounded-full bg-secondary" />
-                {page.categories?.find((c: any) => c.slug !== "peru-tours")
+                {page.categories?.find((c: Category) => c.slug !== "peru-tours")
                   ?.nombre || page.titulo}
               </span>
             </div>
@@ -187,7 +187,7 @@ const pageStats =
                 <div class="mx-auto mt-4 h-px w-24 bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {page.preguntasAcordeon.map((pregunta: any) => (
+                {page.preguntasAcordeon.map((pregunta: Pregunta) => (
                   <details class="group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)] transition-colors duration-300 open:border-primary/20 open:bg-primary/[0.02]">
                     <summary class="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden md:px-6">
                       <span class="text-left text-sm font-semibold text-foreground md:text-base">
@@ -215,15 +215,14 @@ const pageStats =
                         Array.isArray(pregunta.contenido) && (
                           <div class="space-y-3">
                             {pregunta.contenido.map(
-                              (block: any, blockIndex: number) => {
+                              (block: StrapiBlock) => {
                                 if (block.type === "paragraph") {
                                   return (
                                     <p
-                                      key={blockIndex}
                                       class="text-base leading-7 text-muted-foreground"
                                     >
                                       {(block.children || [])
-                                        .map((child: any) => child.text || "")
+                                        .map((child: StrapiBlockChild) => child.text || "")
                                         .join("")}
                                     </p>
                                   );
@@ -231,22 +230,20 @@ const pageStats =
                                 if (block.type === "heading") {
                                   const level = block.level;
                                   const headingText = (block.children || [])
-                                    .map((child: any) => child.text || "")
+                                    .map((child: StrapiBlockChild) => child.text || "")
                                     .join("");
                                   if (level === 1) {
                                     return (
-                                      <h1
-                                        key={blockIndex}
+                                      <h2
                                         class="text-xl font-bold text-foreground"
                                       >
                                         {headingText}
-                                      </h1>
+                                      </h2>
                                     );
                                   }
                                   if (level === 2) {
                                     return (
                                       <h2
-                                        key={blockIndex}
                                         class="text-lg font-bold text-foreground"
                                       >
                                         {headingText}
@@ -255,7 +252,6 @@ const pageStats =
                                   }
                                   return (
                                     <h3
-                                      key={blockIndex}
                                       class="text-base font-semibold text-foreground"
                                     >
                                       {headingText}
@@ -268,18 +264,16 @@ const pageStats =
                                     format === "ordered" ? "ol" : "ul";
                                   return (
                                     <ListTag
-                                      key={blockIndex}
                                       class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
                                     >
                                       {(block.children || []).map(
-                                        (listItem: any, i: number) => (
+                                        (listItem: StrapiBlockChild) => (
                                           <li
-                                            key={i}
                                             class="text-muted-foreground"
                                           >
                                             {(listItem.children || [])
                                               .map(
-                                                (child: any) =>
+                                                (child: StrapiBlockChild) =>
                                                   child.text || "",
                                               )
                                               .join("")}

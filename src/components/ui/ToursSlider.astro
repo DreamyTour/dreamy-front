@@ -1,5 +1,5 @@
 ---
-import type { Tour } from "@/interface/tours";
+import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import TourCard from "@/components/ui/TourCard.astro";
 import { ArrowLeftIcon, ArrowRightIcon } from "@/components/icons/NavigationIcons";
@@ -21,7 +21,7 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
       <!-- Slider Container - horizontal scroll -->
       <div
         class="flex gap-6 overflow-x-auto py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
-        id={`slider-${Math.random().toString(36).substr(2, 9)}`}
+        id={`slider-${Math.random().toString(36).slice(2, 11)}`}
         data-slider-track
         data-original-count={tours.length}
         data-is-looped={shouldLoop ? "true" : "false"}
@@ -96,7 +96,7 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
       const isLooped = container.dataset.isLooped === "true";
       
       const autoPlayDelay = 3500;
-      let autoPlay: ReturnType<typeof window.setInterval> | undefined;
+      let autoPlay: number | undefined;
       let scrollAmount = 0;
       let loopWidth = 0;
       let isAdjustingScroll = false;

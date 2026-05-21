@@ -1,11 +1,10 @@
 ---
-import type { HeaderTop as HeaderTopType } from "@/interface/global";
+import type { HeaderTop as HeaderTopType } from "@/types/global";
 import Button from "@/components/ui/button.astro";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import type { Lang } from "@/lib/i18n";
 import { localizePath } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
-import { getImageUrl } from "@/lib/helpers";
 
 interface Props {
   data?: HeaderTopType;

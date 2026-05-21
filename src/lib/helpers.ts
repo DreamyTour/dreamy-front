@@ -1,12 +1,18 @@
 import type { Lang } from "./i18n";
 import { rewriteUrl as rewriteLocalizedUrl } from "./i18n";
-import type { Imagen } from "@/interface/common";
+import type { Imagen } from "@/types/common";
+import type { StrapiBlock, StrapiBlockChild } from "@/types/page";
 
 const strapiUrl =
 	import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "") ||
 	"http://localhost:1337";
 
-type ImageLike = Imagen | Imagen[] | null | undefined;
+const formatFallbacks: Record<string, string[]> = {
+	thumbnail: ["thumbnail", "small", "medium", "large"],
+	small: ["small", "thumbnail", "medium", "large"],
+	medium: ["medium", "small", "large", "thumbnail"],
+	large: ["large", "medium", "small", "thumbnail"],
+};
 
 function normalizeImage(image: unknown): Imagen | null {
 	if (!image) return null;
@@ -15,6 +21,21 @@ function normalizeImage(image: unknown): Imagen | null {
 	if (!imgObj || typeof imgObj !== "object") return null;
 
 	return imgObj as Imagen;
+}
+
+function resolveImageUrl(url: string, baseUrl = strapiUrl): string {
+	return url.startsWith("http") ? url : `${baseUrl}${url}`;
+}
+
+function getFormatUrl(imgObj: Imagen, format: string | undefined): string | undefined {
+	if (!format || !imgObj.formats) return undefined;
+
+	for (const key of formatFallbacks[format] || [format]) {
+		const url = imgObj.formats[key]?.url;
+		if (url) return url;
+	}
+
+	return undefined;
 }
 
 /**
@@ -36,18 +57,18 @@ export function getImageUrl(
 	const resolvedBaseUrl =
 		(isFormatKey ? baseUrl : formatOrBaseUrl) || strapiUrl;
 	const url =
-		(format ? imgObj.formats?.[format]?.url : undefined) || imgObj.url;
+		getFormatUrl(imgObj, format) || imgObj.url;
 
 	if (!url) return "/og-default.jpg";
 
-	return url.startsWith("http") ? url : `${resolvedBaseUrl}${url}`;
+	return resolveImageUrl(url, resolvedBaseUrl);
 }
 
-export function getImageAlt(image: ImageLike, fallback = ""): string {
+export function getImageAlt(image: unknown, fallback = ""): string {
 	return normalizeImage(image)?.alternativeText || fallback;
 }
 
-export function getImageSrcSet(image: ImageLike, formats?: string[]): string {
+export function getImageSrcSet(image: unknown, formats?: string[]): string {
 	const imgObj = normalizeImage(image);
 	if (!imgObj?.formats) return "";
 
@@ -60,10 +81,7 @@ export function getImageSrcSet(image: ImageLike, formats?: string[]): string {
 
 	return candidates
 		.map(([, format]) => {
-			const url = format.url.startsWith("http")
-				? format.url
-				: `${strapiUrl}${format.url}`;
-			return `${url} ${format.width}w`;
+			return `${resolveImageUrl(format.url)} ${format.width}w`;
 		})
 		.join(", ");
 }
@@ -111,8 +129,11 @@ export function extractTextFromBlocks(blocks: unknown): string {
 	if (!Array.isArray(blocks)) return typeof blocks === "string" ? blocks : "";
 	return blocks
 		.map((block) => {
-			if (block?.children && Array.isArray(block.children)) {
-				return block.children.map((child: any) => child.text || "").join("");
+			const maybeBlock = block as Partial<StrapiBlock>;
+			if (Array.isArray(maybeBlock.children)) {
+				return maybeBlock.children
+					.map((child: StrapiBlockChild) => child.text || "")
+					.join("");
 			}
 			return "";
 		})

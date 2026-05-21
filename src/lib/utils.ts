@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Lang } from "@/lib/i18n";
 import { rewriteUrl as rewriteLocalizedUrl } from "@/lib/i18n";
-import type { Global, MenuItem, Link } from "@/interface/global";
+import type { Global, MenuItem, Link } from "@/types/global";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

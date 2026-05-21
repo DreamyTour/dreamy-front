@@ -1,5 +1,5 @@
-import type { SEOProps } from "@/components/SEO.astro";
-import type { SEO } from "@/interface/common";
+import type { SEOProps } from "@/components/layout/SEO.astro";
+import type { SEO } from "@/types/common";
 import { getImageUrl } from "@/lib/helpers";
 import type { Lang } from "@/lib/i18n";
 

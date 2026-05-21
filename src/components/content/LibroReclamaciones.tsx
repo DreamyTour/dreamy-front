@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import countriesData from "@/data/countries.json";
+
+interface Country {
+	iso2: string;
+	nameES: string;
+}
 
 // Colores del theme (definidos en global.css)
 const colors = {
@@ -32,7 +37,7 @@ export default function LibroReclamaciones() {
 	>("idle");
 
 	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+		e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
 	) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
@@ -42,7 +47,7 @@ export default function LibroReclamaciones() {
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		setSubmitStatus("idle");
@@ -88,17 +93,6 @@ export default function LibroReclamaciones() {
 		}
 	};
 
-	const getButtonClass = () => {
-		if (submitStatus === "success") {
-			return "from-green-500 to-green-600";
-		}
-		if (submitStatus === "error") {
-			return "from-red-500 to-red-600";
-		}
-		// Usar color primario
-		return "hover:brightness-110";
-	};
-
 	const buttonStyle = () => {
 		if (submitStatus === "success") {
 			return {
@@ -123,10 +117,6 @@ export default function LibroReclamaciones() {
 		color: colors.foreground,
 	};
 
-	const focusRingStyle = {
-		"--tw-ring-color": colors.primary,
-	};
-
 	return (
 		<form onSubmit={handleSubmit} className="space-y-6">
 			{/* IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE */}
@@ -141,12 +131,14 @@ export default function LibroReclamaciones() {
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div className="md:col-span-2">
 						<label
+							htmlFor="lr-nombres"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
 							Nombres <span className="text-red-500">*</span>
 						</label>
 						<input
+							id="lr-nombres"
 							type="text"
 							name="nombres"
 							value={formData.nombres}
@@ -160,27 +152,32 @@ export default function LibroReclamaciones() {
 
 					<div>
 						<label
+							htmlFor="lr-pais"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
 							País <span className="text-red-500">*</span>
 						</label>
 						<select
+							id="lr-pais"
 							name="pais"
 							value={formData.pais}
-							onChange={(e) => handleChange(e as any)}
+							onChange={(e) => handleChange(e)}
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all bg-white"
 						>
 							<option value="">Selecciona tu país</option>
-							{countriesData
-								.map((c: any) => (
-									<option key={`lr-country-${c.iso2}`} value={c.nameES}>
-										{c.nameES}
+							{(countriesData as Country[])
+								.map((country) => (
+									<option
+										key={`lr-country-${country.iso2}`}
+										value={country.nameES}
+									>
+										{country.nameES}
 									</option>
 								))
-								.sort((a: any, b: any) =>
+								.sort((a, b) =>
 									a.props.children.localeCompare(b.props.children),
 								)}
 						</select>
@@ -188,6 +185,7 @@ export default function LibroReclamaciones() {
 
 					<div>
 						<label
+							htmlFor="lr-documento"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
@@ -195,6 +193,7 @@ export default function LibroReclamaciones() {
 							<span className="text-red-500">*</span>
 						</label>
 						<input
+							id="lr-documento"
 							type="text"
 							name="documento"
 							value={formData.documento}
@@ -208,12 +207,14 @@ export default function LibroReclamaciones() {
 
 					<div>
 						<label
+							htmlFor="lr-email"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
 							Email <span className="text-red-500">*</span>
 						</label>
 						<input
+							id="lr-email"
 							type="email"
 							name="email"
 							value={formData.email}
@@ -227,12 +228,14 @@ export default function LibroReclamaciones() {
 
 					<div>
 						<label
+							htmlFor="lr-telefono"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
 							Teléfono <span className="text-red-500">*</span>
 						</label>
 						<input
+							id="lr-telefono"
 							type="tel"
 							name="telefono"
 							value={formData.telefono}
@@ -246,6 +249,7 @@ export default function LibroReclamaciones() {
 
 					<div>
 						<label
+							htmlFor="lr-menor-no"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
@@ -254,6 +258,7 @@ export default function LibroReclamaciones() {
 						<div className="flex gap-4 mt-2">
 							<label className="inline-flex items-center cursor-pointer">
 								<input
+									id="lr-menor-no"
 									type="radio"
 									name="menorEdad"
 									value="no"
@@ -267,6 +272,7 @@ export default function LibroReclamaciones() {
 							</label>
 							<label className="inline-flex items-center cursor-pointer">
 								<input
+									id="lr-menor-si"
 									type="radio"
 									name="menorEdad"
 									value="si"
@@ -285,6 +291,7 @@ export default function LibroReclamaciones() {
 						className={formData.menorEdad === "si" ? "md:col-span-2" : "hidden"}
 					>
 						<label
+							htmlFor="lr-datos-apoderado"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
@@ -292,6 +299,7 @@ export default function LibroReclamaciones() {
 							<span className="text-red-500">*</span>
 						</label>
 						<input
+							id="lr-datos-apoderado"
 							type="text"
 							name="datosApoderado"
 							value={formData.datosApoderado}
@@ -316,6 +324,7 @@ export default function LibroReclamaciones() {
 				<div className="space-y-6">
 					<div>
 						<label
+							htmlFor="lr-tipo-reclamo"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
@@ -336,6 +345,7 @@ export default function LibroReclamaciones() {
 								}}
 							>
 								<input
+									id="lr-tipo-reclamo"
 									type="radio"
 									name="tipo"
 									value="reclamo"
@@ -362,6 +372,7 @@ export default function LibroReclamaciones() {
 								}}
 							>
 								<input
+									id="lr-tipo-queja"
 									type="radio"
 									name="tipo"
 									value="queja"
@@ -381,6 +392,7 @@ export default function LibroReclamaciones() {
 
 					<div>
 						<label
+							htmlFor="lr-detalle"
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
@@ -388,6 +400,7 @@ export default function LibroReclamaciones() {
 							<span className="text-red-500">*</span>
 						</label>
 						<textarea
+							id="lr-detalle"
 							name="detalle"
 							value={formData.detalle}
 							onChange={handleChange}

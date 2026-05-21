@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/main.astro";
-import type { SEOProps } from "@/components/SEO.astro";
+import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { Lang } from "@/lib/i18n";
 
 interface Props {
@@ -18,7 +18,7 @@ const { slugMap, seo, lang } = Astro.props;
 
 {
   slugMap && (
-    <script
+    <script is:inline
       id="tour-slug-map"
       type="application/json"
       set:html={JSON.stringify(slugMap)}

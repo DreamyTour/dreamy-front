@@ -10,11 +10,9 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 // SSG + SSR for API routes
 export default defineConfig({
-  adapter: cloudflare({
-    compatibility: {
-      date: '2026-04-22',
-    },
-  }),
+  adapter: process.env.NODE_ENV === 'production'
+    ? cloudflare()
+    : undefined,
 
   fonts: [
     {

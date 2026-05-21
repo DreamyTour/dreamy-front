@@ -1,20 +1,19 @@
 ---
 import TourLayout from "@/layouts/TourLayout.astro";
-import PageContent from "@/components/PageContent.astro";
+import PageContent from "@/components/content/PageContent.astro";
 import Layout from "@/layouts/main.astro";
-import fetchApi, { fetchAllStrapi } from "@/lib/strapi";
+import { fetchAllStrapi } from "@/lib/strapi";
 import { dedupeLocalizedDocuments } from "@/lib/utils";
-import type { Tour } from "@/interface/tours";
-import type { Page } from "@/interface/page";
+import type { Category as TourCategory, Tour } from "@/types/tours";
+import type { Category as PageCategory, Page } from "@/types/page";
 import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
-import type { SEOProps } from "@/components/SEO.astro";
+import type { AstroComponentFactory } from "astro/runtime/server/index.js";
+import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { ManualSEO } from "@/lib/seo";
 import {
   getImageUrl,
   generateDescription,
-  getYouTubeVideoId,
-  getThumbnailUrl,
 } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 
@@ -22,14 +21,15 @@ import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
 import ContactForm from "@/components/tours/ContactForm.astro";
 import BookingForm from "@/components/tours/BookingForm";
-import TourCard from "@/components/ui/TourCard.astro";
-import LiteYouTube from "@/components/LiteYouTube.astro";
+import RelatedTours from "@/components/tours/RelatedTours.astro";
 
 interface MdxFrontmatter {
   title: string;
   description?: string;
   lang: Lang;
   seo?: ManualSEO;
+  heroImage?: string;
+  heroImageAlt?: string;
 }
 
 interface Props {
@@ -38,7 +38,7 @@ interface Props {
   page?: Page;
   slugMap?: Record<string, string>;
   pageSlugMap?: Record<string, string>;
-  mdxComponent?: any;
+  mdxComponent?: { default?: AstroComponentFactory };
   mdxFrontmatter?: MdxFrontmatter;
   isRedirect?: boolean;
   redirectTo?: string;
@@ -49,7 +49,7 @@ interface Props {
 export async function getStaticPaths() {
   const paths: Array<{
     params: { lang: string; slug: string };
-    props: unknown;
+    props: Partial<Props>;
   }> = [];
 
   // ✅ MDX PAGES - dynamic imports
@@ -57,7 +57,12 @@ export async function getStaticPaths() {
   const mdxPages = import.meta.glob("@/content/pages/**/*.mdx");
 
   for (const path in mdxPages) {
-    const mod = (await mdxPages[path]()) as any;
+    const mod = (await mdxPages[path]()) as {
+      default?: AstroComponentFactory;
+      frontmatter?: MdxFrontmatter & { slugs?: Record<string, string> };
+    };
+    const frontmatter = mod.frontmatter;
+    if (!frontmatter) continue;
     const subpath = path.split("/content/pages/")[1].replace(".mdx", "");
     const [lang, slug] = subpath.split("/");
 
@@ -66,8 +71,8 @@ export async function getStaticPaths() {
       props: {
         type: "mdx",
         mdxComponent: mod,
-        mdxFrontmatter: mod.frontmatter || {},
-        pageSlugMap: mod.frontmatter.slugs || {},
+        mdxFrontmatter: frontmatter,
+        pageSlugMap: frontmatter.slugs || {},
       },
     });
   }
@@ -110,7 +115,7 @@ export async function getStaticPaths() {
       let toursRelated = allToursByLang[lang].filter(t => t.slug !== tour.slug);
       if (categorySlug) {
         toursRelated = toursRelated.filter(t => 
-          t.categories?.some((c: any) => c.slug === categorySlug)
+          t.categories?.some((c: TourCategory) => c.slug === categorySlug)
         );
       }
       toursRelated = toursRelated.slice(0, 3);
@@ -134,13 +139,13 @@ export async function getStaticPaths() {
         pageSlugsByDocId[page.documentId] = {};
       }
       pageSlugsByDocId[page.documentId][lang] = page.slug;
-      const pageDestinationCategory = page?.categories?.find((c: any) => c.slug !== "peru-tours") ??
+      const pageDestinationCategory = page?.categories?.find((c: PageCategory) => c.slug !== "peru-tours") ??
         (page?.slug ? { slug: page.slug, nombre: page.titulo } : undefined);
 
       let toursByCategory: Tour[] = [];
       if (pageDestinationCategory?.slug) {
         toursByCategory = allToursByLang[lang].filter(t => 
-          t.categories?.some((c: any) => c.slug === pageDestinationCategory.slug)
+          t.categories?.some((c: TourCategory) => c.slug === pageDestinationCategory.slug)
         );
       }
 
@@ -260,7 +265,7 @@ let tourWithCategory = tour;
 
 // ====== CHECK INCA TRAIL CATEGORY ======
 const isIncaTrail = tourWithCategory?.categories?.some(
-  (c: any) =>
+  (c: TourCategory) =>
     c.slug.includes("inca-trail") ||
     c.slug.includes("camino-inca") ||
     c.slug.includes("trilha-inca"),
@@ -299,39 +304,6 @@ if (type === "mdx" && mdxFrontmatter) {
   });
 }
 
-const pageVideoId =
-  type === "page" && page?.video?.videoUrl
-    ? getYouTubeVideoId(page.video.videoUrl)
-    : null;
-
-const pageVideoThumbnail =
-  type === "page" && page?.video?.thumbnail
-    ? getThumbnailUrl(page.video.thumbnail)
-    : null;
-
-const pageUiCopy = {
-  es: {
-    eyebrow: "Colección destacada",
-    experienceLabel: "Experiencia curada",
-    exploreCta: "Ver experiencias",
-    toursStat: "experiencias",
-  },
-  en: {
-    eyebrow: "Featured collection",
-    experienceLabel: "Curated experience",
-    exploreCta: "View experiences",
-    toursStat: "experiences",
-  },
-  pt: {
-    eyebrow: "Coleção em destaque",
-    experienceLabel: "Experiência curada",
-    exploreCta: "Ver experiências",
-    toursStat: "experiências",
-  },
-} as const;
-
-const pageCopy = pageUiCopy[lang] ?? pageUiCopy[DEFAULT_LANG];
-
 const mdxUiCopy = {
   es: {
     eyebrow: "Guia Dreamy",
@@ -352,21 +324,12 @@ const heroImage =
 const heroImageAlt =
   (mdxFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
 
-const pageStats =
-  type === "page" && page
-    ? [
-        {
-          value: toursByCategory.length > 0 ? `${toursByCategory.length}` : "—",
-          label: pageCopy.toursStat,
-        },
-      ]
-    : [];
 ---
 
 {
-  type === "mdx" && mdxComponent && (
+  type === "mdx" && mdxComponent && mdxFrontmatter && (
     <Layout seo={seoProps} lang={lang}>
-      <script
+      <script is:inline
         id="page-slug-map"
         type="application/json"
         set:html={JSON.stringify(pageSlugMap || {})}
@@ -444,31 +407,7 @@ const pageStats =
           </TourTabs>
         </div>
 
-        {/* Tours Relacionados */}
-        {toursRelated.length > 0 && (
-          <section class="w-full mt-16">
-            <div class="max-w-8xl mx-auto">
-              <div class="text-center mb-10">
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 relative inline-block">
-                  <span class="relative z-10">Tours Relacionados</span>
-                  <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
-                </h2>
-                <div class="flex items-center justify-center gap-3 mt-4">
-                  <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
-                  <div class="w-12 h-1.5 bg-secondary rounded-full relative">
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full" />
-                  </div>
-                  <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
-                </div>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {toursRelated.map((relatedTour) => (
-                  <TourCard tour={relatedTour} lang={lang} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <RelatedTours tours={toursRelated} lang={lang} />
       </div>
     </TourLayout>
   )
@@ -479,9 +418,9 @@ const pageStats =
     <PageContent
       page={page}
       toursByCategory={toursByCategory}
-      pageSlugMap={pageSlugMap}
+      pageSlugMap={pageSlugMap ?? {}}
       lang={lang}
-      seoProps={seoProps}
+      seoProps={seoProps!}
     />
   )
 }

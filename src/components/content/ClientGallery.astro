@@ -1,7 +1,7 @@
 ---
 import fetchApi from "@/lib/strapi";
-import type { GaleriaResponse, GaleriaItem } from "@/interface/galeria";
-import { getImageUrl } from "@/lib/helpers";
+import type { GaleriaResponse, GaleriaItem } from "@/types/galeria";
+import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
 import { ZoomIcon, ArrowLeftIcon, ArrowRightIcon } from "@/components/icons/NavigationIcons";
 
 interface Props {
@@ -25,14 +25,18 @@ const galleryData = await fetchApi<GaleriaResponse>({
 
 // Extraer las imágenes del array galeria
 const galeriaItems = galleryData?.data?.[0]?.galeria || [];
-const validItems: { img: string; alt: string }[] = [];
+const validItems: { img: string; srcSet: string; fullImg: string; alt: string }[] = [];
 
 galeriaItems.forEach((item: GaleriaItem) => {
   if (item.imagen && item.imagen.length > 0) {
-    const img = getImageUrl(item.imagen[0]) || "";
+    const img = getImageUrl(item.imagen[0], "small") || "";
+    const srcSet = getImageSrcSet(item.imagen[0], ["thumbnail", "small", "medium"]);
+    const fullImg = getImageUrl(item.imagen[0], "large") || img;
     if (img) {
       validItems.push({
         img,
+        srcSet,
+        fullImg,
         alt: item.alt || "",
       });
     }
@@ -46,15 +50,24 @@ validItems.splice(totalImages);
 {
   validItems.length > 0 ? (
     <div class="grid grid-cols-3 gap-3 mb-12">
-      {validItems.map((item, index) => (
+      {validItems.map((item) => (
         <button
           type="button"
           class="relative overflow-hidden group cursor-pointer rounded-sm aspect-square w-full !p-0 border-0"
-          style={`background-image: url('${item.img}'); background-size: cover !important; background-position: center; background-repeat: no-repeat;`}
-          data-src={item.img}
+          data-src={item.fullImg}
           data-alt={item.alt}
           data-lightbox-btn
+          aria-label={`Abrir imagen de galería${item.alt ? `: ${item.alt}` : ""}`}
         >
+          <img
+            src={item.img}
+            srcset={item.srcSet || undefined}
+            sizes="(max-width: 767px) 33vw, (max-width: 1023px) 25vw, 180px"
+            alt={item.alt}
+            class="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
           <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -77,7 +90,9 @@ validItems.splice(totalImages);
   class="fixed inset-0 bg-black/95 z-50 hidden items-center justify-center p-4"
   role="dialog"
   aria-modal="true"
+  aria-labelledby="lightbox-title"
 >
+  <h2 id="lightbox-title" class="sr-only">Imagen de galería</h2>
   <button
     type="button"
     class="absolute top-4 right-4 text-white/80 hover:text-white text-5xl font-light hover:scale-110 transition-all cursor-pointer z-50 w-12 h-12 flex items-center justify-center"
@@ -108,7 +123,7 @@ validItems.splice(totalImages);
   <img
     id="lightbox-img"
     src=""
-    alt="Full size image"
+    alt=""
     class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl"
   />
 
@@ -120,11 +135,14 @@ validItems.splice(totalImages);
 </div>
 
 <script is:inline>
-  document.addEventListener("astro:page-load", function () {
-    var totalImages = document.querySelectorAll("[data-lightbox-btn]").length;
-    var currentIndex = 0;
+  let currentIndex = 0;
 
-    var buttons = document.querySelectorAll("[data-lightbox-btn]");
+  function getTotalImages() {
+    return document.querySelectorAll("[data-lightbox-btn]").length;
+  }
+
+  document.addEventListener("astro:page-load", function () {
+    const buttons = document.querySelectorAll("[data-lightbox-btn]");
     buttons.forEach(function (btn, index) {
       btn.addEventListener("click", function () {
         openLightbox(index);
@@ -148,18 +166,17 @@ validItems.splice(totalImages);
 
   function openLightbox(index) {
     currentIndex = index;
-    var button = document.querySelectorAll("[data-lightbox-btn]")[index];
-    var lightbox = document.getElementById("lightbox");
-    var lightboxImg = document.getElementById("lightbox-img");
-    var counter = document.getElementById("lightbox-counter");
+    const button = document.querySelectorAll("[data-lightbox-btn]")[index];
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const counter = document.getElementById("lightbox-counter");
 
     if (button && lightbox && lightboxImg) {
-      var src = button.getAttribute("data-src");
-      var alt = button.getAttribute("data-alt");
+      const src = button.getAttribute("data-src") || "";
+      const alt = button.getAttribute("data-alt") || "";
       lightboxImg.src = src;
       lightboxImg.alt = alt;
-      var totalImages = document.querySelectorAll("[data-lightbox-btn]").length;
-      counter.textContent = index + 1 + " / " + totalImages;
+      if (counter) counter.textContent = index + 1 + " / " + getTotalImages();
       lightbox.classList.remove("hidden");
       lightbox.classList.add("flex");
       document.body.style.overflow = "hidden";
@@ -167,7 +184,7 @@ validItems.splice(totalImages);
   }
 
   function closeLightbox() {
-    var lightbox = document.getElementById("lightbox");
+    const lightbox = document.getElementById("lightbox");
     if (lightbox) {
       lightbox.classList.add("hidden");
       lightbox.classList.remove("flex");
@@ -176,7 +193,7 @@ validItems.splice(totalImages);
   }
 
   function navigateLightbox(direction) {
-    var totalImages = document.querySelectorAll("[data-lightbox-btn]").length;
+    const totalImages = getTotalImages();
     if (totalImages === 0) return;
     currentIndex = (currentIndex + direction + totalImages) % totalImages;
     openLightbox(currentIndex);

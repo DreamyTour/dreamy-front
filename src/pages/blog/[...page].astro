@@ -1,13 +1,28 @@
 ---
 import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
-import type { Blog, CategoryBlog } from "@/interface/blog";
+import type { Blog, CategoryBlog } from "@/types/blog";
 import CardPost from "@/components/ui/CardPost.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 
-export async function getStaticPaths({ paginate }: any) {
-  const allPaths: any[] = [];
+type PaginatedPage = {
+  data: Blog[];
+  currentPage: number;
+  lastPage: number;
+  url: { prev?: string | null; next?: string | null };
+};
+type BlogListProps = {
+  page: PaginatedPage;
+  allCategories: CategoryBlog[];
+};
+type Paginate = (
+  data: Blog[],
+  options: { pageSize: number; props?: Record<string, unknown> },
+) => unknown[];
+
+export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
+  const allPaths: unknown[] = [];
 
   for (const lang of [DEFAULT_LANG]) {
     const blogs = await fetchApi<Blog[]>({
@@ -21,7 +36,7 @@ export async function getStaticPaths({ paginate }: any) {
 
     const blogsList = blogs && Array.isArray(blogs) ? blogs : [];
 
-    const cats = await fetchApi<any[]>({
+    const cats = await fetchApi<CategoryBlog[]>({
       endpoint: "category-blogs",
       wrappedByKey: "data",
       locale: lang,
@@ -39,7 +54,7 @@ export async function getStaticPaths({ paginate }: any) {
   return allPaths;
 }
 
-const { page, allCategories } = Astro.props;
+const { page, allCategories } = Astro.props as BlogListProps;
 const lang = DEFAULT_LANG;
 const currentLang = lang;
 const blogsList = page.data;
@@ -87,7 +102,7 @@ const blogsList = page.data;
 
         {
           allCategories &&
-            allCategories.map((cat: any) => (
+            allCategories.map((cat: CategoryBlog) => (
               <a
                 href={rewriteUrl(`/blog/${cat.slug}`, lang)}
                 class="px-5 py-2 rounded-full text-sm font-medium transition-all shadow-sm 

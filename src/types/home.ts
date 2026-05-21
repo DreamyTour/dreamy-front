@@ -45,12 +45,14 @@ export interface Certifications {
 export interface SectionMapi {
 	id: number;
 	titulo: string;
+	description?: string;
 	limit: number;
 	category: Category;
 }
 export interface peruPaquetes {
 	id: number;
 	titulo: string;
+	description?: string;
 	limit: number;
 	category: Category;
 }

@@ -1,7 +1,7 @@
 ---
-import type { About } from "@/interface/home";
+import type { About } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
-import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
 
 interface Props {
   data?: About;
@@ -11,7 +11,8 @@ interface Props {
 const { data, lang } = Astro.props;
 if (!data) return;
 
-const imagenUrl = getImageUrl(data.imagen);
+const imagenUrl = getImageUrl(data.imagen, "large");
+const imageSrcSet = getImageSrcSet(data.imagen, ["small", "medium", "large"]);
 const imageAlt = getImageAlt(data.imagen, data.titulo);
 const contentParagraphs = data.content
   .split(/\n+/)
@@ -24,11 +25,6 @@ const eyebrowByLang: Record<Lang, string> = {
   pt: "Tour 100% Local",
 };
 
-const buttonByLang: Record<Lang, string> = {
-  en: "Discover Our Tours",
-  es: "Descubre Nuestros Tours",
-  pt: "Descubra Nossos Tours",
-};
 
 const features = {
   en: [
@@ -270,6 +266,8 @@ const features = {
               <div class="absolute inset-0 bg-linear-to-t from-[#181311]/40 via-transparent to-transparent z-10" />
               <img
                 src={imagenUrl}
+                srcset={imageSrcSet || undefined}
+                sizes="(max-width: 1023px) 100vw, 50vw"
                 alt={imageAlt}
                 class="aspect-[4/3] w-full object-cover object-center"
                 loading="lazy"

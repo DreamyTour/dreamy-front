@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import countriesData from "@/data/countries.json";
+
+interface Country {
+	nameES: string;
+	phoneCode?: string;
+}
+
+interface CountryOption {
+	nombre: string;
+	codigo: string;
+}
 
 const i18n = {
 	es: {
@@ -115,13 +125,16 @@ export default function PlaneaTuViaje({
 }: {
 	lang?: "es" | "en" | "pt";
 }) {
-	const t = i18n[lang] || i18n["es"];
+	const t = i18n[lang] || i18n.es;
 
 	// Cargar lista de países según idioma (idealmente traduciríamos country name pero usamos nameES por ahora)
-	const paises = [
-		...countriesData
-			.map((c: any) => ({ nombre: c.nameES, codigo: c.phoneCode }))
-			.sort((a: any, b: any) => a.nombre.localeCompare(b.nombre)),
+	const paises: CountryOption[] = [
+		...(countriesData as Country[])
+			.map((country) => ({
+				nombre: country.nameES,
+				codigo: country.phoneCode || "",
+			}))
+			.sort((a, b) => a.nombre.localeCompare(b.nombre)),
 		{ nombre: t.otherCountry, codigo: "" },
 	];
 
@@ -153,15 +166,13 @@ export default function PlaneaTuViaje({
 	};
 
 	const handleChange = (
-		e: React.ChangeEvent<
-			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-		>,
+		e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
 	) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		setSubmitStatus("idle");

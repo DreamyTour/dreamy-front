@@ -1,9 +1,9 @@
 ---
-import Certification from "@/components/Certification.astro";
+import Certification from "@/components/layout/Certification.astro";
 import { EmailIcon, WhatsAppIcon, PhoneIcon, LocationIcon } from "@/components/icons/SocialContactIcons";
-import type { Footer as FooterType } from "@/interface/global";
+import type { Footer as FooterType } from "@/types/global";
 import type { Lang } from "@/lib/i18n";
-import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {

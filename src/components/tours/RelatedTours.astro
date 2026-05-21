@@ -1,0 +1,37 @@
+---
+import type { Lang } from "@/lib/i18n";
+import type { Tour } from "@/types/tours";
+import TourCard from "@/components/ui/TourCard.astro";
+
+interface Props {
+  tours: Tour[];
+  lang: Lang;
+}
+
+const { tours, lang } = Astro.props;
+---
+
+{
+  tours.length > 0 && (
+    <section class="w-full mt-16">
+      <div class="max-w-8xl mx-auto">
+        <div class="text-center mb-10">
+          <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 relative inline-block">
+            <span class="relative z-10">Tours Relacionados</span>
+            <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
+          </h2>
+          <div class="flex items-center justify-center gap-3 mt-4">
+            <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
+            <div class="w-12 h-1.5 bg-secondary rounded-full relative">
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full" />
+            </div>
+            <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {tours.map((tour) => <TourCard tour={tour} lang={lang} />)}
+        </div>
+      </div>
+    </section>
+  )
+}

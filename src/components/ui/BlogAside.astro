@@ -1,6 +1,6 @@
 ---
 import type { Lang } from "@/lib/i18n";
-import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Category {
@@ -108,7 +108,7 @@ const formatUrl = (url: string) =>
                 {social.imagen?.url && (
                   <img
                     src={getImageUrl(social.imagen)}
-                    alt={getImageAlt(social.imagen, social.label || "Social")}
+                    alt={social.label || "Social"}
                     class="h-8 w-8 object-contain"
                     loading="lazy"
                     decoding="async"

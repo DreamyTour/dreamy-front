@@ -1,5 +1,5 @@
 ---
-import type { Page } from "@/interface/page";
+import type { Page } from "@/types/page";
 import type { Lang } from "@/lib/i18n";
 import fetchApi from "@/lib/strapi";
 import { getThumbnailUrl } from "@/lib/helpers";
@@ -103,7 +103,7 @@ const pages = response && Array.isArray(response) ? response : [];
                 <div class="flex min-w-0 flex-1 flex-col justify-center px-3 py-2 sm:px-4">
                   <div class="space-y-2">
                     <h3 class="line-clamp-2 text-[0.95rem] font-bold leading-tight text-gray-900 transition-colors duration-300">
-                      {page.titulo || (page as any).nombre}
+                      {page.titulo}
                     </h3>
                   </div>
 

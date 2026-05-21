@@ -2,6 +2,35 @@ import type { APIRoute } from "astro";
 
 export const prerender = false;
 
+interface CheckoutPassenger {
+	name?: string;
+	lastname?: string;
+	gender?: string;
+	dob?: string;
+	country?: string;
+	documentType?: string;
+	documentNumber?: string;
+}
+
+interface CheckoutPayload {
+	passengersInfo?: CheckoutPassenger[];
+	contactInfo?: {
+		firstname?: string;
+		lastname?: string;
+		email?: string;
+		phoneCode?: string;
+		phone?: string;
+	};
+	cart?: {
+		tourName?: string;
+		date?: string;
+		passengers?: number;
+		amountPaid?: number;
+		amountToPayLabel?: "minimum" | "total";
+		totalPrice?: number;
+	};
+}
+
 export const POST: APIRoute = async ({ request }) => {
 	// Dynamic import de Resend solo cuando se necesita
 	let resend = null;
@@ -37,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
 			});
 		}
 
-		const data = JSON.parse(rawBody);
+		const data = JSON.parse(rawBody) as CheckoutPayload;
 
 		const { passengersInfo, contactInfo, cart } = data;
 		const passengers = Array.isArray(passengersInfo) ? passengersInfo : [];
@@ -100,7 +129,7 @@ export const POST: APIRoute = async ({ request }) => {
                <ul>
                  ${passengers
 										.map(
-											(p: any, i: number) =>
+											(p: CheckoutPassenger, i: number) =>
 												`<li style="margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 6px;">
                       <strong style="color: #6d28d9;">Pasajero ${i + 1}:</strong> ${p.name} ${p.lastname}<br/>
                       <strong>Género:</strong> ${p.gender} | 

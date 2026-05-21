@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 
 export function DurationIcon(props: React.SVGProps<SVGSVGElement>) {
 	return (
@@ -10,6 +10,8 @@ export function DurationIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<circle cx="12" cy="12" r="10" />
@@ -28,6 +30,8 @@ export function DifficultyIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="M3 3v18h18" />
@@ -46,6 +50,8 @@ export function GroupIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -66,6 +72,8 @@ export function AltitudeIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="m8 3 4 8 5-5 5 15H2L8 3z" />
@@ -83,6 +91,8 @@ export function GuideIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<circle cx="12" cy="12" r="10" />
@@ -102,6 +112,8 @@ export function TransportIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
@@ -123,6 +135,8 @@ export function MealsIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
@@ -142,6 +156,8 @@ export function DefaultBadgeIcon(props: React.SVGProps<SVGSVGElement>) {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<circle cx="12" cy="12" r="10" />

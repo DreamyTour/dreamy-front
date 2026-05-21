@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Minus, Plus } from "lucide-react";
+import type { Lang } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 
 interface BookingFormProps {
 	tourId: string | number;
 	tourName: string;
 	basePrice?: number;
-	lang: string;
+	lang: Lang;
 }
 
 export default function BookingForm({
@@ -49,7 +50,7 @@ export default function BookingForm({
 		};
 
 		window.localStorage.setItem("bookingCart", JSON.stringify(cartItem));
-		window.location.href = rewriteUrl("/checkout", lang as any);
+		window.location.href = rewriteUrl("/checkout", lang);
 	};
 
 	return (
@@ -154,6 +155,7 @@ export default function BookingForm({
 				</div>
 
 				<button
+					type="button"
 					onClick={handleBookNow}
 					disabled={!date}
 					className="w-full bg-[#20b26b] hover:bg-[#1a9358] text-white font-bold text-lg py-4 rounded-sm shadow-md transition-colors disabled:opacity-60 disabled:cursor-not-allowed"

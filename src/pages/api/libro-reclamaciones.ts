@@ -148,7 +148,7 @@ export const POST: APIRoute = async ({ request }) => {
 		const { data, error } = await resend.emails.send({
 			from: "Dreamy Tours <onboarding@resend.dev>", // Cambiar a tu email verificado en producción
 			to: ["info@dreamy.tours"],
-			reply_to: email,
+			replyTo: email,
 			subject: `📝 Nuevo ${tipo === "reclamo" ? "RECLAMO" : "QUEJA"} - ${nombres} - ${pais}/${ciudad}`,
 			html: htmlContent,
 		});

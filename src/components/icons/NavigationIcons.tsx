@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 
 export function ChevronIcon(props: React.SVGProps<SVGSVGElement>) {
 	return (
@@ -7,6 +7,8 @@ export function ChevronIcon(props: React.SVGProps<SVGSVGElement>) {
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path
@@ -26,6 +28,8 @@ export function ZoomIcon(props: React.SVGProps<SVGSVGElement>) {
 			fill="none"
 			stroke="currentColor"
 			viewBox="0 0 24 24"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path
@@ -45,6 +49,8 @@ export function ArrowLeftIcon(props: React.SVGProps<SVGSVGElement>) {
 			fill="none"
 			stroke="currentColor"
 			viewBox="0 0 24 24"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path
@@ -64,6 +70,8 @@ export function ArrowRightIcon(props: React.SVGProps<SVGSVGElement>) {
 			fill="none"
 			stroke="currentColor"
 			viewBox="0 0 24 24"
+			aria-hidden="true"
+			focusable="false"
 			{...props}
 		>
 			<path

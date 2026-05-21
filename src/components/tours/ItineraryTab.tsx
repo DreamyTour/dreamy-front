@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
-import type { Acordeon as AcordeonType } from "@/interface/tours";
+import type { Acordeon as AcordeonType, StrapiBlock, StrapiBlockChild } from "@/types/tours";
 import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface ItineraryTabProps {
@@ -25,10 +25,10 @@ function AccordionItem({
 	defaultOpen: boolean;
 }) {
 	// Componente para renderizar blocks del acordeón
-	const AcordeonContent = ({ content }: { content: any[] }) => {
+	const AcordeonContent = ({ content }: { content: StrapiBlock[] }) => {
 		if (!content || !Array.isArray(content)) return null;
 
-		const renderTextNodes = (children: any[]) => {
+		const renderTextNodes = (children: StrapiBlockChild[]) => {
 			return children.map((child, i) => {
 				if (!child.text) return null;
 				let textElement: React.ReactNode = child.text;
@@ -45,7 +45,7 @@ function AccordionItem({
 
 		return (
 			<div className="space-y-2">
-				{normalized.map((block: any, blockIndex: number) => {
+				{normalized.map((block, blockIndex) => {
 					if (block.type === "paragraph") {
 						return (
 							<p
@@ -58,15 +58,15 @@ function AccordionItem({
 					}
 
 					if (block.type === "heading") {
-						const level = block.level;
+						const level = block.level as number | undefined;
 						if (level === 1) {
 							return (
-								<h1
+								<h2
 									key={blockIndex}
 									className="text-xl font-bold text-gray-900"
 								>
 									{renderTextNodes(block.children || [])}
-								</h1>
+								</h2>
 							);
 						}
 						if (level === 2) {
@@ -90,7 +90,7 @@ function AccordionItem({
 					}
 
 					if (block.type === "list") {
-						const format = block.format;
+						const format = (block as StrapiBlock & { format?: string }).format;
 						const ListTag = format === "ordered" ? "ol" : "ul";
 
 						return (
@@ -98,7 +98,7 @@ function AccordionItem({
 								key={blockIndex}
 								className={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 text-base text-gray-600 space-y-1`}
 							>
-								{(block.children || []).map((listItem: any, i: number) => (
+								{(block.children || []).map((listItem: StrapiBlockChild, i: number) => (
 									<li key={i} className="text-gray-600">
 										{renderTextNodes(listItem.children || [])}
 									</li>

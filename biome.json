@@ -1,13 +1,12 @@
 {
 	"files": {
-		"includes": ["**/*.{ts,tsx,js,jsx}"],
-		"experimentalScannerIgnores": [
-			"**/*.astro",
-			"**/*.md",
-			"**/*.mdx",
-			"node_modules",
-			"dist",
-			"build"
+		"includes": [
+			"src/**/*.{ts,tsx,js,jsx}",
+			"astro.config.mjs",
+			"components.json",
+			"package.json",
+			"tsconfig.json",
+			"biome.json"
 		]
 	}
 }

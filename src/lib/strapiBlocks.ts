@@ -1,4 +1,6 @@
-import type { StrapiBlock } from "@/interface/tours";
+import type { StrapiBlock } from "@/types/tours";
+
+type ListBlock = StrapiBlock & { format?: string };
 
 /**
  * Agrupa bloques de lista consecutivos del mismo formato en un único bloque.
@@ -12,7 +14,7 @@ export function normalizeLists(content: StrapiBlock[]): StrapiBlock[] {
 			block.type === "list" &&
 			lastBlock &&
 			lastBlock.type === "list" &&
-			(block as any).format === (lastBlock as any).format
+			(block as ListBlock).format === (lastBlock as ListBlock).format
 		) {
 			lastBlock.children = [
 				...(lastBlock.children || []),

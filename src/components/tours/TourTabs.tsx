@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import type { Tour } from "@/interface/tours";
+import type { Tour } from "@/types/tours";
 import OverviewTab from "./OverviewTab";
 import ItineraryTab from "./ItineraryTab";
 import IncludedTab from "./IncludedTab";

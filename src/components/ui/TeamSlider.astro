@@ -63,7 +63,7 @@ const sliderId = `team-slider-${department.replace(/\s/g, "-").toLowerCase()}`;
 
 <script>
   document.addEventListener("astro:page-load", () => {
-    document.querySelectorAll("[data-slider-id]").forEach((slider) => {
+    document.querySelectorAll<HTMLElement>("[data-slider-id]").forEach((slider) => {
       if (slider.dataset.initialized) return;
       slider.dataset.initialized = "true";
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { Acordeon as AcordeonType, StrapiBlock } from "@/interface/tours";
+import type { Acordeon as AcordeonType, StrapiBlock, StrapiBlockChild } from "@/types/tours";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
 import { normalizeLists } from "@/lib/strapiBlocks";
 
@@ -19,10 +19,10 @@ export default function InformationTab({ items }: InformationTabProps) {
 }
 
 function AccordionItem({ item }: { item: AcordeonType }) {
-	const AcordeonContent = ({ content }: { content: any[] }) => {
+	const AcordeonContent = ({ content }: { content: StrapiBlock[] }) => {
 		if (!content || !Array.isArray(content)) return null;
 
-		const renderTextNodes = (children: any[]) => {
+		const renderTextNodes = (children: StrapiBlockChild[]) => {
 			return children.map((child, i) => {
 				if (!child.text) return null;
 				let textElement: React.ReactNode = child.text;
@@ -39,7 +39,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 
 		return (
 			<div className="space-y-2">
-				{normalized.map((block: any, blockIndex: number) => {
+				{normalized.map((block, blockIndex) => {
 					if (block.type === "paragraph") {
 						return (
 							<p
@@ -52,15 +52,15 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 					}
 
 					if (block.type === "heading") {
-						const level = block.level;
+						const level = block.level as number | undefined;
 						if (level === 1) {
 							return (
-								<h1
+								<h2
 									key={blockIndex}
 									className="text-xl font-bold text-gray-900"
 								>
 									{renderTextNodes(block.children || [])}
-								</h1>
+								</h2>
 							);
 						}
 						if (level === 2) {
@@ -84,7 +84,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 					}
 
 					if (block.type === "list") {
-						const format = block.format;
+						const format = (block as StrapiBlock & { format?: string }).format;
 						const ListTag = format === "ordered" ? "ol" : "ul";
 
 						return (
@@ -92,7 +92,7 @@ function AccordionItem({ item }: { item: AcordeonType }) {
 								key={blockIndex}
 								className={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 text-base text-gray-600 space-y-1`}
 							>
-								{(block.children || []).map((listItem: any, i: number) => (
+								{(block.children || []).map((listItem: StrapiBlockChild, i: number) => (
 									<li key={i} className="text-gray-600">
 										{renderTextNodes(listItem.children || [])}
 									</li>

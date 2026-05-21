@@ -7,6 +7,7 @@ interface Props {
 }
 
 const { videoId, title, backgroundImage, withShadowImage } = Astro.props;
+const videoTitle = title || "Reproducir video";
 ---
 
 <div class="relative flex items-center justify-center">
@@ -29,16 +30,16 @@ const { videoId, title, backgroundImage, withShadowImage } = Astro.props;
       ? { style: `background-image: url('${backgroundImage}')` }
       : {}}
     tabindex="0"
-    aria-label="button"
+    aria-label={videoTitle}
+    title={videoTitle}
   >
     <a
       href={`https://youtube.com/watch?v=${videoId}`}
       class="lty-playbtn"
-      title={title}
-      role="button"
-      tabindex="0"
+      title={videoTitle}
+      aria-label={videoTitle}
     >
-      <span class="lyt-visually-hidden">{title}</span>
+      <span class="lyt-visually-hidden">{videoTitle}</span>
     </a>
   </lite-youtube>
 

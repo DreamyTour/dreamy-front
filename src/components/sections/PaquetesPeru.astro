@@ -1,14 +1,13 @@
 ---
-import type { boliviaPaquetes } from "@/interface/home";
-import type { Tour } from "@/interface/tours";
+import type { peruPaquetes } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
-import fetchApi from "@/lib/strapi";
+import { fetchToursByCategory } from "@/lib/strapiQueries";
 import ToursSlider from "@/components/ui/ToursSlider.astro";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
-  data?: boliviaPaquetes;
+  data?: peruPaquetes;
   lang: Lang;
 }
 
@@ -18,21 +17,11 @@ const t = useTranslations(lang);
 
 if (!data) return;
 
-// Fetch tours by category slug
-let tours: Tour[] = [];
-if (data.category?.slug) {
-  const response = await fetchApi<Tour[]>({
-    endpoint: "tours",
-    wrappedByKey: "data",
-    locale: lang,
-    query: {
-      "filters[categories][slug][$eq]": data.category.slug,
-      "pagination[limit]": String(data.limit || 3),
-      populate: "*",
-    },
-  });
-  tours = response && Array.isArray(response) ? response : [];
-}
+const tours = await fetchToursByCategory({
+  categorySlug: data.category?.slug,
+  lang,
+  limit: data.limit || 3,
+});
 
 const hasTours = tours.length > 0;
 const badgeText =
@@ -49,7 +38,7 @@ const availabilityText = {
 }[lang] || { title: "Check Availability", subtitle: "Book your adventure" };
 ---
 
-<section class="w-full py-16 bg-primary/5">
+<section class="w-full py-16">
   <div class="max-w-8xl mx-auto px-6">
     <div
       class="mb-14 md:mb-20 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-between"
@@ -117,7 +106,7 @@ const availabilityText = {
         data.category?.slug && (
           <div class="w-full lg:w-[380px] shrink-0 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 border-l-[6px] border-secondary flex flex-col justify-center">
             <div class="flex items-center gap-4 mb-5">
-              <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white shadow-md">
+              <div class="w-12 h-12 bg-secondary/90 rounded-full flex items-center justify-center text-white shadow-md">
                 <svg
                   class="h-6 w-6"
                   fill="none"

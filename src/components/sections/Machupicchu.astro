@@ -1,11 +1,10 @@
 ---
-import type { SectionMapi } from "@/interface/home";
-import type { Tour } from "@/interface/tours";
+import type { SectionMapi } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
-import fetchApi from "@/lib/strapi";
+import { fetchToursByCategory } from "@/lib/strapiQueries";
 import ToursSlider from "@/components/ui/ToursSlider.astro";
-import { rewriteUrl, dedupeLocalizedDocuments } from "@/lib/utils";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   data?: SectionMapi;
@@ -18,21 +17,11 @@ const t = useTranslations(lang);
 
 if (!data) return;
 
-// Fetch tours by category slug
-let tours: Tour[] = [];
-if (data.category?.slug) {
-  const response = await fetchApi<Tour[]>({
-    endpoint: "tours",
-    wrappedByKey: "data",
-    locale: lang,
-    query: {
-      "filters[categories][slug][$eq]": data.category.slug,
-      "pagination[limit]": String(data.limit || 10),
-      populate: "*",
-    },
-  });
-  tours = response && Array.isArray(response) ? dedupeLocalizedDocuments(response) : [];
-}
+const tours = await fetchToursByCategory({
+  categorySlug: data.category?.slug,
+  lang,
+  limit: data.limit || 10,
+});
 
 const hasTours = tours.length > 0;
 const badgeText =
@@ -95,9 +84,9 @@ const availabilityText = {
         </div>
 
         {
-          (data as any).description ? (
+          data.description ? (
             <p class="text-gray-600 leading-relaxed text-base">
-              {(data as any).description}
+              {data.description}
             </p>
           ) : (
             <p class="text-gray-600 leading-relaxed text-base">

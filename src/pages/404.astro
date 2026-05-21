@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import Layout from "@/layouts/main.astro";
-import { DEFAULT_LANG, LANGS, type Lang } from "@/lib/i18n";
+import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 
 /**
  * 404 Page (SSR)
@@ -126,10 +126,10 @@ const seoProps = {
   <!-- Countdown + redirect -->
   <script is:inline define:vars={{ homeUrl }}>
     (function () {
-      var countdown = 5;
-      var node = document.getElementById("redirect-countdown");
+      let countdown = 5;
+      const node = document.getElementById("redirect-countdown");
 
-      var id = window.setInterval(function () {
+      const id = window.setInterval(function () {
         countdown -= 1;
         if (node && countdown >= 0) node.textContent = String(countdown);
         if (countdown <= 0) {
@@ -140,7 +140,7 @@ const seoProps = {
 
       // Limpieza oficial de Astro View Transitions: si el usuario hace clic
       // en un enlace (ej: logo) se aborta el intervalo de inmediato.
-      var cleanup = function () {
+      const cleanup = function () {
         window.clearInterval(id);
         document.removeEventListener("astro:before-preparation", cleanup);
       };

@@ -1,11 +1,14 @@
 ---
 import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
-import type { Blog } from "@/interface/blog";
+import type { Blog, CategoryBlog } from "@/types/blog";
+import type { Imagen, Logo } from "@/types/common";
+import type { StrapiBlock, StrapiBlockChild } from "@/types/page";
 import { LANGS, DEFAULT_LANG } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
-import LiteYouTube from "@/components/LiteYouTube.astro";
+import LiteYouTube from "@/components/content/LiteYouTube.astro";
 import TableOfContents from "@/components/ui/TableOfContents.astro";
 import {
   getImageAlt,
@@ -15,9 +18,22 @@ import {
 } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 
+type GlobalData = { footer?: { socialLogo?: Logo[] }; socialLogo?: Logo[] };
+type BlogPostProps = {
+  blog: Blog;
+  lang: Lang;
+  allCategories: CategoryBlog[];
+  slugMap: Record<string, string>;
+  globalData: GlobalData;
+  relatedBlogs: Blog[];
+  isRedirect?: boolean;
+  redirectTo?: string;
+};
+type BlogImage = Imagen & { caption?: string };
+
 // Generate SEO description from JSON blocks
 function generateDescription(
-  blocks: unknown[] | undefined,
+  blocks: unknown,
   maxLength = 160,
 ): string {
   if (!blocks || !Array.isArray(blocks)) return "";
@@ -47,14 +63,14 @@ function generateSlug(text: string): string {
 }
 
 // Extract all H2 headings from content for TOC
-function extractHeadings(blocks: any[]): { id: string; text: string }[] {
+function extractHeadings(blocks: unknown): { id: string; text: string }[] {
   if (!blocks || !Array.isArray(blocks)) return [];
 
   const headings: { id: string; text: string }[] = [];
 
   for (const block of blocks) {
     if (block.type === "heading" && block.level === 2) {
-      const text = block.children?.map((c: any) => c.text).join("") || "";
+      const text = block.children?.map((c: StrapiBlockChild) => c.text).join("") || "";
       headings.push({
         id: generateSlug(text),
         text,
@@ -66,20 +82,9 @@ function extractHeadings(blocks: any[]): { id: string; text: string }[] {
 }
 
 // Find the index of the first H2 in the content
-function findFirstH2Index(blocks: any[]): number {
-  if (!blocks || !Array.isArray(blocks)) return -1;
-
-  for (let i = 0; i < blocks.length; i++) {
-    if (blocks[i].type === "heading" && blocks[i].level === 2) {
-      return i;
-    }
-  }
-
-  return -1;
-}
 
 // Extract YouTube video ID from URL
-function getYouTubeVideoId(url: string): string | null {
+function getYouTubeVideoId(url: string | undefined): string | null {
   if (!url) return null;
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/,
@@ -94,7 +99,7 @@ function getYouTubeVideoId(url: string): string | null {
 
 export async function getStaticPaths() {
   const allBlogsByLang: Record<string, Blog[]> = {};
-  const globalDataByLang: Record<string, any> = {};
+  const globalDataByLang: Record<string, GlobalData> = {};
   const relatedBlogsByLang: Record<string, Record<string, Blog[]>> = {};
 
   // Fetch blogs and global data for each language
@@ -107,7 +112,7 @@ export async function getStaticPaths() {
     allBlogsByLang[lang] = blogs && Array.isArray(blogs) ? blogs : [];
 
     // Fetch global data for social logos; backend middleware already populates it
-    const globalData = await fetchApi<any>({
+    const globalData = await fetchApi<GlobalData>({
       endpoint: "global",
       wrappedByKey: "data",
       locale: lang,
@@ -123,8 +128,8 @@ export async function getStaticPaths() {
         .filter(
           (b) =>
             b.documentId !== blog.documentId && // Not the same post
-            b.category_blogs?.some((cat: any) =>
-              categories.some((c: any) => c.documentId === cat.documentId),
+            b.category_blogs?.some((cat: CategoryBlog) =>
+              categories.some((c: CategoryBlog) => c.documentId === cat.documentId),
             ),
         )
         .slice(0, 3); // Max 3 related posts
@@ -145,10 +150,10 @@ export async function getStaticPaths() {
     }
   }
 
-  const paths: any[] = [];
+  const paths: Array<{ params: { lang: string; slug: string }; props: Record<string, unknown> }> = [];
 
   for (const lang of LANGS) {
-    const cats = await fetchApi<any[]>({
+    const cats = await fetchApi<CategoryBlog[]>({
       endpoint: "category-blogs",
       wrappedByKey: "data",
       locale: lang,
@@ -219,6 +224,7 @@ export async function getStaticPaths() {
   return paths;
 }
 
+const props = Astro.props as BlogPostProps;
 const {
   blog,
   lang,
@@ -228,7 +234,7 @@ const {
   relatedBlogs,
   isRedirect,
   redirectTo,
-} = Astro.props;
+} = props;
 
 // Redirect 301 si la página no existe en este idioma
 if (isRedirect && redirectTo) {
@@ -252,7 +258,12 @@ const seoProps = buildSEOProps({
 
 // Extract headings for TOC
 const tocHeadings = extractHeadings(blog.contenido);
-const firstH2Index = findFirstH2Index(blog.contenido);
+const heroImage = getImageUrl(blog.portadaImage, "large");
+const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
+  "small",
+  "medium",
+  "large",
+]);
 ---
 
 <Layout seo={seoProps} lang={lang}>
@@ -260,10 +271,16 @@ const firstH2Index = findFirstH2Index(blog.contenido);
   {
     blog.portadaImage ? (
       <div class="mt-8 relative w-full max-w-8xl mx-auto h-[50vh] min-h-[400px] max-h-[600px] overflow-hidden rounded-sm">
-        {/* Imagen de fondo */}
-        <div
-          class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={`background-image: url('${getImageUrl(blog.portadaImage)}')`}
+        <img
+          src={heroImage}
+          srcset={heroImageSrcSet || undefined}
+          sizes="100vw"
+          alt=""
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
         />
         {/* Overlay oscuro */}
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
@@ -272,7 +289,7 @@ const firstH2Index = findFirstH2Index(blog.contenido);
         <div class="relative z-10 max-w-8xl mx-auto px-4 md:px-8 h-full flex flex-col justify-end pb-12">
           {/* Categoría */}
           <div class="flex flex-wrap gap-3 mb-4">
-            {blog.category_blogs?.map((cat: any) => (
+            {blog.category_blogs?.map((cat: CategoryBlog) => (
               <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 backdrop-blur-sm text-white uppercase tracking-wider border border-primary">
                 {cat.nombre}
               </span>
@@ -311,7 +328,7 @@ const firstH2Index = findFirstH2Index(blog.contenido);
       <div class="max-w-8xl mx-auto px-4 md:px-8 py-16">
         <div class="text-center">
           <div class="flex flex-wrap justify-center gap-3 mb-6">
-            {blog.category_blogs?.map((cat: any) => (
+            {blog.category_blogs?.map((cat: CategoryBlog) => (
               <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary uppercase tracking-wider">
                 {cat.nombre}
               </span>
@@ -355,11 +372,11 @@ const firstH2Index = findFirstH2Index(blog.contenido);
         <div class="w-full text-foreground">
           {
             blog.contenido && Array.isArray(blog.contenido) ? (
-              blog.contenido.map((block: any) => {
+              (blog.contenido as StrapiBlock[]).map((block: StrapiBlock) => {
                 if (block.type === "paragraph") {
                   return (
                     <p class="mb-7 text-base leading-[1.8] text-muted-foreground">
-                      {block.children?.map((child: any) => {
+                      {block.children?.map((child: StrapiBlockChild) => {
                         let text = child.text;
                         if (child.bold)
                           return (
@@ -384,42 +401,29 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                   );
                 }
                 if (block.type === "heading") {
-                  const Tag = `h${block.level}` as any;
+                  const level = block.level as number | undefined;
                   const headingText =
-                    block.children?.map((child: any) => child.text).join("") ||
+                    block.children?.map((child: StrapiBlockChild) => child.text).join("") ||
                     "";
                   const headingId = generateSlug(headingText);
-                  return (
-                    <Tag
-                      id={headingId}
-                      class={
-                        block.level === 1
-                          ? "mt-12 mb-6 text-3xl font-bold tracking-tight text-foreground"
-                          : block.level === 2
-                            ? "mt-10 mb-5 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground"
-                            : block.level === 3
-                              ? "mt-8 mb-4 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
-                              : block.level === 4
-                                ? "mt-6 mb-3 scroll-mt-24 text-lg font-semibold text-foreground"
-                                : "mt-5 mb-2 scroll-mt-24 text-base font-semibold text-foreground"
-                      }
-                    >
-                      {headingText}
-                    </Tag>
-                  );
+                  if (level === 1) return <h2 id={headingId} class="mt-12 mb-6 text-3xl font-bold tracking-tight text-foreground">{headingText}</h2>;
+                  if (level === 2) return <h2 id={headingId} class="mt-10 mb-5 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground">{headingText}</h2>;
+                  if (level === 3) return <h3 id={headingId} class="mt-8 mb-4 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground">{headingText}</h3>;
+                  if (level === 4) return <h4 id={headingId} class="mt-6 mb-3 scroll-mt-24 text-lg font-semibold text-foreground">{headingText}</h4>;
+                  return <h5 id={headingId} class="mt-5 mb-2 scroll-mt-24 text-base font-semibold text-foreground">{headingText}</h5>;
                 }
                 if (block.type === "list") {
                   const ListTag =
-                    block.format === "ordered" ? ("ol" as any) : ("ul" as any);
+                    block.format === "ordered" ? "ol" : "ul";
                   const listClasses =
                     block.format === "ordered"
                       ? "mb-4 list-decimal space-y-3 pl-6 text-base leading-[1.8] text-muted-foreground marker:text-muted-foreground"
                       : "mb-4 list-disc space-y-3 pl-6 text-base leading-[1.8] text-muted-foreground marker:text-muted-foreground";
                   return (
                     <ListTag class={listClasses}>
-                      {block.children?.map((item: any) => (
+                      {block.children?.map((item: StrapiBlockChild) => (
                         <li class="pl-2">
-                          {item.children?.map((child: any) => {
+                          {item.children?.map((child: StrapiBlockChild) => {
                             let text = child.text;
                             if (child.bold)
                               return (
@@ -449,12 +453,13 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                   );
                 }
                 if (block.type === "image") {
+                  const image = block.image as BlogImage | undefined;
                   return (
                     <figure class="my-10 mx-auto">
                       <img
-                        src={getImageUrl(block.image)}
+                        src={getImageUrl(image, "large")}
                         srcset={
-                          getImageSrcSet(block.image, [
+                          getImageSrcSet(image, [
                             "thumbnail",
                             "small",
                             "medium",
@@ -462,14 +467,14 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                           ]) || undefined
                         }
                         sizes="(max-width: 1023px) 100vw, 75vw"
-                        alt={getImageAlt(block.image, "Blog image")}
+                        alt={getImageAlt(image, "Blog image")}
                         class="h-auto w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
                         loading="lazy"
                         decoding="async"
                       />
-                      {block.image?.caption && (
+                      {image?.caption && (
                         <figcaption class="mt-3 text-center text-sm font-medium text-muted-foreground">
-                          {block.image.caption}
+                          {image.caption}
                         </figcaption>
                       )}
                     </figure>
@@ -480,9 +485,15 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                   (block.__component === "shared.video" ||
                     block.component === "shared.video")
                 ) {
-                  const videoId = getYouTubeVideoId(
-                    block.videoURL || block.videoUrl,
-                  );
+                  const videoUrl =
+                    typeof block.videoURL === "string"
+                      ? block.videoURL
+                      : typeof block.videoUrl === "string"
+                        ? block.videoUrl
+                        : undefined;
+                  const videoTitle =
+                    typeof block.title === "string" ? block.title : "Video";
+                  const videoId = getYouTubeVideoId(videoUrl);
                   if (videoId) {
                     const thumbnailUrl = getThumbnailUrl(block.thumbnail);
                     return (
@@ -491,7 +502,7 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                           <div class="hidden lg:block lg:w-[380px] shrink-0">
                             <LiteYouTube
                               videoId={videoId}
-                              title={block.title || "Video"}
+                              title={videoTitle}
                               backgroundImage={thumbnailUrl || undefined}
                               withShadowImage={!!thumbnailUrl}
                             />
@@ -499,7 +510,7 @@ const firstH2Index = findFirstH2Index(blog.contenido);
                           <div class="lg:hidden w-full">
                             <LiteYouTube
                               videoId={videoId}
-                              title={block.title || "Video"}
+                              title={videoTitle}
                               backgroundImage={thumbnailUrl || undefined}
                               withShadowImage={!!thumbnailUrl}
                             />
@@ -564,7 +575,7 @@ const firstH2Index = findFirstH2Index(blog.contenido);
 
 {
   slugMap && Object.keys(slugMap).length > 0 && (
-    <script
+    <script is:inline
       id="blog-slug-map"
       type="application/json"
       set:html={JSON.stringify(slugMap)}

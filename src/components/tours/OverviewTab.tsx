@@ -3,7 +3,7 @@ import type {
 	StrapiBlock,
 	StrapiBlockChild,
 	Timeline,
-} from "@/interface/tours";
+} from "@/types/tours";
 import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface OverviewTabProps {
@@ -16,7 +16,7 @@ export default function OverviewTab({ timeline }: OverviewTabProps) {
 	const ItemsDayContent = ({ content }: { content: StrapiBlock[] }) => {
 		if (!content || !Array.isArray(content)) return null;
 
-		const renderTextNodes = (children: any[]) => {
+		const renderTextNodes = (children: StrapiBlockChild[]) => {
 			return children.map((child, i) => {
 				if (!child.text) return null;
 				let textElement: React.ReactNode = child.text;

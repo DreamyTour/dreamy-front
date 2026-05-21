@@ -4,14 +4,14 @@ import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 
 import fetchApi from "@/lib/strapi";
-import type { Global } from "@/interface/global";
-import { LANGS, DEFAULT_LANG, isValidLang, type Lang } from "@/lib/i18n";
-import Header from "@/components/Header.astro";
-import Footer from "@/components/Footer.astro";
-import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton.astro";
+import type { Global } from "@/types/global";
+import { DEFAULT_LANG, isValidLang, type Lang } from "@/lib/i18n";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+import WhatsAppFloatingButton from "@/components/layout/WhatsAppFloatingButton.astro";
 import { rewriteMenuUrls } from "@/lib/utils";
-import SEO from "@/components/SEO.astro";
-import type { SEOProps } from "@/components/SEO.astro";
+import SEO from "@/components/layout/SEO.astro";
+import type { SEOProps } from "@/components/layout/SEO.astro";
 
 interface Props {
   seo?: SEOProps;

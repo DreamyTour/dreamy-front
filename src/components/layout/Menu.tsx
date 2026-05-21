@@ -15,11 +15,10 @@ import type {
 	Logo,
 	MenuItem,
 	Menu as MenuType,
-} from "@/interface/global";
-import { getImageUrl } from "@/lib/helpers";
+} from "@/types/global";
 import type { Lang } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
-import { LanguageSwitcher } from "./LanguageSwitcher";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface MainMenuProps {
 	menu: MenuType;
@@ -177,13 +176,18 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 					{/* Hamburgesa */}
 					<div className="flex-1 flex justify-end">
 						<button
+							type="button"
 							onClick={() => setMobileOpen(!mobileOpen)}
 							className="p-2 rounded-md -ml-2 text-foreground/70 transition-colors duration-200 hover:text-primary"
 							aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
 							aria-expanded={mobileOpen}
 							aria-controls="mobile-menu"
 						>
-							{mobileOpen ? <X size={24} /> : <Menu size={24} />}
+							{mobileOpen ? (
+								<X size={24} aria-hidden="true" focusable="false" />
+							) : (
+								<Menu size={24} aria-hidden="true" focusable="false" />
+							)}
 						</button>
 					</div>
 				</div>
@@ -198,21 +202,21 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 							aria-hidden="true"
 						/>
 						{/* Menu items */}
-						<div
+						<nav
 							id="mobile-menu"
 							className="absolute top-[64px] left-0 w-full z-50 bg-background pb-4 rounded-b-lg"
-							role="navigation"
 							aria-label="Menú principal"
 						>
 							{/* Botón de cerrar */}
 							<div className="flex justify-end px-4 pt-4">
 								<button
+									type="button"
 									ref={closeButtonRef}
 									onClick={() => setMobileOpen(false)}
 									className="p-2 -mr-2 rounded-md text-muted-foreground transition-colors duration-200 hover:text-primary"
 									aria-label="Cerrar menú"
 								>
-									<X size={24} />
+									<X size={24} aria-hidden="true" focusable="false" />
 								</button>
 							</div>
 
@@ -245,7 +249,7 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 									);
 								})}
 							</ul>
-						</div>
+						</nav>
 					</>
 				)}
 			</div>
@@ -269,6 +273,7 @@ function MobileAccordion({ item, closeMenu, lang }: MobileAccordionProps) {
 		<div>
 			{/* TÍTULO = TOGGLE */}
 			<button
+				type="button"
 				onClick={() => setOpen(!open)}
 				className="flex w-full items-center gap-2 py-3 font-medium text-foreground/80 transition-colors duration-200 hover:text-primary"
 				aria-expanded={open}
@@ -277,6 +282,8 @@ function MobileAccordion({ item, closeMenu, lang }: MobileAccordionProps) {
 				<ChevronDown
 					size={18}
 					className={`ml-auto transition-transform ${open ? "rotate-180" : ""}`}
+					aria-hidden="true"
+					focusable="false"
 				/>
 			</button>
 

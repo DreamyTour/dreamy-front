@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Calendar,
 	Users,
@@ -11,15 +11,44 @@ import {
 } from "lucide-react";
 import countriesData from "@/data/countries.json";
 
+interface BookingCart {
+	tourId?: string | number;
+	tourName?: string;
+	pricePerPerson?: number;
+	totalPrice: number;
+	passengers: number;
+	date?: string;
+	lang?: string;
+}
+
+interface Passenger {
+	name: string;
+	lastname: string;
+	gender: string;
+	dob: string;
+	documentType: string;
+	documentNumber: string;
+	country: string;
+}
+
+interface Country {
+	nameES: string;
+	nameEN: string;
+	iso2: string;
+	phoneCode?: string;
+}
+
+const countries = countriesData as Country[];
+
 export default function CheckoutSummary() {
-	const [cart, setCart] = useState<any>(null);
+	const [cart, setCart] = useState<BookingCart | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [step, setStep] = useState(1);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	// states for Passenger Step
-	const [passengers, setPassengers] = useState<any[]>([]);
+	const [passengers, setPassengers] = useState<Passenger[]>([]);
 	const [contact, setContact] = useState({
 		firstname: "",
 		lastname: "",
@@ -38,7 +67,7 @@ export default function CheckoutSummary() {
 		const savedCart = window.localStorage.getItem("bookingCart");
 		if (savedCart) {
 			try {
-				const parsedCart = JSON.parse(savedCart);
+				const parsedCart = JSON.parse(savedCart) as BookingCart;
 				setCart(parsedCart);
 				// Initialize passengers array based on count
 				setPassengers(
@@ -104,7 +133,7 @@ export default function CheckoutSummary() {
 
 	const handlePassengerChange = (
 		index: number,
-		field: string,
+		field: keyof Passenger,
 		value: string,
 	) => {
 		const newPax = [...passengers];
@@ -222,6 +251,7 @@ export default function CheckoutSummary() {
 					<div className="flex flex-col md:flex-row justify-between items-center gap-6">
 						{/* Step 1 */}
 						<button
+							type="button"
 							onClick={() => setStep(1)}
 							className="flex items-center gap-3 group"
 						>
@@ -246,6 +276,7 @@ export default function CheckoutSummary() {
 
 						{/* Step 2 */}
 						<button
+							type="button"
 							onClick={() => step > 1 && setStep(2)}
 							disabled={step <= 1}
 							className={`flex items-center gap-3 ${step > 1 ? "group cursor-pointer" : "cursor-default"}`}
@@ -375,6 +406,7 @@ export default function CheckoutSummary() {
 						{/* Continue Button */}
 						<div className="flex justify-end mt-8">
 							<button
+								type="button"
 								onClick={() => setStep(2)}
 								className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-4 rounded-sm shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
 							>
@@ -538,7 +570,7 @@ export default function CheckoutSummary() {
 												}
 												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm bg-white"
 											>
-												{countriesData.map((c: any) => (
+												{countries.map((c) => (
 													<option key={`country-${c.iso2}`} value={c.iso2}>
 														{lang === "es" ? c.nameES : c.nameEN}
 													</option>
@@ -611,9 +643,9 @@ export default function CheckoutSummary() {
 											}
 											className="px-3 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm bg-white"
 										>
-											{countriesData
-												.filter((c: any) => c.phoneCode)
-												.map((c: any) => (
+											{countries
+												.filter((c) => c.phoneCode)
+												.map((c) => (
 													<option
 														key={`phone-${c.iso2}`}
 														value={`+${c.phoneCode}`}
@@ -653,14 +685,14 @@ export default function CheckoutSummary() {
 							<span className="text-gray-600 text-sm">
 								I have read and accept the{" "}
 								<a
-									href="#"
+									href="/terms-and-conditions"
 									className="text-primary font-semibold hover:underline"
 								>
 									Terms and Conditions
 								</a>{" "}
 								and{" "}
 								<a
-									href="#"
+									href="/booking-policies"
 									className="text-primary font-semibold hover:underline"
 								>
 									Booking Policies
@@ -672,6 +704,7 @@ export default function CheckoutSummary() {
 						{/* Navigation */}
 						<div className="flex justify-between items-center pt-6 border-t border-gray-100">
 							<button
+								type="button"
 								onClick={() => setStep(1)}
 								className="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-800 transition-colors"
 							>
@@ -679,6 +712,7 @@ export default function CheckoutSummary() {
 								Back to Itinerary
 							</button>
 							<button
+								type="button"
 								onClick={() => {
 									if (validateStep2()) setStep(3);
 								}}
@@ -716,7 +750,7 @@ export default function CheckoutSummary() {
 								Payment Method
 							</h3>
 							<div className="mb-8">
-								<label
+								<div
 									className={`flex items-center justify-between p-5 rounded-sm border-2 cursor-pointer transition-all ${
 										true // Always selected since only PayPal
 											? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
@@ -741,7 +775,7 @@ export default function CheckoutSummary() {
 									<div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
 										<Check className="w-4 h-4 text-white" />
 									</div>
-								</label>
+								</div>
 							</div>
 
 							{/* Payment Amount - The stars of the show */}
@@ -751,7 +785,8 @@ export default function CheckoutSummary() {
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 								{/* Minimum Payment */}
-								<label
+								<button
+									type="button"
 									onClick={() => setPaymentOption("minimum")}
 									className={`relative flex flex-col min-h-[180px] p-5 rounded-sm border-2 cursor-pointer transition-all duration-300 ${
 										paymentOption === "minimum"
@@ -804,10 +839,11 @@ export default function CheckoutSummary() {
 											+US${((totalPrice / 2) * 0.08).toFixed(2)}
 										</span>
 									</div>
-								</label>
+								</button>
 
 								{/* Total Payment */}
-								<label
+								<button
+									type="button"
 									onClick={() => setPaymentOption("total")}
 									className={`relative flex flex-col min-h-[180px] p-5 rounded-sm border-2 cursor-pointer transition-all duration-300 ${
 										paymentOption === "total"
@@ -855,7 +891,7 @@ export default function CheckoutSummary() {
 											+US${(totalPrice * 0.08).toFixed(2)}
 										</span>
 									</div>
-								</label>
+								</button>
 							</div>
 
 							{/* Total to Pay */}
@@ -876,6 +912,7 @@ export default function CheckoutSummary() {
 							{/* Pay Button */}
 							<div className="flex justify-between items-center">
 								<button
+									type="button"
 									onClick={() => setStep(2)}
 									className="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-800 transition-colors"
 								>
@@ -883,6 +920,7 @@ export default function CheckoutSummary() {
 									Back to Passengers
 								</button>
 								<button
+									type="button"
 									onClick={handlePayNow}
 									disabled={isSubmitting}
 									className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-10 rounded-sm shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-lg"

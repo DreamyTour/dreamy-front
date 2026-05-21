@@ -1,39 +1,45 @@
+type QueryValue =
+	| string
+	| number
+	| boolean
+	| null
+	| undefined
+	| Record<string, unknown>
+	| unknown[];
+
 interface Props {
 	endpoint: string;
-	query?: Record<string, any>;
+	query?: Record<string, QueryValue>;
 	wrappedByKey?: string;
 	wrappedByList?: boolean;
-	locale?: string; // 👈 NUEVO
+	locale?: string;
 }
 
-// Global cache to avoid redundant requests during Astro builds
-const requestCache = new Map<string, any>();
+type StrapiListResponse<T> = {
+	data: T[];
+	meta?: {
+		pagination?: {
+			pageCount?: number;
+		};
+	};
+};
 
-/**
- * Fetches data from the Strapi API
- */
-export default async function fetchApi<T>({
-	endpoint,
-	query,
-	wrappedByKey,
-	wrappedByList,
-	locale,
-}: Props): Promise<T> {
-	if (endpoint.startsWith("/")) {
-		endpoint = endpoint.slice(1);
-	}
+const requestCache = new Map<string, unknown>();
 
+function buildStrapiUrl({ endpoint, query, locale }: Props) {
+	const normalizedEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
 	const baseUrl = import.meta.env.VITE_STRAPI_URL;
 
 	if (!baseUrl) {
-		throw new Error("VITE_STRAPI_URL no está definida");
+		throw new Error("VITE_STRAPI_URL no esta definida");
 	}
 
-	const url = new URL(`/api/${endpoint}`, baseUrl);
+	const url = new URL(`/api/${normalizedEndpoint}`, baseUrl);
 
-	// 🔹 Query params - maneja objetos anidados para populate
 	if (query) {
 		Object.entries(query).forEach(([key, value]) => {
+			if (value === undefined || value === null) return;
+
 			if (typeof value === "object") {
 				url.searchParams.append(key, JSON.stringify(value));
 			} else {
@@ -42,33 +48,55 @@ export default async function fetchApi<T>({
 		});
 	}
 
-	// 🔹 Locale (CLAVE)
 	if (locale) {
 		url.searchParams.set("locale", locale);
 	}
 
+	return url;
+}
+
+function unwrapData<T>(data: unknown, wrappedByKey?: string, wrappedByList?: boolean) {
+	let result = data;
+
+	if (wrappedByKey && result && typeof result === "object") {
+		result = (result as Record<string, unknown>)[wrappedByKey];
+	}
+	if (wrappedByList && Array.isArray(result)) result = result[0];
+
+	return result as T;
+}
+
+async function readJsonResponse<T>(res: Response, url: string): Promise<T> {
+	if (!res.ok) {
+		throw new Error(`Strapi request failed (${res.status}) for ${url}`);
+	}
+
+	return res.json() as Promise<T>;
+}
+
+/**
+ * Fetches data from the Strapi API.
+ */
+export default async function fetchApi<T>({
+	endpoint,
+	query,
+	wrappedByKey,
+	wrappedByList,
+	locale,
+}: Props): Promise<T> {
+	const url = buildStrapiUrl({ endpoint, query, locale });
 	const urlString = url.toString();
 
-	// Check cache
 	if (requestCache.has(urlString)) {
-		let data = requestCache.get(urlString);
-		if (wrappedByKey) data = data[wrappedByKey];
-		if (wrappedByList) data = data[0];
-		return data as T;
+		return unwrapData<T>(requestCache.get(urlString), wrappedByKey, wrappedByList);
 	}
 
 	const res = await fetch(urlString);
-	const rawData = await res.json();
+	const rawData = await readJsonResponse<unknown>(res, urlString);
 
-	// Store raw data in cache before wrapping
 	requestCache.set(urlString, rawData);
 
-	let data = rawData;
-
-	if (wrappedByKey) data = data[wrappedByKey];
-	if (wrappedByList) data = data[0];
-
-	return data as T;
+	return unwrapData<T>(rawData, wrappedByKey, wrappedByList);
 }
 
 /**
@@ -80,8 +108,8 @@ export async function fetchAllStrapi<T>({
 	query = {},
 	locale,
 }: Omit<Props, "wrappedByKey" | "wrappedByList">): Promise<T[]> {
-	const pageSize = 100; // Optimal page size for fetching
-	const firstPageRes = await fetchApi<{ data: T[]; meta: { pagination: { pageCount: number } } }>({
+	const pageSize = 100;
+	const firstPageRes = await fetchApi<StrapiListResponse<T>>({
 		endpoint,
 		locale,
 		query: {
@@ -91,17 +119,18 @@ export async function fetchAllStrapi<T>({
 		},
 	});
 
-	const allData: T[] = firstPageRes.data && Array.isArray(firstPageRes.data) ? [...firstPageRes.data] : [];
+	const allData = Array.isArray(firstPageRes.data) ? [...firstPageRes.data] : [];
 	const pageCount = firstPageRes.meta?.pagination?.pageCount || 1;
 
 	if (pageCount > 1) {
-		const CONCURRENCY_LIMIT = 5; // Evita saturar el servidor de Strapi
-		for (let i = 2; i <= pageCount; i += CONCURRENCY_LIMIT) {
+		const concurrencyLimit = 5;
+
+		for (let i = 2; i <= pageCount; i += concurrencyLimit) {
 			const batchPromises: Promise<void>[] = [];
-			
-			for (let page = i; page < i + CONCURRENCY_LIMIT && page <= pageCount; page++) {
+
+			for (let page = i; page < i + concurrencyLimit && page <= pageCount; page++) {
 				batchPromises.push(
-					fetchApi<{ data: T[] }>({
+					fetchApi<StrapiListResponse<T>>({
 						endpoint,
 						locale,
 						query: {
@@ -110,14 +139,13 @@ export async function fetchAllStrapi<T>({
 							"pagination[pageSize]": pageSize,
 						},
 					}).then((res) => {
-						if (res.data && Array.isArray(res.data)) {
+						if (Array.isArray(res.data)) {
 							allData.push(...res.data);
 						}
-					})
+					}),
 				);
 			}
 
-			// Espera a que termine este lote antes de empezar el siguiente
 			await Promise.all(batchPromises);
 		}
 	}

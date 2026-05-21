@@ -14,6 +14,8 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const getLogoSrc = (logo: string | ImageMetadata) =>
+  typeof logo === "string" ? logo : logo.src;
 
 const certifications = [
   {
@@ -101,7 +103,7 @@ const certifications = [
           certifications.map((certification) => (
             <div class="flex justify-center items-center group hover:scale-110 transition-transform duration-300 ease-in-out">
               <img
-                src={certification.logo.src || certification.logo}
+                src={getLogoSrc(certification.logo)}
                 alt={certification.alt}
                 class={certification.size}
                 loading="lazy"

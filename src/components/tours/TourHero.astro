@@ -1,5 +1,5 @@
 ---
-import type { Tour, Badge } from "@/interface/tours";
+import type { Tour, Badge } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
 import { getImageAlt, getImageSrcSet, getImageUrl, extractTextFromBlocks } from "@/lib/helpers";
@@ -76,7 +76,7 @@ const hasBadges = badges && badges.length > 0;
         sizes="(max-width: 767px) 100vw, 25vw"
         alt={subImage1.alt || `${tour.titulo} 1`}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-        loading="eager"
+        loading="lazy"
         decoding="async"
       />
       <div
@@ -95,7 +95,7 @@ const hasBadges = badges && badges.length > 0;
         sizes="(max-width: 767px) 100vw, 25vw"
         alt={subImage2.alt || `${tour.titulo} 2`}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-        loading="eager"
+        loading="lazy"
         decoding="async"
       />
       <div
@@ -124,6 +124,8 @@ const hasBadges = badges && badges.length > 0;
               class="w-full h-full object-cover"
               width="320"
               height="320"
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchpriority={i === 0 ? "high" : "auto"}
               decoding="async"
             />
             {i === 2 && showGalleryButton && (
