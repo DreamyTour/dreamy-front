@@ -15,6 +15,13 @@ const { data, lang } = Astro.props;
 
 const t = useTranslations(lang);
 
+const peruSlugMap = {
+  es: "paquetes-peru",
+  en: "peru-packages",
+  pt: "pacotes-peru",
+};
+const peruSlug = peruSlugMap[lang] || "peru-packages";
+
 if (!data) return;
 
 const tours = await fetchToursByCategory({
@@ -131,7 +138,7 @@ const availabilityText = {
               </div>
             </div>
             <a
-              href={rewriteUrl(`/${data.category.slug}`, lang)}
+              href={rewriteUrl(`/${peruSlug}`, lang)}
               aria-label={t("aria.verMasSeccion")}
               class="w-full flex justify-between items-center border-secondary border hover:text-white hover:bg-secondary text-secondary bg-secondary/10 font-semibold py-3.5 px-5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:border-transparent"
             >
