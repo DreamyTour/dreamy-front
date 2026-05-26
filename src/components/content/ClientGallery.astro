@@ -2,7 +2,11 @@
 import fetchApi from "@/lib/strapi";
 import type { GaleriaResponse, GaleriaItem } from "@/types/galeria";
 import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
-import { ZoomIcon, ArrowLeftIcon, ArrowRightIcon } from "@/components/icons/NavigationIcons";
+import {
+  ZoomIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from "@/components/icons/NavigationIcons";
 
 interface Props {
   totalImages?: number;
@@ -25,12 +29,21 @@ const galleryData = await fetchApi<GaleriaResponse>({
 
 // Extraer las imágenes del array galeria
 const galeriaItems = galleryData?.data?.[0]?.galeria || [];
-const validItems: { img: string; srcSet: string; fullImg: string; alt: string }[] = [];
+const validItems: {
+  img: string;
+  srcSet: string;
+  fullImg: string;
+  alt: string;
+}[] = [];
 
 galeriaItems.forEach((item: GaleriaItem) => {
   if (item.imagen && item.imagen.length > 0) {
     const img = getImageUrl(item.imagen[0], "small") || "";
-    const srcSet = getImageSrcSet(item.imagen[0], ["thumbnail", "small", "medium"]);
+    const srcSet = getImageSrcSet(item.imagen[0], [
+      "thumbnail",
+      "small",
+      "medium",
+    ]);
     const fullImg = getImageUrl(item.imagen[0], "large") || img;
     if (img) {
       validItems.push({
@@ -136,6 +149,7 @@ validItems.splice(totalImages);
 
 <script is:inline>
   let currentIndex = 0;
+  let lastLightboxTrigger = null;
 
   function getTotalImages() {
     return document.querySelectorAll("[data-lightbox-btn]").length;
@@ -145,6 +159,7 @@ validItems.splice(totalImages);
     const buttons = document.querySelectorAll("[data-lightbox-btn]");
     buttons.forEach(function (btn, index) {
       btn.addEventListener("click", function () {
+        lastLightboxTrigger = btn;
         openLightbox(index);
       });
     });
@@ -180,6 +195,7 @@ validItems.splice(totalImages);
       lightbox.classList.remove("hidden");
       lightbox.classList.add("flex");
       document.body.style.overflow = "hidden";
+      document.getElementById("lightbox-close")?.focus();
     }
   }
 
@@ -189,6 +205,7 @@ validItems.splice(totalImages);
       lightbox.classList.add("hidden");
       lightbox.classList.remove("flex");
       document.body.style.overflow = "";
+      if (lastLightboxTrigger) lastLightboxTrigger.focus();
     }
   }
 
@@ -200,8 +217,31 @@ validItems.splice(totalImages);
   }
 
   document.addEventListener("keydown", function (e) {
+    const lightbox = document.getElementById("lightbox");
+    if (!lightbox || lightbox.classList.contains("hidden")) return;
     if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowLeft") navigateLightbox(-1);
-    if (e.key === "ArrowRight") navigateLightbox(1);
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      navigateLightbox(-1);
+    }
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      navigateLightbox(1);
+    }
+    if (e.key === "Tab") {
+      const focusable = lightbox.querySelectorAll(
+        'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
   });
 </script>

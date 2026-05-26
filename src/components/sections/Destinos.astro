@@ -82,7 +82,7 @@ const pages = response && Array.isArray(response) ? response : [];
           {pages.map((page) => {
             const thumbnailUrl =
               getThumbnailUrl(page.video?.thumbnail) ||
-              "/placeholder-image.jpg";
+              "/imagenes/sobre_nosotros.avif";
 
             return (
               <a
@@ -95,6 +95,10 @@ const pages = response && Array.isArray(response) ? response : [];
                     src={thumbnailUrl}
                     alt={page.titulo}
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    width="92"
+                    height="112"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/10 group-hover:opacity-0 transition-opacity" />
                 </div>

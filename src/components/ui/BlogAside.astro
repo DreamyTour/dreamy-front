@@ -34,7 +34,7 @@ const formatUrl = (url: string) =>
     class="sticky top-28 bg-white border border-t-4 border-t-primary border-gray-100 rounded-sm p-8 shadow-sm"
   >
     {/* Categorías */}
-    <h3 class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-xs">
+    <h2 class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-xs">
       {
         lang === "es"
           ? "Categorías"
@@ -42,7 +42,7 @@ const formatUrl = (url: string) =>
             ? "Categorias"
             : "Categories"
       }
-    </h3>
+    </h2>
     <div class="flex flex-col space-y-1">
       <a
         href={rewriteUrl("/blog", lang)}
@@ -90,13 +90,13 @@ const formatUrl = (url: string) =>
     {
       Array.isArray(socialLogos) && socialLogos.length > 0 && (
         <div class="pt-6 mt-6 border-t border-gray-100">
-          <h3 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">
+          <h2 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">
             {lang === "es"
               ? "Compartir"
               : lang === "pt"
                 ? "Compartilhar"
                 : "Share"}
-          </h3>
+          </h2>
           <div class="flex flex-wrap gap-3">
             {socialLogos.map((social: SocialLogo) => (
               <a

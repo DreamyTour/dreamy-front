@@ -1,6 +1,11 @@
 ---
 import Certification from "@/components/layout/Certification.astro";
-import { EmailIcon, WhatsAppIcon, PhoneIcon, LocationIcon } from "@/components/icons/SocialContactIcons";
+import {
+  EmailIcon,
+  WhatsAppIcon,
+  PhoneIcon,
+  LocationIcon,
+} from "@/components/icons/SocialContactIcons";
 import type { Footer as FooterType } from "@/types/global";
 import type { Lang } from "@/lib/i18n";
 import { getImageUrl } from "@/lib/helpers";
@@ -24,24 +29,41 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
 <footer class="relative overflow-hidden bg-[#0c5936] text-white pt-8 pb-12">
   {/* Background Assets */}
   <div class="absolute inset-0 z-0 pointer-events-none">
-    <div class="absolute inset-0 bg-gradient-to-t from-[#094026] via-[#0c5936]/80 to-transparent"></div>
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-[#094026] via-[#0c5936]/80 to-transparent"
+    >
+    </div>
     {/* Subtle Glows */}
-    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-white/10 rounded-full blur-[120px] opacity-30 -translate-y-1/2"></div>
-    <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[150px] opacity-30 translate-y-1/3"></div>
+    <div
+      class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-white/10 rounded-full blur-[120px] opacity-30 -translate-y-1/2"
+    >
+    </div>
+    <div
+      class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[150px] opacity-30 translate-y-1/3"
+    >
+    </div>
   </div>
 
   <div class="relative z-10">
     <Certification lang={lang} />
 
     <div class="max-w-8xl mx-auto px-6 md:px-10 pt-16">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-12 gap-y-16">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-12 gap-y-16"
+      >
         {/* Brand Column */}
         <div class="lg:col-span-4 md:col-span-2 flex flex-col">
-          <a href="/" class="inline-block mb-8 group w-max focus:outline-hidden">
+          <a
+            href="/"
+            class="inline-block mb-8 group w-max focus:outline-hidden"
+          >
             <img
               src="/logo-dreamytours.svg"
               alt="Logo Dreamy Tours"
               class="h-20 w-auto transition-all duration-700 group-hover:scale-105 brightness-0 invert group-hover:opacity-90 drop-shadow-lg"
+              width="220"
+              height="80"
+              loading="lazy"
               decoding="async"
             />
           </a>
@@ -77,7 +99,7 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
                       target={link.isExternal ? "_blank" : "_self"}
                       rel={link.isExternal ? "noopener noreferrer" : ""}
                     >
-                      <span class="w-0 h-[1px] bg-white mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-300 ease-out"></span>
+                      <span class="w-0 h-[1px] bg-white mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-300 ease-out" />
                       {link.label}
                     </a>
                   </li>
@@ -109,7 +131,7 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
                       target={link.isExternal ? "_blank" : "_self"}
                       rel={link.isExternal ? "noopener noreferrer" : ""}
                     >
-                      <span class="w-0 h-[1px] bg-white mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-300 ease-out"></span>
+                      <span class="w-0 h-[1px] bg-white mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-300 ease-out" />
                       {link.label}
                     </a>
                   </li>
@@ -129,53 +151,55 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
             )
           }
           {
-  data?.contact?.link && data.contact.link.length > 0 && (
-    <ul class="flex flex-col gap-4">
-      {data.contact.link.map((link, index) => {
-        const content = (
-          <>
-            <span class="mt-0.5 shrink-0 text-white">
-              {index === 0 && <EmailIcon className="size-5" />}
-              {index === 1 && <WhatsAppIcon className="size-5" />}
-              {index === 2 && <PhoneIcon className="size-5" />}
-              {(index === 3 || index === 4) && (
-                <LocationIcon className="size-5" />
-              )}
-            </span>
-            <span class="leading-relaxed">{link.label}</span>
-          </>
-        );
+            data?.contact?.link && data.contact.link.length > 0 && (
+              <ul class="flex flex-col gap-4">
+                {data.contact.link.map((link, index) => {
+                  const content = (
+                    <>
+                      <span class="mt-0.5 shrink-0 text-white">
+                        {index === 0 && <EmailIcon className="size-5" />}
+                        {index === 1 && <WhatsAppIcon className="size-5" />}
+                        {index === 2 && <PhoneIcon className="size-5" />}
+                        {(index === 3 || index === 4) && (
+                          <LocationIcon className="size-5" />
+                        )}
+                      </span>
+                      <span class="leading-relaxed">{link.label}</span>
+                    </>
+                  );
 
-        return (
-          <li>
-            {index < 2 ? (
-              <a
-                href={rewriteUrl(
-                  normalizeWhatsAppUrl(link.label, link.url) || "",
-                  lang,
-                )}
-                class="group flex items-start gap-4 text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
-                target={link.isExternal ? "_blank" : "_self"}
-                rel={link.isExternal ? "noopener noreferrer" : ""}
-              >
-                {content}
-              </a>
-            ) : (
-              <span class="flex items-start gap-4 text-white text-[0.95rem]">
-                {content}
-              </span>
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  )
-}
+                  return (
+                    <li>
+                      {index < 2 ? (
+                        <a
+                          href={rewriteUrl(
+                            normalizeWhatsAppUrl(link.label, link.url) || "",
+                            lang,
+                          )}
+                          class="group flex items-start gap-4 text-white hover:text-white/80 transition-colors duration-300 text-[0.95rem]"
+                          target={link.isExternal ? "_blank" : "_self"}
+                          rel={link.isExternal ? "noopener noreferrer" : ""}
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <span class="flex items-start gap-4 text-white text-[0.95rem]">
+                          {content}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )
+          }
         </div>
       </div>
 
       {/* Footer Bottom */}
-      <div class="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div
+        class="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6"
+      >
         <div class="flex items-center gap-4">
           <p class="text-white text-sm">
             © {new Date().getFullYear()} Dreamy Tours. Todos los derechos reservados.
@@ -185,13 +209,11 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
         {
           data?.socialLogo && data.socialLogo.length > 0 && (
             <div class="flex items-center gap-3">
-              {
-                data?.socialTitle && (
-                  <span class="text-white text-sm tracking-wider uppercase mr-3 hidden sm:block">
-                    {data.socialTitle}
-                  </span>
-                )
-              }
+              {data?.socialTitle && (
+                <span class="text-white text-sm tracking-wider uppercase mr-3 hidden sm:block">
+                  {data.socialTitle}
+                </span>
+              )}
               {data.socialLogo.map((social) => (
                 <a
                   href={normalizeWhatsAppUrl(social.label, social.url)}
@@ -200,13 +222,16 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
                   aria-label={`Síguenos en ${social.label || "red social"}`}
                   class="group relative flex h-14 w-14 items-center justify-center rounded-full bg-white/5 border-2 border-white/10 hover:border-primary/50 hover:bg-white/10 transition-all duration-300 overflow-hidden"
                 >
-                  <div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   {social.imagen?.url && (
                     <img
                       src={getImageUrl(social.imagen)}
                       alt=""
                       aria-hidden="true"
                       class="h-6 w-auto relative z-10 transition-transform duration-300 group-hover:scale-110"
+                      width="24"
+                      height="24"
+                      loading="lazy"
                       decoding="async"
                     />
                   )}

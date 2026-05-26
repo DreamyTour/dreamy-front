@@ -8,11 +8,13 @@ const seoProps = {
   description: "Complete your booking securely.",
   type: "website" as "website",
   lang: DEFAULT_LANG,
+  robots: "noindex, nofollow",
 };
 ---
 
 <PageLayout seo={seoProps}>
   <div class="bg-gray-50 min-h-[70vh] pt-8 pb-16 border-t border-gray-200">
+    <h1 class="sr-only">Checkout - Booking</h1>
     <CheckoutSummary client:only="react" />
   </div>
 </PageLayout>

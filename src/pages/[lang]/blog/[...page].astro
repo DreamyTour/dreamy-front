@@ -5,6 +5,7 @@ import type { Blog, CategoryBlog } from "@/types/blog";
 import CardPost from "@/components/ui/CardPost.astro";
 import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
+import { buildSEOProps } from "@/lib/seo";
 import { rewriteUrl } from "@/lib/utils";
 
 type PaginatedPage = {
@@ -65,9 +66,42 @@ const routeParams = Astro.params as { lang?: string };
 const lang = isValidLang(routeParams.lang) ? routeParams.lang : DEFAULT_LANG;
 const currentLang: Lang = lang;
 const blogsList = page.data;
+const blogSeoByLang: Record<
+  Lang,
+  { title: string; description: string; pageLabel: string }
+> = {
+  en: {
+    title: "Travel Blog - Peru and Bolivia Tours | Dreamy Tours",
+    description:
+      "Travel guides, tips and destination inspiration for Peru, Bolivia, Machu Picchu, Lake Titicaca and Uyuni.",
+    pageLabel: "Page",
+  },
+  es: {
+    title: "Blog de Viajes - Tours en Peru y Bolivia | Dreamy Tours",
+    description:
+      "Guias de viaje, consejos e inspiracion para Peru, Bolivia, Machu Picchu, Lago Titicaca y Uyuni.",
+    pageLabel: "Pagina",
+  },
+  pt: {
+    title: "Blog de Viagens - Tours no Peru e Bolivia | Dreamy Tours",
+    description:
+      "Guias de viagem, dicas e inspiracao para Peru, Bolivia, Machu Picchu, Lago Titicaca e Uyuni.",
+    pageLabel: "Pagina",
+  },
+};
+const blogSeo = blogSeoByLang[lang];
+const seoProps = buildSEOProps({
+  fallbackTitle:
+    page.currentPage > 1
+      ? `${blogSeo.title} - ${blogSeo.pageLabel} ${page.currentPage}`
+      : blogSeo.title,
+  fallbackDescription: blogSeo.description,
+  type: "website",
+  lang,
+});
 ---
 
-<Layout lang={lang}>
+<Layout seo={seoProps} lang={lang}>
   <div class="w-full py-20 md:py-28">
     <div class="max-w-8xl mx-auto px-6">
       <div class="mb-14 md:mb-20 text-center">

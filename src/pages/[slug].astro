@@ -10,10 +10,7 @@ import type { Lang } from "@/lib/i18n";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { ManualSEO } from "@/lib/seo";
-import {
-  getImageUrl,
-  generateDescription,
-} from "@/lib/helpers";
+import { generateDescription } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 
 import TourHero from "@/components/tours/TourHero.astro";
@@ -217,16 +214,17 @@ if (type === "mdx" && mdxFrontmatter) {
     seo: mdxFrontmatter.seo,
     fallbackTitle: mdxFrontmatter.title || "Página",
     fallbackDescription: mdxFrontmatter.description || "",
-    fallbackImage: "/og-default.jpg",
+    fallbackImage: mdxFrontmatter.heroImage,
+    fallbackImageAlt: mdxFrontmatter.heroImageAlt,
     type: "website",
     lang: lang,
+    slugMap: pageSlugMap,
   });
 } else if (type === "tour" && tour) {
   seoProps = buildSEOProps({
     seo: tour.seo,
     fallbackTitle: tour.titulo || "Tour",
     fallbackDescription: generateDescription(tour.content),
-    fallbackImage: getImageUrl(tour.imagenDestacada),
     type: "article",
     lang: lang,
     slugMap,
@@ -236,7 +234,6 @@ if (type === "mdx" && mdxFrontmatter) {
     seo: page.seo,
     fallbackTitle: page.titulo || "Página",
     fallbackDescription: generateDescription(page.content),
-    fallbackImage: "/og-default.jpg",
     type: "website",
     lang: lang,
     slugMap: pageSlugMap,
@@ -262,13 +259,13 @@ const heroImage =
   "/imagenes/sobre_nosotros.avif";
 const heroImageAlt =
   (mdxFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
-
 ---
 
 {
   type === "mdx" && mdxComponent && mdxFrontmatter && (
     <Layout seo={seoProps} lang={lang}>
-      <script is:inline
+      <script
+        is:inline
         id="page-slug-map"
         type="application/json"
         set:html={JSON.stringify(pageSlugMap || {})}

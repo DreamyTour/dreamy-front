@@ -12,7 +12,7 @@ import PaquetesBolivia from "@/components/sections/PaquetesBolivia.astro";
 import HomePost from "@/components/sections/HomePost.astro";
 import Destinos from "@/components/sections/Destinos.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
-import { buildSEOProps } from "@/lib/seo";
+import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
 
 const lang = DEFAULT_LANG;
 
@@ -25,14 +25,18 @@ const homeData = await fetchApi<Home>({
   },
 });
 
-const seoProps = buildSEOProps({
-  seo: homeData?.seo,
-  fallbackTitle: "Turismo Perú Bolivia - Tours y Paquetes Turísticos",
-  fallbackDescription:
-    "Organiza tu viaje a Perú y Bolivia con los mejores tours: Machu Picchu, Lago Titicaca, Salar de Uyuni y más. Paquetes turísticos completos.",
-  type: "website",
-  lang,
-});
+const seoProps = {
+  ...buildSEOProps({
+    seo: homeData?.seo,
+    fallbackTitle: "Turismo Perú Bolivia - Tours y Paquetes Turísticos",
+    fallbackDescription:
+      "Organiza tu viaje a Perú y Bolivia con los mejores tours: Machu Picchu, Lago Titicaca, Salar de Uyuni y más. Paquetes turísticos completos.",
+    type: "website",
+    lang,
+  }),
+  image: DEFAULT_SEO_IMAGE,
+  imageAlt: "Dreamy Tours - tours y paquetes turisticos en Peru y Bolivia",
+};
 ---
 
 <Layout seo={seoProps}>

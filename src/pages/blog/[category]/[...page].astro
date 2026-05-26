@@ -150,21 +150,29 @@ const heroImage = currentCategory?.imagenDestacada
   ? getImageUrl(currentCategory.imagenDestacada, "large")
   : "";
 const heroImageSrcSet = currentCategory?.imagenDestacada
-  ? getImageSrcSet(currentCategory.imagenDestacada, ["small", "medium", "large"])
+  ? getImageSrcSet(currentCategory.imagenDestacada, [
+      "small",
+      "medium",
+      "large",
+    ])
   : "";
 
 // SEO props para la categoría
-const seoProps = buildSEOProps({
+const categorySeoProps = buildSEOProps({
   seo: currentCategory?.seo,
   fallbackTitle: currentCategory?.nombre || "Blog",
   fallbackDescription: currentCategory?.descripcion || "",
-  fallbackImage: currentCategory?.imagenDestacada
-    ? getImageUrl(currentCategory.imagenDestacada)
-    : "/og-default.jpg",
   type: "website",
   lang,
   slugMap,
 });
+const seoProps =
+  page.currentPage > 1
+    ? {
+        ...categorySeoProps,
+        title: `${categorySeoProps.title} - Page ${page.currentPage}`,
+      }
+    : categorySeoProps;
 ---
 
 <Layout seo={seoProps}>

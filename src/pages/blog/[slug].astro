@@ -30,10 +30,7 @@ type BlogPostProps = {
 type BlogImage = Imagen & { caption?: string };
 
 // Generate SEO description from JSON blocks
-function generateDescription(
-  blocks: unknown,
-  maxLength = 160,
-): string {
+function generateDescription(blocks: unknown, maxLength = 160): string {
   if (!blocks || !Array.isArray(blocks)) return "";
   let plainText = "";
   for (const block of blocks) {
@@ -68,7 +65,8 @@ function extractHeadings(blocks: unknown): { id: string; text: string }[] {
 
   for (const block of blocks) {
     if (block.type === "heading" && block.level === 2) {
-      const text = block.children?.map((c: StrapiBlockChild) => c.text).join("") || "";
+      const text =
+        block.children?.map((c: StrapiBlockChild) => c.text).join("") || "";
       headings.push({
         id: generateSlug(text),
         text,
@@ -127,7 +125,9 @@ export async function getStaticPaths() {
           (b) =>
             b.documentId !== blog.documentId && // Not the same post
             b.category_blogs?.some((cat: CategoryBlog) =>
-              categories.some((c: CategoryBlog) => c.documentId === cat.documentId),
+              categories.some(
+                (c: CategoryBlog) => c.documentId === cat.documentId,
+              ),
             ),
         )
         .slice(0, 3); // Max 3 related posts
@@ -148,7 +148,10 @@ export async function getStaticPaths() {
     }
   }
 
-  const paths: Array<{ params: { slug: string }; props: Record<string, unknown> }> = [];
+  const paths: Array<{
+    params: { slug: string };
+    props: Record<string, unknown>;
+  }> = [];
 
   for (const lang of [DEFAULT_LANG]) {
     const cats = await fetchApi<CategoryBlog[]>({
@@ -187,7 +190,6 @@ const seoProps = buildSEOProps({
   seo: blog.seo,
   fallbackTitle: blog.titulo || "Blog",
   fallbackDescription: generateDescription(blog.contenido),
-  fallbackImage: getImageUrl(blog.portadaImage),
   type: "article",
   lang,
   publishedTime: blog.publishedAt,
@@ -341,18 +343,57 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
                 if (block.type === "heading") {
                   const level = block.level as number | undefined;
                   const headingText =
-                    block.children?.map((child: StrapiBlockChild) => child.text).join("") ||
-                    "";
+                    block.children
+                      ?.map((child: StrapiBlockChild) => child.text)
+                      .join("") || "";
                   const headingId = generateSlug(headingText);
-                  if (level === 1) return <h2 id={headingId} class="mt-12 mb-6 text-3xl font-bold tracking-tight text-foreground">{headingText}</h2>;
-                  if (level === 2) return <h2 id={headingId} class="mt-10 mb-5 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground">{headingText}</h2>;
-                  if (level === 3) return <h3 id={headingId} class="mt-8 mb-4 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground">{headingText}</h3>;
-                  if (level === 4) return <h4 id={headingId} class="mt-6 mb-3 scroll-mt-24 text-lg font-semibold text-foreground">{headingText}</h4>;
-                  return <h5 id={headingId} class="mt-5 mb-2 scroll-mt-24 text-base font-semibold text-foreground">{headingText}</h5>;
+                  if (level === 1)
+                    return (
+                      <h2
+                        id={headingId}
+                        class="mt-12 mb-6 text-3xl font-bold tracking-tight text-foreground"
+                      >
+                        {headingText}
+                      </h2>
+                    );
+                  if (level === 2)
+                    return (
+                      <h2
+                        id={headingId}
+                        class="mt-10 mb-5 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground"
+                      >
+                        {headingText}
+                      </h2>
+                    );
+                  if (level === 3)
+                    return (
+                      <h2
+                        id={headingId}
+                        class="mt-8 mb-4 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
+                      >
+                        {headingText}
+                      </h2>
+                    );
+                  if (level === 4)
+                    return (
+                      <h3
+                        id={headingId}
+                        class="mt-6 mb-3 scroll-mt-24 text-lg font-semibold text-foreground"
+                      >
+                        {headingText}
+                      </h3>
+                    );
+                  return (
+                    <h4
+                      id={headingId}
+                      class="mt-5 mb-2 scroll-mt-24 text-base font-semibold text-foreground"
+                    >
+                      {headingText}
+                    </h4>
+                  );
                 }
                 if (block.type === "list") {
-                  const ListTag =
-                    block.format === "ordered" ? "ol" : "ul";
+                  const ListTag = block.format === "ordered" ? "ol" : "ul";
                   const listClasses =
                     block.format === "ordered"
                       ? "mb-4 list-decimal space-y-3 pl-6 text-base leading-[1.8] text-muted-foreground marker:text-muted-foreground"
@@ -513,7 +554,8 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
 
 {
   slugMap && Object.keys(slugMap).length > 0 && (
-    <script is:inline
+    <script
+      is:inline
       id="blog-slug-map"
       type="application/json"
       set:html={JSON.stringify(slugMap)}

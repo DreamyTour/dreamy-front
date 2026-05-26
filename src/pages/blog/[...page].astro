@@ -4,6 +4,7 @@ import fetchApi from "@/lib/strapi";
 import type { Blog, CategoryBlog } from "@/types/blog";
 import CardPost from "@/components/ui/CardPost.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
+import { buildSEOProps } from "@/lib/seo";
 import { rewriteUrl } from "@/lib/utils";
 
 type PaginatedPage = {
@@ -58,9 +59,19 @@ const { page, allCategories } = Astro.props as BlogListProps;
 const lang = DEFAULT_LANG;
 const currentLang = lang;
 const blogsList = page.data;
+const seoProps = buildSEOProps({
+  fallbackTitle:
+    page.currentPage > 1
+      ? `Travel Blog - Page ${page.currentPage} | Dreamy Tours`
+      : "Travel Blog - Peru and Bolivia Tours | Dreamy Tours",
+  fallbackDescription:
+    "Travel guides, tips and destination inspiration for Peru, Bolivia, Machu Picchu, Lake Titicaca and Uyuni.",
+  type: "website",
+  lang,
+});
 ---
 
-<Layout>
+<Layout seo={seoProps}>
   <div class="w-full py-20 md:py-28">
     <div class="max-w-8xl mx-auto px-6">
       <div class="mb-14 md:mb-20 text-center">
