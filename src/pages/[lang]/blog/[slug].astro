@@ -17,6 +17,7 @@ import {
   getThumbnailUrl,
 } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
+import { normalizeLists } from "@/lib/strapiBlocks";
 
 type GlobalData = { footer?: { socialLogo?: Logo[] }; socialLogo?: Logo[] };
 type BlogPostProps = {
@@ -374,10 +375,10 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
         <div class="w-full text-foreground">
           {
             blog.contenido && Array.isArray(blog.contenido) ? (
-              (blog.contenido as StrapiBlock[]).map((block: StrapiBlock) => {
+              normalizeLists(blog.contenido as StrapiBlock[]).map((block: StrapiBlock) => {
                 if (block.type === "paragraph") {
                   return (
-                    <p class="mb-7 text-base leading-[1.8] text-muted-foreground">
+                    <p class="mb-5 text-base leading-relaxed text-muted-foreground">
                       {block.children?.map((child: StrapiBlockChild) => {
                         let text = child.text;
                         if (child.bold)
@@ -411,59 +412,65 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
                   const headingId = generateSlug(headingText);
                   if (level === 1)
                     return (
-                      <h2
-                        id={headingId}
-                        class="mt-12 mb-6 text-3xl font-bold tracking-tight text-foreground"
-                      >
-                        {headingText}
-                      </h2>
+                      <div class="relative pl-5 mt-8 mb-3">
+                        <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
+                        <h2
+                          id={headingId}
+                          class="text-3xl font-bold tracking-tight text-foreground"
+                        >
+                          {headingText}
+                        </h2>
+                      </div>
                     );
                   if (level === 2)
                     return (
-                      <h2
-                        id={headingId}
-                        class="mt-10 mb-5 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground"
-                      >
-                        {headingText}
-                      </h2>
+                      <div class="relative pl-5 mt-7 mb-3 scroll-mt-24">
+                        <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
+                        <h2
+                          id={headingId}
+                          class="text-2xl font-bold tracking-tight text-foreground"
+                        >
+                          {headingText}
+                        </h2>
+                      </div>
                     );
                   if (level === 3)
                     return (
-                      <h2
-                        id={headingId}
-                        class="mt-8 mb-4 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
-                      >
-                        {headingText}
-                      </h2>
-                    );
-                  if (level === 4)
-                    return (
                       <h3
                         id={headingId}
-                        class="mt-6 mb-3 scroll-mt-24 text-lg font-semibold text-foreground"
+                        class="mt-6 mb-2 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
                       >
                         {headingText}
                       </h3>
                     );
+                  if (level === 4)
+                    return (
+                      <h4
+                        id={headingId}
+                        class="mt-5 mb-2 scroll-mt-24 text-lg font-semibold text-foreground"
+                      >
+                        {headingText}
+                      </h4>
+                    );
                   return (
-                    <h4
+                    <h5
                       id={headingId}
-                      class="mt-5 mb-2 scroll-mt-24 text-base font-semibold text-foreground"
+                      class="mt-4 mb-1 scroll-mt-24 text-base font-semibold text-foreground"
                     >
                       {headingText}
-                    </h4>
+                    </h5>
                   );
                 }
                 if (block.type === "list") {
                   const ListTag = block.format === "ordered" ? "ol" : "ul";
                   const listClasses =
                     block.format === "ordered"
-                      ? "mb-4 list-decimal space-y-3 pl-6 text-base leading-[1.8] text-muted-foreground marker:text-muted-foreground"
-                      : "mb-4 list-disc space-y-3 pl-6 text-base leading-[1.8] text-muted-foreground marker:text-muted-foreground";
+                      ? "mb-5 list-decimal space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground"
+                      : "mb-5 list-disc space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground";
                   return (
                     <ListTag class={listClasses}>
                       {block.children?.map((item: StrapiBlockChild) => (
-                        <li class="pl-2">
+                        <li class="pl-1">
                           {item.children?.map((child: StrapiBlockChild) => {
                             let text = child.text;
                             if (child.bold)
