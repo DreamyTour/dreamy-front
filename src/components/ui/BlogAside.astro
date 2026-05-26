@@ -27,14 +27,31 @@ const { categories, currentSlug, lang, socialLogos = [] } = Astro.props;
 
 const formatUrl = (url: string) =>
   url?.startsWith("http") ? url : `https://${url}`;
+
+const getSocialHoverClass = (label: string = "", url: string = "") => {
+  const text = `${label} ${url}`.toLowerCase();
+  if (text.includes("youtube")) {
+    return "hover:bg-red-600 hover:shadow-[0_8px_20px_rgba(16,185,129,0.3)]";
+  }
+  if (text.includes("facebook")) {
+    return "hover:bg-blue-600 hover:shadow-[0_8px_20px_rgba(37,99,235,0.3)]";
+  }
+  if (text.includes("instagram") || text.includes("insta")) {
+    return "hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-500 hover:shadow-[0_8px_20px_rgba(236,72,153,0.3)]";
+  }
+  if (text.includes("pinterest") || text.includes(" pint ")) {
+    return "hover:bg-red-600 hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)]";
+  }
+  return "hover:bg-primary hover:shadow-[0_8px_20px_rgba(34,197,94,0.3)]";
+};
 ---
 
 <aside class="hidden lg:block lg:w-[30%] xl:w-[25%] shrink-0">
   <div
-    class="sticky top-28 bg-white border border-t-4 border-t-primary border-gray-100 rounded-sm p-8 shadow-sm"
+    class="sticky top-10 bg-white/95 backdrop-blur-md border border-gray-100/80 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 border-t-4 border-t-primary"
   >
     {/* Categorías */}
-    <h2 class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-xs">
+    <h2 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-[0.7rem] opacity-75">
       {
         lang === "es"
           ? "Categorías"
@@ -43,14 +60,14 @@ const formatUrl = (url: string) =>
             : "Categories"
       }
     </h2>
-    <div class="flex flex-col space-y-1">
+    <div class="flex flex-col space-y-1 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
       <a
         href={rewriteUrl("/blog", lang)}
-        class={`px-4 py-2.5 rounded-sm text-sm font-medium transition-all flex items-center justify-between border border-transparent
+        class={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-between border border-transparent
           ${
             !currentSlug
               ? "bg-primary/10 text-primary font-semibold"
-              : "text-gray-600 hover:text-primary hover:bg-gray-50"
+              : "text-gray-600 hover:text-primary hover:bg-primary/5"
           }`}
       >
         <span>
@@ -71,11 +88,11 @@ const formatUrl = (url: string) =>
           return (
             <a
               href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-              class={`px-4 py-2.5 rounded-sm text-sm font-medium transition-all flex items-center justify-between border border-transparent
+              class={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center justify-between border border-transparent
                 ${
                   isActive
                     ? "bg-primary/10 text-primary font-semibold"
-                    : "text-gray-600 hover:text-primary hover:bg-gray-50"
+                    : "text-gray-600 hover:text-primary hover:bg-primary/5"
                 }`}
             >
               <span>{cat.nombre}</span>
@@ -89,8 +106,8 @@ const formatUrl = (url: string) =>
     {/* Redes Sociales */}
     {
       Array.isArray(socialLogos) && socialLogos.length > 0 && (
-        <div class="pt-6 mt-6 border-t border-gray-100">
-          <h2 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">
+        <div class="pt-6 mt-6 border-t border-gray-100/80">
+          <h2 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-[0.7rem] opacity-75">
             {lang === "es"
               ? "Compartir"
               : lang === "pt"
@@ -103,20 +120,18 @@ const formatUrl = (url: string) =>
                 href={formatUrl(social.url)}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="group flex items-center gap-3 px-4 py-3 rounded-sm bg-primary hover:bg-green-900 hover:scale-105 transition-all duration-300 w-full"
+                title={social.label || "Social"}
+                class={`group flex items-center justify-center h-11 w-11 rounded-2xl bg-gray-50 border border-gray-100/50 hover:border-transparent hover:scale-110 hover:-translate-y-1 hover:rotate-6 transition-all duration-300 shadow-xs ${getSocialHoverClass(social.label, social.url)}`}
               >
                 {social.imagen?.url && (
                   <img
                     src={getImageUrl(social.imagen)}
                     alt={social.label || "Social"}
-                    class="h-8 w-8 object-contain"
+                    class="h-5 w-5 object-contain brightness-0 opacity-50 group-hover:brightness-100 group-hover:opacity-100 transition-all duration-300"
                     loading="lazy"
                     decoding="async"
                   />
                 )}
-                <span class="text-sm font-medium text-white">
-                  {social.label || "Social"}
-                </span>
               </a>
             ))}
           </div>
@@ -125,3 +140,20 @@ const formatUrl = (url: string) =>
     }
   </div>
 </aside>
+
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary, #cbd5e1);
+    border-radius: 4px;
+    opacity: 0.5;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-secondary, #94a3b8);
+  }
+</style>

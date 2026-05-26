@@ -4,17 +4,62 @@ import type { Hero } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   data?: Hero;
   lang: Lang;
 }
 
-const { data } = Astro.props;
+const { data, lang } = Astro.props;
 if (!data) return;
 
 const videoUrl = getImageUrl(data.backgroundVideo);
 const badgeIconUrl = getImageUrl(data.badgeIcon);
+
+function getButtonUrl(btnUrl: string, btnLabel: string) {
+  const urlLower = (btnUrl || "").toLowerCase();
+  const labelLower = (btnLabel || "").toLowerCase();
+
+  // "ver paquetes" button
+  if (
+    urlLower.includes("paquete") || 
+    urlLower.includes("package") || 
+    urlLower.includes("pacote") ||
+    labelLower.includes("paquete") || 
+    labelLower.includes("package") || 
+    labelLower.includes("pacote")
+  ) {
+    return rewriteUrl("/#machupicchu", lang);
+  }
+
+  // contact button
+  if (
+    urlLower.includes("contact") || 
+    urlLower.includes("contat") || 
+    urlLower.includes("viaje") || 
+    urlLower.includes("trip") || 
+    urlLower.includes("viagem") ||
+    labelLower.includes("contact") || 
+    labelLower.includes("contat") || 
+    labelLower.includes("viaje") || 
+    labelLower.includes("trip") || 
+    labelLower.includes("viagem") ||
+    labelLower.includes("planea") ||
+    labelLower.includes("plan") ||
+    labelLower.includes("planeje")
+  ) {
+    const contactSlugMap = {
+      es: "planea-tu-viaje",
+      en: "plan-your-trip",
+      pt: "planeje-sua-viagem",
+    };
+    const contactSlug = contactSlugMap[lang] || "plan-your-trip";
+    return rewriteUrl(`/${contactSlug}`, lang);
+  }
+
+  return rewriteUrl(btnUrl, lang);
+}
 ---
 
 <section
@@ -107,7 +152,7 @@ const badgeIconUrl = getImageUrl(data.badgeIcon);
           {data.button.map((btn) => (
             <Button
               label={btn.label}
-              href={btn.url}
+              href={getButtonUrl(btn.url, btn.label)}
               type={btn.type}
               isExternal={btn.isExternal}
             />
