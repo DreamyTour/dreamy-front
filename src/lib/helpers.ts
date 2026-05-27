@@ -27,7 +27,10 @@ function resolveImageUrl(url: string, baseUrl = strapiUrl): string {
 	return url.startsWith("http") ? url : `${baseUrl}${url}`;
 }
 
-function getFormatUrl(imgObj: Imagen, format: string | undefined): string | undefined {
+function getFormatUrl(
+	imgObj: Imagen,
+	format: string | undefined,
+): string | undefined {
 	if (!format || !imgObj.formats) return undefined;
 
 	for (const key of formatFallbacks[format] || [format]) {
@@ -56,8 +59,7 @@ export function getImageUrl(
 	const format = isFormatKey ? formatOrBaseUrl : undefined;
 	const resolvedBaseUrl =
 		(isFormatKey ? baseUrl : formatOrBaseUrl) || strapiUrl;
-	const url =
-		getFormatUrl(imgObj, format) || imgObj.url;
+	const url = getFormatUrl(imgObj, format) || imgObj.url;
 
 	if (!url) return "/og-default.jpg";
 

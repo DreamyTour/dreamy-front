@@ -6,7 +6,13 @@ import ItineraryTab from "./ItineraryTab";
 import IncludedTab from "./IncludedTab";
 import InformationTab from "./InformationTab";
 import PriceTab from "./PriceTab";
-import { OverviewIcon, ItineraryIcon, IncludedIcon, InformationIcon, PriceIcon } from "@/components/icons/TourIcons";
+import {
+	OverviewIcon,
+	ItineraryIcon,
+	IncludedIcon,
+	InformationIcon,
+	PriceIcon,
+} from "@/components/icons/TourIcons";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
 
 interface Props {
@@ -122,15 +128,25 @@ export default function TourTabs({ tour, children }: Props) {
 	const renderIcon = (type: string) => {
 		switch (type) {
 			case "overview":
-				return <OverviewIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />;
+				return (
+					<OverviewIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
+				);
 			case "itinerary":
-				return <ItineraryIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />;
+				return (
+					<ItineraryIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
+				);
 			case "included":
-				return <IncludedIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />;
+				return (
+					<IncludedIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
+				);
 			case "information":
-				return <InformationIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />;
+				return (
+					<InformationIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
+				);
 			case "price":
-				return <PriceIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />;
+				return (
+					<PriceIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
+				);
 			default:
 				return null;
 		}

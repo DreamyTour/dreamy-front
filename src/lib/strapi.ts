@@ -27,7 +27,9 @@ type StrapiListResponse<T> = {
 const requestCache = new Map<string, unknown>();
 
 function buildStrapiUrl({ endpoint, query, locale }: Props) {
-	const normalizedEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+	const normalizedEndpoint = endpoint.startsWith("/")
+		? endpoint.slice(1)
+		: endpoint;
 	const baseUrl = import.meta.env.VITE_STRAPI_URL;
 
 	if (!baseUrl) {
@@ -55,7 +57,11 @@ function buildStrapiUrl({ endpoint, query, locale }: Props) {
 	return url;
 }
 
-function unwrapData<T>(data: unknown, wrappedByKey?: string, wrappedByList?: boolean) {
+function unwrapData<T>(
+	data: unknown,
+	wrappedByKey?: string,
+	wrappedByList?: boolean,
+) {
 	let result = data;
 
 	if (wrappedByKey && result && typeof result === "object") {
@@ -88,7 +94,11 @@ export default async function fetchApi<T>({
 	const urlString = url.toString();
 
 	if (requestCache.has(urlString)) {
-		return unwrapData<T>(requestCache.get(urlString), wrappedByKey, wrappedByList);
+		return unwrapData<T>(
+			requestCache.get(urlString),
+			wrappedByKey,
+			wrappedByList,
+		);
 	}
 
 	const res = await fetch(urlString);
@@ -119,7 +129,9 @@ export async function fetchAllStrapi<T>({
 		},
 	});
 
-	const allData = Array.isArray(firstPageRes.data) ? [...firstPageRes.data] : [];
+	const allData = Array.isArray(firstPageRes.data)
+		? [...firstPageRes.data]
+		: [];
 	const pageCount = firstPageRes.meta?.pagination?.pageCount || 1;
 
 	if (pageCount > 1) {
@@ -128,7 +140,11 @@ export async function fetchAllStrapi<T>({
 		for (let i = 2; i <= pageCount; i += concurrencyLimit) {
 			const batchPromises: Promise<void>[] = [];
 
-			for (let page = i; page < i + concurrencyLimit && page <= pageCount; page++) {
+			for (
+				let page = i;
+				page < i + concurrencyLimit && page <= pageCount;
+				page++
+			) {
 				batchPromises.push(
 					fetchApi<StrapiListResponse<T>>({
 						endpoint,

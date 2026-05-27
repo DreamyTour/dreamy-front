@@ -4,32 +4,32 @@ import { dedupeLocalizedDocuments } from "@/lib/utils";
 import type { Tour } from "@/types/tours";
 
 interface CategoryQuery {
-  categorySlug?: string;
-  lang: Lang;
-  limit?: number;
-  dedupe?: boolean;
+	categorySlug?: string;
+	lang: Lang;
+	limit?: number;
+	dedupe?: boolean;
 }
 
 export async function fetchToursByCategory({
-  categorySlug,
-  lang,
-  limit = 3,
-  dedupe = true,
+	categorySlug,
+	lang,
+	limit = 3,
+	dedupe = true,
 }: CategoryQuery) {
-  if (!categorySlug) return [];
+	if (!categorySlug) return [];
 
-  const tours = await fetchApi<Tour[]>({
-    endpoint: "tours",
-    wrappedByKey: "data",
-    locale: lang,
-    query: {
-      "filters[categories][slug][$eq]": categorySlug,
-      "pagination[limit]": limit,
-      populate: "*",
-    },
-  });
+	const tours = await fetchApi<Tour[]>({
+		endpoint: "tours",
+		wrappedByKey: "data",
+		locale: lang,
+		query: {
+			"filters[categories][slug][$eq]": categorySlug,
+			"pagination[limit]": limit,
+			populate: "*",
+		},
+	});
 
-  if (!Array.isArray(tours)) return [];
+	if (!Array.isArray(tours)) return [];
 
-  return dedupe ? dedupeLocalizedDocuments(tours) : tours;
+	return dedupe ? dedupeLocalizedDocuments(tours) : tours;
 }
