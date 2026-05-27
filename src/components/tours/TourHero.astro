@@ -8,7 +8,6 @@ import {
   getImageUrl,
   extractTextFromBlocks,
 } from "@/lib/helpers";
-import type { Imagen } from "@/types/common";
 
 interface Props {
   tour: Tour;
@@ -19,17 +18,6 @@ interface Props {
 const { tour, lang, badges } = Astro.props;
 if (!tour) return;
 
-function getModalSrcSet(img: Imagen): string {
-  const formattedSrcSet = getImageSrcSet(img, ["medium", "large"]);
-  const originalUrl = getImageUrl(img);
-  const originalCandidate =
-    img.width && originalUrl !== "/og-default.jpg"
-      ? `${originalUrl} ${img.width}w`
-      : "";
-
-  return [formattedSrcSet, originalCandidate].filter(Boolean).join(", ");
-}
-
 // Extract array of image URLs
 const images = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada
@@ -38,8 +26,8 @@ const images = Array.isArray(tour.imagenDestacada)
         gridSrcSet: getImageSrcSet(img, ["small", "medium"]),
         thumbUrl: getImageUrl(img, "small"),
         thumbSrcSet: getImageSrcSet(img, ["thumbnail", "small"]),
-        modalUrl: getImageUrl(img),
-        modalSrcSet: getModalSrcSet(img),
+        modalUrl: getImageUrl(img, "medium"),
+        modalSrcSet: getImageSrcSet(img, ["small", "medium"]),
         alt: getImageAlt(img, tour.titulo),
       }))
       .filter((img) => img.gridUrl && img.gridUrl !== "/og-default.jpg")
@@ -92,6 +80,13 @@ const galleryLabel = galleryLabels[lang] || galleryLabels.en;
 
 const categoryName = tour.categories?.[0]?.nombre;
 const hasBadges = badges && badges.length > 0;
+const galleryImagesJson = JSON.stringify(
+  images.map((img) => ({
+    src: img.modalUrl,
+    srcSet: img.modalSrcSet,
+    alt: img.alt || tour.titulo,
+  })),
+);
 ---
 
 <div class="tour-hero-container w-full pt-4 pb-8 relative">
@@ -346,38 +341,27 @@ const hasBadges = badges && badges.length > 0;
       </button>
 
       <div class="tour-gallery-stage relative min-h-0 flex-1">
-        {
-          images.map((img, index) => (
-            <figure
-              class:list={[
-                "tour-gallery-slide relative hidden h-full min-h-[420px] md:min-h-[620px]",
-                index === 0 && "is-active",
-              ]}
-              data-gallery-slide
-            >
-              <img
-                src={img.modalUrl}
-                srcset={img.modalSrcSet || undefined}
-                sizes="(max-width: 767px) 94vw, (max-width: 1279px) 88vw, 800px"
-                alt={
-                  img.alt ||
-                  (index === 0
-                    ? tour.titulo
-                    : `${tour.titulo} - Foto ${index + 1}`)
-                }
-                class="mx-auto h-full max-h-[88vh] min-h-[420px] w-full object-contain md:min-h-[560px]"
-                loading="lazy"
-                decoding="async"
-              />
-              <figcaption class="tour-gallery-caption pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-6 pb-7 pt-20 text-center text-sm italic leading-relaxed text-white/90 sm:px-12 sm:pb-9 sm:text-base">
-                {img.alt ||
-                  (index === 0
-                    ? tour.titulo
-                    : `${tour.titulo} - Foto ${index + 1}`)}
-              </figcaption>
-            </figure>
-          ))
-        }
+        <figure
+          class="tour-gallery-slide is-active relative flex h-full min-h-[420px] md:min-h-[620px]"
+          data-gallery-slide
+        >
+          <img
+            src={mainImage.modalUrl}
+            srcset={mainImage.modalSrcSet || undefined}
+            sizes="(max-width: 767px) 94vw, (max-width: 1279px) 88vw, 800px"
+            alt={mainImage.alt}
+            class="mx-auto h-full max-h-[88vh] min-h-[420px] w-full object-contain md:min-h-[560px]"
+            loading="lazy"
+            decoding="async"
+            data-gallery-image
+          />
+          <figcaption
+            class="tour-gallery-caption pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-6 pb-7 pt-20 text-center text-sm italic leading-relaxed text-white/90 sm:px-12 sm:pb-9 sm:text-base"
+            data-gallery-caption
+          >
+            {mainImage.alt}
+          </figcaption>
+        </figure>
 
         <button
           type="button"
@@ -420,6 +404,11 @@ const hasBadges = badges && badges.length > 0;
           </svg>
         </button>
       </div>
+      <script
+        type="application/json"
+        data-gallery-images
+        set:html={galleryImagesJson}
+      />
     </div>
   </div>
 </div>
@@ -594,20 +583,59 @@ const hasBadges = badges && badges.length > 0;
 </style>
 
 <script>
+  type GalleryImage = {
+    src: string;
+    srcSet?: string;
+    alt: string;
+  };
+
   let activeGalleryTrigger: HTMLElement | null = null;
+  const galleryDataCache = new WeakMap<HTMLElement, GalleryImage[]>();
+
+  function getGalleryImages(modal: HTMLElement): GalleryImage[] {
+    const cached = galleryDataCache.get(modal);
+    if (cached) return cached;
+
+    const dataEl = modal.querySelector<HTMLScriptElement>(
+      "[data-gallery-images]",
+    );
+    if (!dataEl?.textContent) return [];
+
+    try {
+      const images = JSON.parse(dataEl.textContent) as GalleryImage[];
+      galleryDataCache.set(modal, images);
+      return images;
+    } catch {
+      return [];
+    }
+  }
 
   function setGalleryIndex(modal: HTMLElement, nextIndex: number) {
-    const slides = Array.from(
-      modal.querySelectorAll<HTMLElement>("[data-gallery-slide]"),
-    );
-    if (slides.length === 0) return;
+    const images = getGalleryImages(modal);
+    if (images.length === 0) return;
 
-    const index = (nextIndex + slides.length) % slides.length;
+    const index = (nextIndex + images.length) % images.length;
+    const item = images[index];
     modal.dataset.galleryIndex = String(index);
 
-    slides.forEach((slide, slideIndex) => {
-      slide.classList.toggle("is-active", slideIndex === index);
-    });
+    const imageEl = modal.querySelector<HTMLImageElement>(
+      "[data-gallery-image]",
+    );
+    const captionEl = modal.querySelector<HTMLElement>(
+      "[data-gallery-caption]",
+    );
+
+    if (imageEl) {
+      imageEl.src = item.src;
+      if (item.srcSet) {
+        imageEl.srcset = item.srcSet;
+      } else {
+        imageEl.removeAttribute("srcset");
+      }
+      imageEl.alt = item.alt;
+    }
+
+    if (captionEl) captionEl.textContent = item.alt;
   }
 
   function moveGallery(modal: HTMLElement, direction: number) {
