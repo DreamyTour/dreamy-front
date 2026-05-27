@@ -102,6 +102,11 @@ const hasBadges = badges && badges.length > 0;
     {/* Left Large Image - spans 2 columns and 2 rows */}
     <div
       class="col-span-2 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
+      data-gallery-open={galleryId}
+      data-gallery-index="0"
+      role="button"
+      tabindex="0"
+      aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
     >
       <img
         src={mainImage.gridUrl}
