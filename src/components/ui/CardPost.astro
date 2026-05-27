@@ -2,7 +2,7 @@
 import type { Blog } from "@/types/blog";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
-import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -17,16 +17,7 @@ const { blog, lang, isFeatured = false, showDescription = false } = Astro.props;
 if (!blog) return null;
 
 const t = useTranslations(lang);
-const mainImage = getImageUrl(
-  blog.portadaImage,
-  isFeatured ? "large" : "medium",
-);
-const imageSrcSet = getImageSrcSet(blog.portadaImage, [
-  "thumbnail",
-  "small",
-  "medium",
-  "large",
-]);
+const mainImage = getImageUrl(blog.portadaImage, "small");
 const imageAlt = getImageAlt(blog.portadaImage, blog.titulo);
 
 const category = blog.category_blogs?.[0]?.nombre || null;
@@ -110,11 +101,10 @@ const imageHeight = isFeatured ? "aspect-[16/9]" : "aspect-[4/3]";
         mainImage && mainImage !== "/og-default.jpg" ? (
           <img
             src={mainImage}
-            srcset={imageSrcSet || undefined}
             sizes={
               isFeatured
-                ? "(max-width: 1023px) 100vw, 66vw"
-                : "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
+                ? "(max-width: 1023px) 92vw, 640px"
+                : "(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 320px"
             }
             alt={imageAlt}
             class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"

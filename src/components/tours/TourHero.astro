@@ -181,7 +181,14 @@ const hasBadges = badges && badges.length > 0;
     >
       {
         images.slice(0, 3).map((img, i) => (
-          <div class="w-[85vw] h-[320px] shrink-0 snap-center rounded-sm overflow-hidden relative shadow-sm">
+          <div
+            class="w-[85vw] h-[320px] shrink-0 snap-center rounded-sm overflow-hidden relative shadow-sm cursor-pointer"
+            data-gallery-open={galleryId}
+            data-gallery-index={String(i)}
+            role="button"
+            tabindex="0"
+            aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
+          >
             <img
               src={img.gridUrl}
               srcset={img.gridSrcSet || undefined}
@@ -684,6 +691,19 @@ const hasBadges = badges && badges.length > 0;
   });
 
   document.addEventListener("keydown", (e) => {
+    const keyboardTrigger = (e.target as HTMLElement).closest<HTMLElement>(
+      '[data-gallery-open][role="button"]',
+    );
+    if (
+      keyboardTrigger &&
+      !keyboardTrigger.closest("[data-gallery-modal]") &&
+      (e.key === "Enter" || e.key === " ")
+    ) {
+      e.preventDefault();
+      keyboardTrigger.click();
+      return;
+    }
+
     const openModal = document.querySelector<HTMLElement>(
       "[data-gallery-modal]:not(.hidden)",
     );

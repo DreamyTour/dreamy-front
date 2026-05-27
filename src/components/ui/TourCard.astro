@@ -3,7 +3,7 @@ import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
-import { getImageAlt, getImageSrcSet, getImageUrl, extractTextFromBlocks } from "@/lib/helpers";
+import { getImageAlt, getImageUrl, extractTextFromBlocks } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -16,13 +16,7 @@ const { tour, lang } = Astro.props;
 if (!tour) return null;
 
 const t = useTranslations(lang);
-const mainImage = getImageUrl(tour.imagenDestacada, "medium");
-const imageSrcSet = getImageSrcSet(tour.imagenDestacada, [
-  "thumbnail",
-  "small",
-  "medium",
-  "large",
-]);
+const mainImage = getImageUrl(tour.imagenDestacada, "small");
 const imageAlt = getImageAlt(tour.imagenDestacada, tour.titulo);
 const primaryCategory = tour.categories?.[0]?.nombre;
 ---
@@ -50,8 +44,7 @@ const primaryCategory = tour.categories?.[0]?.nombre;
       mainImage && mainImage !== "/og-default.jpg" ? (
         <img
           src={mainImage}
-          srcset={imageSrcSet || undefined}
-          sizes="(max-width: 767px) 100vw, (max-width: 1023px) calc((100vw - 24px) / 2), calc((100vw - 72px) / 4)"
+          sizes="(max-width: 767px) 92vw, (max-width: 1023px) calc((100vw - 24px) / 2), 320px"
           alt={imageAlt}
           class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]"
           loading="lazy"
