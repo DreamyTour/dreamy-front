@@ -50,6 +50,10 @@ const sliderData = [...premios, ...premios];
 
         return (
           <div class="slide" title={cert.description}>
+            <span class="corner corner-tl" aria-hidden="true" />
+            <span class="corner corner-tr" aria-hidden="true" />
+            <span class="corner corner-bl" aria-hidden="true" />
+            <span class="corner corner-br" aria-hidden="true" />
             {imageUrl !== "/og-default.jpg" && (
               <img
                 src={imageUrl}
@@ -102,6 +106,7 @@ const sliderData = [...premios, ...premios];
   }
 
   .slide {
+    position: relative;
     flex-shrink: 0;
     min-width: 120px;
     max-width: 200px;
@@ -111,14 +116,63 @@ const sliderData = [...premios, ...premios];
     padding: 1rem;
     border-radius: 12px;
     border: 1px solid transparent;
-    transition: all 0.3s ease;
+    transition:
+      background-color 0.3s ease,
+      box-shadow 0.3s ease,
+      transform 0.3s ease;
   }
 
   .slide:hover {
-    transform: translateY(-8px);
-    border-color: #4a5d4e;
-    background: white;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transform: scale(1.06);
+    background: color-mix(in oklab, var(--background) 92%, transparent);
+  }
+
+  .corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .corner-tl {
+    top: 8px;
+    left: 8px;
+    border-top: 2px solid var(--primary);
+    border-left: 2px solid var(--primary);
+    transform: translate(6px, 6px);
+  }
+
+  .corner-tr {
+    top: 8px;
+    right: 8px;
+    border-top: 2px solid var(--primary);
+    border-right: 2px solid var(--primary);
+    transform: translate(-6px, 6px);
+  }
+
+  .corner-bl {
+    bottom: 8px;
+    left: 8px;
+    border-bottom: 2px solid var(--primary);
+    border-left: 2px solid var(--primary);
+    transform: translate(6px, -6px);
+  }
+
+  .corner-br {
+    right: 8px;
+    bottom: 8px;
+    border-right: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    transform: translate(-6px, -6px);
+  }
+
+  .slide:hover .corner {
+    opacity: 1;
+    transform: translate(0, 0);
   }
 
   .slide img {
@@ -141,6 +195,13 @@ const sliderData = [...premios, ...premios];
     100% {
       /* Se traslada la mitad exacta de todo el ancho + la mitad del gap para un loop perfecto */
       transform: translateX(calc(-50% - 1.5rem));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .slider-track {
+      gap: 3rem;
+      animation-duration: 8s;
     }
   }
 </style>

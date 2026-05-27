@@ -25,31 +25,30 @@ const eyebrowByLang: Record<Lang, string> = {
   pt: "Tour 100% Local",
 };
 
-
 const features = {
   en: [
     {
       title: "Excellence Service",
       desc: "Highest quality standards",
-      icon: "check",
+      icon: "award",
       color: "green",
     },
     {
       title: "Personalized Attention",
       desc: "Customized experiences",
-      icon: "badge",
+      icon: "user",
       color: "yellow",
     },
     {
       title: "Safety & Reliability",
       desc: "Operational excellence",
-      icon: "star",
+      icon: "shield",
       color: "green",
     },
     {
       title: "Responsible Tourism",
       desc: "Protecting environment",
-      icon: "heart",
+      icon: "leaf",
       color: "yellow",
     },
   ],
@@ -57,25 +56,25 @@ const features = {
     {
       title: "Servicio de Excelencia",
       desc: "Los más altos estándares",
-      icon: "check",
+      icon: "award",
       color: "green",
     },
     {
       title: "Atención Personalizada",
       desc: "Experiencias a medida",
-      icon: "badge",
+      icon: "user",
       color: "yellow",
     },
     {
       title: "Seguridad y Confianza",
       desc: "Excelencia operativa",
-      icon: "star",
+      icon: "shield",
       color: "green",
     },
     {
       title: "Turismo Responsable",
       desc: "Protección ambiental",
-      icon: "heart",
+      icon: "leaf",
       color: "yellow",
     },
   ],
@@ -83,25 +82,25 @@ const features = {
     {
       title: "Serviço de Excelência",
       desc: "Padrões de alta qualidade",
-      icon: "check",
+      icon: "award",
       color: "green",
     },
     {
       title: "Atenção Personalizada",
       desc: "Experiências sob medida",
-      icon: "badge",
+      icon: "user",
       color: "yellow",
     },
     {
       title: "Segurança e Confiança",
       desc: "Excelência operacional",
-      icon: "star",
+      icon: "shield",
       color: "green",
     },
     {
       title: "Turismo Responsável",
       desc: "Proteção ambiental",
-      icon: "heart",
+      icon: "leaf",
       color: "yellow",
     },
   ],
@@ -182,9 +181,9 @@ const features = {
             features[lang].map((act) => (
               <div class="flex items-start gap-4">
                 <div
-                  class={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${act.color === "green" ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}
+                  class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border bg-white shadow-sm ${act.color === "green" ? "border-primary/15 text-primary" : "border-secondary/15 text-secondary"}`}
                 >
-                  {act.icon === "check" && (
+                  {act.icon === "award" && (
                     <svg
                       class="h-5 w-5"
                       fill="none"
@@ -192,14 +191,15 @@ const features = {
                       stroke-width="2"
                       stroke="currentColor"
                     >
+                      <circle cx="12" cy="8" r="5" />
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M5 13l4 4L19 7"
+                        d="M8.5 12.5 7 22l5-3 5 3-1.5-9.5"
                       />
                     </svg>
                   )}
-                  {act.icon === "badge" && (
+                  {act.icon === "user" && (
                     <svg
                       class="h-5 w-5"
                       fill="none"
@@ -210,11 +210,32 @@ const features = {
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                        d="M16 19a4 4 0 0 0-8 0"
+                      />
+                      <circle cx="12" cy="8" r="3.5" />
+                    </svg>
+                  )}
+                  {act.icon === "shield" && (
+                    <svg
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 3 19 6v5c0 4.5-2.9 8.3-7 10-4.1-1.7-7-5.5-7-10V6l7-3z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m9.5 12 1.8 1.8 3.7-4"
                       />
                     </svg>
                   )}
-                  {act.icon === "star" && (
+                  {act.icon === "leaf" && (
                     <svg
                       class="h-5 w-5"
                       fill="none"
@@ -225,22 +246,12 @@ const features = {
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-1.182-1.985l1.31-5.5a.562.562 0 01.815-.595l4.636 2.502a.563.563 0 00.814-.595l-1.314-5.467a.563.563 0 00-.472-.41L13.16 3.03zm-7.66 0c0-.85.99-1.32 1.63-.78l3.18 3.18a.563.563 0 00.78 0l3.18-3.18c.64-.54 1.63-.07 1.63.78v8.66c0 .85-.99 1.32-1.63.78l-3.18-3.18a.563.563 0 00-.78 0l-3.18 3.18c-.64.54-1.63.07-1.63-.78V3.5z"
+                        d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"
                       />
-                    </svg>
-                  )}
-                  {act.icon === "heart" && (
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                        d="M5 19c2.5-5 6-8.5 10.5-10.5"
                       />
                     </svg>
                   )}

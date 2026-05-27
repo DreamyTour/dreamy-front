@@ -157,6 +157,177 @@ const leftColumnPoints = mapPoints.slice(0, Math.ceil(mapPoints.length / 2));
 const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
 ---
 
+<section class="w-full overflow-hidden bg-primary/5 py-16 lg:hidden">
+  <div class="max-w-8xl mx-auto px-6">
+    <div class="mb-10 max-w-3xl text-left md:mb-12">
+      <div
+        class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
+      >
+        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+            clip-rule="evenodd"></path>
+        </svg>
+        {t.badge}
+      </div>
+
+      <h2
+        class="relative inline-block mb-2 text-3xl font-bold text-gray-900 md:text-4xl"
+      >
+        <span class="relative z-10">
+          {t.title}
+          <span class="text-secondary">{t.titleHighlight}</span>
+        </span>
+        <span
+          class="absolute bottom-0 left-0 h-3 w-24 rounded-full bg-secondary/30 -z-0 blur-sm"
+        ></span>
+      </h2>
+
+      <div class="mt-4 mb-6 flex items-center justify-start gap-3">
+        <div
+          class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary"
+        >
+        </div>
+        <div class="relative h-1.5 w-12 rounded-full bg-secondary">
+          <div
+            class="absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+          >
+          </div>
+        </div>
+        <div
+          class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary"
+        >
+        </div>
+      </div>
+
+      <p class="text-base leading-relaxed text-gray-600">{t.description}</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {
+        mapPoints.map((point, index) => {
+          const pointTitle =
+            point.title[lang as keyof typeof point.title] ?? point.title.es;
+          const pointSubtitle =
+            point.subtitle[lang as keyof typeof point.subtitle] ??
+            point.subtitle.es;
+          const pointDescription =
+            point.description[lang as keyof typeof point.description] ??
+            point.description.es;
+          const isFeatured = index === 0;
+
+          return (
+            <a
+              href={rewriteUrl(`/${point.slug}`, lang)}
+              class:list={[
+                "group relative overflow-hidden rounded-xl border border-white/80 bg-white shadow-[0_10px_35px_rgb(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/25",
+                isFeatured
+                  ? "min-h-[260px] md:col-span-2"
+                  : "flex min-h-[124px] p-2",
+              ]}
+              aria-label={`${pointTitle} - ${pointSubtitle}`}
+            >
+              {isFeatured ? (
+                <>
+                  <img
+                    src={backgroundImageMobile.src}
+                    alt=""
+                    aria-hidden="true"
+                    class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    width="640"
+                    height="420"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/78 via-black/30 to-black/5" />
+                  <div class="relative z-10 flex h-full min-h-[260px] flex-col justify-end p-5">
+                    <span class="mb-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-white/15 text-xs font-bold text-white backdrop-blur-md">
+                      01
+                    </span>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">
+                      {pointSubtitle}
+                    </p>
+                    <h3 class="mt-2 text-2xl font-bold leading-tight text-white">
+                      {pointTitle}
+                    </h3>
+                    <p class="mt-2 line-clamp-2 text-sm leading-6 text-white/82">
+                      {pointDescription}
+                    </p>
+                    <div class="mt-4 flex items-center gap-2 text-sm font-semibold text-white">
+                      <span>{t.cta}</span>
+                      <svg
+                        class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div class="relative w-[96px] shrink-0 overflow-hidden rounded-lg">
+                    <img
+                      src={backgroundImageMobile.src}
+                      alt=""
+                      aria-hidden="true"
+                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      width="96"
+                      height="124"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="absolute left-2 top-2 rounded-full bg-black/45 px-2 py-1 text-[0.65rem] font-bold text-white backdrop-blur-sm">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                  </div>
+
+                  <div class="flex min-w-0 flex-1 flex-col justify-center px-3 py-2 sm:px-4">
+                    <p class="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-secondary">
+                      {pointSubtitle}
+                    </p>
+                    <h3 class="mt-1 line-clamp-2 text-[1rem] font-bold leading-tight text-gray-950 transition-colors duration-300 group-hover:text-secondary">
+                      {pointTitle}
+                    </h3>
+                    <p class="mt-1.5 line-clamp-2 text-xs leading-5 text-gray-500">
+                      {pointDescription}
+                    </p>
+
+                    <div class="mt-2 flex items-center gap-1.5 text-[0.78rem] font-semibold text-secondary">
+                      <span>{t.cta}</span>
+                      <svg
+                        class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </>
+              )}
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
 <section
   class="py-16 relative overflow-hidden bg-primary/5 hidden lg:block"
   data-peru-guide

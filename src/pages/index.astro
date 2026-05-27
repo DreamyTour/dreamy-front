@@ -10,7 +10,6 @@ import PaquetesPeru from "@/components/sections/PaquetesPeru.astro";
 import PeruGuide from "@/components/sections/PeruGuide.astro";
 import PaquetesBolivia from "@/components/sections/PaquetesBolivia.astro";
 import HomePost from "@/components/sections/HomePost.astro";
-import Destinos from "@/components/sections/Destinos.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
 
@@ -46,7 +45,6 @@ const seoProps = {
   <Machupicchu data={homeData?.sectionMapi} lang={lang} />
   <PaquetesPeru data={homeData?.peruPaquetes} lang={lang} />
   <PeruGuide lang={lang} />
-  <Destinos lang={lang} />
   <PaquetesBolivia data={homeData?.boliviaPaquetes} lang={lang} />
   <HomePost data={homeData?.cardPost} lang={lang} />
 </Layout>
