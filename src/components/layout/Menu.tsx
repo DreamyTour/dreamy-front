@@ -175,10 +175,9 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
           MOBILE (< lg)
           ======================= */}
       <div className="lg:hidden">
-        {/* Mobile Header: Hamburguesa, Idioma, Logo */}
-        <div className="flex items-center justify-between px-4 py-3 bg-background">
-          {/* Logo a la derecha */}
-          <div className="flex-1 flex">
+        {/* Mobile Header: Logo, idioma y menu */}
+        <div className="flex items-center gap-4 px-4 py-3 bg-background">
+          <div className="flex min-w-0 shrink-0">
             <a
               href={logoUrl}
               target={logo?.isExternal ? "_blank" : "_self"}
@@ -195,17 +194,13 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
               />
             </a>
           </div>
-          {/* Idioma al medio */}
-          <div className="flex-1 flex justify-center">
+          <div className="ml-auto flex items-center justify-end gap-2">
             {lang && <LanguageSwitcher currentLang={lang} />}
-          </div>
-          {/* Hamburgesa */}
-          <div className="flex-1 flex justify-end">
             <button
               type="button"
               ref={menuButtonRef}
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-md -ml-2 text-foreground/70 transition-colors duration-200 hover:text-primary"
+              className="p-2 rounded-md text-foreground/70 transition-colors duration-200 hover:text-primary"
               aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
