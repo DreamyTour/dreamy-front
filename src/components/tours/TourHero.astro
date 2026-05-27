@@ -22,17 +22,25 @@ if (!tour) return;
 const images = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada
       .map((img) => ({
-        url: getImageUrl(img, "large"),
-        srcSet: getImageSrcSet(img, ["thumbnail", "small", "medium", "large"]),
+        gridUrl: getImageUrl(img, "medium"),
+        gridSrcSet: getImageSrcSet(img, ["small", "medium"]),
+        thumbUrl: getImageUrl(img, "small"),
+        thumbSrcSet: getImageSrcSet(img, ["thumbnail", "small"]),
+        modalUrl: getImageUrl(img, "large"),
+        modalSrcSet: getImageSrcSet(img, ["medium", "large"]),
         alt: getImageAlt(img, tour.titulo),
       }))
-      .filter((img) => img.url && img.url !== "/og-default.jpg")
+      .filter((img) => img.gridUrl && img.gridUrl !== "/og-default.jpg")
   : [];
 
 if (images.length === 0) {
   images.push({
-    url: "/og-default.jpg",
-    srcSet: "",
+    gridUrl: "/og-default.jpg",
+    gridSrcSet: "",
+    thumbUrl: "/og-default.jpg",
+    thumbSrcSet: "",
+    modalUrl: "/og-default.jpg",
+    modalSrcSet: "",
     alt: tour.titulo,
   });
 }
@@ -84,9 +92,9 @@ const hasBadges = badges && badges.length > 0;
       class="col-span-2 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
     >
       <img
-        src={mainImage.url}
-        srcset={mainImage.srcSet || undefined}
-        sizes="(max-width: 767px) 100vw, 50vw"
+        src={mainImage.gridUrl}
+        srcset={mainImage.gridSrcSet || undefined}
+        sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 640px"
         alt={mainImage.alt}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
         loading="eager"
@@ -135,9 +143,9 @@ const hasBadges = badges && badges.length > 0;
           aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
         >
           <img
-            src={img.url}
-            srcset={img.srcSet || undefined}
-            sizes="(max-width: 767px) 100vw, 25vw"
+            src={img.thumbUrl}
+            srcset={img.thumbSrcSet || undefined}
+            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 25vw, 320px"
             alt={img.alt || `${tour.titulo} ${index + 2}`}
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             loading="lazy"
@@ -158,8 +166,8 @@ const hasBadges = badges && badges.length > 0;
         images.slice(0, 3).map((img, i) => (
           <div class="w-[85vw] h-[320px] shrink-0 snap-center rounded-sm overflow-hidden relative shadow-sm">
             <img
-              src={img.url}
-              srcset={img.srcSet || undefined}
+              src={img.gridUrl}
+              srcset={img.gridSrcSet || undefined}
               sizes="85vw"
               alt={
                 img.alt ||
@@ -288,7 +296,7 @@ const hasBadges = badges && badges.length > 0;
     aria-label={galleryLabel.title}
     data-gallery-modal
   >
-    <div class="relative flex h-full max-h-[94vh] w-full max-w-6xl flex-col">
+    <div class="relative flex h-full max-h-[94vh] w-full max-w-5xl flex-col">
       <button
         type="button"
         class="tour-gallery-close absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
@@ -322,16 +330,16 @@ const hasBadges = badges && badges.length > 0;
               data-gallery-slide
             >
               <img
-                src={img.url}
-                srcset={img.srcSet || undefined}
-                sizes="(max-width: 767px) 100vw, 1100px"
+                src={img.modalUrl}
+                srcset={img.modalSrcSet || undefined}
+                sizes="(max-width: 767px) 92vw, (max-width: 1279px) 82vw, 920px"
                 alt={
                   img.alt ||
                   (index === 0
                     ? tour.titulo
                     : `${tour.titulo} - Foto ${index + 1}`)
                 }
-                class="h-full max-h-[94vh] min-h-[420px] w-full object-contain md:min-h-[620px]"
+                class="mx-auto h-full max-h-[88vh] min-h-[420px] w-full max-w-[920px] object-contain md:min-h-[560px]"
                 loading="lazy"
                 decoding="async"
               />
