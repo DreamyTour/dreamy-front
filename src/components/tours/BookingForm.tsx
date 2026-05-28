@@ -134,10 +134,7 @@ export default function BookingForm({
 			setDate("");
 			setSelectedAvailability(null);
 
-			const API_BASE = import.meta.env.DEV
-				? "/calendar-api"
-				: "https://calendar.dreamy.tours/v1";
-			const url = `${API_BASE}/tickets?place=${PLACE_ID}&road=${road}&year=${CURRENT_YEAR}&month=${currentMonth}`;
+			const url = `/calendar-api/tickets?place=${PLACE_ID}&road=${road}&year=${CURRENT_YEAR}&month=${currentMonth}`;
 
 			try {
 				const response = await fetch(url, { signal: controller.signal });
