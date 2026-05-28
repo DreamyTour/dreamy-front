@@ -1,7 +1,7 @@
-import * as React from "react";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
 import { ChevronDownIcon } from "lucide-react";
-import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
+import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -75,7 +75,7 @@ const navigationMenuItemStyle = "static";
 /* -------------------------------------------------------------------------- */
 
 const navigationMenuTriggerStyle = cva(
-	"group inline-flex h-9 items-center justify-center gap-2 rounded-md bg-background px-4 py-2 text-md font-medium text-foreground transition-colors duration-200 hover:text-primary focus:text-primary focus:outline-none",
+	"group relative inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap bg-background px-3.5 pb-3 pt-2 text-sm font-semibold text-foreground/82 transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 focus:text-primary focus:outline-none data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-4",
 );
 
 function NavigationMenuTrigger({
@@ -126,7 +126,7 @@ function NavigationMenuContent({
 }
 
 const navigationMenuContentStyle =
-	"absolute left-0 right-0 top-full z-50 mt-2 w-full rounded-md bg-white p-4 shadow-lg";
+	"absolute left-0 right-0 top-full z-50 mt-3 w-full overflow-hidden rounded-2xl border border-border/80 bg-white p-0 shadow-[0_30px_90px_-56px_var(--foreground)]";
 
 /* -------------------------------------------------------------------------- */
 /* LINK                                                                       */
@@ -154,9 +154,9 @@ const navigationMenuLinkStyle = cva(
 		variants: {
 			variant: {
 				default:
-					"inline-flex items-center gap-2 px-4 py-2 text-base font-medium",
+					"relative inline-flex h-11 items-center gap-2 whitespace-nowrap px-3.5 pb-3 pt-2 text-sm font-semibold after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:after:scale-x-100 xl:px-4",
 				dropdown:
-					"group flex min-w-0 items-center gap-3 rounded-sm border border-transparent px-4 py-3 text-sm font-medium text-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/10 hover:bg-primary/5 hover:text-primary hover:shadow-sm",
+					"group relative flex min-w-0 items-start justify-between gap-3 rounded-none px-4 py-4 text-sm font-semibold text-foreground/78 transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-linear-to-r after:from-transparent after:via-border after:to-transparent hover:text-primary focus:text-primary",
 			},
 		},
 		defaultVariants: {
@@ -167,15 +167,15 @@ const navigationMenuLinkStyle = cva(
 
 export {
 	NavigationMenu,
-	NavigationMenuList,
-	NavigationMenuItem,
-	NavigationMenuTrigger,
 	NavigationMenuContent,
+	NavigationMenuItem,
 	NavigationMenuLink,
-	navigationMenuRootStyle,
-	navigationMenuListStyle,
-	navigationMenuItemStyle,
+	NavigationMenuList,
+	NavigationMenuTrigger,
 	navigationMenuContentStyle,
-	navigationMenuTriggerStyle,
+	navigationMenuItemStyle,
 	navigationMenuLinkStyle,
+	navigationMenuListStyle,
+	navigationMenuRootStyle,
+	navigationMenuTriggerStyle,
 };

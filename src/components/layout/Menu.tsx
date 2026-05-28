@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
@@ -107,76 +107,87 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 	return (
 		<>
 			{/* =======================
-          DESKTOP (lg+)
+          DESKTOP (xl+)
           ======================= */}
-			<NavigationMenu className="hidden lg:flex w-full max-w-8xl mx-auto py-3">
-				<NavigationMenuList className="w-full justify-between gap-4">
-					{menu?.menuItems?.map((menuItem: MenuItem) => {
-						const hasChildren =
-							Array.isArray(menuItem.item) && menuItem.item.length > 0;
+			<div className="hidden border-y border-border/70 bg-white shadow-[0_14px_38px_-34px_var(--foreground)] xl:block">
+				<NavigationMenu className="w-full max-w-8xl mx-auto px-4 py-3">
+					<NavigationMenuList className="w-full justify-center gap-3">
+						{menu?.menuItems?.map((menuItem: MenuItem) => {
+							const hasChildren =
+								Array.isArray(menuItem.item) && menuItem.item.length > 0;
 
-						return (
-							<NavigationMenuItem key={menuItem.id}>
-								{hasChildren ? (
-									<>
-										<NavigationMenuTrigger
-											onClick={() => {
-												if (menuItem.link?.url) {
-													window.location.href = rewriteUrl(
-														menuItem.link.url,
-														lang,
-													);
-												}
-											}}
-										>
-											<MenuLabelWithBadge
-												label={menuItem.link.label}
-												badge={menuItem.link.badge}
-											/>
-										</NavigationMenuTrigger>
+							return (
+								<NavigationMenuItem
+									key={menuItem.id}
+									className="flex justify-center"
+								>
+									{hasChildren ? (
+										<>
+											<NavigationMenuTrigger
+												onClick={() => {
+													if (menuItem.link?.url) {
+														window.location.href = rewriteUrl(
+															menuItem.link.url,
+															lang,
+														);
+													}
+												}}
+											>
+												<MenuLabelWithBadge
+													label={menuItem.link.label}
+													badge={menuItem.link.badge}
+												/>
+											</NavigationMenuTrigger>
 
-										<NavigationMenuContent>
-											<ul className="grid w-full gap-x-3 gap-y-1 mt-1 p-1 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
-												{menuItem.item.map((subItem: Link) => (
-													<li key={subItem.id}>
-														<NavigationMenuLink asChild variant="dropdown">
-															<a href={rewriteUrl(subItem.url, lang)}>
-																<span className="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-primary transition-colors flex-shrink-0"></span>
-																<span className="truncate text-foreground">
-																	{subItem.label}
-																</span>
-																{subItem.badge ? (
-																	<span className="inline-flex items-center whitespace-nowrap rounded-sm bg-secondary px-2 py-2 text-[10px] font-bold leading-none text-secondary-foreground">
-																		{subItem.badge}
+											<NavigationMenuContent>
+												<ul className="grid w-full grid-cols-3 gap-x-8 gap-y-1.5 p-6">
+													{menuItem.item.map((subItem: Link) => (
+														<li key={subItem.id}>
+															<NavigationMenuLink asChild variant="dropdown">
+																<a href={rewriteUrl(subItem.url, lang)}>
+																	<ChevronRight
+																		size={14}
+																		strokeWidth={2.2}
+																		className="shrink-0 text-primary/45 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary"
+																		aria-hidden="true"
+																		focusable="false"
+																	/>
+																	<span className="min-w-0 flex-1 whitespace-normal text-balance leading-snug">
+																		{subItem.label}
 																	</span>
-																) : null}
-															</a>
-														</NavigationMenuLink>
-													</li>
-												))}
-											</ul>
-										</NavigationMenuContent>
-									</>
-								) : (
-									<NavigationMenuLink asChild>
-										<a href={rewriteUrl(menuItem.link.url, lang)}>
-											<MenuLabelWithBadge
-												label={menuItem.link.label}
-												badge={menuItem.link.badge}
-											/>
-										</a>
-									</NavigationMenuLink>
-								)}
-							</NavigationMenuItem>
-						);
-					})}
-				</NavigationMenuList>
-			</NavigationMenu>
+																	{subItem.badge ? (
+																		<span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-secondary px-2 py-1 text-[10px] font-bold leading-none text-secondary-foreground">
+																			{subItem.badge}
+																		</span>
+																	) : null}
+																</a>
+															</NavigationMenuLink>
+														</li>
+													))}
+												</ul>
+											</NavigationMenuContent>
+										</>
+									) : (
+										<NavigationMenuLink asChild>
+											<a href={rewriteUrl(menuItem.link.url, lang)}>
+												<MenuLabelWithBadge
+													label={menuItem.link.label}
+													badge={menuItem.link.badge}
+												/>
+											</a>
+										</NavigationMenuLink>
+									)}
+								</NavigationMenuItem>
+							);
+						})}
+					</NavigationMenuList>
+				</NavigationMenu>
+			</div>
 
 			{/* =======================
-          MOBILE (< lg)
+          MOBILE (< xl)
           ======================= */}
-			<div className="relative lg:hidden">
+			<div className="relative xl:hidden">
 				{/* Mobile Header: Logo, idioma y menu */}
 				<div className="relative z-50 flex items-center gap-4 px-4 py-3 bg-background/95 backdrop-blur-md">
 					<div className="flex min-w-0 shrink-0">
@@ -316,9 +327,12 @@ function MobileAccordion({ item, closeMenu, lang }: MobileAccordionProps) {
 								className="group relative flex min-w-0 items-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-medium text-foreground/70 transition-colors duration-200 hover:text-primary"
 								onClick={closeMenu}
 							>
-								<span
+								<ChevronRight
+									size={14}
+									strokeWidth={2.2}
 									aria-hidden="true"
-									className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-linear-to-r from-transparent via-primary/15 to-transparent transition-opacity duration-200 group-hover:via-primary/30"
+									focusable="false"
+									className="shrink-0 text-primary/45 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-primary"
 								/>
 								<span className="min-w-0 truncate">{subItem.label}</span>
 								{subItem.badge ? (

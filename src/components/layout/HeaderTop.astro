@@ -1,6 +1,5 @@
 ---
 import type { HeaderTop as HeaderTopType } from "@/types/global";
-import Button from "@/components/ui/button.astro";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import type { Lang } from "@/lib/i18n";
 import { localizePath } from "@/lib/i18n";
@@ -34,9 +33,11 @@ const getLinkProps = (
 };
 ---
 
-<div class="hidden lg:block w-full bg-background text-foreground pb-4">
+<div class="hidden xl:block w-full bg-background text-foreground">
   <!-- Bloque superior: links a la izquierda, logo a la derecha -->
-  <div class="flex max-w-8xl justify-between items-end mx-auto px-4">
+  <div
+    class="flex max-w-8xl items-center justify-between gap-8 mx-auto px-4 py-3"
+  >
     <!-- Logo -->
     <div class="group">
       <a
@@ -47,17 +48,17 @@ const getLinkProps = (
         <img
           src="/logo-dreamytours.svg"
           alt="Logo Dreamy Tours"
-          class="h-20 w-auto group-hover:scale-105 duration-300 transition-transform"
+          class="h-14 w-auto group-hover:scale-[1.03] duration-300 transition-transform"
           width="220"
           height="80"
           fetchpriority="high"
         />
       </a>
     </div>
-    <div class="flex flex-col items-end">
+    <div class="flex min-w-0 flex-1 flex-col items-end gap-2">
       <!-- Links a la izquierda -->
       <nav
-        class="hidden lg:flex flex-wrap justify-center p-4 divide-x-1 divide-neutral-400"
+        class="hidden xl:flex max-w-full flex-wrap items-center justify-end gap-x-4 gap-y-1"
       >
         {
           data.headerLink.map((link) => {
@@ -67,7 +68,7 @@ const getLinkProps = (
                 href={rewriteUrl(link.url, lang)}
                 target={target}
                 rel={rel}
-                class="px-4 text-muted-foreground hover:text-primary transition-colors duration-200 cursor-pointer"
+                class="text-xs font-medium text-muted-foreground transition-colors duration-200 hover:text-primary"
               >
                 {link.label}
               </a>
@@ -75,18 +76,22 @@ const getLinkProps = (
           })
         }
       </nav>
-      <div
-        class="mt-2 flex flex-wrap gap-2 justify-center items-center md:justify-start"
-      >
-        <div class="hidden lg:flex gap-2">
+      <div class="flex flex-wrap items-center justify-end gap-2">
+        <div class="hidden xl:flex flex-wrap justify-end gap-2">
           {
             data.button.map((btn) => (
-              <Button
-                label={btn.label}
+              <a
                 href={rewriteUrl(btn.url, lang)}
-                type={btn.type}
-                isExternal={btn.isExternal}
-              />
+                target={btn.isExternal ? "_blank" : "_self"}
+                rel={btn.isExternal ? "noopener noreferrer" : undefined}
+                class={`inline-flex items-center rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 ${
+                  btn.type === "PRIMARY"
+                    ? "border-secondary bg-secondary text-white hover:bg-secondary/90"
+                    : "border-border bg-muted/60 text-foreground/75 hover:border-primary/25 hover:text-primary"
+                }`}
+              >
+                {btn.label}
+              </a>
             ))
           }
         </div>

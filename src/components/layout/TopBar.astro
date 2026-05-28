@@ -19,12 +19,12 @@ const target = isExternal ? "_blank" : "_self";
 const rel = isExternal ? "noopener noreferrer" : undefined;
 ---
 
-<div class="w-full bg-primary text-white text-base hidden md:block">
+<div class="w-full bg-primary text-white hidden md:block">
   <div
-    class="max-w-8xl mx-auto px-4 py-2 flex items-center justify-center gap-4"
+    class="max-w-8xl mx-auto px-4 py-1.5 flex items-center justify-center gap-3 text-sm"
   >
     <!-- Texto -->
-    <p class="font-medium tracking-wide">
+    <p class="font-medium leading-tight tracking-wide">
       {data.text}
     </p>
 
@@ -35,7 +35,7 @@ const rel = isExternal ? "noopener noreferrer" : undefined;
           href={rewriteUrl(data.link.url, lang)}
           target={target}
           rel={rel}
-          class="underline underline-offset-4 decoration-white/50 hover:decoration-white transition-colors duration-200"
+          class="font-semibold underline underline-offset-4 decoration-white/45 transition-colors duration-200 hover:decoration-white"
         >
           {data.link.label}
         </a>
