@@ -27,6 +27,15 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		server: {
+			proxy: {
+				"/calendar-api": {
+					target: "https://calendar.dreamy.tours",
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/calendar-api/, "/v1"),
+				},
+			},
+		},
 	},
 
 	integrations: [
