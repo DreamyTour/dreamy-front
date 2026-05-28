@@ -134,7 +134,7 @@ export default function BookingForm({
 			setDate("");
 			setSelectedAvailability(null);
 
-			const url = `/calendar-api/tickets?place=${PLACE_ID}&road=${road}&year=${CURRENT_YEAR}&month=${currentMonth}`;
+			const url = `/api/calendar-tickets?place=${PLACE_ID}&road=${road}&year=${CURRENT_YEAR}&month=${currentMonth}`;
 
 			try {
 				const response = await fetch(url, { signal: controller.signal });

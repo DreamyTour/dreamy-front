@@ -29,10 +29,10 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 		server: {
 			proxy: {
-				"/calendar-api": {
+				"/api/calendar-tickets": {
 					target: "https://calendar.dreamy.tours",
 					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/calendar-api/, "/v1"),
+					rewrite: (path) => path.replace(/^\/api\/calendar-tickets/, "/v1/tickets"),
 				},
 			},
 		},
