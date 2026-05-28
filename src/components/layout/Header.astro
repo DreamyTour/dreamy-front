@@ -5,6 +5,7 @@ import TopBar from "@/components/layout/TopBar.astro";
 import HeaderTop from "@/components/layout/HeaderTop.astro";
 import Menu from "@/components/layout/Menu.tsx";
 import type { Lang } from "@/lib/i18n";
+import { localizePath } from "@/lib/i18n";
 
 interface Props {
   data: Global;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const { data, lang } = Astro.props;
+const mobileLogoUrl = localizePath("/", lang);
 ---
 
 <header class="w-full border-solid border-b border-border shadow-sm">
@@ -20,7 +22,7 @@ const { data, lang } = Astro.props;
   <div class="border-t border-primary/20"></div>
   <Menu
     menu={data?.menu}
-    logo={data?.headerTop?.logo}
+    logoUrl={mobileLogoUrl}
     lang={lang}
     client:load
     transition:persist

@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/navigation-menu";
 import type { Lang } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
-import type { Link, Logo, MenuItem, Menu as MenuType } from "@/types/global";
+import type { Link, MenuItem, Menu as MenuType } from "@/types/global";
 
 interface MainMenuProps {
 	menu: MenuType;
-	logo: Logo;
+	logoUrl: string;
 	lang: Lang;
 }
 
@@ -40,13 +40,11 @@ function MenuLabelWithBadge({
 	);
 }
 
-export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
+export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const mobileMenuRef = useRef<HTMLElement>(null);
 	const wasMobileOpenRef = useRef(false);
-
-	const logoUrl = rewriteUrl(logo?.url || "/", lang);
 
 	// Focus trap y gestión del foco al abrir/cerrar menú móvil
 	useEffect(() => {
@@ -182,15 +180,10 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 				{/* Mobile Header: Logo, idioma y menu */}
 				<div className="relative z-50 flex items-center gap-4 px-4 py-3 bg-background/95 backdrop-blur-md">
 					<div className="flex min-w-0 shrink-0">
-						<a
-							href={logoUrl}
-							target={logo?.isExternal ? "_blank" : "_self"}
-							rel={logo?.isExternal ? "noopener noreferrer" : undefined}
-							className="block"
-						>
+						<a href={logoUrl} className="block">
 							<img
 								src="/logo-dreamytours.svg"
-								alt={logo?.label ?? "Logo"}
+								alt="Logo Dreamy Tours"
 								className="h-10 w-auto"
 								width="110"
 								height="40"
@@ -223,7 +216,7 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 					<>
 						{/* Overlay */}
 						<div
-							className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-md"
+							className="fixed inset-0 z-40 bg-foreground/12 backdrop-blur-sm"
 							onClick={() => setMobileOpen(false)}
 							aria-hidden="true"
 						/>
@@ -231,10 +224,10 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 						<nav
 							id="mobile-menu"
 							ref={mobileMenuRef}
-							className="absolute left-0 right-0 top-full z-50 mt-1 border-x border-b border-border/40 bg-background p-2 shadow-2xl shadow-black/10 animate-in fade-in slide-in-from-top-2 duration-300 ease-out max-h-[calc(100dvh-80px)] overflow-y-auto"
+							className="absolute left-3 right-3 top-full z-50 mt-3 max-h-[calc(100dvh-92px)] overflow-y-auto rounded-2xl border border-border bg-white p-3 shadow-[0_24px_70px_-44px_var(--foreground)] animate-in fade-in slide-in-from-top-2 duration-300 ease-out"
 							aria-label="Menú principal"
 						>
-							<ul className="flex flex-col gap-1.5 px-1 pb-2 pt-0.5">
+							<ul className="flex flex-col gap-2 px-0.5 pb-1 pt-0.5">
 								{menu?.menuItems?.map((menuItem: MenuItem) => {
 									const hasChildren =
 										Array.isArray(menuItem.item) && menuItem.item.length > 0;
@@ -250,9 +243,13 @@ export default function MainMenu({ menu, logo, lang }: MainMenuProps) {
 											) : (
 												<a
 													href={rewriteUrl(menuItem.link.url, lang)}
-													className="group inline-flex w-full min-w-0 items-center rounded-lg border border-primary/15 px-4 py-3.5 text-base font-medium text-foreground/70 transition-all duration-200 hover:border-primary/25 hover:bg-primary/5 hover:text-primary"
+													className="group relative inline-flex w-full min-w-0 items-center rounded-xl px-3.5 py-3.5 text-base font-semibold text-foreground transition-colors duration-200 hover:bg-primary/6 hover:text-primary"
 													onClick={() => setMobileOpen(false)}
 												>
+													<span
+														aria-hidden="true"
+														className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-linear-to-r from-transparent via-primary/25 to-transparent transition-opacity duration-200 group-hover:via-primary/45"
+													/>
 													<MenuLabelWithBadge
 														label={menuItem.link.label}
 														badge={menuItem.link.badge}
@@ -289,13 +286,17 @@ function MobileAccordion({ item, closeMenu, lang }: MobileAccordionProps) {
 			<button
 				type="button"
 				onClick={() => setOpen(!open)}
-				className={`group flex w-full items-center rounded-lg border border-primary/15 px-4 py-3.5 text-base font-medium transition-all duration-200 ${
+				className={`group relative inline-flex w-full items-center rounded-xl px-3.5 py-3.5 text-base font-semibold transition-colors duration-200 ${
 					open
-						? "border-primary/25 bg-primary/10 text-primary"
-						: "text-foreground/70 hover:border-primary/25 hover:bg-primary/5 hover:text-primary"
+						? "text-primary"
+						: "text-foreground hover:bg-primary/6 hover:text-primary"
 				}`}
 				aria-expanded={open}
 			>
+				<span
+					aria-hidden="true"
+					className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-linear-to-r from-transparent via-primary/25 to-transparent transition-opacity duration-200 group-hover:via-primary/45"
+				/>
 				<MenuLabelWithBadge label={item.link.label} badge={item.link.badge} />
 				<ChevronDown
 					size={18}
@@ -307,14 +308,18 @@ function MobileAccordion({ item, closeMenu, lang }: MobileAccordionProps) {
 
 			{/* Submenu */}
 			{open && (
-				<ul className="mx-3 mb-2 mt-0.5 flex animate-in fade-in slide-in-from-top-1 duration-200 flex-col gap-0.5 rounded-xl bg-muted/50 p-1.5">
+				<ul className="mb-2 mt-1 flex animate-in fade-in slide-in-from-top-1 duration-200 flex-col gap-0.5 px-2">
 					{item.item.map((subItem: Link) => (
 						<li key={subItem.id}>
 							<a
 								href={rewriteUrl(subItem.url, lang)}
-								className="flex min-w-0 items-center gap-2 rounded-md px-3.5 py-2.5 text-sm text-foreground/60 transition-all duration-200 hover:bg-background hover:text-primary"
+								className="group relative flex min-w-0 items-center gap-2 rounded-lg px-3.5 py-2.5 text-sm font-medium text-foreground/70 transition-colors duration-200 hover:text-primary"
 								onClick={closeMenu}
 							>
+								<span
+									aria-hidden="true"
+									className="pointer-events-none absolute inset-x-4 bottom-0 h-px bg-linear-to-r from-transparent via-primary/15 to-transparent transition-opacity duration-200 group-hover:via-primary/30"
+								/>
 								<span className="min-w-0 truncate">{subItem.label}</span>
 								{subItem.badge ? (
 									<span className="inline-flex shrink-0 items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold leading-none text-secondary-foreground">
