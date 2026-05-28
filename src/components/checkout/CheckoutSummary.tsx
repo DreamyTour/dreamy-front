@@ -231,7 +231,9 @@ export default function CheckoutSummary() {
 	let startDateStr = "TBD";
 	if (date) {
 		try {
-			startDateStr = new Date(date).toLocaleDateString(
+			const [y, m, d] = date.split("-").map(Number);
+			const localDate = new Date(y, m - 1, d);
+			startDateStr = localDate.toLocaleDateString(
 				lang === "es" ? "es-ES" : "en-US",
 				{
 					weekday: "long",

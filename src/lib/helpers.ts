@@ -176,7 +176,8 @@ export function formatDate(
 	if (!dateString) return "";
 
 	try {
-		const date = new Date(dateString);
+		const [y, m, d] = dateString.split("-").map(Number);
+		const date = new Date(y, m - 1, d);
 		return date.toLocaleDateString(locale === "pt" ? "pt-BR" : locale, {
 			year: "numeric",
 			month: "long",
