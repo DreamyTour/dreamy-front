@@ -1,11 +1,12 @@
 import * as React from "react";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
+import { normalizeLists } from "@/lib/strapiBlocks";
+import { cn } from "@/lib/utils";
 import type {
 	Acordeon as AcordeonType,
 	StrapiBlock,
 	StrapiBlockChild,
 } from "@/types/tours";
-import { normalizeLists } from "@/lib/strapiBlocks";
 
 interface ItineraryTabProps {
 	items: AcordeonType[];
@@ -13,9 +14,13 @@ interface ItineraryTabProps {
 
 export default function ItineraryTab({ items }: ItineraryTabProps) {
 	return (
-		<div className="space-y-3">
+		<div className="space-y-4">
 			{items.map((item, index) => (
-				<AccordionItem key={index} item={item} defaultOpen={index === 0} />
+				<AccordionItem
+					key={item.titulo}
+					item={item}
+					defaultOpen={index === 0}
+				/>
 			))}
 		</div>
 	);
@@ -28,43 +33,49 @@ function AccordionItem({
 	item: AcordeonType;
 	defaultOpen: boolean;
 }) {
+	const [isOpen, setIsOpen] = React.useState(defaultOpen);
+	const contentId = React.useId();
+
 	// Componente para renderizar blocks del acordeón
 	const AcordeonContent = ({ content }: { content: StrapiBlock[] }) => {
 		if (!content || !Array.isArray(content)) return null;
 
+		const getChildKey = (child: StrapiBlockChild) => JSON.stringify(child);
+
+		const getBlockKey = (block: StrapiBlock) => JSON.stringify(block);
+
 		const renderTextNodes = (children: StrapiBlockChild[]) => {
-			return children.map((child, i) => {
+			return children.map((child) => {
 				if (!child.text) return null;
 				let textElement: React.ReactNode = child.text;
-				if (child.bold)
-					textElement = <strong key={`bold-${i}`}>{textElement}</strong>;
-				if (child.italic) textElement = <em key={`em-${i}`}>{textElement}</em>;
-				if (child.underline) textElement = <u key={`u-${i}`}>{textElement}</u>;
-				if (child.strikethrough)
-					textElement = <s key={`s-${i}`}>{textElement}</s>;
+				if (child.bold) textElement = <strong>{textElement}</strong>;
+				if (child.italic) textElement = <em>{textElement}</em>;
+				if (child.underline) textElement = <u>{textElement}</u>;
+				if (child.strikethrough) textElement = <s>{textElement}</s>;
 				if (child.code)
 					textElement = (
-						<code
-							key={`code-${i}`}
-							className="bg-gray-100 px-1 rounded text-sm"
-						>
+						<code className="bg-gray-100 px-1 rounded text-sm">
 							{textElement}
 						</code>
 					);
-				return <React.Fragment key={i}>{textElement}</React.Fragment>;
+				return (
+					<React.Fragment key={getChildKey(child)}>
+						{textElement}
+					</React.Fragment>
+				);
 			});
 		};
 
-		const normalized = React.useMemo(() => normalizeLists(content), [content]);
+		const normalized = normalizeLists(content);
 
 		return (
 			<div className="space-y-2">
-				{normalized.map((block, blockIndex) => {
+				{normalized.map((block) => {
 					if (block.type === "paragraph") {
 						return (
 							<p
-								key={blockIndex}
-								className="text-base leading-relaxed text-foreground/80"
+								key={getBlockKey(block)}
+								className="text-base leading-7 text-muted-foreground"
 							>
 								{renderTextNodes(block.children || [])}
 							</p>
@@ -76,8 +87,8 @@ function AccordionItem({
 						if (level === 1) {
 							return (
 								<h2
-									key={blockIndex}
-									className="text-xl font-bold text-gray-900"
+									key={getBlockKey(block)}
+									className="text-xl font-bold text-foreground"
 								>
 									{renderTextNodes(block.children || [])}
 								</h2>
@@ -86,8 +97,8 @@ function AccordionItem({
 						if (level === 2) {
 							return (
 								<h2
-									key={blockIndex}
-									className="text-lg font-bold text-gray-900"
+									key={getBlockKey(block)}
+									className="text-lg font-bold text-foreground"
 								>
 									{renderTextNodes(block.children || [])}
 								</h2>
@@ -95,8 +106,8 @@ function AccordionItem({
 						}
 						return (
 							<h2
-								key={blockIndex}
-								className="text-base font-semibold text-gray-800"
+								key={getBlockKey(block)}
+								className="text-base font-semibold text-foreground"
 							>
 								{renderTextNodes(block.children || [])}
 							</h2>
@@ -109,16 +120,17 @@ function AccordionItem({
 
 						return (
 							<ListTag
-								key={blockIndex}
-								className={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 text-base text-gray-600 space-y-1`}
+								key={getBlockKey(block)}
+								className={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-base text-muted-foreground`}
 							>
-								{(block.children || []).map(
-									(listItem: StrapiBlockChild, i: number) => (
-										<li key={i} className="text-gray-600">
-											{renderTextNodes(listItem.children || [])}
-										</li>
-									),
-								)}
+								{(block.children || []).map((listItem: StrapiBlockChild) => (
+									<li
+										key={getChildKey(listItem)}
+										className="text-muted-foreground"
+									>
+										{renderTextNodes(listItem.children || [])}
+									</li>
+								))}
 							</ListTag>
 						);
 					}
@@ -130,21 +142,39 @@ function AccordionItem({
 	};
 
 	return (
-		<details
-			open={defaultOpen}
-			className="group border border-gray-200 rounded-sm overflow-hidden"
-		>
-			<summary className="w-full flex items-center justify-between p-4 md:p-5 bg-white hover:bg-gray-50 transition-colors duration-200 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-				<span className="font-semibold text-gray-800 text-sm md:text-base text-left">
+		<div className="overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]">
+			<button
+				type="button"
+				aria-expanded={isOpen}
+				aria-controls={contentId}
+				className="flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-200 hover:bg-primary/[0.03] md:px-6"
+				onClick={() => setIsOpen((current) => !current)}
+			>
+				<span className="text-left text-sm font-semibold text-foreground md:text-base">
 					{item.titulo}
 				</span>
-				<span className="text-gray-400 transition-transform duration-200 group-open:rotate-180">
-					<ChevronIcon className="w-5 h-5" />
+				<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary">
+					<ChevronIcon
+						className={cn(
+							"h-5 w-5 transition-transform duration-200",
+							isOpen && "rotate-180",
+						)}
+					/>
 				</span>
-			</summary>
-			<div className="px-4 md:px-5 pb-4 md:pb-5">
-				<AcordeonContent content={item.contenido} />
+			</button>
+			<div
+				id={contentId}
+				className={cn(
+					"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+					isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+				)}
+			>
+				<div className="overflow-hidden">
+					<div className="border-t border-primary/10 px-5 pb-5 pt-4 md:px-6 md:pb-6">
+						<AcordeonContent content={item.contenido} />
+					</div>
+				</div>
 			</div>
-		</details>
+		</div>
 	);
 }
