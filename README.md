@@ -34,10 +34,10 @@ Sitio web de Dreamy Tours construido con Astro, React y Tailwind CSS. El proyect
 ## Requisitos
 
 - Node.js `>=22 <24`.
-- Bun recomendado para instalar y ejecutar scripts.
+- Bun para instalar dependencias y ejecutar scripts.
 - Acceso al CMS configurado en `VITE_STRAPI_URL`.
 
-El repositorio incluye `bun.lock` y `package-lock.json`. Para mantener consistencia con el flujo actual, se recomienda usar Bun.
+El repositorio usa `bun.lock` como unico lockfile. No uses otros gestores de paquetes para instalar dependencias.
 
 ## Instalacion
 
