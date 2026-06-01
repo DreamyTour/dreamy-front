@@ -3,11 +3,18 @@ import PageLayout from "@/layouts/PageLayout.astro";
 import TourCard from "@/components/ui/TourCard.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
 import type { SEOProps } from "@/components/layout/SEO.astro";
-import type { Category, Page, Pregunta, StrapiBlock, StrapiBlockChild } from "@/types/page";
+import type {
+  Category,
+  Page,
+  Pregunta,
+  StrapiBlock,
+  StrapiBlockChild,
+} from "@/types/page";
 import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import { getYouTubeVideoId, getThumbnailUrl } from "@/lib/helpers";
 import { DEFAULT_LANG } from "@/lib/i18n";
+import { serializeJsonForHtml } from "@/lib/html";
 
 interface Props {
   page: Page;
@@ -59,20 +66,22 @@ const pageStats =
 ---
 
 <PageLayout seo={seoProps} lang={lang}>
-  <script is:inline
+  <script
+    is:inline
     id="page-slug-map"
     type="application/json"
-    set:html={JSON.stringify(pageSlugMap)}
+    set:html={serializeJsonForHtml(pageSlugMap)}
   />
   <div
     class="content-shell max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12"
   >
-    <section class="content-hero relative isolate bg-background pt-4 pb-8 md:pt-6 md:pb-12">
+    <section
+      class="content-hero relative isolate bg-background pt-4 pb-8 md:pt-6 md:pb-12"
+    >
       <div
         class="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16"
       >
         <div class="max-w-3xl">
-
           <div class="mt-6 space-y-5">
             <h1
               class="content-hero-title max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]"
@@ -94,8 +103,16 @@ const pageStats =
               class="group inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30"
             >
               {pageCopy.exploreCta}
-              <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                  clip-rule="evenodd"></path>
               </svg>
             </a>
 
@@ -103,7 +120,9 @@ const pageStats =
               pageStats.map((stat) => (
                 <div class="flex items-center gap-3">
                   <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background shadow-sm">
-                    <span class="text-[1.05rem] font-bold text-foreground">{stat.value}</span>
+                    <span class="text-[1.05rem] font-bold text-foreground">
+                      {stat.value}
+                    </span>
                   </div>
                   <span class="text-sm font-medium tracking-wide text-muted-foreground capitalize">
                     {stat.label}
@@ -214,78 +233,72 @@ const pageStats =
                       {pregunta.contenido &&
                         Array.isArray(pregunta.contenido) && (
                           <div class="space-y-3">
-                            {pregunta.contenido.map(
-                              (block: StrapiBlock) => {
-                                if (block.type === "paragraph") {
+                            {pregunta.contenido.map((block: StrapiBlock) => {
+                              if (block.type === "paragraph") {
+                                return (
+                                  <p class="text-base leading-7 text-muted-foreground">
+                                    {(block.children || [])
+                                      .map(
+                                        (child: StrapiBlockChild) =>
+                                          child.text || "",
+                                      )
+                                      .join("")}
+                                  </p>
+                                );
+                              }
+                              if (block.type === "heading") {
+                                const level = block.level;
+                                const headingText = (block.children || [])
+                                  .map(
+                                    (child: StrapiBlockChild) =>
+                                      child.text || "",
+                                  )
+                                  .join("");
+                                if (level === 1) {
                                   return (
-                                    <p
-                                      class="text-base leading-7 text-muted-foreground"
-                                    >
-                                      {(block.children || [])
-                                        .map((child: StrapiBlockChild) => child.text || "")
-                                        .join("")}
-                                    </p>
-                                  );
-                                }
-                                if (block.type === "heading") {
-                                  const level = block.level;
-                                  const headingText = (block.children || [])
-                                    .map((child: StrapiBlockChild) => child.text || "")
-                                    .join("");
-                                  if (level === 1) {
-                                    return (
-                                      <h2
-                                        class="text-xl font-bold text-foreground"
-                                      >
-                                        {headingText}
-                                      </h2>
-                                    );
-                                  }
-                                  if (level === 2) {
-                                    return (
-                                      <h2
-                                        class="text-lg font-bold text-foreground"
-                                      >
-                                        {headingText}
-                                      </h2>
-                                    );
-                                  }
-                                  return (
-                                    <h3
-                                      class="text-base font-semibold text-foreground"
-                                    >
+                                    <h2 class="text-xl font-bold text-foreground">
                                       {headingText}
-                                    </h3>
+                                    </h2>
                                   );
                                 }
-                                if (block.type === "list") {
-                                  const format = block.format;
-                                  const ListTag =
-                                    format === "ordered" ? "ol" : "ul";
+                                if (level === 2) {
                                   return (
-                                    <ListTag
-                                      class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
-                                    >
-                                      {(block.children || []).map(
-                                        (listItem: StrapiBlockChild) => (
-                                          <li
-                                            class="text-muted-foreground"
-                                          >
-                                            {(listItem.children || [])
-                                              .map(
-                                                (child: StrapiBlockChild) =>
-                                                  child.text || "",
-                                              )
-                                              .join("")}
-                                          </li>
-                                        ),
-                                      )}
-                                    </ListTag>
+                                    <h2 class="text-lg font-bold text-foreground">
+                                      {headingText}
+                                    </h2>
                                   );
                                 }
-                                return null;
-                              },
-                            )}
+                                return (
+                                  <h3 class="text-base font-semibold text-foreground">
+                                    {headingText}
+                                  </h3>
+                                );
+                              }
+                              if (block.type === "list") {
+                                const format = block.format;
+                                const ListTag =
+                                  format === "ordered" ? "ol" : "ul";
+                                return (
+                                  <ListTag
+                                    class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
+                                  >
+                                    {(block.children || []).map(
+                                      (listItem: StrapiBlockChild) => (
+                                        <li class="text-muted-foreground">
+                                          {(listItem.children || [])
+                                            .map(
+                                              (child: StrapiBlockChild) =>
+                                                child.text || "",
+                                            )
+                                            .join("")}
+                                        </li>
+                                      ),
+                                    )}
+                                  </ListTag>
+                                );
+                              }
+                              return null;
+                            })}
                           </div>
                         )}
                     </div>

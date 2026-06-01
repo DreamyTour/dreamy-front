@@ -122,6 +122,21 @@
     color-mix(in oklab, var(--foreground) 28%, transparent);
 }
 
+@supports (content-visibility: auto) {
+  .content-deferred {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+
+  .content-deferred--compact {
+    contain-intrinsic-size: auto 360px;
+  }
+
+  .content-deferred--tall {
+    contain-intrinsic-size: auto 960px;
+  }
+}
+
 .about-page .about-surface {
   background: var(--background);
 }
@@ -694,12 +709,19 @@ html {
   --ring: color-mix(in oklab, var(--primary) 35%, white);
 
   --destructive: oklch(0.62 0.25 25);
+
+  color-scheme: light dark;
+  accent-color: var(--primary);
+  scrollbar-color: color-mix(in oklab, var(--primary) 70%, black)
+    color-mix(in oklab, var(--muted) 92%, white);
+  scrollbar-width: thin;
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-outfit);
+    font-size-adjust: from-font;
   }
 
   h1,
@@ -713,6 +735,39 @@ html {
 
   p {
     text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 24%, transparent);
+    color: var(--foreground);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --muted-foreground: oklch(0.34 0 0);
+    --border: oklch(0.66 0 0);
+    --ring: oklch(0.34 0.13 147.34);
+  }
+
+  :where(a, button, input, select, textarea):focus-visible {
+    outline-width: 4px;
+  }
+}
+
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--primary) 70%, black);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: color-mix(in oklab, var(--muted) 92%, white);
   }
 }
 

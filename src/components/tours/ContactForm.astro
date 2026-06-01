@@ -1,5 +1,5 @@
 ---
-import countriesData from "@/data/countries.json";
+import { countriesWithPhoneCode } from "@/data/countries";
 
 interface Props {
   tourName?: string;
@@ -8,9 +8,9 @@ interface Props {
 const { tourName } = Astro.props;
 
 // Prepare countries sorted by name, filter out empty phone codes
-const countries = countriesData
-  .filter((c) => c.phoneCode)
-  .sort((a, b) => a.nameES.localeCompare(b.nameES));
+const countries = [...countriesWithPhoneCode].sort((a, b) =>
+  a.nameES.localeCompare(b.nameES),
+);
 ---
 
 <div
@@ -99,7 +99,7 @@ const countries = countriesData
         name="nombres"
         required
         autocomplete="name"
-        aria-required="true"
+        enterkeyhint="next"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-sm"
         placeholder="Ingresa tu nombre completo"
       />
@@ -120,7 +120,8 @@ const countries = countriesData
         name="email"
         required
         autocomplete="email"
-        aria-required="true"
+        inputmode="email"
+        enterkeyhint="next"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-sm"
         placeholder="tu@email.com"
       />
@@ -172,6 +173,8 @@ const countries = countriesData
           id="contact-whatsapp"
           name="telefono"
           autocomplete="tel-national"
+          inputmode="tel"
+          enterkeyhint="next"
           class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-r-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-sm"
           placeholder="999 999 999"
         />
@@ -191,7 +194,7 @@ const countries = countriesData
         name="mensaje"
         rows={4}
         required
-        aria-required="true"
+        enterkeyhint="send"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 resize-none text-sm"
         placeholder="¿En qué fechas te gustaría reservar? ¿Cuántas personas?"
       ></textarea>

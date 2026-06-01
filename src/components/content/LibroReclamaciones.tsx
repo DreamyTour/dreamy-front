@@ -1,12 +1,7 @@
 "use client";
 
 import { type ChangeEvent, useState } from "react";
-import countriesData from "@/data/countries.json";
-
-interface Country {
-	iso2: string;
-	nameES: string;
-}
+import { countries } from "@/data/countries";
 
 // Colores del theme (definidos en global.css)
 const colors = {
@@ -17,6 +12,10 @@ const colors = {
 	border: "oklch(0.9 0.01 240)",
 	foreground: "oklch(0.16 0.06 150)",
 };
+
+const sortedCountries = [...countries].sort((a, b) =>
+	a.nameES.localeCompare(b.nameES),
+);
 
 export default function LibroReclamaciones() {
 	const [formData, setFormData] = useState({
@@ -120,7 +119,12 @@ export default function LibroReclamaciones() {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-6">
+		<form
+			action="/api/libro-reclamaciones"
+			method="post"
+			onSubmit={handleSubmit}
+			className="space-y-6"
+		>
 			{/* IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE */}
 			<div>
 				<h2
@@ -145,6 +149,8 @@ export default function LibroReclamaciones() {
 							name="nombres"
 							value={formData.nombres}
 							onChange={handleChange}
+							autoComplete="name"
+							enterKeyHint="next"
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
@@ -165,23 +171,20 @@ export default function LibroReclamaciones() {
 							name="pais"
 							value={formData.pais}
 							onChange={(e) => handleChange(e)}
+							autoComplete="country-name"
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all bg-white"
 						>
 							<option value="">Selecciona tu país</option>
-							{(countriesData as Country[])
-								.map((country) => (
-									<option
-										key={`lr-country-${country.iso2}`}
-										value={country.nameES}
-									>
-										{country.nameES}
-									</option>
-								))
-								.sort((a, b) =>
-									a.props.children.localeCompare(b.props.children),
-								)}
+							{sortedCountries.map((country) => (
+								<option
+									key={`lr-country-${country.iso2}`}
+									value={country.nameES}
+								>
+									{country.nameES}
+								</option>
+							))}
 						</select>
 					</div>
 
@@ -200,6 +203,8 @@ export default function LibroReclamaciones() {
 							name="documento"
 							value={formData.documento}
 							onChange={handleChange}
+							autoComplete="off"
+							enterKeyHint="next"
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
@@ -221,6 +226,9 @@ export default function LibroReclamaciones() {
 							name="email"
 							value={formData.email}
 							onChange={handleChange}
+							autoComplete="email"
+							inputMode="email"
+							enterKeyHint="next"
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
@@ -242,6 +250,9 @@ export default function LibroReclamaciones() {
 							name="telefono"
 							value={formData.telefono}
 							onChange={handleChange}
+							autoComplete="tel"
+							inputMode="tel"
+							enterKeyHint="next"
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
@@ -306,6 +317,8 @@ export default function LibroReclamaciones() {
 							name="datosApoderado"
 							value={formData.datosApoderado}
 							onChange={handleChange}
+							autoComplete="name"
+							enterKeyHint="next"
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder="Nombre completo del padre, madre o apoderado"
@@ -406,6 +419,7 @@ export default function LibroReclamaciones() {
 							name="detalle"
 							value={formData.detalle}
 							onChange={handleChange}
+							enterKeyHint="send"
 							required
 							rows={6}
 							style={inputStyle}

@@ -244,6 +244,7 @@ export default function BookingForm({
 									Ruta
 								</span>
 								<select
+									name="machu-picchu-route"
 									value={road}
 									onChange={(event) => setRoad(event.target.value)}
 									className="h-10 w-full rounded-sm border border-[#db5b24] bg-white px-3 text-sm text-gray-800 outline-none"
@@ -259,6 +260,7 @@ export default function BookingForm({
 									Mes
 								</span>
 								<select
+									name="travel-month"
 									value={currentMonth}
 									onChange={(event) =>
 										setCurrentMonth(Number(event.target.value))
@@ -340,59 +342,70 @@ export default function BookingForm({
 									No se pudo cargar la disponibilidad.
 								</div>
 							) : (
-								calendarDays.map(({ day, dateKey, availability, tone, isSelectable }) => {
-									const isSelected = date === dateKey;
-									const toneStyles: Record<string, string> = {
-										available: "bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
-										limited: "bg-red-50 text-red-700 hover:bg-red-100",
-										unavailable: "bg-gray-50 text-gray-400 cursor-not-allowed",
-									};
-									const toneLabel: Record<string, string> = {
-										available: "text-emerald-700",
-										limited: "text-red-600",
-										unavailable: "text-gray-400",
-									};
+								calendarDays.map(
+									({ day, dateKey, availability, tone, isSelectable }) => {
+										const isSelected = date === dateKey;
+										const toneStyles: Record<string, string> = {
+											available:
+												"bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
+											limited: "bg-red-50 text-red-700 hover:bg-red-100",
+											unavailable:
+												"bg-gray-50 text-gray-400 cursor-not-allowed",
+										};
+										const toneLabel: Record<string, string> = {
+											available: "text-emerald-700",
+											limited: "text-red-600",
+											unavailable: "text-gray-400",
+										};
 
-									return (
-										<button
-											key={dateKey}
-											type="button"
-											disabled={!isSelectable}
-											onClick={() => {
-												setDate(dateKey);
-												setSelectedAvailability(availability);
-												setPassengers(1);
-											}}
-											className={`relative flex h-14 flex-col items-center justify-center gap-px border-b border-r border-gray-100 transition ${toneStyles[tone]} ${
-												isSelected
-													? "z-[1] ring-2 ring-inset ring-[#db5b24]"
-													: ""
-											}`}
-											aria-label={`${dateKey}${isSelectable ? `, ${availability} cupos disponibles` : ", sin disponibilidad"}`}
-										>
-											<span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold leading-none ${
-												tone === "available"
-													? "bg-emerald-200 text-emerald-900"
-													: tone === "limited"
-														? "bg-red-200 text-red-900"
-														: "bg-gray-200 text-gray-500"
-											}`}>
-												{day}
-											</span>
-											<span className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${
-												!isSelectable ? "line-through" : ""
-											}`}>
-												{availability}
-											</span>
-										</button>
-									);
-								})
+										return (
+											<button
+												key={dateKey}
+												type="button"
+												disabled={!isSelectable}
+												onClick={() => {
+													setDate(dateKey);
+													setSelectedAvailability(availability);
+													setPassengers(1);
+												}}
+												className={`relative flex h-14 flex-col items-center justify-center gap-px border-b border-r border-gray-100 transition ${toneStyles[tone]} ${
+													isSelected
+														? "z-[1] ring-2 ring-inset ring-[#db5b24]"
+														: ""
+												}`}
+												aria-label={`${dateKey}${isSelectable ? `, ${availability} cupos disponibles` : ", sin disponibilidad"}`}
+											>
+												<span
+													className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold leading-none ${
+														tone === "available"
+															? "bg-emerald-200 text-emerald-900"
+															: tone === "limited"
+																? "bg-red-200 text-red-900"
+																: "bg-gray-200 text-gray-500"
+													}`}
+												>
+													{day}
+												</span>
+												<span
+													className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${
+														!isSelectable ? "line-through" : ""
+													}`}
+												>
+													{availability}
+												</span>
+											</button>
+										);
+									},
+								)
 							)}
 						</div>
 					</div>
 
 					{date && (
-						<div className="mt-3 rounded-sm border border-[#db5b24]/20 bg-[#db5b24]/5 px-4 py-3 text-sm text-gray-700">
+						<div
+							className="mt-3 rounded-sm border border-[#db5b24]/20 bg-[#db5b24]/5 px-4 py-3 text-sm text-gray-700"
+							aria-live="polite"
+						>
 							<span className="font-semibold text-gray-900">
 								Fecha elegida:
 							</span>{" "}

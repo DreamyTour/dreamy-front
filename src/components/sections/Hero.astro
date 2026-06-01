@@ -23,11 +23,11 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 
   // "ver paquetes" button
   if (
-    urlLower.includes("paquete") || 
-    urlLower.includes("package") || 
+    urlLower.includes("paquete") ||
+    urlLower.includes("package") ||
     urlLower.includes("pacote") ||
-    labelLower.includes("paquete") || 
-    labelLower.includes("package") || 
+    labelLower.includes("paquete") ||
+    labelLower.includes("package") ||
     labelLower.includes("pacote")
   ) {
     return rewriteUrl("/#machupicchu", lang);
@@ -35,15 +35,15 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 
   // contact button
   if (
-    urlLower.includes("contact") || 
-    urlLower.includes("contat") || 
-    urlLower.includes("viaje") || 
-    urlLower.includes("trip") || 
+    urlLower.includes("contact") ||
+    urlLower.includes("contat") ||
+    urlLower.includes("viaje") ||
+    urlLower.includes("trip") ||
     urlLower.includes("viagem") ||
-    labelLower.includes("contact") || 
-    labelLower.includes("contat") || 
-    labelLower.includes("viaje") || 
-    labelLower.includes("trip") || 
+    labelLower.includes("contact") ||
+    labelLower.includes("contat") ||
+    labelLower.includes("viaje") ||
+    labelLower.includes("trip") ||
     labelLower.includes("viagem") ||
     labelLower.includes("planea") ||
     labelLower.includes("plan") ||
@@ -63,7 +63,7 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 ---
 
 <section
-  class="hero-section relative w-full min-h-[60vh] md:min-h-[80vh]  flex items-end overflow-hidden"
+  class="hero-section relative w-full min-h-[60vh] md:min-h-[80vh] flex items-end overflow-hidden"
 >
   {/* ──── Video de fondo ──── */}
   {
@@ -74,13 +74,17 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
           alt=""
           aria-hidden="true"
           class="absolute inset-0 h-full w-full object-cover md:hidden"
+          width={backgroundImageMobile.width}
+          height={backgroundImageMobile.height}
           loading="eager"
-          decoding="async"
+          decoding="sync"
           fetchpriority="high"
         />
         <video
           class="absolute inset-0 hidden h-full w-full object-cover md:block"
           src={videoUrl}
+          width={backgroundImageMobile.width}
+          height={backgroundImageMobile.height}
           autoplay
           muted
           loop
@@ -95,8 +99,10 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
         alt=""
         aria-hidden="true"
         class="absolute inset-0 h-full w-full object-cover"
+        width={backgroundImageMobile.width}
+        height={backgroundImageMobile.height}
         loading="eager"
-        decoding="async"
+        decoding="sync"
         fetchpriority="high"
       />
     )
@@ -122,7 +128,10 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
               src={badgeIconUrl}
               alt={getImageAlt(data.badgeIcon, "iconos de seguridad del badge")}
               class="w-4 h-4"
+              width={data.badgeIcon?.width || 16}
+              height={data.badgeIcon?.height || 16}
               decoding="async"
+              fetchpriority="low"
             />
           )}
           <span class="text-xs font-semibold tracking-widest uppercase text-white">

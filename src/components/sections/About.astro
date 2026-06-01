@@ -18,6 +18,7 @@ const contentParagraphs = data.content
   .split(/\n+/)
   .map((paragraph) => paragraph.trim())
   .filter(Boolean);
+const emphasisPattern = /(DREAMY TOURS|Peru and Bolivia|responsible tourism)/;
 
 const eyebrowByLang: Record<Lang, string> = {
   en: "100% Local Tour",
@@ -107,7 +108,9 @@ const features = {
 };
 ---
 
-<section class="relative w-full overflow-hidden bg-[#fafqfa] py-16">
+<section
+  class="content-deferred relative w-full overflow-hidden bg-[#fafqfa] py-16"
+>
   <!-- Fondos decorativos -->
   <div
     class="pointer-events-none absolute -left-48 -top-48 h-96 w-96 rounded-full bg-[#10b981]/5 blur-3xl"
@@ -150,22 +153,17 @@ const features = {
           {
             contentParagraphs.length > 0 ? (
               contentParagraphs.map((paragraph) => (
-                <p
-                  class="text-base leading-relaxed text-[#181311]/70"
-                  set:html={paragraph
-                    .replace(
-                      /DREAMY TOURS/g,
-                      '<strong class="text-primary font-bold">DREAMY TOURS</strong>',
-                    )
-                    .replace(
-                      /Peru and Bolivia/g,
-                      '<strong class="text-primary font-bold">Peru and Bolivia</strong>',
-                    )
-                    .replace(
-                      /responsible tourism/g,
-                      '<strong class="text-primary font-bold">responsible tourism</strong>',
+                <p class="text-base leading-relaxed text-[#181311]/70">
+                  {paragraph
+                    .split(emphasisPattern)
+                    .map((part) =>
+                      emphasisPattern.test(part) ? (
+                        <strong class="text-primary font-bold">{part}</strong>
+                      ) : (
+                        part
+                      ),
                     )}
-                />
+                </p>
               ))
             ) : (
               <p class="text-base leading-relaxed text-[#181311]/70">

@@ -12,6 +12,7 @@ import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { ManualSEO } from "@/lib/seo";
 import { generateDescription } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
+import { serializeJsonForHtml } from "@/lib/html";
 
 import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
@@ -268,7 +269,7 @@ const heroImageAlt =
         is:inline
         id="page-slug-map"
         type="application/json"
-        set:html={JSON.stringify(pageSlugMap || {})}
+        set:html={serializeJsonForHtml(pageSlugMap || {})}
       />
       <div class="content-shell content-shell--mdx w-full mx-auto">
         <section class="content-hero content-hero--mdx relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">

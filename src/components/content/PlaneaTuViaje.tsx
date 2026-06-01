@@ -1,12 +1,7 @@
 "use client";
 
 import { type ChangeEvent, useState } from "react";
-import countriesData from "@/data/countries.json";
-
-interface Country {
-	nameES: string;
-	phoneCode?: string;
-}
+import { countries } from "@/data/countries";
 
 interface CountryOption {
 	nombre: string;
@@ -129,10 +124,10 @@ export default function PlaneaTuViaje({
 
 	// Cargar lista de países según idioma (idealmente traduciríamos country name pero usamos nameES por ahora)
 	const paises: CountryOption[] = [
-		...(countriesData as Country[])
+		...countries
 			.map((country) => ({
 				nombre: country.nameES,
-				codigo: country.phoneCode || "",
+				codigo: country.phoneCode,
 			}))
 			.sort((a, b) => a.nombre.localeCompare(b.nombre)),
 		{ nombre: t.otherCountry, codigo: "" },
@@ -235,7 +230,12 @@ export default function PlaneaTuViaje({
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-8 rounded-sm p-5  md:p-8">
+		<form
+			action="/api/planea-tu-viaje"
+			method="post"
+			onSubmit={handleSubmit}
+			className="space-y-8 rounded-sm p-5  md:p-8"
+		>
 			<div className="flex items-center gap-3 pb-5">
 				<div className="h-[2px] w-12 rounded-full bg-primary/70" />
 				<div className="h-px flex-1 bg-stone-200" />
@@ -269,6 +269,8 @@ export default function PlaneaTuViaje({
 							name="nombres"
 							value={formData.nombres}
 							onChange={handleChange}
+							autoComplete="name"
+							enterKeyHint="next"
 							required
 							style={inputStyle}
 							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
@@ -288,6 +290,7 @@ export default function PlaneaTuViaje({
 							name="pais"
 							value={formData.pais}
 							onChange={(e) => handlePaisChange(e.target.value)}
+							autoComplete="country-name"
 							required
 							style={inputStyle}
 							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
@@ -314,6 +317,9 @@ export default function PlaneaTuViaje({
 							name="email"
 							value={formData.email}
 							onChange={handleChange}
+							autoComplete="email"
+							inputMode="email"
+							enterKeyHint="next"
 							required
 							style={inputStyle}
 							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
@@ -336,6 +342,11 @@ export default function PlaneaTuViaje({
 								id="telefono"
 								type="tel"
 								name="telefono"
+								value={formData.telefono}
+								onChange={handleChange}
+								autoComplete="tel-national"
+								inputMode="tel"
+								enterKeyHint="next"
 								style={{
 									...inputStyle,
 									borderLeft: "none",
@@ -378,6 +389,7 @@ export default function PlaneaTuViaje({
 							name="adultos"
 							value={formData.adultos}
 							onChange={handleChange}
+							inputMode="numeric"
 							min="1"
 							style={inputStyle}
 							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
@@ -397,6 +409,7 @@ export default function PlaneaTuViaje({
 							name="menores"
 							value={formData.menores}
 							onChange={handleChange}
+							inputMode="numeric"
 							min="0"
 							style={inputStyle}
 							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
@@ -481,6 +494,7 @@ export default function PlaneaTuViaje({
 						name="mensaje"
 						value={formData.mensaje}
 						onChange={handleChange}
+						enterKeyHint="send"
 						rows={4}
 						style={inputStyle}
 						className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"

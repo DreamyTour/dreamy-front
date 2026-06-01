@@ -18,6 +18,7 @@ import {
 } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 import { normalizeLists } from "@/lib/strapiBlocks";
+import { serializeJsonForHtml } from "@/lib/html";
 
 type GlobalData = { footer?: { socialLogo?: Logo[] }; socialLogo?: Logo[] };
 type BlogPostProps = {
@@ -375,202 +376,205 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
         <div class="w-full text-foreground">
           {
             blog.contenido && Array.isArray(blog.contenido) ? (
-              normalizeLists(blog.contenido as StrapiBlock[]).map((block: StrapiBlock) => {
-                if (block.type === "paragraph") {
-                  return (
-                    <p class="mb-5 text-base leading-relaxed text-muted-foreground">
-                      {block.children?.map((child: StrapiBlockChild) => {
-                        let text = child.text;
-                        if (child.bold)
-                          return (
-                            <strong class="font-semibold text-foreground">
-                              {text}
-                            </strong>
-                          );
-                        if (child.italic) return <em class="italic">{text}</em>;
-                        if (child.underline)
-                          return (
-                            <u class="underline underline-offset-4">{text}</u>
-                          );
-                        if (child.code)
-                          return (
-                            <code class="rounded-md bg-muted px-1.5 py-0.5 text-sm font-mono text-primary">
-                              {text}
-                            </code>
-                          );
-                        return text;
-                      })}
-                    </p>
-                  );
-                }
-                if (block.type === "heading") {
-                  const level = block.level as number | undefined;
-                  const headingText =
-                    block.children
-                      ?.map((child: StrapiBlockChild) => child.text)
-                      .join("") || "";
-                  const headingId = generateSlug(headingText);
-                  if (level === 1)
+              normalizeLists(blog.contenido as StrapiBlock[]).map(
+                (block: StrapiBlock) => {
+                  if (block.type === "paragraph") {
                     return (
-                      <div class="relative pl-5 mt-8 mb-3">
-                        <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
-                        <h2
-                          id={headingId}
-                          class="text-3xl font-bold tracking-tight text-foreground"
-                        >
-                          {headingText}
-                        </h2>
-                      </div>
-                    );
-                  if (level === 2)
-                    return (
-                      <div class="relative pl-5 mt-7 mb-3 scroll-mt-24">
-                        <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
-                        <h2
-                          id={headingId}
-                          class="text-2xl font-bold tracking-tight text-foreground"
-                        >
-                          {headingText}
-                        </h2>
-                      </div>
-                    );
-                  if (level === 3)
-                    return (
-                      <h3
-                        id={headingId}
-                        class="mt-6 mb-2 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
-                      >
-                        {headingText}
-                      </h3>
-                    );
-                  if (level === 4)
-                    return (
-                      <h4
-                        id={headingId}
-                        class="mt-5 mb-2 scroll-mt-24 text-lg font-semibold text-foreground"
-                      >
-                        {headingText}
-                      </h4>
-                    );
-                  return (
-                    <h5
-                      id={headingId}
-                      class="mt-4 mb-1 scroll-mt-24 text-base font-semibold text-foreground"
-                    >
-                      {headingText}
-                    </h5>
-                  );
-                }
-                if (block.type === "list") {
-                  const ListTag = block.format === "ordered" ? "ol" : "ul";
-                  const listClasses =
-                    block.format === "ordered"
-                      ? "mb-5 list-decimal space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground"
-                      : "mb-5 list-disc space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground";
-                  return (
-                    <ListTag class={listClasses}>
-                      {block.children?.map((item: StrapiBlockChild) => (
-                        <li class="pl-1">
-                          {item.children?.map((child: StrapiBlockChild) => {
-                            let text = child.text;
-                            if (child.bold)
-                              return (
-                                <strong class="font-semibold text-foreground">
-                                  {text}
-                                </strong>
-                              );
-                            if (child.italic)
-                              return <em class="italic">{text}</em>;
-                            if (child.underline)
-                              return (
-                                <u class="underline underline-offset-4">
-                                  {text}
-                                </u>
-                              );
-                            if (child.code)
-                              return (
-                                <code class="rounded-md bg-muted px-1.5 py-0.5 text-sm font-mono text-primary">
-                                  {text}
-                                </code>
-                              );
-                            return text;
-                          })}
-                        </li>
-                      ))}
-                    </ListTag>
-                  );
-                }
-                if (block.type === "image") {
-                  const image = block.image as BlogImage | undefined;
-                  return (
-                    <figure class="my-10 mx-auto">
-                      <img
-                        src={getImageUrl(image, "large")}
-                        srcset={
-                          getImageSrcSet(image, [
-                            "thumbnail",
-                            "small",
-                            "medium",
-                            "large",
-                          ]) || undefined
-                        }
-                        sizes="(max-width: 1023px) 100vw, 75vw"
-                        alt={getImageAlt(image, "Blog image")}
-                        class="h-auto w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      {image?.caption && (
-                        <figcaption class="mt-3 text-center text-sm font-medium text-muted-foreground">
-                          {image.caption}
-                        </figcaption>
-                      )}
-                    </figure>
-                  );
-                }
-                if (
-                  block.type === "component" &&
-                  (block.__component === "shared.video" ||
-                    block.component === "shared.video")
-                ) {
-                  const videoUrl =
-                    typeof block.videoURL === "string"
-                      ? block.videoURL
-                      : typeof block.videoUrl === "string"
-                        ? block.videoUrl
-                        : undefined;
-                  const videoTitle =
-                    typeof block.title === "string" ? block.title : "Video";
-                  const videoId = getYouTubeVideoId(videoUrl);
-                  if (videoId) {
-                    const thumbnailUrl = getThumbnailUrl(block.thumbnail);
-                    return (
-                      <div class="my-10">
-                        <div class="flex flex-col lg:flex-row gap-8 items-start">
-                          <div class="hidden lg:block lg:w-[380px] shrink-0">
-                            <LiteYouTube
-                              videoId={videoId}
-                              title={videoTitle}
-                              backgroundImage={thumbnailUrl || undefined}
-                              withShadowImage={!!thumbnailUrl}
-                            />
-                          </div>
-                          <div class="lg:hidden w-full">
-                            <LiteYouTube
-                              videoId={videoId}
-                              title={videoTitle}
-                              backgroundImage={thumbnailUrl || undefined}
-                              withShadowImage={!!thumbnailUrl}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      <p class="mb-5 text-base leading-relaxed text-muted-foreground">
+                        {block.children?.map((child: StrapiBlockChild) => {
+                          let text = child.text;
+                          if (child.bold)
+                            return (
+                              <strong class="font-semibold text-foreground">
+                                {text}
+                              </strong>
+                            );
+                          if (child.italic)
+                            return <em class="italic">{text}</em>;
+                          if (child.underline)
+                            return (
+                              <u class="underline underline-offset-4">{text}</u>
+                            );
+                          if (child.code)
+                            return (
+                              <code class="rounded-md bg-muted px-1.5 py-0.5 text-sm font-mono text-primary">
+                                {text}
+                              </code>
+                            );
+                          return text;
+                        })}
+                      </p>
                     );
                   }
+                  if (block.type === "heading") {
+                    const level = block.level as number | undefined;
+                    const headingText =
+                      block.children
+                        ?.map((child: StrapiBlockChild) => child.text)
+                        .join("") || "";
+                    const headingId = generateSlug(headingText);
+                    if (level === 1)
+                      return (
+                        <div class="relative pl-5 mt-8 mb-3">
+                          <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
+                          <h2
+                            id={headingId}
+                            class="text-3xl font-bold tracking-tight text-foreground"
+                          >
+                            {headingText}
+                          </h2>
+                        </div>
+                      );
+                    if (level === 2)
+                      return (
+                        <div class="relative pl-5 mt-7 mb-3 scroll-mt-24">
+                          <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
+                          <h2
+                            id={headingId}
+                            class="text-2xl font-bold tracking-tight text-foreground"
+                          >
+                            {headingText}
+                          </h2>
+                        </div>
+                      );
+                    if (level === 3)
+                      return (
+                        <h3
+                          id={headingId}
+                          class="mt-6 mb-2 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
+                        >
+                          {headingText}
+                        </h3>
+                      );
+                    if (level === 4)
+                      return (
+                        <h4
+                          id={headingId}
+                          class="mt-5 mb-2 scroll-mt-24 text-lg font-semibold text-foreground"
+                        >
+                          {headingText}
+                        </h4>
+                      );
+                    return (
+                      <h5
+                        id={headingId}
+                        class="mt-4 mb-1 scroll-mt-24 text-base font-semibold text-foreground"
+                      >
+                        {headingText}
+                      </h5>
+                    );
+                  }
+                  if (block.type === "list") {
+                    const ListTag = block.format === "ordered" ? "ol" : "ul";
+                    const listClasses =
+                      block.format === "ordered"
+                        ? "mb-5 list-decimal space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground"
+                        : "mb-5 list-disc space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground";
+                    return (
+                      <ListTag class={listClasses}>
+                        {block.children?.map((item: StrapiBlockChild) => (
+                          <li class="pl-1">
+                            {item.children?.map((child: StrapiBlockChild) => {
+                              let text = child.text;
+                              if (child.bold)
+                                return (
+                                  <strong class="font-semibold text-foreground">
+                                    {text}
+                                  </strong>
+                                );
+                              if (child.italic)
+                                return <em class="italic">{text}</em>;
+                              if (child.underline)
+                                return (
+                                  <u class="underline underline-offset-4">
+                                    {text}
+                                  </u>
+                                );
+                              if (child.code)
+                                return (
+                                  <code class="rounded-md bg-muted px-1.5 py-0.5 text-sm font-mono text-primary">
+                                    {text}
+                                  </code>
+                                );
+                              return text;
+                            })}
+                          </li>
+                        ))}
+                      </ListTag>
+                    );
+                  }
+                  if (block.type === "image") {
+                    const image = block.image as BlogImage | undefined;
+                    return (
+                      <figure class="my-10 mx-auto">
+                        <img
+                          src={getImageUrl(image, "large")}
+                          srcset={
+                            getImageSrcSet(image, [
+                              "thumbnail",
+                              "small",
+                              "medium",
+                              "large",
+                            ]) || undefined
+                          }
+                          sizes="(max-width: 1023px) 100vw, 75vw"
+                          alt={getImageAlt(image, "Blog image")}
+                          class="h-auto w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        {image?.caption && (
+                          <figcaption class="mt-3 text-center text-sm font-medium text-muted-foreground">
+                            {image.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    );
+                  }
+                  if (
+                    block.type === "component" &&
+                    (block.__component === "shared.video" ||
+                      block.component === "shared.video")
+                  ) {
+                    const videoUrl =
+                      typeof block.videoURL === "string"
+                        ? block.videoURL
+                        : typeof block.videoUrl === "string"
+                          ? block.videoUrl
+                          : undefined;
+                    const videoTitle =
+                      typeof block.title === "string" ? block.title : "Video";
+                    const videoId = getYouTubeVideoId(videoUrl);
+                    if (videoId) {
+                      const thumbnailUrl = getThumbnailUrl(block.thumbnail);
+                      return (
+                        <div class="my-10">
+                          <div class="flex flex-col lg:flex-row gap-8 items-start">
+                            <div class="hidden lg:block lg:w-[380px] shrink-0">
+                              <LiteYouTube
+                                videoId={videoId}
+                                title={videoTitle}
+                                backgroundImage={thumbnailUrl || undefined}
+                                withShadowImage={!!thumbnailUrl}
+                              />
+                            </div>
+                            <div class="lg:hidden w-full">
+                              <LiteYouTube
+                                videoId={videoId}
+                                title={videoTitle}
+                                backgroundImage={thumbnailUrl || undefined}
+                                withShadowImage={!!thumbnailUrl}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }
                   return null;
-                }
-                return null;
-              })
+                },
+              )
             ) : (
               <p class="italic text-muted-foreground">No content available.</p>
             )
@@ -627,7 +631,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
       is:inline
       id="blog-slug-map"
       type="application/json"
-      set:html={JSON.stringify(slugMap)}
+      set:html={serializeJsonForHtml(slugMap)}
     />
   )
 }

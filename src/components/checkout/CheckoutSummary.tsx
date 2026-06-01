@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from "react";
 import {
-	Calendar,
-	Users,
 	AlertCircle,
-	Check,
 	ArrowLeft,
 	ArrowRight,
-	Shield,
+	Calendar,
+	Check,
 	Lock,
+	Shield,
+	Users,
 } from "lucide-react";
-import countriesData from "@/data/countries.json";
+import { useEffect, useRef, useState } from "react";
+import { countries } from "@/data/countries";
 
 interface BookingCart {
 	tourId?: string | number;
@@ -30,15 +30,6 @@ interface Passenger {
 	documentNumber: string;
 	country: string;
 }
-
-interface Country {
-	nameES: string;
-	nameEN: string;
-	iso2: string;
-	phoneCode?: string;
-}
-
-const countries = countriesData as Country[];
 
 export default function CheckoutSummary() {
 	const [cart, setCart] = useState<BookingCart | null>(null);
@@ -90,11 +81,13 @@ export default function CheckoutSummary() {
 	}, []);
 
 	// Clear error when user starts typing
+	// biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally clears stale errors when form state changes.
 	useEffect(() => {
 		setError(null);
 	}, [contact, passengers, acceptedTerms]);
 
 	// Clear error when changing steps
+	// biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally clears stale errors when the checkout step changes.
 	useEffect(() => {
 		setError(null);
 	}, [step]);
@@ -210,7 +203,7 @@ export default function CheckoutSummary() {
 				window.localStorage.removeItem("bookingCart");
 				window.location.href = data.redirectUrl;
 			} else {
-				alert("Error Processing Checkout: " + (data.error || "Unknown"));
+				alert(`Error Processing Checkout: ${data.error || "Unknown"}`);
 			}
 		} catch (err) {
 			const message = err instanceof Error ? err.message : "Network Error";
@@ -242,7 +235,7 @@ export default function CheckoutSummary() {
 					day: "numeric",
 				},
 			);
-		} catch (e) {
+		} catch {
 			/* ignore */
 		}
 	}
@@ -472,7 +465,7 @@ export default function CheckoutSummary() {
 						<div className="space-y-6 mb-10">
 							{passengers.map((pax, i) => (
 								<div
-									key={i}
+									key={`${pax.documentNumber || pax.dob || pax.name || "passenger"}-${pax.lastname || ""}`}
 									className="bg-gray-50/30 rounded-sm p-5 border border-gray-100"
 								>
 									<div className="flex items-center gap-2 mb-4">
@@ -491,6 +484,9 @@ export default function CheckoutSummary() {
 											</span>
 											<input
 												type="text"
+												name={`passenger-${i + 1}-given-name`}
+												autoComplete="given-name"
+												required
 												value={pax.name}
 												onChange={(e) =>
 													handlePassengerChange(i, "name", e.target.value)
@@ -504,6 +500,9 @@ export default function CheckoutSummary() {
 											</span>
 											<input
 												type="text"
+												name={`passenger-${i + 1}-family-name`}
+												autoComplete="family-name"
+												required
 												value={pax.lastname}
 												onChange={(e) =>
 													handlePassengerChange(i, "lastname", e.target.value)
@@ -516,6 +515,8 @@ export default function CheckoutSummary() {
 												Gender *
 											</span>
 											<select
+												name={`passenger-${i + 1}-gender`}
+												required
 												value={pax.gender}
 												onChange={(e) =>
 													handlePassengerChange(i, "gender", e.target.value)
@@ -532,6 +533,9 @@ export default function CheckoutSummary() {
 											</span>
 											<input
 												type="date"
+												name={`passenger-${i + 1}-birthdate`}
+												autoComplete="bday"
+												required
 												value={pax.dob}
 												onChange={(e) =>
 													handlePassengerChange(i, "dob", e.target.value)
@@ -544,6 +548,8 @@ export default function CheckoutSummary() {
 												Document Type *
 											</span>
 											<select
+												name={`passenger-${i + 1}-document-type`}
+												required
 												value={pax.documentType}
 												onChange={(e) =>
 													handlePassengerChange(
@@ -564,6 +570,9 @@ export default function CheckoutSummary() {
 											</span>
 											<input
 												type="text"
+												name={`passenger-${i + 1}-document-number`}
+												autoComplete="off"
+												required
 												value={pax.documentNumber}
 												onChange={(e) =>
 													handlePassengerChange(
@@ -580,6 +589,9 @@ export default function CheckoutSummary() {
 												Issuing Country *
 											</span>
 											<select
+												name={`passenger-${i + 1}-issuing-country`}
+												autoComplete="country"
+												required
 												value={pax.country}
 												onChange={(e) =>
 													handlePassengerChange(i, "country", e.target.value)
@@ -611,6 +623,9 @@ export default function CheckoutSummary() {
 									</span>
 									<input
 										type="text"
+										name="contact-given-name"
+										autoComplete="given-name"
+										required
 										placeholder="John"
 										value={contact.firstname}
 										onChange={(e) =>
@@ -625,6 +640,9 @@ export default function CheckoutSummary() {
 									</span>
 									<input
 										type="text"
+										name="contact-family-name"
+										autoComplete="family-name"
+										required
 										placeholder="Doe"
 										value={contact.lastname}
 										onChange={(e) =>
@@ -639,6 +657,10 @@ export default function CheckoutSummary() {
 									</span>
 									<input
 										type="email"
+										name="contact-email"
+										autoComplete="email"
+										inputMode="email"
+										required
 										placeholder="john@example.com"
 										value={contact.email}
 										onChange={(e) =>
@@ -653,6 +675,9 @@ export default function CheckoutSummary() {
 											Country Code *
 										</span>
 										<select
+											name="contact-phone-code"
+											autoComplete="tel-country-code"
+											required
 											value={contact.phoneCode}
 											onChange={(e) =>
 												setContact({ ...contact, phoneCode: e.target.value })
@@ -678,6 +703,10 @@ export default function CheckoutSummary() {
 										</span>
 										<input
 											type="tel"
+											name="contact-phone"
+											autoComplete="tel-national"
+											inputMode="tel"
+											required
 											placeholder="123 456 7890"
 											value={contact.phone}
 											onChange={(e) =>
@@ -694,6 +723,8 @@ export default function CheckoutSummary() {
 						<label className="flex items-start gap-3 mb-8 cursor-pointer p-4 bg-gray-50/30 rounded-sm border border-gray-100">
 							<input
 								type="checkbox"
+								name="acceptedTerms"
+								required
 								checked={acceptedTerms}
 								onChange={(e) => setAcceptedTerms(e.target.checked)}
 								className="w-5 h-5 accent-primary cursor-pointer mt-0.5 rounded"
@@ -766,13 +797,7 @@ export default function CheckoutSummary() {
 								Payment Method
 							</h3>
 							<div className="mb-8">
-								<div
-									className={`flex items-center justify-between p-5 rounded-sm border-2 cursor-pointer transition-all ${
-										true // Always selected since only PayPal
-											? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-											: "border-gray-200 hover:border-primary/50"
-									}`}
-								>
+								<div className="flex items-center justify-between p-5 rounded-sm border-2 cursor-pointer transition-all border-primary bg-primary/5 shadow-lg shadow-primary/10">
 									<div className="flex items-center gap-4">
 										<div className="w-12 h-12 bg-[#003087] rounded-lg flex items-center justify-center">
 											<span className="text-white font-bold text-sm">

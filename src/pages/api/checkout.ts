@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { escapeHtml } from "../../lib/html";
 
 export const prerender = false;
 
@@ -32,7 +33,6 @@ interface CheckoutPayload {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-	// Dynamic import de Resend solo cuando se necesita
 	let resend = null;
 	const resendApiKey =
 		import.meta.env.RESEND_API_KEY || process.env.RESEND_API_KEY;
@@ -67,18 +67,16 @@ export const POST: APIRoute = async ({ request }) => {
 		}
 
 		const data = JSON.parse(rawBody) as CheckoutPayload;
-
 		const { passengersInfo, contactInfo, cart } = data;
 		const passengers = Array.isArray(passengersInfo) ? passengersInfo : [];
 
 		console.log("Checkout API received:", {
-			passengersInfo,
-			contactInfo,
-			cart,
+			passengersCount: passengers.length,
+			hasContactEmail: Boolean(contactInfo?.email),
+			tourName: cart?.tourName,
 		});
 
-		// Validar que tenemos los datos necesarios
-		if (!cart || !cart.tourName || !cart.totalPrice) {
+		if (!cart?.tourName || !cart.totalPrice) {
 			console.error("Missing cart data");
 			return new Response(JSON.stringify({ error: "Missing cart data" }), {
 				status: 400,
@@ -86,7 +84,7 @@ export const POST: APIRoute = async ({ request }) => {
 			});
 		}
 
-		if (!contactInfo || !contactInfo.email) {
+		if (!contactInfo?.email) {
 			console.error("Missing contact email");
 			return new Response(JSON.stringify({ error: "Missing contact email" }), {
 				status: 400,
@@ -94,50 +92,80 @@ export const POST: APIRoute = async ({ request }) => {
 			});
 		}
 
+		const totalPrice = Number(cart.totalPrice);
+		const amountPaid = Number(cart.amountPaid);
+
+		if (!Number.isFinite(totalPrice)) {
+			throw new Error("Invalid cart.totalPrice value");
+		}
+
 		let emailSent = false;
 		let emailError: string | null = null;
+		const safeCart = {
+			tourName: escapeHtml(cart.tourName),
+			date: escapeHtml(cart.date || "Sin definir"),
+			passengers: escapeHtml(cart.passengers),
+			amountPaid: Number.isFinite(amountPaid) ? amountPaid.toFixed(2) : "0.00",
+			totalPrice: totalPrice.toFixed(2),
+			amountToPayLabel:
+				cart.amountToPayLabel === "minimum" ? "Adelanto del 50%" : "Pago Total",
+		};
+		const safeContact = {
+			firstname: escapeHtml(contactInfo.firstname),
+			lastname: escapeHtml(contactInfo.lastname),
+			email: escapeHtml(contactInfo.email),
+			phoneCode: escapeHtml(contactInfo.phoneCode),
+			phone: escapeHtml(contactInfo.phone),
+		};
 
-		// 1. Enviar Email con Resend solo si esta configurado
 		if (resend && contactInfo.email) {
 			const { data: emailData, error: resendError } = await resend.emails.send({
 				from: "Reservas Dreamy Tours <info@dreamy.tours>",
 				to: ["info@dreamy.tours"],
-				//bcc: [contactInfo.email], // Se enviará una copia a la agencia
 				subject: `Reserva Confirmada: ${cart.tourName}`,
 				replyTo: contactInfo.email,
 				html: `
              <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
                <h2>Detalles de la Reserva</h2>
-               <p><strong>Tour:</strong> ${cart.tourName}</p>
-               <p><strong>Fecha de Viaje:</strong> ${cart.date || "Sin definir"}</p>
-               <p><strong>Cantidad de Pasajeros:</strong> ${cart.passengers}</p>
-               
+               <p><strong>Tour:</strong> ${safeCart.tourName}</p>
+               <p><strong>Fecha de Viaje:</strong> ${safeCart.date}</p>
+               <p><strong>Cantidad de Pasajeros:</strong> ${safeCart.passengers}</p>
+
                <h3>Detalles de Pago</h3>
-               <p><strong>Monto Pagado a través de PayPal:</strong> US$${Number(cart.amountPaid).toFixed(2)} 
-                 <em>(${cart.amountToPayLabel === "minimum" ? "Adelanto del 50%" : "Pago Total"})</em>
+               <p><strong>Monto Pagado a traves de PayPal:</strong> US$${safeCart.amountPaid}
+                 <em>(${safeCart.amountToPayLabel})</em>
                </p>
-               <p><strong>Precio Total Original:</strong> US$${Number(cart.totalPrice).toFixed(2)}</p>
+               <p><strong>Precio Total Original:</strong> US$${safeCart.totalPrice}</p>
 
                <h3>Datos de Contacto Principales</h3>
                <ul style="list-style: none; padding: 0;">
-                  <li><strong>Nombre Completo:</strong> ${contactInfo.firstname} ${contactInfo.lastname}</li>
-                  <li><strong>Correo Electrónico:</strong> ${contactInfo.email}</li>
-                  <li><strong>Teléfono / WhatsApp:</strong> ${contactInfo.phoneCode} ${contactInfo.phone}</li>
+                  <li><strong>Nombre Completo:</strong> ${safeContact.firstname} ${safeContact.lastname}</li>
+                  <li><strong>Correo Electronico:</strong> ${safeContact.email}</li>
+                  <li><strong>Telefono / WhatsApp:</strong> ${safeContact.phoneCode} ${safeContact.phone}</li>
                </ul>
 
-               <h3>Información de los Pasajeros (Travelers)</h3>
+               <h3>Informacion de los Pasajeros (Travelers)</h3>
                <ul>
                  ${passengers
-										.map(
-											(p: CheckoutPassenger, i: number) =>
-												`<li style="margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 6px;">
-                      <strong style="color: #6d28d9;">Pasajero ${i + 1}:</strong> ${p.name} ${p.lastname}<br/>
-                      <strong>Género:</strong> ${p.gender} | 
-                      <strong>Fecha de Nacimiento:</strong> ${p.dob} | 
-                      <strong>País Emisor:</strong> ${p.country}<br/>
-                      <strong>${p.documentType}:</strong> ${p.documentNumber}
-                   </li>`,
-										)
+										.map((p: CheckoutPassenger, i: number) => {
+											const passenger = {
+												name: escapeHtml(p.name),
+												lastname: escapeHtml(p.lastname),
+												gender: escapeHtml(p.gender),
+												dob: escapeHtml(p.dob),
+												country: escapeHtml(p.country),
+												documentType: escapeHtml(p.documentType),
+												documentNumber: escapeHtml(p.documentNumber),
+											};
+
+											return `<li style="margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 6px;">
+                      <strong style="color: #6d28d9;">Pasajero ${i + 1}:</strong> ${passenger.name} ${passenger.lastname}<br/>
+                      <strong>Genero:</strong> ${passenger.gender} |
+                      <strong>Fecha de Nacimiento:</strong> ${passenger.dob} |
+                      <strong>Pais Emisor:</strong> ${passenger.country}<br/>
+                      <strong>${passenger.documentType}:</strong> ${passenger.documentNumber}
+                   </li>`;
+										})
 										.join("")}
                </ul>
              </div>
@@ -155,14 +183,8 @@ export const POST: APIRoute = async ({ request }) => {
 			console.log("Resend not configured, skipping email");
 		}
 
-		// 2. Armar la URL de PayPal
-		// IMPORTANTE: Actualizar este correo al correo oficial de tu cuenta PayPal de negocio
 		const businessEmail = "info@turismoperu.com.pe";
 		const itemName = encodeURIComponent(cart.tourName);
-		const totalPrice = Number(cart.totalPrice);
-		if (!Number.isFinite(totalPrice)) {
-			throw new Error("Invalid cart.totalPrice value");
-		}
 		const amount = totalPrice.toFixed(2);
 		const returnUrl = encodeURIComponent(
 			`${new URL(request.url).origin}/checkout/success`,

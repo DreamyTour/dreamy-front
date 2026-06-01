@@ -1,6 +1,7 @@
 ---
 import type { Lang } from "@/lib/i18n";
 import { LANGS, DEFAULT_LANG, localizePath, stripLangPrefix } from "@/lib/i18n";
+import { serializeJsonForHtml } from "@/lib/html";
 
 const DEFAULT_SEO_IMAGE_ALT =
   "Dreamy Tours - tours y paquetes turisticos en Peru y Bolivia";
@@ -255,19 +256,19 @@ const articleSchema =
 <script
   is:inline
   type="application/ld+json"
-  set:html={JSON.stringify(organizationSchema)}
+  set:html={serializeJsonForHtml(organizationSchema)}
 />
 <script
   is:inline
   type="application/ld+json"
-  set:html={JSON.stringify(breadcrumbSchema)}
+  set:html={serializeJsonForHtml(breadcrumbSchema)}
 />
 {
   articleSchema && (
     <script
       is:inline
       type="application/ld+json"
-      set:html={JSON.stringify(articleSchema)}
+      set:html={serializeJsonForHtml(articleSchema)}
     />
   )
 }
