@@ -1,0 +1,523 @@
+---
+type Lang = "es" | "en" | "pt";
+
+interface Props {
+  lang?: Lang;
+}
+
+const selectedLang = Astro.props.lang ?? "en";
+
+const content = {
+  es: {
+    kicker: "Inclusión y diversidad",
+    introTitle: "Viaja por Perú con respeto, cuidado y libertad.",
+    introText:
+      "Dreamy Tours da la bienvenida a viajeros LGBT+ en Cusco, el Valle Sagrado, Machu Picchu, Perú y Bolivia. Nuestro propósito es sencillo: crear viajes donde te sientas visto, protegido y libre de disfrutar los Andes sin tener que explicar quién eres.",
+    note: "El Orgullo se celebra cada junio, con el 28 de junio como Día Internacional del Orgullo LGBT+. Para nosotros, la inclusión no es temporal; forma parte de cómo diseñamos y operamos cada viaje.",
+    prideTitle: "El significado del Día del Orgullo LGBT+",
+    prideParagraphs: [
+      "El Día Internacional del Orgullo LGBT+ se conmemora el 28 de junio en muchas partes del mundo. Es un recordatorio de la lucha continua por la igualdad de derechos, la dignidad y la protección frente a la discriminación, la violencia y los delitos de odio.",
+      "El Orgullo también celebra la valentía de quienes eligieron visibilidad y comunidad cuando el mundo les pedía silencio.",
+    ],
+    timelineLabel: "Momentos clave en la historia del Orgullo LGBT+",
+    timeline: [
+      {
+        marker: "1969",
+        title: "El levantamiento de Stonewall",
+        text: "En la madrugada del 28 de junio de 1969, la comunidad LGBT+ resistió una redada policial en el Stonewall Inn de Greenwich Village, Nueva York. Ese momento se convirtió en una de las chispas más claras del movimiento moderno del Orgullo.",
+      },
+      {
+        marker: "Movimiento global",
+        title: "Una demanda de dignidad",
+        text: "Lo que empezó como resistencia se transformó en un movimiento mundial por el respeto, el reconocimiento legal, la igualdad y la libertad de vivir abiertamente.",
+      },
+      {
+        marker: "2009",
+        title: "Reconocimiento del Mes del Orgullo",
+        text: "En junio de 2009, Barack Obama reconoció junio como el Mes del Orgullo LGBT, honrando Stonewall y renovando el llamado a la igualdad ante la ley.",
+      },
+      {
+        marker: "2016",
+        title: "Monumento Nacional Stonewall",
+        text: "Stonewall se convirtió en el primer monumento nacional de Estados Unidos dedicado a los derechos LGBT+, preservando su lugar en la historia de los derechos civiles.",
+      },
+    ],
+    travelTitle: "Viajes LGBT+ en Perú y Sudamérica",
+    travelText:
+      "Perú es un destino vibrante, con hospitalidad cálida, culturas vivas, paisajes sagrados y rutas inolvidables. En Dreamy Tours, nos alegra recibir a viajeros LGBT+ en Cusco, el Valle Sagrado, Machu Picchu y más allá.",
+    commitmentsLabel: "Compromisos de Dreamy Tours",
+    commitments: [
+      {
+        number: "01",
+        title: "Seguridad y respeto",
+        text: "Nuestro equipo y guías locales están orientados a brindar acompañamiento respetuoso e inclusivo desde la llegada hasta la despedida.",
+      },
+      {
+        number: "02",
+        title: "Experiencias a medida",
+        text: "Escapadas románticas, lunas de miel, viajes familiares y aventuras andinas pueden adaptarse a tu ritmo y estilo de viaje.",
+      },
+      {
+        number: "03",
+        title: "Aliados confiables",
+        text: "Coordinamos con hoteles, transportes y operadores locales que entienden la hospitalidad sin discriminación.",
+      },
+    ],
+    ctaKicker: "Viajes inclusivos en Perú y Bolivia",
+    ctaTitle:
+      "Planifica un viaje donde la experiencia se sienta personal, no genérica.",
+    ctaText: "Planifica tu viaje",
+  },
+  en: {
+    kicker: "Inclusion & diversity",
+    introTitle: "Travel through Peru with respect, care, and freedom.",
+    introText:
+      "Dreamy Tours welcomes LGBT+ travelers in Cusco, the Sacred Valley, Machu Picchu, Peru, and Bolivia. Our role is simple: create journeys where you feel seen, protected, and free to enjoy the Andes without having to explain who you are.",
+    note: "Pride is celebrated every June, with June 28 marking International LGBT+ Pride Day. For us, inclusion is not seasonal; it is part of how we design and operate every trip.",
+    prideTitle: "The Meaning of LGBT+ Pride Day",
+    prideParagraphs: [
+      "International LGBT+ Pride Day is observed on June 28 in many parts of the world. It is a reminder of the ongoing struggle for equal rights, dignity, and protection from discrimination, violence, and hate crimes.",
+      "Pride also celebrates the courage of people who chose visibility and community when the world asked them to stay silent.",
+    ],
+    timelineLabel: "Key moments in LGBT+ Pride history",
+    timeline: [
+      {
+        marker: "1969",
+        title: "The Stonewall uprising",
+        text: "In the early hours of June 28, 1969, the LGBT+ community resisted a police raid at the Stonewall Inn in Greenwich Village, New York. That moment became one of the clearest sparks of the modern Pride movement.",
+      },
+      {
+        marker: "Global movement",
+        title: "A demand for dignity",
+        text: "What began as resistance became a worldwide movement for respect, legal recognition, equality, and the freedom to live openly.",
+      },
+      {
+        marker: "2009",
+        title: "Pride Month recognition",
+        text: "In June 2009, Barack Obama recognized June as LGBT Pride Month, honoring Stonewall and renewing the call for equality under the law.",
+      },
+      {
+        marker: "2016",
+        title: "Stonewall National Monument",
+        text: "Stonewall became the first United States national monument dedicated to LGBT+ rights, preserving its place in the history of civil rights.",
+      },
+    ],
+    travelTitle: "LGBT+ Travel in Peru and South America",
+    travelText:
+      "Peru is a vibrant destination with warm hospitality, living cultures, sacred landscapes, and unforgettable routes. At Dreamy Tours, we are glad to welcome LGBT+ travelers to Cusco, the Sacred Valley, Machu Picchu, and beyond.",
+    commitmentsLabel: "Dreamy Tours commitments",
+    commitments: [
+      {
+        number: "01",
+        title: "Safety and respect",
+        text: "Our team and local guides are oriented toward respectful, inclusive travel support from arrival to farewell.",
+      },
+      {
+        number: "02",
+        title: "Tailored experiences",
+        text: "Romantic escapes, honeymoons, family trips, and Andean adventures can be shaped around your pace and travel style.",
+      },
+      {
+        number: "03",
+        title: "Trusted partners",
+        text: "We coordinate with hotels, transport providers, and local operators who understand hospitality without discrimination.",
+      },
+    ],
+    ctaKicker: "Inclusive journeys in Peru and Bolivia",
+    ctaTitle: "Plan a trip where the experience feels personal, not generic.",
+    ctaText: "Plan your trip",
+  },
+  pt: {
+    kicker: "Inclusão e diversidade",
+    introTitle: "Viaje pelo Peru com respeito, cuidado e liberdade.",
+    introText:
+      "A Dreamy Tours recebe viajantes LGBT+ em Cusco, no Vale Sagrado, em Machu Picchu, no Peru e na Bolívia. Nosso papel é simples: criar viagens nas quais você se sinta visto, protegido e livre para aproveitar os Andes sem precisar explicar quem você é.",
+    note: "O Orgulho é celebrado todos os anos em junho, com 28 de junho marcando o Dia Internacional do Orgulho LGBT+. Para nós, a inclusão não é sazonal; faz parte de como desenhamos e operamos cada viagem.",
+    prideTitle: "O significado do Dia do Orgulho LGBT+",
+    prideParagraphs: [
+      "O Dia Internacional do Orgulho LGBT+ é celebrado em 28 de junho em muitas partes do mundo. É um lembrete da luta contínua por igualdade de direitos, dignidade e proteção contra discriminação, violência e crimes de ódio.",
+      "O Orgulho também celebra a coragem de pessoas que escolheram visibilidade e comunidade quando o mundo pedia silêncio.",
+    ],
+    timelineLabel: "Momentos-chave na história do Orgulho LGBT+",
+    timeline: [
+      {
+        marker: "1969",
+        title: "A revolta de Stonewall",
+        text: "Na madrugada de 28 de junho de 1969, a comunidade LGBT+ resistiu a uma batida policial no Stonewall Inn, em Greenwich Village, Nova York. Esse momento se tornou uma das faíscas mais claras do movimento moderno do Orgulho.",
+      },
+      {
+        marker: "Movimento global",
+        title: "Uma demanda por dignidade",
+        text: "O que começou como resistência se transformou em um movimento mundial por respeito, reconhecimento legal, igualdade e liberdade para viver abertamente.",
+      },
+      {
+        marker: "2009",
+        title: "Reconhecimento do Mês do Orgulho",
+        text: "Em junho de 2009, Barack Obama reconheceu junho como o Mês do Orgulho LGBT, homenageando Stonewall e renovando o chamado pela igualdade perante a lei.",
+      },
+      {
+        marker: "2016",
+        title: "Monumento Nacional Stonewall",
+        text: "Stonewall tornou-se o primeiro monumento nacional dos Estados Unidos dedicado aos direitos LGBT+, preservando seu lugar na história dos direitos civis.",
+      },
+    ],
+    travelTitle: "Viagens LGBT+ no Peru e na América do Sul",
+    travelText:
+      "O Peru é um destino vibrante, com hospitalidade acolhedora, culturas vivas, paisagens sagradas e rotas inesquecíveis. Na Dreamy Tours, temos prazer em receber viajantes LGBT+ em Cusco, no Vale Sagrado, em Machu Picchu e além.",
+    commitmentsLabel: "Compromissos da Dreamy Tours",
+    commitments: [
+      {
+        number: "01",
+        title: "Segurança e respeito",
+        text: "Nossa equipe e guias locais são orientados para oferecer apoio de viagem respeitoso e inclusivo desde a chegada até a despedida.",
+      },
+      {
+        number: "02",
+        title: "Experiências sob medida",
+        text: "Escapadas românticas, luas de mel, viagens em família e aventuras andinas podem ser adaptadas ao seu ritmo e estilo de viagem.",
+      },
+      {
+        number: "03",
+        title: "Parceiros confiáveis",
+        text: "Coordenamos com hotéis, transportes e operadores locais que entendem hospitalidade sem discriminação.",
+      },
+    ],
+    ctaKicker: "Viagens inclusivas no Peru e na Bolívia",
+    ctaTitle:
+      "Planeje uma viagem em que a experiência pareça pessoal, não genérica.",
+    ctaText: "Planeje sua viagem",
+  },
+} satisfies Record<
+  Lang,
+  {
+    kicker: string;
+    introTitle: string;
+    introText: string;
+    note: string;
+    prideTitle: string;
+    prideParagraphs: string[];
+    timelineLabel: string;
+    timeline: Array<{ marker: string; title: string; text: string }>;
+    travelTitle: string;
+    travelText: string;
+    commitmentsLabel: string;
+    commitments: Array<{ number: string; title: string; text: string }>;
+    ctaKicker: string;
+    ctaTitle: string;
+    ctaText: string;
+  }
+>;
+
+const page = content[selectedLang] ?? content.en;
+---
+
+<section class="lgbt-page" aria-labelledby="lgbt-intro-title">
+  <div class="lgbt-kicker">{page.kicker}</div>
+
+  <div class="lgbt-intro">
+    <div>
+      <h2 id="lgbt-intro-title">{page.introTitle}</h2>
+      <p>{page.introText}</p>
+    </div>
+
+    <p class="lgbt-note">{page.note}</p>
+  </div>
+
+  <div class="lgbt-pride-bar" aria-hidden="true"></div>
+</section>
+
+<section class="lgbt-copy" aria-labelledby="lgbt-pride-title">
+  <h2 id="lgbt-pride-title">{page.prideTitle}</h2>
+  {page.prideParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+</section>
+
+<section class="lgbt-page lgbt-timeline" aria-label={page.timelineLabel}>
+  {
+    page.timeline.map((item) => (
+      <article>
+        <span>{item.marker}</span>
+        <h3>{item.title}</h3>
+        <p>{item.text}</p>
+      </article>
+    ))
+  }
+</section>
+
+<section class="lgbt-copy" aria-labelledby="lgbt-travel-title">
+  <h2 id="lgbt-travel-title">{page.travelTitle}</h2>
+  <p>{page.travelText}</p>
+</section>
+
+<section class="lgbt-page lgbt-commitments" aria-label={page.commitmentsLabel}>
+  {
+    page.commitments.map((item) => (
+      <div>
+        <span>{item.number}</span>
+        <h3>{item.title}</h3>
+        <p>{item.text}</p>
+      </div>
+    ))
+  }
+</section>
+
+<section class="lgbt-page lgbt-cta" aria-labelledby="lgbt-cta-title">
+  <div>
+    <p>{page.ctaKicker}</p>
+    <h2 id="lgbt-cta-title">{page.ctaTitle}</h2>
+  </div>
+
+  <a href="mailto:info@dreamytours.com">{page.ctaText}</a>
+</section>
+
+<style>
+  .lgbt-page,
+  .lgbt-copy {
+    --lgbt-ink: color-mix(in oklab, var(--foreground) 92%, #172554 8%);
+    --lgbt-soft: color-mix(in oklab, var(--muted) 70%, white 30%);
+    --lgbt-line: color-mix(in oklab, var(--border) 88%, transparent);
+    --lgbt-accent: #0f766e;
+    color: var(--lgbt-ink);
+  }
+
+  .lgbt-page {
+    margin-block: clamp(1.75rem, 1.3rem + 1.6vw, 3rem);
+  }
+
+  .lgbt-page:first-child {
+    margin-block-start: 0;
+  }
+
+  .lgbt-copy {
+    max-inline-size: 74ch;
+    margin-block: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .lgbt-copy h2 {
+    margin: 0 0 1rem;
+    color: var(--foreground);
+    font-size: clamp(1.8rem, 1.25rem + 1.7vw, 3rem);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .lgbt-copy p {
+    margin: 0 0 1rem;
+    color: color-mix(in oklab, var(--foreground) 75%, transparent);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    text-wrap: pretty;
+  }
+
+  .lgbt-kicker {
+    margin-block-end: 1rem;
+    color: var(--lgbt-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .lgbt-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(17rem, 0.65fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: end;
+  }
+
+  .lgbt-intro h2,
+  .lgbt-cta h2 {
+    max-inline-size: 14ch;
+    margin: 0;
+    color: var(--foreground);
+    font-size: clamp(2rem, 1.35rem + 2.4vw, 4rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .lgbt-intro p {
+    max-inline-size: 62ch;
+    margin-block: 1.25rem 0;
+    color: color-mix(in oklab, var(--foreground) 74%, transparent);
+    font-size: clamp(1.05rem, 0.98rem + 0.25vw, 1.2rem);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .lgbt-note {
+    border-inline-start: 3px solid var(--lgbt-accent);
+    padding-inline-start: 1.25rem;
+    font-weight: 600;
+  }
+
+  .lgbt-pride-bar {
+    block-size: 0.45rem;
+    margin-block-start: clamp(2rem, 4vw, 3.5rem);
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      #ef4444,
+      #f97316,
+      #eab308,
+      #22c55e,
+      #3b82f6,
+      #8b5cf6
+    );
+  }
+
+  .lgbt-timeline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    border-block: 1px solid var(--lgbt-line);
+  }
+
+  .lgbt-timeline article {
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    border-inline-start: 1px solid var(--lgbt-line);
+  }
+
+  .lgbt-timeline article:first-child {
+    border-inline-start: 0;
+  }
+
+  .lgbt-timeline span,
+  .lgbt-commitments span,
+  .lgbt-cta p {
+    color: var(--lgbt-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .lgbt-timeline h3,
+  .lgbt-commitments h3 {
+    margin-block: 0.65rem 0.55rem;
+    color: var(--foreground);
+    font-size: clamp(1.1rem, 1rem + 0.35vw, 1.35rem);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .lgbt-timeline p,
+  .lgbt-commitments p {
+    margin: 0;
+    color: color-mix(in oklab, var(--foreground) 70%, transparent);
+    font-size: 0.98rem;
+    line-height: 1.7;
+    text-wrap: pretty;
+  }
+
+  .lgbt-commitments {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  .lgbt-commitments > div {
+    padding-block-start: 1.25rem;
+    border-block-start: 2px solid var(--lgbt-line);
+  }
+
+  .lgbt-cta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    margin-block-start: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(1.5rem, 4vw, 3rem);
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--lgbt-soft), white 12%),
+        transparent
+      ),
+      var(--lgbt-soft);
+    border-block: 1px solid var(--lgbt-line);
+  }
+
+  .lgbt-cta p {
+    margin: 0 0 0.65rem;
+  }
+
+  .lgbt-cta h2 {
+    max-inline-size: 20ch;
+    font-size: clamp(1.65rem, 1.25rem + 1.5vw, 3rem);
+  }
+
+  .lgbt-cta a {
+    display: inline-flex;
+    min-block-size: 3rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--foreground);
+    color: var(--background);
+    padding-inline: 1.35rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease;
+    white-space: nowrap;
+  }
+
+  .lgbt-cta a:hover {
+    background: var(--lgbt-accent);
+    transform: translateY(-1px);
+  }
+
+  .lgbt-cta a:focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--lgbt-accent) 45%, white);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 900px) {
+    .lgbt-intro,
+    .lgbt-commitments,
+    .lgbt-cta {
+      grid-template-columns: 1fr;
+    }
+
+    .lgbt-timeline {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .lgbt-timeline article:nth-child(odd) {
+      border-inline-start: 0;
+    }
+
+    .lgbt-cta {
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .lgbt-timeline {
+      grid-template-columns: 1fr;
+    }
+
+    .lgbt-timeline article {
+      border-inline-start: 0;
+      border-block-start: 1px solid var(--lgbt-line);
+    }
+
+    .lgbt-timeline article:first-child {
+      border-block-start: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lgbt-cta a {
+      transition: background-color 180ms ease;
+    }
+
+    .lgbt-cta a:hover {
+      transform: none;
+    }
+  }
+</style>
