@@ -107,9 +107,11 @@ const galleryImagesJson = serializeJsonForHtml(
       <img
         src={mainImage.gridUrl}
         srcset={mainImage.gridSrcSet || undefined}
-        sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 640px"
+        sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 600px"
         alt={mainImage.alt}
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+        width="600"
+        height="500"
         loading="eager"
         fetchpriority="high"
         decoding="async"

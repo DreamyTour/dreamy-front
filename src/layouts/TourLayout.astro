@@ -8,12 +8,14 @@ interface Props {
   slugMap?: Record<string, string>;
   seo?: SEOProps;
   lang?: Lang;
+  lcpImageUrl?: string;
+  lcpImageSrcSet?: string;
 }
 
-const { slugMap, seo, lang } = Astro.props;
+const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet } = Astro.props;
 ---
 
-<Layout seo={seo} lang={lang}>
+<Layout seo={seo} lang={lang} lcpImageUrl={lcpImageUrl} lcpImageSrcSet={lcpImageSrcSet}>
   <slot />
 </Layout>
 

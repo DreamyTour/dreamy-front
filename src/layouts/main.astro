@@ -16,9 +16,11 @@ import type { SEOProps } from "@/components/layout/SEO.astro";
 interface Props {
   seo?: SEOProps;
   lang?: Lang;
+  lcpImageUrl?: string;
+  lcpImageSrcSet?: string;
 }
 
-const { seo, lang: langProp } = Astro.props;
+const { seo, lang: langProp, lcpImageUrl, lcpImageSrcSet } = Astro.props;
 
 // 1. Detectamos el idioma desde los params de la vista de forma automática
 // o desde la prop que se pasa desde la página
@@ -62,6 +64,18 @@ const seoProps = seo || {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* LCP image preload — emitted only on pages that have a known hero image (e.g. tour pages)
+        This hint is placed before ClientRouter/Font so the browser fetches it at highest priority
+        during initial HTML parse, cutting ~1-2s from LCP. */}
+    {lcpImageUrl && (
+      <link
+        rel="preload"
+        as="image"
+        href={lcpImageUrl}
+        {...(lcpImageSrcSet ? { imagesrcset: lcpImageSrcSet, imagesizes: "(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 600px" } : {})}
+        fetchpriority="high"
+      />
+    )}
     <ClientRouter />
     <Font cssVariable="--font-outfit" preload />
     <SEO {...seoProps} />

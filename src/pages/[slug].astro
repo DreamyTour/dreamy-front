@@ -13,6 +13,7 @@ import type { ManualSEO } from "@/lib/seo";
 import { generateDescription } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 import { serializeJsonForHtml } from "@/lib/html";
+import { getImageUrl, getImageSrcSet } from "@/lib/helpers";
 
 import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
@@ -241,6 +242,16 @@ if (type === "mdx" && mdxFrontmatter) {
   });
 }
 
+// Compute LCP image URL for tour pages — used by the layout to emit a preload hint
+const tourLcpImageUrl =
+  type === "tour" && tour && Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
+    ? getImageUrl(tour.imagenDestacada[0], "medium")
+    : undefined;
+const tourLcpImageSrcSet =
+  type === "tour" && tour && Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
+    ? getImageSrcSet(tour.imagenDestacada[0], ["small", "medium"])
+    : undefined;
+
 const mdxUiCopy = {
   es: {
     eyebrow: "Dreamy Guide",
@@ -322,7 +333,7 @@ const heroImageAlt =
 
 {
   type === "tour" && tour && (
-    <TourLayout seo={seoProps} slugMap={slugMap} lang={lang}>
+    <TourLayout seo={seoProps} slugMap={slugMap} lang={lang} lcpImageUrl={tourLcpImageUrl} lcpImageSrcSet={tourLcpImageSrcSet}>
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12">
         <TourHero tour={tour} lang={lang} badges={tour.badge} />
 
@@ -331,7 +342,7 @@ const heroImageAlt =
             <div class="sticky top-24">
               {isIncaTrail ? (
                 <BookingForm
-                  client:load
+                  client:idle
                   tourId={tour.documentId}
                   tourName={tour.titulo}
                   basePrice={tour.priceTour}
