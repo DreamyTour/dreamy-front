@@ -14,6 +14,7 @@ import type { ManualSEO } from "@/lib/seo";
 import { generateDescription } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 import { serializeJsonForHtml } from "@/lib/html";
+import { getImageUrl, getImageSrcSet } from "@/lib/helpers";
 
 import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
@@ -308,7 +309,6 @@ if (type === "mdx" && mdxFrontmatter) {
 }
 
 // Compute the LCP image URL for tour pages so the layout can emit a preload hint
-import { getImageUrl, getImageSrcSet } from "@/lib/helpers";
 const tourLcpImageUrl =
   type === "tour" && tour && Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
     ? getImageUrl(tour.imagenDestacada[0], "medium")
