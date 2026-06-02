@@ -2,6 +2,7 @@ import { Minus, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
 import type { Lang } from "@/lib/i18n";
+import type { TicketsByDate } from "@/lib/incaTrailAvailability";
 import { rewriteUrl } from "@/lib/utils";
 
 interface BookingFormProps {
@@ -9,6 +10,10 @@ interface BookingFormProps {
 	tourName: string;
 	basePrice?: number;
 	lang: Lang;
+	year?: number;
+	initialMonth?: number;
+	initialRoad?: string;
+	initialTickets?: TicketsByDate;
 }
 
 export default function BookingForm({
@@ -16,12 +21,16 @@ export default function BookingForm({
 	tourName,
 	basePrice = 620.0,
 	lang,
+	year,
+	initialMonth,
+	initialRoad = "1",
+	initialTickets,
 }: BookingFormProps) {
 	const [date, setDate] = useState<string>("");
 	const [selectedAvailability, setSelectedAvailability] = useState<
 		number | null
 	>(null);
-	const [road, setRoad] = useState<string>("1");
+	const [road, setRoad] = useState<string>(initialRoad);
 	const [passengers, setPassengers] = useState<number>(1);
 	const [totalPrice, setTotalPrice] = useState<number>(basePrice || 620);
 
@@ -102,6 +111,10 @@ export default function BookingForm({
 
 					<IncaTrailAvailabilityCalendar
 						lang={lang}
+						year={year}
+						initialMonth={initialMonth}
+						initialRoad={initialRoad}
+						initialTickets={initialTickets}
 						selectedDate={date}
 						compact
 						onViewChange={handleCalendarViewChange}

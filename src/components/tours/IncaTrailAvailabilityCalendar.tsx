@@ -31,6 +31,7 @@ interface IncaTrailAvailabilityCalendarProps {
 }
 
 const EMPTY_TICKETS: TicketsByDate = {};
+const ticketsCache = new Map<string, TicketsByDate>();
 
 const monthNamesByLang: Record<Lang, string[]> = {
 	es: [
@@ -152,6 +153,30 @@ function getTone(availability: number) {
 	return "unavailable";
 }
 
+function getCacheKey(year: number, month: number, road: string) {
+	return `${year}-${month}-${road}`;
+}
+
+async function fetchTickets({
+	year,
+	month,
+	road,
+	signal,
+}: {
+	year: number;
+	month: number;
+	road: string;
+	signal?: AbortSignal;
+}) {
+	const url = `/api/calendar-tickets?place=${INCA_TRAIL_PLACE_ID}&road=${road}&year=${year}&month=${month}`;
+	const response = await fetch(url, { signal });
+
+	if (!response.ok) throw new Error("Error fetching availability");
+
+	const data = (await response.json()) as { tickets?: TicketsByDate };
+	return data.tickets || {};
+}
+
 export default function IncaTrailAvailabilityCalendar({
 	lang,
 	year = new Date().getFullYear(),
@@ -174,6 +199,15 @@ export default function IncaTrailAvailabilityCalendar({
 	const copy = copyByLang[lang] ?? copyByLang.es;
 
 	useEffect(() => {
+		if (Object.keys(initialTickets).length === 0) return;
+
+		ticketsCache.set(
+			getCacheKey(year, startingMonth, initialRoad),
+			initialTickets,
+		);
+	}, [year, startingMonth, initialRoad, initialTickets]);
+
+	useEffect(() => {
 		onViewChange?.({ road, month: currentMonth });
 	}, [road, currentMonth, onViewChange]);
 
@@ -187,20 +221,29 @@ export default function IncaTrailAvailabilityCalendar({
 			return;
 		}
 
+		const cacheKey = getCacheKey(year, currentMonth, road);
+		const cachedTickets = ticketsCache.get(cacheKey);
+
+		if (cachedTickets) {
+			setTickets(cachedTickets);
+			setLoadState("idle");
+			return;
+		}
+
 		const controller = new AbortController();
 
 		async function loadAvailability() {
 			setLoadState("loading");
-			setTickets({});
-
-			const url = `/api/calendar-tickets?place=${INCA_TRAIL_PLACE_ID}&road=${road}&year=${year}&month=${currentMonth}`;
 
 			try {
-				const response = await fetch(url, { signal: controller.signal });
-				if (!response.ok) throw new Error("Error fetching availability");
-
-				const data = (await response.json()) as { tickets?: TicketsByDate };
-				setTickets(data.tickets || {});
+				const nextTickets = await fetchTickets({
+					year,
+					month: currentMonth,
+					road,
+					signal: controller.signal,
+				});
+				ticketsCache.set(cacheKey, nextTickets);
+				setTickets(nextTickets);
 				setLoadState("idle");
 			} catch (error) {
 				if (controller.signal.aborted) return;
@@ -213,6 +256,29 @@ export default function IncaTrailAvailabilityCalendar({
 
 		return () => controller.abort();
 	}, [road, currentMonth, year, initialRoad, startingMonth, initialTickets]);
+
+	useEffect(() => {
+		const nextMonth = currentMonth + 1;
+
+		if (nextMonth > 12) return;
+
+		const cacheKey = getCacheKey(year, nextMonth, road);
+
+		if (ticketsCache.has(cacheKey)) return;
+
+		const controller = new AbortController();
+
+		fetchTickets({
+			year,
+			month: nextMonth,
+			road,
+			signal: controller.signal,
+		})
+			.then((nextTickets) => ticketsCache.set(cacheKey, nextTickets))
+			.catch(() => {});
+
+		return () => controller.abort();
+	}, [road, currentMonth, year]);
 
 	const firstDay = new Date(year, currentMonth - 1, 1);
 	const daysInMonth = new Date(year, currentMonth, 0).getDate();

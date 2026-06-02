@@ -1,0 +1,38 @@
+---
+import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
+import type { Lang } from "@/lib/i18n";
+import {
+  fetchIncaTrailTickets,
+  type TicketsByDate,
+} from "@/lib/incaTrailAvailability";
+
+interface Props {
+  lang: Lang;
+  year: number;
+  initialMonth: number;
+  initialRoad: string;
+}
+
+const { lang, year, initialMonth, initialRoad } = Astro.props;
+
+let initialTickets: TicketsByDate = {};
+
+try {
+  initialTickets = await fetchIncaTrailTickets({
+    road: initialRoad,
+    year,
+    month: initialMonth,
+  });
+} catch {
+  initialTickets = {};
+}
+---
+
+<IncaTrailAvailabilityCalendar
+  client:load
+  lang={lang}
+  year={year}
+  initialMonth={initialMonth}
+  initialRoad={initialRoad}
+  initialTickets={initialTickets}
+/>

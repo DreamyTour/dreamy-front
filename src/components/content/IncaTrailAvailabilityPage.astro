@@ -1,16 +1,12 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
 import TourCard from "@/components/ui/TourCard.astro";
-import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
+import IncaTrailAvailabilityCalendarIsland from "@/components/content/IncaTrailAvailabilityCalendarIsland.astro";
 import { fetchAllStrapi } from "@/lib/strapi";
 import { dedupeLocalizedDocuments } from "@/lib/utils";
 import type { Lang } from "@/lib/i18n";
 import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { Tour, Category as TourCategory } from "@/types/tours";
-import {
-  fetchIncaTrailTickets,
-  type TicketsByDate,
-} from "@/lib/incaTrailAvailability";
 import { serializeJsonForHtml } from "@/lib/html";
 import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
 
@@ -199,18 +195,6 @@ const initialMonth =
   calendarYear === now.getFullYear() ? now.getMonth() + 1 : 1;
 const initialRoad = "1";
 
-let initialTickets: TicketsByDate = {};
-
-try {
-  initialTickets = await fetchIncaTrailTickets({
-    road: initialRoad,
-    year: calendarYear,
-    month: initialMonth,
-  });
-} catch {
-  initialTickets = {};
-}
-
 const normalizeText = (value: string | undefined) =>
   (value || "")
     .toLowerCase()
@@ -351,14 +335,39 @@ const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
               {copy.calendarIntro}
             </p>
           </div>
-          <IncaTrailAvailabilityCalendar
-            client:load
+          <IncaTrailAvailabilityCalendarIsland
+            server:defer
             lang={lang}
             year={calendarYear}
             initialMonth={initialMonth}
             initialRoad={initialRoad}
-            initialTickets={initialTickets}
-          />
+          >
+            <div
+              slot="fallback"
+              class="min-h-[430px] rounded-lg border border-gray-200 bg-white p-4"
+            >
+              <div
+                class="grid grid-cols-1 gap-3 border-b border-gray-100 bg-[#faf8f5] p-4 sm:grid-cols-2"
+              >
+                <div class="h-10 rounded-sm bg-gray-200/80"></div>
+                <div class="h-10 rounded-sm bg-gray-200/80"></div>
+              </div>
+              <div class="mt-4 flex items-center justify-between px-3 py-3">
+                <div class="h-9 w-9 rounded-full bg-gray-100"></div>
+                <div class="h-5 w-32 rounded bg-gray-200"></div>
+                <div class="h-9 w-9 rounded-full bg-gray-100"></div>
+              </div>
+              <div
+                class="mt-3 grid grid-cols-7 gap-px overflow-hidden rounded-sm bg-gray-100"
+              >
+                {
+                  Array.from({ length: 35 }).map(() => (
+                    <div class="h-16 bg-gray-50" />
+                  ))
+                }
+              </div>
+            </div>
+          </IncaTrailAvailabilityCalendarIsland>
         </div>
       </section>
 

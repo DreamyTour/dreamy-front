@@ -165,17 +165,17 @@ export default function TourTabs({ tour, children }: Props) {
 
 	return (
 		<div className="w-full" ref={tabsRef}>
-			{/* Desktop Layout */}
-			<div className="hidden lg:flex flex-col">
-				<div className="w-full">
+			<div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8">
+				{/* Desktop Layout */}
+				<div className="hidden lg:contents">
 					<Tabs
 						value={activeTab}
 						onValueChange={handleTabChange}
-						className="w-full"
+						className="contents"
 					>
 						{/* Sticky container - Full Bleed */}
 						<div
-							className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] border-y border-gray-200/60 ${isStuck ? "shadow-md" : ""}`}
+							className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] border-y border-gray-200/60 lg:col-span-2 ${isStuck ? "shadow-md" : ""}`}
 						>
 							<div className="w-full">
 								<TabsList className="flex w-full justify-between items-stretch !p-0 !bg-transparent !rounded-none divide-x divide-gray-200/50 !h-auto gap-0 !border-0 outline-none ring-0">
@@ -216,172 +216,163 @@ export default function TourTabs({ tour, children }: Props) {
 							</div>
 						</div>
 
-						<div className="flex gap-8 mt-8 lg:mt-12">
-							<div className="flex-1 w-full lg:w-[70%]">
-								{hasOverview && (
-									<TabsContent
-										value="overview"
-										className="outline-none animate-fade-in"
-									>
-										<section>
-											<OverviewTab timeline={tab.overview.timeline} />
-										</section>
-									</TabsContent>
-								)}
-
-								{hasItinerary && (
-									<TabsContent
-										value="itinerary"
-										className="outline-none animate-fade-in"
-									>
-										<section>
-											<ItineraryTab items={tab.itinerary.acordeon} />
-										</section>
-									</TabsContent>
-								)}
-
-								{hasInformation && (
-									<TabsContent
-										value="information"
-										className="outline-none animate-fade-in"
-									>
-										<section>
-											<InformationTab items={tab.information.acordeon} />
-										</section>
-									</TabsContent>
-								)}
-
-								{hasIncluded && (
-									<TabsContent
-										value="included"
-										className="outline-none animate-fade-in"
-									>
-										<section>
-											<div className="not-prose">
-												<IncludedTab contenido={tab.included.contenido} />
-											</div>
-										</section>
-									</TabsContent>
-								)}
-
-								{hasPrice && (
-									<TabsContent
-										value="price"
-										className="outline-none animate-fade-in"
-									>
-										<section>
-											<div className="not-prose">
-												<PriceTab contenido={tab.price.contenido} />
-											</div>
-										</section>
-									</TabsContent>
-								)}
-							</div>
-
-							{/* Aside: Booking / Contact Form */}
-							{children && (
-								<div
-									id="tour-contact-form"
-									className="hidden lg:block lg:w-[30%] shrink-0"
+						<div className="mt-8 min-w-0 lg:mt-12">
+							{hasOverview && (
+								<TabsContent
+									value="overview"
+									className="outline-none animate-fade-in"
 								>
-									{children}
-								</div>
+									<section>
+										<OverviewTab timeline={tab.overview.timeline} />
+									</section>
+								</TabsContent>
+							)}
+
+							{hasItinerary && (
+								<TabsContent
+									value="itinerary"
+									className="outline-none animate-fade-in"
+								>
+									<section>
+										<ItineraryTab items={tab.itinerary.acordeon} />
+									</section>
+								</TabsContent>
+							)}
+
+							{hasInformation && (
+								<TabsContent
+									value="information"
+									className="outline-none animate-fade-in"
+								>
+									<section>
+										<InformationTab items={tab.information.acordeon} />
+									</section>
+								</TabsContent>
+							)}
+
+							{hasIncluded && (
+								<TabsContent
+									value="included"
+									className="outline-none animate-fade-in"
+								>
+									<section>
+										<div className="not-prose">
+											<IncludedTab contenido={tab.included.contenido} />
+										</div>
+									</section>
+								</TabsContent>
+							)}
+
+							{hasPrice && (
+								<TabsContent
+									value="price"
+									className="outline-none animate-fade-in"
+								>
+									<section>
+										<div className="not-prose">
+											<PriceTab contenido={tab.price.contenido} />
+										</div>
+									</section>
+								</TabsContent>
 							)}
 						</div>
 					</Tabs>
 				</div>
-			</div>
 
-			{/* Mobile Layout */}
-			<div className="lg:hidden space-y-4">
-				{/* Summary */}
-				{hasOverview && tab.overview.titulo && (
-					<details open className={mobileAccordionClass}>
-						<summary className={mobileSummaryClass}>
-							<span className="text-left text-sm font-semibold text-foreground">
-								{tab.overview.titulo}
-							</span>
-							<span className={mobileIconClass}>
-								<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-							</span>
-						</summary>
-						<div className={mobileContentClass}>
-							<OverviewTab timeline={tab.overview.timeline} />
-						</div>
-					</details>
-				)}
+				{/* Mobile Layout */}
+				<div className="space-y-4 lg:hidden">
+					{/* Summary */}
+					{hasOverview && tab.overview.titulo && (
+						<details open className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.overview.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<OverviewTab timeline={tab.overview.timeline} />
+							</div>
+						</details>
+					)}
 
-				{/* Itinerary */}
-				{hasItinerary && tab.itinerary.titulo && (
-					<details open={!hasOverview} className={mobileAccordionClass}>
-						<summary className={mobileSummaryClass}>
-							<span className="text-left text-sm font-semibold text-foreground">
-								{tab.itinerary.titulo}
-							</span>
-							<span className={mobileIconClass}>
-								<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-							</span>
-						</summary>
-						<div className={mobileContentClass}>
-							<ItineraryTab items={tab.itinerary.acordeon} />
-						</div>
-					</details>
-				)}
+					{/* Itinerary */}
+					{hasItinerary && tab.itinerary.titulo && (
+						<details open={!hasOverview} className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.itinerary.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<ItineraryTab items={tab.itinerary.acordeon} />
+							</div>
+						</details>
+					)}
 
-				{/* Included */}
-				{hasIncluded && tab.included.titulo && (
-					<details className={mobileAccordionClass}>
-						<summary className={mobileSummaryClass}>
-							<span className="text-left text-sm font-semibold text-foreground">
-								{tab.included.titulo}
-							</span>
-							<span className={mobileIconClass}>
-								<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-							</span>
-						</summary>
-						<div className={mobileContentClass}>
-							<IncludedTab contenido={tab.included.contenido} />
-						</div>
-					</details>
-				)}
+					{/* Included */}
+					{hasIncluded && tab.included.titulo && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.included.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<IncludedTab contenido={tab.included.contenido} />
+							</div>
+						</details>
+					)}
 
-				{/* Information */}
-				{hasInformation && tab.information.titulo && (
-					<details className={mobileAccordionClass}>
-						<summary className={mobileSummaryClass}>
-							<span className="text-left text-sm font-semibold text-foreground">
-								{tab.information.titulo}
-							</span>
-							<span className={mobileIconClass}>
-								<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-							</span>
-						</summary>
-						<div className={mobileContentClass}>
-							<InformationTab items={tab.information.acordeon} />
-						</div>
-					</details>
-				)}
+					{/* Information */}
+					{hasInformation && tab.information.titulo && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.information.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<InformationTab items={tab.information.acordeon} />
+							</div>
+						</details>
+					)}
 
-				{/* Price */}
-				{hasPrice && tab.price.titulo && (
-					<details className={mobileAccordionClass}>
-						<summary className={mobileSummaryClass}>
-							<span className="text-left text-sm font-semibold text-foreground">
-								{tab.price.titulo}
-							</span>
-							<span className={mobileIconClass}>
-								<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-							</span>
-						</summary>
-						<div className={mobileContentClass}>
-							<PriceTab contenido={tab.price.contenido} />
-						</div>
-					</details>
-				)}
+					{/* Price */}
+					{hasPrice && tab.price.titulo && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.price.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<PriceTab contenido={tab.price.contenido} />
+							</div>
+						</details>
+					)}
+				</div>
 
-				{/* Mobile Booking / Contact */}
+				{/* Booking / Contact Form */}
 				{children && (
-					<div id="tour-contact-form-mobile" className="mt-8">
+					<div
+						id="tour-contact-form"
+						className="mt-8 min-w-0 lg:sticky lg:top-24 lg:mt-12 lg:self-start"
+					>
 						{children}
 					</div>
 				)}

@@ -13,7 +13,7 @@ import { defineConfig, fontProviders } from "astro/config";
 export default defineConfig({
 	site: "https://dreamy.tours",
 
-	adapter: process.env.NODE_ENV === "production" ? cloudflare() : undefined,
+	adapter: cloudflare(),
 
 	markdown: {
 		processor: unified({
@@ -40,7 +40,8 @@ export default defineConfig({
 				"/api/calendar-tickets": {
 					target: "https://calendar.dreamy.tours",
 					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/api\/calendar-tickets/, "/v1/tickets"),
+					rewrite: (path) =>
+						path.replace(/^\/api\/calendar-tickets/, "/v1/tickets"),
 				},
 			},
 		},

@@ -19,7 +19,8 @@ import { getImageUrl, getImageSrcSet } from "@/lib/helpers";
 import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
 import ContactForm from "@/components/tours/ContactForm.astro";
-import BookingForm from "@/components/tours/BookingForm";
+import BookingFormFallback from "@/components/tours/BookingFormFallback.astro";
+import BookingFormIsland from "@/components/tours/BookingFormIsland.astro";
 import RelatedTours from "@/components/tours/RelatedTours.astro";
 
 interface MdxFrontmatter {
@@ -310,11 +311,17 @@ if (type === "mdx" && mdxFrontmatter) {
 
 // Compute the LCP image URL for tour pages so the layout can emit a preload hint
 const tourLcpImageUrl =
-  type === "tour" && tour && Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
+  type === "tour" &&
+  tour &&
+  Array.isArray(tour.imagenDestacada) &&
+  tour.imagenDestacada[0]
     ? getImageUrl(tour.imagenDestacada[0], "medium")
     : undefined;
 const tourLcpImageSrcSet =
-  type === "tour" && tour && Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
+  type === "tour" &&
+  tour &&
+  Array.isArray(tour.imagenDestacada) &&
+  tour.imagenDestacada[0]
     ? getImageSrcSet(tour.imagenDestacada[0], ["small", "medium"])
     : undefined;
 
@@ -399,25 +406,31 @@ const heroImageAlt =
 
 {
   type === "tour" && tour && (
-    <TourLayout seo={seoProps} slugMap={slugMap} lang={lang} lcpImageUrl={tourLcpImageUrl} lcpImageSrcSet={tourLcpImageSrcSet}>
+    <TourLayout
+      seo={seoProps}
+      slugMap={slugMap}
+      lang={lang}
+      lcpImageUrl={tourLcpImageUrl}
+      lcpImageSrcSet={tourLcpImageSrcSet}
+    >
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 pt-6 md:pt-8 pb-12">
         <TourHero tour={tour} lang={lang} badges={tour.badge} />
 
         <div class="w-full mt-8">
           <TourTabs tour={tour} client:visible>
-            <div class="sticky top-24">
-              {isIncaTrail ? (
-                <BookingForm
-                  client:idle
-                  tourId={tour.documentId}
-                  tourName={tour.titulo}
-                  basePrice={tour.priceTour}
-                  lang={lang}
-                />
-              ) : (
-                <ContactForm tourName={tour.titulo} />
-              )}
-            </div>
+            {isIncaTrail ? (
+              <BookingFormIsland
+                server:defer
+                tourId={tour.documentId}
+                tourName={tour.titulo}
+                basePrice={tour.priceTour}
+                lang={lang}
+              >
+                <BookingFormFallback slot="fallback" />
+              </BookingFormIsland>
+            ) : (
+              <ContactForm tourName={tour.titulo} />
+            )}
           </TourTabs>
         </div>
 
