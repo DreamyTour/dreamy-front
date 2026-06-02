@@ -29,6 +29,7 @@ interface CheckoutPayload {
 		amountPaid?: number;
 		amountToPayLabel?: "minimum" | "total";
 		totalPrice?: number;
+		lang?: "en" | "es" | "pt";
 	};
 }
 
@@ -185,9 +186,16 @@ export const POST: APIRoute = async ({ request }) => {
 
 		const businessEmail = "info@turismoperu.com.pe";
 		const itemName = encodeURIComponent(cart.tourName);
-		const amount = totalPrice.toFixed(2);
+		const amount = Number.isFinite(amountPaid)
+			? amountPaid.toFixed(2)
+			: totalPrice.toFixed(2);
+		const checkoutLang = cart.lang === "es" || cart.lang === "pt" ? cart.lang : "en";
+		const successPath =
+			checkoutLang === "en"
+				? "/checkout/success"
+				: `/${checkoutLang}/checkout/success`;
 		const returnUrl = encodeURIComponent(
-			`${new URL(request.url).origin}/checkout/success`,
+			`${new URL(request.url).origin}${successPath}`,
 		);
 
 		const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${businessEmail}&item_name=${itemName}&amount=${amount}&currency_code=USD&return=${returnUrl}`;

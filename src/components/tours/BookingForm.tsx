@@ -73,9 +73,11 @@ export default function BookingForm({
 			road,
 			availability: selectedAvailability,
 			lang,
+			tourPath: window.location.pathname,
 		};
 
 		window.localStorage.setItem("bookingCart", JSON.stringify(cartItem));
+		window.localStorage.setItem("lastBookingTourPath", window.location.pathname);
 		window.location.href = rewriteUrl("/checkout", lang);
 	};
 

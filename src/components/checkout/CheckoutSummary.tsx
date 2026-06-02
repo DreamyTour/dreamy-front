@@ -19,6 +19,7 @@ interface BookingCart {
 	passengers: number;
 	date?: string;
 	lang?: string;
+	tourPath?: string;
 }
 
 interface Passenger {
@@ -32,13 +33,21 @@ interface Passenger {
 	country: string;
 }
 
-export default function CheckoutSummary() {
+interface CheckoutSummaryProps {
+	initialLang?: "en" | "es" | "pt";
+}
+
+export default function CheckoutSummary({
+	initialLang = "en",
+}: CheckoutSummaryProps) {
 	const [cart, setCart] = useState<BookingCart | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [emptyCartHref, setEmptyCartHref] = useState("/");
 	const [step, setStep] = useState(1);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const errorRef = useRef<HTMLDivElement>(null);
+	const firstPassengerNameRef = useRef<HTMLInputElement>(null);
 
 	// states for Passenger Step
 	const [passengers, setPassengers] = useState<Passenger[]>([]);
@@ -58,6 +67,10 @@ export default function CheckoutSummary() {
 
 	useEffect(() => {
 		const savedCart = window.localStorage.getItem("bookingCart");
+		const savedTourPath = window.localStorage.getItem("lastBookingTourPath");
+		setEmptyCartHref(
+			savedTourPath || (initialLang === "en" ? "/" : `/${initialLang}`),
+		);
 		if (savedCart) {
 			try {
 				const parsedCart = JSON.parse(savedCart) as BookingCart;
@@ -102,6 +115,16 @@ export default function CheckoutSummary() {
 		}
 	}, [error]);
 
+	useEffect(() => {
+		if (step !== 2 || passengers.length === 0 || error) return;
+
+		const focusTimer = window.setTimeout(() => {
+			firstPassengerNameRef.current?.focus({ preventScroll: true });
+		}, 0);
+
+		return () => window.clearTimeout(focusTimer);
+	}, [step, passengers.length, error]);
+
 	// Loading state
 	if (loading) {
 		return (
@@ -126,7 +149,7 @@ export default function CheckoutSummary() {
 					Explora nuestros tours y comienza tu aventura
 				</p>
 				<a
-					href="/"
+					href={emptyCartHref}
 					className="px-8 py-3.5 bg-primary text-white font-semibold rounded-sm shadow-lg shadow-primary/25 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
 				>
 					Explorar Tours
@@ -175,6 +198,7 @@ export default function CheckoutSummary() {
 		// recalculate amount based on total vs minimum
 		const payAmount =
 			paymentOption === "total" ? cart.totalPrice : cart.totalPrice / 2;
+		const fee = payAmount * 0.08;
 
 		try {
 			const response = await fetch("/api/checkout", {
@@ -186,7 +210,7 @@ export default function CheckoutSummary() {
 					cart: {
 						...cart,
 						amountToPayLabel: paymentOption,
-						amountPaid: payAmount,
+						amountPaid: payAmount + fee,
 					},
 					passengersInfo: passengers,
 					contactInfo: contact,
@@ -204,7 +228,6 @@ export default function CheckoutSummary() {
 			}
 
 			if (data.success && data.redirectUrl) {
-				window.localStorage.removeItem("bookingCart");
 				window.location.href = data.redirectUrl;
 			} else {
 				alert(`Error Processing Checkout: ${data.error || "Unknown"}`);
@@ -487,6 +510,7 @@ export default function CheckoutSummary() {
 												First Name *
 											</span>
 											<input
+												ref={i === 0 ? firstPassengerNameRef : undefined}
 												type="text"
 												name={`passenger-${i + 1}-given-name`}
 												autoComplete="given-name"

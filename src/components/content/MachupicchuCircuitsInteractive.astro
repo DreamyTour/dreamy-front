@@ -8,6 +8,8 @@ interface Props {
   lang?: MachupicchuCircuitsLang;
 }
 
+type Tone = "c1" | "c2" | "c3" | "gold";
+
 const mapImage =
   "https://dreamy.tours/wp-content/uploads/Ruta-1-A-2048x1448.webp";
 
@@ -16,180 +18,334 @@ const content =
   machupicchuCircuitsContent[selectedLang] ?? machupicchuCircuitsContent.es;
 const { circuits, routes, ui, compareRows, booking, cta, ctaHref } = content;
 
+const toneStyles: Record<
+  Tone,
+  {
+    border: string;
+    badge: string;
+    text: string;
+    soft: string;
+    header: string;
+    button: string;
+    dialog: string;
+    title: string;
+  }
+> = {
+  c1: {
+    border: "border-t-[#007a3d]",
+    badge: "bg-[#007a3d]",
+    text: "text-[#007a3d]",
+    soft: "bg-[#e8f7ef] text-[#007a3d]",
+    header: "bg-gradient-to-br from-[#007a3d] to-[#004b29]",
+    button: "bg-[#007a3d]",
+    dialog: "bg-[#007a3d]",
+    title: "text-[#007a3d]",
+  },
+  c2: {
+    border: "border-t-[#1463a5]",
+    badge: "bg-[#1463a5]",
+    text: "text-[#1463a5]",
+    soft: "bg-[#e7f1fb] text-[#1463a5]",
+    header: "bg-gradient-to-br from-[#1463a5] to-[#083b6d]",
+    button: "bg-[#1463a5]",
+    dialog: "bg-[#1463a5]",
+    title: "text-[#1463a5]",
+  },
+  c3: {
+    border: "border-t-[#7a3db8]",
+    badge: "bg-[#7a3db8]",
+    text: "text-[#7a3db8]",
+    soft: "bg-[#f0e8fb] text-[#7a3db8]",
+    header: "bg-gradient-to-br from-[#7a3db8] to-[#4b247b]",
+    button: "bg-[#7a3db8]",
+    dialog: "bg-[#7a3db8]",
+    title: "text-[#7a3db8]",
+  },
+  gold: {
+    border: "border-t-[#b06a00]",
+    badge: "bg-[#b06a00]",
+    text: "text-[#7a4a00]",
+    soft: "bg-[#fff4d9] text-[#7a4a00]",
+    header: "bg-gradient-to-br from-[#b06a00] to-[#7a4a00]",
+    button: "bg-[#b06a00]",
+    dialog: "bg-[#b06a00]",
+    title: "text-[#7a4a00]",
+  },
+};
+
+const focusClass =
+  "focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#f2b84b]";
+const pillButtonClass = `${focusClass} inline-flex cursor-pointer justify-center rounded-full border-0 px-4 py-3 text-sm font-extrabold leading-none text-white no-underline transition hover:-translate-y-0.5 hover:brightness-105`;
+const cardClass =
+  "overflow-hidden rounded-lg border border-[rgba(16,32,25,0.12)] bg-white shadow-[0_24px_60px_-42px_rgba(16,32,25,0.45)]";
+
 const dialogs = [
   ...circuits.map((circuit) => ({
     id: circuit.dialogId,
-    tone: circuit.tone,
-    title: `${ui.officialMap} · ${ui.circuit} ${circuit.number} ${circuit.name}`,
+    tone: circuit.tone as Tone,
+    title: `${ui.officialMap} - ${ui.circuit} ${circuit.number} ${circuit.name}`,
     alt: circuit.alt,
-    caption: `© Dreamy Tours · ${ui.officialMap} · ${ui.circuit} ${circuit.number} ${circuit.name} (${circuit.routes.join(", ")})`,
+    caption: `(c) Dreamy Tours - ${ui.officialMap} - ${ui.circuit} ${circuit.number} ${circuit.name} (${circuit.routes.join(", ")})`,
   })),
   ...routes.map((route) => ({
     id: route.modalId,
-    tone: route.tone,
-    title: `${ui.map} · ${route.title}`,
+    tone: route.tone as Tone,
+    title: `${ui.map} - ${route.title}`,
     alt: `${ui.officialMap} ${route.title}`,
     caption:
       route.id === "ruta-1a"
-        ? `© Dreamy Tours · ${ui.officialMap} · ${route.title}`
-        : `${ui.replaceImage} · ${route.title}`,
+        ? `(c) Dreamy Tours - ${ui.officialMap} - ${route.title}`
+        : `${ui.replaceImage} - ${route.title}`,
   })),
 ];
 ---
 
-<section class="mpc" data-mpc-circuits aria-labelledby="mpc-heading">
-  <div class="mpc-decree">
-    <span class="mpc-decree-icon" aria-hidden="true">!</span>
-    <p>{ui.decree}</p>
+<section
+  class="mpc mt-8 text-[#102019]"
+  data-mpc-circuits
+  aria-labelledby="mpc-heading"
+>
+  <div
+    class="flex items-start gap-4 rounded-lg border border-l-4 border-[rgba(176,106,0,0.22)] border-l-[#b06a00] bg-gradient-to-br from-[#fff8e8] to-white p-5 shadow-[0_20px_45px_-34px_rgba(16,32,25,0.45)] max-sm:flex-col max-sm:items-stretch"
+  >
+    <span
+      class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#b06a00] font-extrabold text-white"
+      aria-hidden="true">!</span
+    >
+    <p class="m-0 text-[0.96rem] leading-7 text-[#654510]">{ui.decree}</p>
   </div>
 
-  <section class="mpc-map-section" aria-labelledby="mpc-heading">
-    <p class="mpc-label">{ui.mapsLabel}</p>
-    <h2 id="mpc-heading">{ui.mapsTitle}</h2>
-    <p class="mpc-desc">{ui.mapsDescription}</p>
+  <section class="py-12 text-center" aria-labelledby="mpc-heading">
+    <p
+      class="m-0 text-xs font-extrabold tracking-[0.18em] text-[#007a3d] uppercase"
+    >
+      {ui.mapsLabel}
+    </p>
+    <h2
+      id="mpc-heading"
+      class="mt-2 mb-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+    >
+      {ui.mapsTitle}
+    </h2>
+    <p class="mx-auto mt-3 mb-0 leading-7 text-[#5d6a62]">
+      {ui.mapsDescription}
+    </p>
 
-    <div class="mpc-circuit-grid">
+    <div class="mt-8 grid grid-cols-1 gap-5 text-left lg:grid-cols-3">
       {
-        circuits.map((circuit) => (
-          <article class={`mpc-circuit-card ${circuit.tone}`}>
-            <button
-              class="mpc-map-trigger"
-              type="button"
-              data-mpc-dialog={circuit.dialogId}
-              aria-label={`${ui.viewFullMap}: ${ui.circuit} ${circuit.number} ${circuit.name}`}
-            >
-              <img
-                src={mapImage}
-                alt={circuit.alt}
-                width="1024"
-                height="724"
-                loading="lazy"
-              />
-              <span class="mpc-card-badge">
-                {ui.circuit} {circuit.number}
-              </span>
-              <span class="mpc-card-overlay">{ui.viewFullMap}</span>
-            </button>
-            <div class="mpc-card-body">
-              <span class="mpc-card-num">
-                {ui.circuit} {circuit.number}
-              </span>
-              <h3>{circuit.name}</h3>
-              <ul
-                class="mpc-route-tags"
-                aria-label={`${ui.routesAria} ${circuit.number}`}
-              >
-                {circuit.routes.map((route) => (
-                  <li>{route}</li>
-                ))}
-              </ul>
+        circuits.map((circuit) => {
+          const tone = toneStyles[circuit.tone as Tone];
+
+          return (
+            <article class={`${cardClass} grid grid-rows-[auto_1fr] border-t-4 ${tone.border}`}>
               <button
-                class="mpc-card-cta"
+                class={`${focusClass} group relative block aspect-[16/10] w-full cursor-pointer overflow-hidden border-0 bg-[#0b1611] p-0 text-white`}
                 type="button"
                 data-mpc-dialog={circuit.dialogId}
+                aria-label={`${ui.viewFullMap}: ${ui.circuit} ${circuit.number} ${circuit.name}`}
               >
-                {ui.viewCircuitMap}
+                <img
+                  class="block h-full w-full object-cover transition group-hover:scale-105"
+                  src={mapImage}
+                  alt={circuit.alt}
+                  width="1024"
+                  height="724"
+                  loading="lazy"
+                />
+                <span
+                  class={`absolute top-4 left-4 rounded-full px-3 py-1.5 text-xs font-extrabold ${tone.badge}`}
+                >
+                  {ui.circuit} {circuit.number}
+                </span>
+                <span class="absolute inset-0 flex items-center justify-center bg-[rgba(4,10,7,0.68)] opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {ui.viewFullMap}
+                </span>
               </button>
-            </div>
-          </article>
-        ))
+              <div class="flex flex-col p-5">
+                <span
+                  class={`inline-flex text-xs font-extrabold tracking-[0.14em] uppercase ${tone.text}`}
+                >
+                  {ui.circuit} {circuit.number}
+                </span>
+                <h3 class="mt-1 mb-0 text-2xl leading-tight font-extrabold">
+                  {circuit.name}
+                </h3>
+                <ul
+                  class="mt-4 mb-5 flex list-none flex-wrap gap-2 p-0"
+                  aria-label={`${ui.routesAria} ${circuit.number}`}
+                >
+                  {circuit.routes.map((route) => (
+                    <li class="rounded-full border border-[rgba(16,32,25,0.12)] bg-[#f4f7f4] px-2.5 py-1.5 text-xs font-bold text-[#5d6a62]">
+                      {route}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  class={`${pillButtonClass} mt-auto w-full ${tone.button}`}
+                  type="button"
+                  data-mpc-dialog={circuit.dialogId}
+                >
+                  {ui.viewCircuitMap}
+                </button>
+              </div>
+            </article>
+          );
+        })
       }
     </div>
   </section>
 
-  <nav class="mpc-tabs" aria-label={ui.navLabel}>
+  <nav
+    class="sticky top-0 z-[8] mb-10 flex gap-3 overflow-x-auto rounded-b-lg border border-[rgba(16,32,25,0.1)] bg-white/95 p-2 shadow-[0_12px_26px_-20px_rgba(16,32,25,0.5)]"
+    aria-label={ui.navLabel}
+  >
     {
-      circuits.map((circuit) => (
-        <a class={`mpc-tab ${circuit.tone}`} href={`#${circuit.id}`}>
-          {ui.circuit} {circuit.number} - {circuit.name} (
-          {circuit.routes.length} {ui.routes})
-        </a>
-      ))
+      circuits.map((circuit) => {
+        const tone = toneStyles[circuit.tone as Tone];
+
+        return (
+          <a
+            class={`${focusClass} flex-1 basis-[max-content] rounded-full px-4 py-3 text-center text-sm font-extrabold no-underline ${tone.soft}`}
+            href={`#${circuit.id}`}
+          >
+            {ui.circuit} {circuit.number} - {circuit.name} (
+            {circuit.routes.length} {ui.routes})
+          </a>
+        );
+      })
     }
   </nav>
 
-  <div class="mpc-routes">
+  <div>
     {
-      circuits.map((circuit) => (
-        <section
-          id={circuit.id}
-          class="mpc-circuit-section"
-          aria-labelledby={`${circuit.id}-title`}
-        >
-          <header class={`mpc-circuit-header ${circuit.tone}`}>
-            <span class="mpc-circuit-number" aria-hidden="true">
-              {circuit.number}
-            </span>
-            <div>
-              <h2 id={`${circuit.id}-title`}>
-                {ui.circuit} {circuit.number} - {circuit.name}
-              </h2>
-              <p>{circuit.summary}</p>
-            </div>
-          </header>
+      circuits.map((circuit) => {
+        const tone = toneStyles[circuit.tone as Tone];
 
-          <div class="mpc-route-list">
-            {routes
-              .filter((route) => route.circuitId === circuit.id)
-              .map((route) => (
-                <article id={route.id} class={`mpc-route-card ${route.tone}`}>
-                  <header class="mpc-route-head">
-                    <div>
-                      <h3>{route.title}</h3>
-                      {route.seasonal && (
-                        <span class="mpc-seasonal">{route.seasonal}</span>
-                      )}
-                    </div>
-                    <button
-                      class="mpc-route-map"
-                      type="button"
-                      data-mpc-dialog={route.modalId}
-                      aria-label={`${ui.viewRouteMap}: ${route.title}`}
+        return (
+          <section
+            id={circuit.id}
+            class="scroll-mt-24 not-first:mt-12"
+            aria-labelledby={`${circuit.id}-title`}
+          >
+            <header
+              class={`mb-4 flex items-center gap-5 rounded-lg p-5 text-white max-sm:flex-col max-sm:items-stretch ${tone.header}`}
+            >
+              <span
+                class="flex h-14 w-14 flex-none items-center justify-center rounded-full border border-white/25 bg-white/15 text-2xl font-black"
+                aria-hidden="true"
+              >
+                {circuit.number}
+              </span>
+              <div>
+                <h2
+                  id={`${circuit.id}-title`}
+                  class="m-0 text-[clamp(1.55rem,3vw,2.2rem)] leading-tight font-extrabold text-white"
+                >
+                  {ui.circuit} {circuit.number} - {circuit.name}
+                </h2>
+                <p class="mt-1 mb-0 leading-7 text-white/80">
+                  {circuit.summary}
+                </p>
+              </div>
+            </header>
+
+            <div class="grid gap-4">
+              {routes
+                .filter((route) => route.circuitId === circuit.id)
+                .map((route) => {
+                  const routeTone = toneStyles[route.tone as Tone];
+
+                  return (
+                    <article
+                      id={route.id}
+                      class={`${cardClass} border-t-[3px] ${routeTone.border}`}
                     >
-                      {ui.viewRouteMap}
-                    </button>
-                  </header>
-
-                  <div class="mpc-route-body">
-                    <p class="mpc-route-intro">{route.intro}</p>
-                    <dl class="mpc-details">
-                      {route.details.map(([label, value]) => (
-                        <div class="mpc-detail">
-                          <dt>{label}</dt>
-                          <dd>{value}</dd>
+                      <header
+                        class={`flex items-center justify-between gap-4 p-4 max-sm:flex-col max-sm:items-stretch ${routeTone.soft}`}
+                      >
+                        <div>
+                          <h3
+                            class={`m-0 text-xl leading-tight font-extrabold ${routeTone.title}`}
+                          >
+                            {route.title}
+                          </h3>
+                          {route.seasonal && (
+                            <span class="mt-2 inline-flex rounded-full border border-[rgba(176,106,0,0.2)] bg-white px-2.5 py-1.5 text-xs font-extrabold text-[#7a4a00]">
+                              {route.seasonal}
+                            </span>
+                          )}
                         </div>
-                      ))}
-                    </dl>
-                    <div class="mpc-ideal">
-                      <h4>{ui.idealTitle}</h4>
-                      <ul>
-                        {route.ideal.map(([lead, text]) => (
-                          <li>
-                            <strong>{lead}</strong> - {text}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </article>
-              ))}
-          </div>
-        </section>
-      ))
+                        <button
+                          class={`${pillButtonClass} ${routeTone.button} max-sm:w-full`}
+                          type="button"
+                          data-mpc-dialog={route.modalId}
+                          aria-label={`${ui.viewRouteMap}: ${route.title}`}
+                        >
+                          {ui.viewRouteMap}
+                        </button>
+                      </header>
+
+                      <div class="p-5">
+                        <p class="m-0 max-w-[82ch] leading-7 text-[#5d6a62]">
+                          {route.intro}
+                        </p>
+                        <dl class="mt-5 grid gap-3 md:grid-cols-2">
+                          {route.details.map(([label, value]) => (
+                            <div class="rounded-lg border border-[rgba(16,32,25,0.12)] bg-[#f4f7f4] p-4">
+                              <dt class="text-xs font-extrabold tracking-[0.08em] text-[#102019] uppercase">
+                                {label}
+                              </dt>
+                              <dd class="mt-1.5 mb-0 leading-6 text-[#5d6a62]">
+                                {value}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                        <div class="mt-5 rounded-lg border border-[rgba(16,32,25,0.12)] bg-[#fbfdfb] p-4">
+                          <h4 class="m-0 text-base font-extrabold">
+                            {ui.idealTitle}
+                          </h4>
+                          <ul class="mt-3 mb-0 list-disc pl-5 leading-7 text-[#5d6a62]">
+                            {route.ideal.map(([lead, text]) => (
+                              <li>
+                                <strong>{lead}</strong> - {text}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+            </div>
+          </section>
+        );
+      })
     }
   </div>
 
-  <section class="mpc-compare" aria-labelledby="mpc-compare-title">
-    <h2 id="mpc-compare-title">{ui.compareTitle}</h2>
-    <div class="mpc-table-wrap">
-      <table>
-        <caption>{ui.compareCaption}</caption>
+  <section class="mt-12" aria-labelledby="mpc-compare-title">
+    <h2
+      id="mpc-compare-title"
+      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+    >
+      {ui.compareTitle}
+    </h2>
+    <div
+      class="mt-4 overflow-x-auto rounded-lg border border-[rgba(16,32,25,0.12)]"
+    >
+      <table class="w-full min-w-[760px] border-collapse">
+        <caption class="p-4 text-left text-[#5d6a62]">
+          {ui.compareCaption}
+        </caption>
         <thead>
           <tr>
-            <th scope="col">{ui.detailHeader}</th>
+            <th class="border-t-0 bg-[#0b1611] p-4 text-left text-white" scope="col">
+              {ui.detailHeader}
+            </th>
             {
               circuits.map((circuit) => (
-                <th scope="col">
+                <th class="border-t-0 bg-[#0b1611] p-4 text-left text-white" scope="col">
                   {ui.circuit} {circuit.number}
                 </th>
               ))
@@ -201,10 +357,21 @@ const dialogs = [
             compareRows.map(
               ([detail, circuitOne, circuitTwo, circuitThree]) => (
                 <tr>
-                  <th scope="row">{detail}</th>
-                  <td>{circuitOne}</td>
-                  <td>{circuitTwo}</td>
-                  <td>{circuitThree}</td>
+                  <th
+                    class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left font-extrabold text-[#102019]"
+                    scope="row"
+                  >
+                    {detail}
+                  </th>
+                  <td class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left">
+                    {circuitOne}
+                  </td>
+                  <td class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left">
+                    {circuitTwo}
+                  </td>
+                  <td class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left">
+                    {circuitThree}
+                  </td>
                 </tr>
               ),
             )
@@ -214,56 +381,87 @@ const dialogs = [
     </div>
   </section>
 
-  <section class="mpc-booking" aria-labelledby="mpc-booking-title">
-    <h2 id="mpc-booking-title">{ui.bookingTitle}</h2>
-    <div class="mpc-booking-grid">
+  <section class="mt-12" aria-labelledby="mpc-booking-title">
+    <h2
+      id="mpc-booking-title"
+      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+    >
+      {ui.bookingTitle}
+    </h2>
+    <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
       {
         booking.map((item) => (
-          <article>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
+          <article class={`${cardClass} p-5`}>
+            <h3 class="m-0 text-lg font-extrabold">{item.title}</h3>
+            <p class="mt-2 mb-0 leading-7 text-[#5d6a62]">{item.text}</p>
           </article>
         ))
       }
     </div>
   </section>
 
-  <div class="mpc-cta">
-    <h2>{cta.title}</h2>
-    <p>{cta.text}</p>
-    <a href={ctaHref}>{cta.label}</a>
+  <div
+    class="mt-12 rounded-lg border border-[rgba(0,122,61,0.18)] bg-gradient-to-br from-[#e9f7ef] to-[#fffaf0] p-6"
+  >
+    <h2
+      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+    >
+      {cta.title}
+    </h2>
+    <p class="mt-2 mb-0 leading-7 text-[#5d6a62]">{cta.text}</p>
+    <a class={`${pillButtonClass} mt-4 bg-[#007a3d]`} href={ctaHref}>
+      {cta.label}
+    </a>
   </div>
 
   {
-    dialogs.map((dialog) => (
-      <dialog
-        id={dialog.id}
-        class={`mpc-dialog ${dialog.tone}`}
-        aria-labelledby={`${dialog.id}-title`}
-        closedby="any"
-      >
-        <div class="mpc-dialog-panel">
-          <header>
-            <h2 id={`${dialog.id}-title`}>{dialog.title}</h2>
-            <form method="dialog">
-              <button type="submit" aria-label={ui.closeMap}>
-                ×
-              </button>
-            </form>
-          </header>
-          <figure>
-            <img
-              src={mapImage}
-              alt={dialog.alt}
-              width="1024"
-              height="724"
-              loading="lazy"
-            />
-            <figcaption>{dialog.caption}</figcaption>
-          </figure>
-        </div>
-      </dialog>
-    ))
+    dialogs.map((dialog) => {
+      const tone = toneStyles[dialog.tone];
+
+      return (
+        <dialog
+          id={dialog.id}
+          class="mpc-dialog fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-full max-w-[min(92vw,1040px)] overflow-clip border-0 bg-transparent p-0 text-[#102019] max-sm:max-h-[calc(100dvh-1rem)] max-sm:max-w-[94vw]"
+          aria-labelledby={`${dialog.id}-title`}
+          closedby="any"
+        >
+          <div class="grid max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-lg border border-white/15 bg-[#f7faf8] shadow-[0_30px_90px_rgba(0,0,0,0.38)] max-sm:max-h-[calc(100dvh-1rem)]">
+            <header
+              class={`flex items-center justify-between gap-4 p-4 text-white ${tone.dialog}`}
+            >
+              <h2
+                id={`${dialog.id}-title`}
+                class="m-0 text-lg leading-tight font-extrabold text-white"
+              >
+                {dialog.title}
+              </h2>
+              <form method="dialog">
+                <button
+                  class={`${focusClass} inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/15 text-xl leading-none text-white`}
+                  type="submit"
+                  aria-label={ui.closeMap}
+                >
+                  x
+                </button>
+              </form>
+            </header>
+            <figure class="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] p-4">
+              <img
+                class="block h-full max-h-[min(68dvh,620px)] w-full rounded-md bg-[#e8ede9] object-contain max-sm:max-h-[58dvh]"
+                src={mapImage}
+                alt={dialog.alt}
+                width="1024"
+                height="724"
+                loading="lazy"
+              />
+              <figcaption class="mt-3 text-center text-sm leading-6 text-[#5d6a62]">
+                {dialog.caption}
+              </figcaption>
+            </figure>
+          </div>
+        </dialog>
+      );
+    })
   }
 </section>
 
@@ -338,743 +536,9 @@ const dialogs = [
 </script>
 
 <style>
-  .mpc {
-    --mpc-ink: #102019;
-    --mpc-muted: #5d6a62;
-    --mpc-line: rgba(16, 32, 25, 0.12);
-    --mpc-paper: #ffffff;
-    --mpc-soft: #f4f7f4;
-    --c1: #007a3d;
-    --c1-soft: #e8f7ef;
-    --c2: #1463a5;
-    --c2-soft: #e7f1fb;
-    --c3: #7a3db8;
-    --c3-soft: #f0e8fb;
-    --gold: #b06a00;
-    --gold-soft: #fff4d9;
-    color: var(--mpc-ink);
-    margin-top: 2rem;
-  }
-
-  .mpc :where(h2, h3, h4, p, ul, dl, figure) {
-    margin: 0;
-  }
-
-  .mpc :where(button, a):focus-visible {
-    outline: 3px solid #f2b84b;
-    outline-offset: 3px;
-  }
-
-  .mpc-decree {
-    align-items: flex-start;
-    background: linear-gradient(135deg, #fff8e8, #ffffff);
-    border: 1px solid rgba(176, 106, 0, 0.22);
-    border-left: 5px solid var(--gold);
-    border-radius: 8px;
-    box-shadow: 0 20px 45px -34px rgba(16, 32, 25, 0.45);
-    display: flex;
-    gap: 1rem;
-    padding: 1.1rem 1.25rem;
-  }
-
-  .mpc-decree p {
-    color: #654510;
-    font-size: 0.96rem;
-    line-height: 1.7;
-  }
-
-  .mpc-decree-icon {
-    align-items: center;
-    background: var(--gold);
-    border-radius: 999px;
-    color: #fff;
-    display: inline-flex;
-    flex: 0 0 auto;
-    font-weight: 800;
-    height: 1.75rem;
-    justify-content: center;
-    width: 1.75rem;
-  }
-
-  .mpc-map-section {
-    padding: 3.25rem 0 2.2rem;
-    text-align: center;
-  }
-
-  .mpc-label {
-    color: var(--c1);
-    font-size: 0.74rem;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .mpc-map-section h2,
-  .mpc-compare h2,
-  .mpc-booking h2,
-  .mpc-cta h2 {
-    color: var(--mpc-ink);
-    font-size: clamp(1.8rem, 4vw, 2.75rem);
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 1.08;
-    margin-top: 0.55rem;
-  }
-
-  .mpc-desc {
-    color: var(--mpc-muted);
-    line-height: 1.7;
-    margin-top: 0.75rem;
-  }
-
-  .mpc-circuit-grid {
-    display: grid;
-    gap: 1.35rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 2rem;
-    text-align: left;
-  }
-
-  .mpc-circuit-card,
-  .mpc-route-card,
-  .mpc-booking article {
-    background: var(--mpc-paper);
-    border: 1px solid var(--mpc-line);
-    border-radius: 8px;
-    box-shadow: 0 24px 60px -42px rgba(16, 32, 25, 0.45);
-    overflow: hidden;
-  }
-
-  .mpc-circuit-card {
-    display: grid;
-    grid-template-rows: auto 1fr;
-  }
-
-  .mpc-circuit-card.c1 {
-    border-top: 4px solid var(--c1);
-  }
-
-  .mpc-circuit-card.c2 {
-    border-top: 4px solid var(--c2);
-  }
-
-  .mpc-circuit-card.c3 {
-    border-top: 4px solid var(--c3);
-  }
-
-  .mpc-map-trigger {
-    aspect-ratio: 16 / 10;
-    background: #0b1611;
-    border: 0;
-    color: #fff;
-    cursor: pointer;
-    display: block;
-    overflow: hidden;
-    padding: 0;
-    position: relative;
-    width: 100%;
-  }
-
-  .mpc-map-trigger img {
-    display: block;
-    height: 100%;
-    object-fit: cover;
-    transition: scale 0.35s ease;
-    width: 100%;
-  }
-
-  .mpc-map-trigger:hover img {
-    scale: 1.04;
-  }
-
-  .mpc-card-badge,
-  .mpc-card-overlay {
-    position: absolute;
-  }
-
-  .mpc-card-badge {
-    border-radius: 999px;
-    font-size: 0.74rem;
-    font-weight: 800;
-    left: 1rem;
-    padding: 0.35rem 0.7rem;
-    top: 1rem;
-  }
-
-  .c1 .mpc-card-badge,
-  .c1 .mpc-card-cta,
-  .c1 .mpc-route-map {
-    background: var(--c1);
-  }
-
-  .c2 .mpc-card-badge,
-  .c2 .mpc-card-cta,
-  .c2 .mpc-route-map {
-    background: var(--c2);
-  }
-
-  .c3 .mpc-card-badge,
-  .c3 .mpc-card-cta,
-  .c3 .mpc-route-map {
-    background: var(--c3);
-  }
-
-  .gold .mpc-route-map {
-    background: var(--gold);
-  }
-
-  .mpc-card-overlay {
-    align-items: center;
-    background: rgba(4, 10, 7, 0.68);
-    display: flex;
-    inset: 0;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .mpc-map-trigger:hover .mpc-card-overlay,
-  .mpc-map-trigger:focus-visible .mpc-card-overlay {
-    opacity: 1;
-  }
-
-  .mpc-card-body {
-    display: flex;
-    flex-direction: column;
-    padding: 1.2rem;
-  }
-
-  .mpc-card-num {
-    display: inline-flex;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .c1 .mpc-card-num {
-    color: var(--c1);
-  }
-
-  .c2 .mpc-card-num {
-    color: var(--c2);
-  }
-
-  .c3 .mpc-card-num {
-    color: var(--c3);
-  }
-
-  .mpc-card-body h3 {
-    font-size: 1.45rem;
-    line-height: 1.15;
-    margin-top: 0.35rem;
-  }
-
-  .mpc-route-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    list-style: none;
-    margin-bottom: 1.1rem;
-    margin-top: 1rem;
-    padding: 0;
-  }
-
-  .mpc-route-tags li {
-    background: var(--mpc-soft);
-    border: 1px solid var(--mpc-line);
-    border-radius: 999px;
-    color: var(--mpc-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
-    padding: 0.34rem 0.62rem;
-  }
-
-  .mpc-card-cta,
-  .mpc-route-map,
-  .mpc-cta a {
-    border: 0;
-    border-radius: 999px;
-    color: #fff;
-    cursor: pointer;
-    display: inline-flex;
-    font-size: 0.88rem;
-    font-weight: 800;
-    justify-content: center;
-    line-height: 1;
-    padding: 0.78rem 1rem;
-    text-decoration: none;
-    transition:
-      transform 0.18s ease,
-      filter 0.18s ease;
-  }
-
-  .mpc-card-cta {
-    margin-top: auto;
-    width: 100%;
-  }
-
-  .mpc-card-cta:hover,
-  .mpc-route-map:hover,
-  .mpc-cta a:hover {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
-  }
-
-  .mpc-tabs {
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(16, 32, 25, 0.1);
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 12px 26px -20px rgba(16, 32, 25, 0.5);
-    display: flex;
-    gap: 0.7rem;
-    margin: 0 0 2.5rem;
-    overflow-x: auto;
-    padding: 0.65rem;
-    position: sticky;
-    top: 0;
-    z-index: 8;
-  }
-
-  .mpc-tab {
-    border-radius: 999px;
-    color: var(--mpc-ink);
-    flex: 1 0 max-content;
-    font-size: 0.88rem;
-    font-weight: 800;
-    padding: 0.8rem 1rem;
-    text-align: center;
-    text-decoration: none;
-  }
-
-  .mpc-tab.c1 {
-    background: var(--c1-soft);
-    color: var(--c1);
-  }
-
-  .mpc-tab.c2 {
-    background: var(--c2-soft);
-    color: var(--c2);
-  }
-
-  .mpc-tab.c3 {
-    background: var(--c3-soft);
-    color: var(--c3);
-  }
-
-  .mpc-circuit-section {
-    scroll-margin-top: 92px;
-  }
-
-  .mpc-circuit-section + .mpc-circuit-section {
-    margin-top: 3rem;
-  }
-
-  .mpc-circuit-header {
-    align-items: center;
-    border-radius: 8px;
-    color: #fff;
-    display: flex;
-    gap: 1.25rem;
-    margin-bottom: 1rem;
-    padding: 1.35rem;
-  }
-
-  .mpc-circuit-header.c1 {
-    background: linear-gradient(135deg, var(--c1), #004b29);
-  }
-
-  .mpc-circuit-header.c2 {
-    background: linear-gradient(135deg, var(--c2), #083b6d);
-  }
-
-  .mpc-circuit-header.c3 {
-    background: linear-gradient(135deg, var(--c3), #4b247b);
-  }
-
-  .mpc-circuit-number {
-    align-items: center;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 999px;
-    display: flex;
-    flex: 0 0 auto;
-    font-size: 1.6rem;
-    font-weight: 900;
-    height: 3.4rem;
-    justify-content: center;
-    width: 3.4rem;
-  }
-
-  .mpc-circuit-header h2 {
-    color: #fff;
-    font-size: clamp(1.55rem, 3vw, 2.2rem);
-    font-weight: 850;
-    line-height: 1.1;
-  }
-
-  .mpc-circuit-header p {
-    color: rgba(255, 255, 255, 0.78);
-    line-height: 1.6;
-    margin-top: 0.35rem;
-  }
-
-  .mpc-route-list {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .mpc-route-card.c1 {
-    border-top: 3px solid var(--c1);
-  }
-
-  .mpc-route-card.c2 {
-    border-top: 3px solid var(--c2);
-  }
-
-  .mpc-route-card.c3 {
-    border-top: 3px solid var(--c3);
-  }
-
-  .mpc-route-card.gold {
-    border-top: 3px solid var(--gold);
-  }
-
-  .mpc-route-head {
-    align-items: center;
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    padding: 1rem 1.15rem;
-  }
-
-  .mpc-route-card.c1 .mpc-route-head {
-    background: var(--c1-soft);
-  }
-
-  .mpc-route-card.c2 .mpc-route-head {
-    background: var(--c2-soft);
-  }
-
-  .mpc-route-card.c3 .mpc-route-head {
-    background: var(--c3-soft);
-  }
-
-  .mpc-route-card.gold .mpc-route-head {
-    background: var(--gold-soft);
-  }
-
-  .mpc-route-head h3 {
-    font-size: 1.2rem;
-    font-weight: 850;
-    line-height: 1.25;
-  }
-
-  .mpc-route-card.c1 h3 {
-    color: var(--c1);
-  }
-
-  .mpc-route-card.c2 h3 {
-    color: var(--c2);
-  }
-
-  .mpc-route-card.c3 h3 {
-    color: var(--c3);
-  }
-
-  .mpc-route-card.gold h3 {
-    color: #7a4a00;
-  }
-
-  .mpc-seasonal {
-    background: #fff;
-    border: 1px solid rgba(176, 106, 0, 0.2);
-    border-radius: 999px;
-    color: #7a4a00;
-    display: inline-flex;
-    font-size: 0.72rem;
-    font-weight: 800;
-    margin-top: 0.5rem;
-    padding: 0.35rem 0.6rem;
-  }
-
-  .mpc-route-body {
-    padding: 1.25rem;
-  }
-
-  .mpc-route-intro {
-    color: var(--mpc-muted);
-    line-height: 1.75;
-    max-width: 82ch;
-  }
-
-  .mpc-details {
-    display: grid;
-    gap: 0.8rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 1.2rem;
-  }
-
-  .mpc-detail {
-    background: var(--mpc-soft);
-    border: 1px solid var(--mpc-line);
-    border-radius: 8px;
-    padding: 0.9rem;
-  }
-
-  .mpc-detail dt {
-    color: var(--mpc-ink);
-    font-size: 0.75rem;
-    font-weight: 850;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .mpc-detail dd {
-    color: var(--mpc-muted);
-    line-height: 1.55;
-    margin: 0.35rem 0 0;
-  }
-
-  .mpc-ideal {
-    background: #fbfdfb;
-    border: 1px solid var(--mpc-line);
-    border-radius: 8px;
-    margin-top: 1.2rem;
-    padding: 1rem;
-  }
-
-  .mpc-ideal h4 {
-    font-size: 1rem;
-    font-weight: 850;
-  }
-
-  .mpc-ideal ul {
-    color: var(--mpc-muted);
-    line-height: 1.65;
-    margin-top: 0.65rem;
-    padding-left: 1.1rem;
-  }
-
-  .mpc-compare,
-  .mpc-booking,
-  .mpc-cta {
-    margin-top: 3rem;
-  }
-
-  .mpc-table-wrap {
-    border: 1px solid var(--mpc-line);
-    border-radius: 8px;
-    margin-top: 1rem;
-    overflow-x: auto;
-  }
-
-  .mpc table {
-    border-collapse: collapse;
-    min-width: 760px;
-    width: 100%;
-  }
-
-  .mpc caption {
-    color: var(--mpc-muted);
-    padding: 0.9rem;
-    text-align: left;
-  }
-
-  .mpc th,
-  .mpc td {
-    border-top: 1px solid var(--mpc-line);
-    padding: 0.85rem 1rem;
-    text-align: left;
-  }
-
-  .mpc thead th {
-    background: #0b1611;
-    border-top: 0;
-    color: #fff;
-  }
-
-  .mpc tbody th {
-    color: var(--mpc-ink);
-    font-weight: 850;
-  }
-
-  .mpc-booking-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 1rem;
-  }
-
-  .mpc-booking article {
-    padding: 1.15rem;
-  }
-
-  .mpc-booking h3 {
-    font-size: 1.05rem;
-    font-weight: 850;
-  }
-
-  .mpc-booking p,
-  .mpc-cta p {
-    color: var(--mpc-muted);
-    line-height: 1.7;
-    margin-top: 0.55rem;
-  }
-
-  .mpc-cta {
-    background: linear-gradient(135deg, #e9f7ef, #fffaf0);
-    border: 1px solid rgba(0, 122, 61, 0.18);
-    border-radius: 8px;
-    padding: 1.4rem;
-  }
-
-  .mpc-cta a {
-    background: var(--c1);
-    margin-top: 1rem;
-  }
-
-  .mpc-dialog {
-    background: transparent;
-    border: 0;
-    color: var(--mpc-ink);
-    inset: 0;
-    margin: auto;
-    max-height: calc(100dvh - 2rem);
-    max-width: min(92vw, 1040px);
-    overflow: clip;
-    padding: 0;
-    position: fixed;
-    width: 100%;
-  }
-
   .mpc-dialog::backdrop {
     background: rgba(4, 10, 7, 0.78);
     backdrop-filter: blur(3px);
-  }
-
-  .mpc-dialog-panel {
-    background: #f7faf8;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 8px;
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    max-height: calc(100dvh - 2rem);
-    overflow: hidden;
-  }
-
-  .mpc-dialog header {
-    align-items: center;
-    color: #fff;
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    padding: 1rem 1.15rem;
-  }
-
-  .mpc-dialog.c1 header {
-    background: var(--c1);
-  }
-
-  .mpc-dialog.c2 header {
-    background: var(--c2);
-  }
-
-  .mpc-dialog.c3 header {
-    background: var(--c3);
-  }
-
-  .mpc-dialog.gold header {
-    background: var(--gold);
-  }
-
-  .mpc-dialog h2 {
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 850;
-    line-height: 1.25;
-  }
-
-  .mpc-dialog button {
-    align-items: center;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 999px;
-    color: #fff;
-    cursor: pointer;
-    display: inline-flex;
-    font-size: 1.35rem;
-    height: 2.25rem;
-    justify-content: center;
-    line-height: 1;
-    width: 2.25rem;
-  }
-
-  .mpc-dialog figure {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    min-height: 0;
-    padding: 1rem;
-  }
-
-  .mpc-dialog img {
-    background: #e8ede9;
-    border-radius: 6px;
-    display: block;
-    height: 100%;
-    max-height: min(68dvh, 620px);
-    object-fit: contain;
-    width: 100%;
-  }
-
-  .mpc-dialog figcaption {
-    color: var(--mpc-muted);
-    font-size: 0.85rem;
-    line-height: 1.55;
-    margin-top: 0.75rem;
-    text-align: center;
-  }
-
-  @media (max-width: 960px) {
-    .mpc-circuit-grid,
-    .mpc-booking-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .mpc-tabs {
-      top: 0;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .mpc-decree,
-    .mpc-circuit-header,
-    .mpc-route-head {
-      align-items: stretch;
-      flex-direction: column;
-    }
-
-    .mpc-details {
-      grid-template-columns: 1fr;
-    }
-
-    .mpc-route-map {
-      width: 100%;
-    }
-
-    .mpc-dialog {
-      max-height: calc(100dvh - 1rem);
-      max-width: 94vw;
-    }
-
-    .mpc-dialog-panel {
-      max-height: calc(100dvh - 1rem);
-    }
-
-    .mpc-dialog img {
-      max-height: 58dvh;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {

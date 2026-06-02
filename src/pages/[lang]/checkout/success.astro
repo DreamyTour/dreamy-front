@@ -1,0 +1,29 @@
+---
+import CheckoutSuccess from "@/components/checkout/CheckoutSuccess.astro";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { DEFAULT_LANG, LOCALIZED_LANGS, isValidLang } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return LOCALIZED_LANGS.map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
+
+if (lang === DEFAULT_LANG) {
+  return Astro.redirect("/checkout/success");
+}
+
+const seoProps = {
+  title: "Payment request sent - Dreamy Tours",
+  description: "Your payment request was sent.",
+  type: "website" as "website",
+  lang,
+  robots: "noindex, nofollow",
+};
+---
+
+<PageLayout seo={seoProps} lang={lang}>
+  <CheckoutSuccess lang={lang} />
+</PageLayout>

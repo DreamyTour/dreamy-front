@@ -41,6 +41,7 @@ test("checkout passenger and contact fields keep focus while typing", async ({
   });
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByText("Traveler Information").waitFor({ state: "visible" });
+  await expect(page.locator('input[name="passenger-1-given-name"]')).toBeFocused();
 
   await typeAndKeepFocus(page, 'input[name="passenger-1-given-name"]', "Ana");
   await typeAndKeepFocus(

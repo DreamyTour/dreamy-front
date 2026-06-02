@@ -1,0 +1,17 @@
+---
+import CheckoutSuccess from "@/components/checkout/CheckoutSuccess.astro";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { DEFAULT_LANG } from "@/lib/i18n";
+
+const seoProps = {
+  title: "Payment request sent - Dreamy Tours",
+  description: "Your payment request was sent.",
+  type: "website" as "website",
+  lang: DEFAULT_LANG,
+  robots: "noindex, nofollow",
+};
+---
+
+<PageLayout seo={seoProps}>
+  <CheckoutSuccess lang={DEFAULT_LANG} />
+</PageLayout>

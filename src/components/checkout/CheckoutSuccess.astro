@@ -1,0 +1,106 @@
+---
+import type { Lang } from "@/lib/i18n";
+
+interface Props {
+  lang?: Lang;
+}
+
+const lang = Astro.props.lang ?? "en";
+
+const copy = {
+  en: {
+    title: "Payment request sent",
+    text: "If PayPal confirmed your payment, our team will review your booking details and contact you shortly.",
+    tour: "Return to tour",
+    home: "Go to home",
+    fallbackTour: "your tour",
+  },
+  es: {
+    title: "Solicitud de pago enviada",
+    text: "Si PayPal confirmó tu pago, nuestro equipo revisará los datos de la reserva y te contactará pronto.",
+    tour: "Volver al tour",
+    home: "Ir al inicio",
+    fallbackTour: "tu tour",
+  },
+  pt: {
+    title: "Solicitação de pagamento enviada",
+    text: "Se o PayPal confirmou o seu pagamento, nossa equipe revisará os dados da reserva e entrará em contato em breve.",
+    tour: "Voltar ao tour",
+    home: "Ir ao início",
+    fallbackTour: "seu tour",
+  },
+}[lang];
+
+const homeHref = lang === "en" ? "/" : `/${lang}`;
+---
+
+<section
+  class="mx-auto flex min-h-[60vh] w-full max-w-3xl flex-col items-center justify-center px-4 py-16 text-center"
+  data-checkout-success
+  data-home-href={homeHref}
+>
+  <div
+    class="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-3xl font-black text-primary"
+    aria-hidden="true"
+  >
+    OK
+  </div>
+  <p class="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-primary">
+    Dreamy Tours
+  </p>
+  <h1 class="mb-4 text-3xl font-black tracking-tight text-gray-950 md:text-4xl">
+    {copy.title}
+  </h1>
+  <p class="mb-3 max-w-2xl text-base leading-7 text-gray-600">{copy.text}</p>
+  <p class="mb-8 text-sm font-semibold text-gray-800" data-tour-name>
+    {copy.fallbackTour}
+  </p>
+
+  <div class="flex flex-col gap-3 sm:flex-row">
+    <a
+      href={homeHref}
+      data-tour-link
+      class="inline-flex items-center justify-center rounded-sm bg-primary px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90"
+    >
+      {copy.tour}
+    </a>
+    <a
+      href={homeHref}
+      class="inline-flex items-center justify-center rounded-sm border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-800 transition hover:bg-gray-50"
+    >
+      {copy.home}
+    </a>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector("[data-checkout-success]");
+  if (root instanceof HTMLElement) {
+    const homeHref = root.dataset.homeHref || "/";
+    const savedCart = window.localStorage.getItem("bookingCart");
+    const previousTourPath = window.localStorage.getItem("lastBookingTourPath");
+    let tourName = "";
+    let tourPath = previousTourPath || homeHref;
+
+    if (savedCart) {
+      try {
+        const cart = JSON.parse(savedCart);
+        if (typeof cart.tourName === "string") tourName = cart.tourName;
+        if (typeof cart.tourPath === "string") tourPath = cart.tourPath;
+      } catch {
+        /* Ignore malformed storage and keep fallback links. */
+      }
+    }
+
+    window.localStorage.removeItem("bookingCart");
+    window.localStorage.setItem("lastBookingTourPath", tourPath);
+
+    const tourNameEl = root.querySelector("[data-tour-name]");
+    if (tourNameEl && tourName) tourNameEl.textContent = tourName;
+
+    const tourLink = root.querySelector("[data-tour-link]");
+    if (tourLink instanceof HTMLAnchorElement) {
+      tourLink.href = tourPath || homeHref;
+    }
+  }
+</script>
