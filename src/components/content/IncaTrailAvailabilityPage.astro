@@ -1,0 +1,471 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import TourCard from "@/components/ui/TourCard.astro";
+import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
+import { fetchAllStrapi } from "@/lib/strapi";
+import { dedupeLocalizedDocuments } from "@/lib/utils";
+import type { Lang } from "@/lib/i18n";
+import type { SEOProps } from "@/components/layout/SEO.astro";
+import type { Tour, Category as TourCategory } from "@/types/tours";
+import {
+  fetchIncaTrailTickets,
+  type TicketsByDate,
+} from "@/lib/incaTrailAvailability";
+import { serializeJsonForHtml } from "@/lib/html";
+import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
+
+interface Props {
+  lang: Lang;
+  seo: SEOProps;
+}
+
+const { lang, seo } = Astro.props;
+
+const copyByLang = {
+  es: {
+    eyebrow: "Permisos oficiales 2026",
+    title: "Disponibilidad Camino Inca 2026",
+    intro:
+      "El Camino Inca es uno de los destinos mas iconicos para los amantes del trekking en el mundo, combinando belleza natural, arqueologia inca y una experiencia cultural unica. Su alta demanda y las estrictas regulaciones hacen que la disponibilidad sea un tema central para quienes desean realizar esta travesia.",
+    availabilityTitle: "Por que es limitada la disponibilidad del Camino Inca?",
+    regulationsTitle: "Regulaciones del Gobierno Peruano",
+    regulations:
+      "Para proteger la ruta y el medio ambiente, el gobierno ha limitado el numero de permisos diarios a 500 personas, incluyendo guias, porteadores y turistas. Este limite es supervisado estrictamente por el Ministerio de Cultura del Peru.",
+    seasonsTitle: "Temporada alta y baja",
+    seasons: [
+      "Temporada alta (mayo a septiembre): la disponibilidad se agota rapidamente por las condiciones climaticas ideales.",
+      "Temporada baja (octubre a abril): hay menos demanda, pero febrero permanece cerrado por mantenimiento.",
+    ],
+    requirementsTitle: "Requisitos de reserva anticipada",
+    requirementsIntro:
+      "Los permisos suelen agotarse con 6 meses de anticipacion, especialmente para los meses mas populares. Para reservar necesitamos:",
+    requirements: [
+      "Pasaporte original vigente o documento de identidad",
+      "Numero de telefono",
+      "Seguro de viaje internacional",
+    ],
+    calendarTitle: "Calendario de disponibilidad",
+    calendarIntro:
+      "Consulta los cupos disponibles para las rutas autorizadas del Camino Inca. La disponibilidad se actualiza desde el sistema de tickets.",
+    toursTitle: "Tours de Camino Inca",
+    toursIntro:
+      "Estas experiencias pertenecen a la categoria Camino Inca y estan disponibles para reserva segun cupos oficiales.",
+    noTours: "No encontramos tours publicados en la categoria Camino Inca.",
+    paymentTitle: "Pago de Reserva",
+    paymentIntro:
+      "El pago de la reserva es un paso fundamental para asegurar tu cupo en el Camino Inca. A continuacion, se detallan las condiciones generales:",
+    depositTitle: "Deposito inicial",
+    depositItems: [
+      "Es obligatorio realizar un pago anticipado de US$200.00 por persona para confirmar la reserva.",
+      "El deposito garantiza la emision del permiso, gestionado directamente por la agencia autorizada.",
+    ],
+    conditionsTitle: "Condiciones del pago",
+    conditions:
+      "El deposito es no reembolsable, ya que los permisos son emitidos en tiempo real y asignados a un nombre especifico. El saldo pendiente debe abonarse al menos 5 dias antes de la fecha de salida y puede pagarse en efectivo. Si se paga con tarjeta, se aplica un cargo adicional del 6% correspondiente a la comision bancaria.",
+    methodsTitle: "Metodos de pago aceptados",
+    methods: [
+      "Transferencias bancarias",
+      "Pagos con tarjeta de credito o debito, sujetos a comisiones adicionales",
+      "Plataformas digitales de pago como PayPal, link de pagos, entre otras",
+    ],
+    confirmationTitle: "Confirmacion de la reserva",
+    confirmation:
+      "Una vez recibido el pago, la agencia emite el permiso oficial en el sistema del Ministerio de Cultura y envia una confirmacion por correo electronico con los datos del permiso y del itinerario.",
+    categoryLabel: "Camino Inca",
+    stats: [
+      "permisos diarios entre turistas, guias y porteadores",
+      "meses de anticipacion recomendada para reservar",
+      "cerrado por mantenimiento de la ruta",
+    ],
+  },
+  en: {
+    eyebrow: "Official 2026 permits",
+    title: "Inca Trail Availability 2026",
+    intro:
+      "The Inca Trail is one of the world's most iconic trekking routes, combining natural beauty, Inca archaeology and a unique cultural experience. High demand and strict regulations make availability essential when planning this journey.",
+    availabilityTitle: "Why is Inca Trail availability limited?",
+    regulationsTitle: "Peruvian Government regulations",
+    regulations:
+      "To protect the route and the environment, the government limits daily permits to 500 people, including guides, porters and travelers. This limit is strictly supervised by Peru's Ministry of Culture.",
+    seasonsTitle: "High and low season",
+    seasons: [
+      "High season (May to September): spaces sell out quickly because of ideal weather conditions.",
+      "Low season (October to April): demand is lower, but February is fully closed for maintenance.",
+    ],
+    requirementsTitle: "Advance booking requirements",
+    requirementsIntro:
+      "Permits often sell out 6 months in advance, especially for the most popular months. To book, we need:",
+    requirements: [
+      "Valid original passport or identity document",
+      "Phone number",
+      "International travel insurance",
+    ],
+    calendarTitle: "Availability calendar",
+    calendarIntro:
+      "Check available spaces for authorized Inca Trail routes. Availability is loaded from the ticketing system.",
+    toursTitle: "Inca Trail tours",
+    toursIntro:
+      "These experiences belong to the Inca Trail category and can be reserved according to official permit availability.",
+    noTours: "We could not find published tours in the Inca Trail category.",
+    paymentTitle: "Reservation Payment",
+    paymentIntro:
+      "Reservation payment is essential to secure your place on the Inca Trail. These are the general conditions:",
+    depositTitle: "Initial deposit",
+    depositItems: [
+      "An advance payment of US$200.00 per person is required to confirm the reservation.",
+      "The deposit guarantees permit issuance, managed directly by the authorized agency.",
+    ],
+    conditionsTitle: "Payment conditions",
+    conditions:
+      "The deposit is non-refundable because permits are issued in real time and assigned to a specific name. The remaining balance must be paid at least 5 days before departure and can be paid in cash. Card payments include an additional 6% bank commission.",
+    methodsTitle: "Accepted payment methods",
+    methods: [
+      "Bank transfers",
+      "Credit or debit card payments, subject to additional fees",
+      "Digital payment platforms such as PayPal and payment links",
+    ],
+    confirmationTitle: "Reservation confirmation",
+    confirmation:
+      "Once payment is received, the agency issues the official permit in the Ministry of Culture system and sends an email confirmation with permit and itinerary details.",
+    categoryLabel: "Inca Trail",
+    stats: [
+      "daily permits including travelers, guides and porters",
+      "months in advance recommended for booking",
+      "closed for route maintenance",
+    ],
+  },
+  pt: {
+    eyebrow: "Permissoes oficiais 2026",
+    title: "Disponibilidade Trilha Inca 2026",
+    intro:
+      "A Trilha Inca e um dos roteiros de trekking mais iconicos do mundo, combinando beleza natural, arqueologia inca e uma experiencia cultural unica. A alta demanda e as regras estritas tornam a disponibilidade essencial para planejar esta aventura.",
+    availabilityTitle: "Por que a disponibilidade da Trilha Inca e limitada?",
+    regulationsTitle: "Regulamentacoes do Governo Peruano",
+    regulations:
+      "Para proteger a rota e o meio ambiente, o governo limita as permissoes diarias a 500 pessoas, incluindo guias, carregadores e viajantes. Esse limite e supervisionado rigorosamente pelo Ministerio da Cultura do Peru.",
+    seasonsTitle: "Alta e baixa temporada",
+    seasons: [
+      "Alta temporada (maio a setembro): as vagas acabam rapidamente devido ao clima ideal.",
+      "Baixa temporada (outubro a abril): ha menos demanda, mas fevereiro permanece fechado para manutencao.",
+    ],
+    requirementsTitle: "Requisitos para reserva antecipada",
+    requirementsIntro:
+      "As permissoes costumam acabar com 6 meses de antecedencia, especialmente nos meses mais procurados. Para reservar, precisamos de:",
+    requirements: [
+      "Passaporte original valido ou documento de identidade",
+      "Numero de telefone",
+      "Seguro viagem internacional",
+    ],
+    calendarTitle: "Calendario de disponibilidade",
+    calendarIntro:
+      "Consulte as vagas disponiveis para as rotas autorizadas da Trilha Inca. A disponibilidade e carregada a partir do sistema de tickets.",
+    toursTitle: "Tours da Trilha Inca",
+    toursIntro:
+      "Estas experiencias pertencem a categoria Trilha Inca e podem ser reservadas conforme as vagas oficiais.",
+    noTours: "Nao encontramos tours publicados na categoria Trilha Inca.",
+    paymentTitle: "Pagamento da Reserva",
+    paymentIntro:
+      "O pagamento da reserva e fundamental para garantir sua vaga na Trilha Inca. Veja as condicoes gerais:",
+    depositTitle: "Deposito inicial",
+    depositItems: [
+      "E obrigatorio realizar um pagamento antecipado de US$200.00 por pessoa para confirmar a reserva.",
+      "O deposito garante a emissao da permissao, gerenciada diretamente pela agencia autorizada.",
+    ],
+    conditionsTitle: "Condicoes de pagamento",
+    conditions:
+      "O deposito nao e reembolsavel, pois as permissoes sao emitidas em tempo real e atribuidas a um nome especifico. O saldo deve ser pago pelo menos 5 dias antes da data de saida e pode ser feito em dinheiro. Em pagamentos com cartao, aplica-se uma taxa adicional de 6% referente a comissao bancaria.",
+    methodsTitle: "Metodos de pagamento aceitos",
+    methods: [
+      "Transferencias bancarias",
+      "Pagamentos com cartao de credito ou debito, sujeitos a taxas adicionais",
+      "Plataformas digitais de pagamento como PayPal e links de pagamento",
+    ],
+    confirmationTitle: "Confirmacao da reserva",
+    confirmation:
+      "Apos receber o pagamento, a agencia emite a permissao oficial no sistema do Ministerio da Cultura e envia uma confirmacao por e-mail com os dados da permissao e do itinerario.",
+    categoryLabel: "Trilha Inca",
+    stats: [
+      "permissoes diarias entre viajantes, guias e carregadores",
+      "meses de antecedencia recomendados para reservar",
+      "fechado para manutencao da rota",
+    ],
+  },
+} as const;
+
+const copy = copyByLang[lang];
+const now = new Date();
+const calendarYear = 2026;
+const initialMonth =
+  calendarYear === now.getFullYear() ? now.getMonth() + 1 : 1;
+const initialRoad = "1";
+
+let initialTickets: TicketsByDate = {};
+
+try {
+  initialTickets = await fetchIncaTrailTickets({
+    road: initialRoad,
+    year: calendarYear,
+    month: initialMonth,
+  });
+} catch {
+  initialTickets = {};
+}
+
+const normalizeText = (value: string | undefined) =>
+  (value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
+
+const categoryAliases = [
+  "inca trail",
+  "camino inca",
+  "trilha inca",
+  "trilha-inca",
+  "inca-trail",
+  "camino-inca",
+];
+
+function isIncaTrailCategory(category: TourCategory) {
+  const source = `${category.slug} ${category.nombre}`;
+  const normalized = normalizeText(source).replaceAll("-", " ");
+
+  return categoryAliases.some((alias) =>
+    normalized.includes(alias.replaceAll("-", " ")),
+  );
+}
+
+const toursRaw = await fetchAllStrapi<Tour>({
+  endpoint: "tours",
+  locale: lang,
+});
+
+const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
+  .filter((tour) => tour.categories?.some(isIncaTrailCategory))
+  .sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+---
+
+<PageLayout seo={seo} lang={lang}>
+  <script
+    is:inline
+    id="page-slug-map"
+    type="application/json"
+    set:html={serializeJsonForHtml(incaTrailAvailabilitySlugMap)}
+  />
+
+  <div class="bg-background">
+    <section class="border-b border-border bg-muted/40">
+      <div
+        class="mx-auto grid max-w-8xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-16"
+      >
+        <div class="max-w-3xl">
+          <div
+            class="inline-flex items-center gap-2 rounded-sm border border-secondary/20 bg-white px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-secondary"
+          >
+            <span class="h-2 w-2 rounded-full bg-secondary"></span>
+            {copy.eyebrow}
+          </div>
+          <h1
+            class="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+          >
+            {copy.title}
+          </h1>
+          <p
+            class="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg"
+          >
+            {copy.intro}
+          </p>
+        </div>
+
+        <div class="grid content-start gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <div class="rounded-sm border border-border bg-white p-5">
+            <p class="text-3xl font-semibold text-primary">500</p>
+            <p class="mt-1 text-sm leading-6 text-muted-foreground">
+              {copy.stats[0]}
+            </p>
+          </div>
+          <div class="rounded-sm border border-border bg-white p-5">
+            <p class="text-3xl font-semibold text-primary">6</p>
+            <p class="mt-1 text-sm leading-6 text-muted-foreground">
+              {copy.stats[1]}
+            </p>
+          </div>
+          <div class="rounded-sm border border-border bg-white p-5">
+            <p class="text-3xl font-semibold text-primary">Feb</p>
+            <p class="mt-1 text-sm leading-6 text-muted-foreground">
+              {copy.stats[2]}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="mx-auto max-w-8xl px-4 py-12 md:px-6 lg:px-8">
+      <section class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div>
+          <h2 class="text-3xl font-semibold tracking-tight text-foreground">
+            {copy.availabilityTitle}
+          </h2>
+          <div class="mt-6 space-y-5 text-base leading-8 text-muted-foreground">
+            <div>
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.regulationsTitle}
+              </h3>
+              <p class="mt-2">{copy.regulations}</p>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.seasonsTitle}
+              </h3>
+              <ul class="mt-2 space-y-2">
+                {copy.seasons.map((item) => <li>{item}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.requirementsTitle}
+              </h3>
+              <p class="mt-2">{copy.requirementsIntro}</p>
+              <ul class="mt-3 space-y-2">
+                {
+                  copy.requirements.map((item) => (
+                    <li class="flex gap-3">
+                      <span class="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="rounded-sm border border-border bg-white p-4 shadow-[0_24px_60px_-42px_color-mix(in_oklab,var(--foreground)_28%,transparent)] md:p-5"
+        >
+          <div class="mb-5">
+            <h2 class="text-2xl font-semibold tracking-tight text-foreground">
+              {copy.calendarTitle}
+            </h2>
+            <p class="mt-2 text-sm leading-6 text-muted-foreground">
+              {copy.calendarIntro}
+            </p>
+          </div>
+          <IncaTrailAvailabilityCalendar
+            client:load
+            lang={lang}
+            year={calendarYear}
+            initialMonth={initialMonth}
+            initialRoad={initialRoad}
+            initialTickets={initialTickets}
+          />
+        </div>
+      </section>
+
+      <section class="py-14 md:py-16">
+        <div
+          class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between"
+        >
+          <div>
+            <span
+              class="text-xs font-semibold uppercase tracking-[0.24em] text-secondary"
+            >
+              {copy.categoryLabel}
+            </span>
+            <h2
+              class="mt-2 text-3xl font-semibold tracking-tight text-foreground"
+            >
+              {copy.toursTitle}
+            </h2>
+          </div>
+          <p class="max-w-2xl text-sm leading-6 text-muted-foreground">
+            {copy.toursIntro}
+          </p>
+        </div>
+
+        {
+          tours.length > 0 ? (
+            <div class="grid grid-cols-1 gap-x-2 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+              {tours.map((tour) => (
+                <TourCard tour={tour} lang={lang} />
+              ))}
+            </div>
+          ) : (
+            <div class="rounded-sm border border-dashed border-border bg-muted/40 p-8 text-center text-muted-foreground">
+              {copy.noTours}
+            </div>
+          )
+        }
+      </section>
+
+      <section class="border-t border-border py-12">
+        <div class="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
+          <div>
+            <h2 class="text-3xl font-semibold tracking-tight text-foreground">
+              {copy.paymentTitle}
+            </h2>
+            <p class="mt-4 text-base leading-8 text-muted-foreground">
+              {copy.paymentIntro}
+            </p>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-sm border border-border bg-white p-6">
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.depositTitle}
+              </h3>
+              <ul
+                class="mt-4 space-y-3 text-sm leading-6 text-muted-foreground"
+              >
+                {
+                  copy.depositItems.map((item) => (
+                    <li class="flex gap-3">
+                      <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+
+            <div class="rounded-sm border border-border bg-white p-6">
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.conditionsTitle}
+              </h3>
+              <p class="mt-4 text-sm leading-6 text-muted-foreground">
+                {copy.conditions}
+              </p>
+            </div>
+
+            <div class="rounded-sm border border-border bg-white p-6">
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.methodsTitle}
+              </h3>
+              <ul
+                class="mt-4 space-y-3 text-sm leading-6 text-muted-foreground"
+              >
+                {
+                  copy.methods.map((item) => (
+                    <li class="flex gap-3">
+                      <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+
+            <div class="rounded-sm border border-border bg-white p-6">
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.confirmationTitle}
+              </h3>
+              <p class="mt-4 text-sm leading-6 text-muted-foreground">
+                {copy.confirmation}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</PageLayout>

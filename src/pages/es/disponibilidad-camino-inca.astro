@@ -1,0 +1,8 @@
+---
+import IncaTrailAvailabilityPage from "@/components/content/IncaTrailAvailabilityPage.astro";
+import { incaTrailAvailabilitySeoByLang } from "@/data/incaTrailAvailabilityPage";
+
+export const prerender = false;
+---
+
+<IncaTrailAvailabilityPage lang="es" seo={incaTrailAvailabilitySeoByLang.es} />
