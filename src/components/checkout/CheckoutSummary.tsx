@@ -22,6 +22,7 @@ interface BookingCart {
 }
 
 interface Passenger {
+	id: string;
 	name: string;
 	lastname: string;
 	gender: string;
@@ -63,15 +64,18 @@ export default function CheckoutSummary() {
 				setCart(parsedCart);
 				// Initialize passengers array based on count
 				setPassengers(
-					Array.from({ length: parsedCart.passengers || 1 }).map(() => ({
-						name: "",
-						lastname: "",
-						gender: "Male",
-						dob: "",
-						documentType: "Passport",
-						documentNumber: "",
-						country: "US",
-					})),
+					Array.from({ length: parsedCart.passengers || 1 }).map(
+						(_, index) => ({
+							id: `passenger-${index + 1}`,
+							name: "",
+							lastname: "",
+							gender: "Male",
+							dob: "",
+							documentType: "Passport",
+							documentNumber: "",
+							country: "US",
+						}),
+					),
 				);
 			} catch (e) {
 				console.error("Failed to parse cart", e);
@@ -465,7 +469,7 @@ export default function CheckoutSummary() {
 						<div className="space-y-6 mb-10">
 							{passengers.map((pax, i) => (
 								<div
-									key={`${pax.documentNumber || pax.dob || pax.name || "passenger"}-${pax.lastname || ""}`}
+									key={pax.id}
 									className="bg-gray-50/30 rounded-sm p-5 border border-gray-100"
 								>
 									<div className="flex items-center gap-2 mb-4">
