@@ -23,7 +23,8 @@ const copyByLang = {
     title: "Disponibilidad Camino Inca 2026",
     intro:
       "El Camino Inca es uno de los destinos mas iconicos para los amantes del trekking en el mundo, combinando belleza natural, arqueologia inca y una experiencia cultural unica. Su alta demanda y las estrictas regulaciones hacen que la disponibilidad sea un tema central para quienes desean realizar esta travesia.",
-    availabilityTitle: "Por que es limitada la disponibilidad del Camino Inca?",
+    availabilityTitle:
+      "¿Por qué es limitada la disponibilidad del Camino Inca?",
     regulationsTitle: "Regulaciones del Gobierno Peruano",
     regulations:
       "Para proteger la ruta y el medio ambiente, el gobierno ha limitado el numero de permisos diarios a 500 personas, incluyendo guias, porteadores y turistas. Este limite es supervisado estrictamente por el Ministerio de Cultura del Peru.",
@@ -267,7 +268,7 @@ const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
   <div class="bg-background">
     <section class="border-b border-border bg-muted/40">
       <div
-        class="mx-auto grid max-w-8xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-16"
+        class="mx-auto grid max-w-8xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[0.96fr_1.04fr] lg:px-8 lg:py-16"
       >
         <div class="max-w-3xl">
           <div
@@ -286,76 +287,34 @@ const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
           >
             {copy.intro}
           </p>
-        </div>
 
-        <div
-          class="self-start overflow-hidden rounded-lg border border-[#d8e3dc] bg-white shadow-[0_24px_70px_-48px_rgba(15,53,35,0.55)]"
-        >
           <div
-            class="grid divide-y divide-[#e6eee9] sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y"
+            class="mt-8 overflow-hidden rounded-lg border border-[#d8e3dc] bg-white shadow-[0_24px_70px_-54px_rgba(15,53,35,0.5)]"
           >
-            {
-              copy.stats.map((stat, index) => (
-                <div class="p-5">
-                  <p class="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-secondary">
-                    {copy.statsKickers[index]}
-                  </p>
-                  <p class="mt-2 text-3xl font-semibold leading-none text-primary">
-                    {copy.statsValues[index]}
-                  </p>
-                  <p class="mt-2 text-sm leading-6 text-muted-foreground">
-                    {stat}
-                  </p>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="mx-auto max-w-8xl px-4 py-12 md:px-6 lg:px-8">
-      <section class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-        <div>
-          <h2 class="text-3xl font-semibold tracking-tight text-foreground">
-            {copy.availabilityTitle}
-          </h2>
-          <div class="mt-6 space-y-5 text-base leading-8 text-muted-foreground">
-            <div>
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.regulationsTitle}
-              </h3>
-              <p class="mt-2">{copy.regulations}</p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.seasonsTitle}
-              </h3>
-              <ul class="mt-2 space-y-2">
-                {copy.seasons.map((item) => <li>{item}</li>)}
-              </ul>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.requirementsTitle}
-              </h3>
-              <p class="mt-2">{copy.requirementsIntro}</p>
-              <ul class="mt-3 space-y-2">
-                {
-                  copy.requirements.map((item) => (
-                    <li class="flex gap-3">
-                      <span class="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
-                      <span>{item}</span>
-                    </li>
-                  ))
-                }
-              </ul>
+            <div
+              class="grid divide-y divide-[#e6eee9] sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+            >
+              {
+                copy.stats.map((stat, index) => (
+                  <div class="p-4 md:p-5">
+                    <p class="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-secondary">
+                      {copy.statsKickers[index]}
+                    </p>
+                    <p class="mt-2 text-2xl font-semibold leading-none text-primary md:text-3xl">
+                      {copy.statsValues[index]}
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-muted-foreground">
+                      {stat}
+                    </p>
+                  </div>
+                ))
+              }
             </div>
           </div>
         </div>
 
         <div
-          class="relative overflow-hidden rounded-lg border border-[#ead9c7] bg-[#fffdf8] p-4 shadow-[0_28px_90px_-48px_rgba(70,45,23,0.58)] md:p-5"
+          class="relative self-start overflow-hidden rounded-lg border border-[#ead9c7] bg-[#fffdf8] p-4 shadow-[0_28px_90px_-48px_rgba(70,45,23,0.58)] md:p-5"
         >
           <div
             class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#244237,#db5b24,#c49a42)]"
@@ -412,6 +371,61 @@ const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
               </div>
             </div>
           </IncaTrailAvailabilityCalendarIsland>
+        </div>
+      </div>
+    </section>
+
+    <div class="mx-auto max-w-8xl px-4 py-12 md:px-6 lg:px-8">
+      <section class="border-b border-border pb-12 md:pb-14">
+        <div>
+          <h2
+            class="max-w-3xl text-3xl font-semibold tracking-tight text-foreground"
+          >
+            {copy.availabilityTitle}
+          </h2>
+          <div
+            class="mt-6 grid gap-6 text-base leading-8 text-muted-foreground lg:grid-cols-3"
+          >
+            <div class="border-t border-[#e4d8cc] pt-5 lg:border-t-0 lg:pt-0">
+              <span class="mb-4 block h-1 w-12 rounded-full bg-secondary"
+              ></span>
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.regulationsTitle}
+              </h3>
+              <p class="mt-2">{copy.regulations}</p>
+            </div>
+            <div
+              class="border-t border-[#e4d8cc] pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
+            >
+              <span class="mb-4 block h-1 w-12 rounded-full bg-primary"></span>
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.seasonsTitle}
+              </h3>
+              <ul class="mt-2 space-y-2">
+                {copy.seasons.map((item) => <li>{item}</li>)}
+              </ul>
+            </div>
+            <div
+              class="border-t border-[#e4d8cc] pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
+            >
+              <span class="mb-4 block h-1 w-12 rounded-full bg-[#db5b24]"
+              ></span>
+              <h3 class="text-lg font-semibold text-foreground">
+                {copy.requirementsTitle}
+              </h3>
+              <p class="mt-2">{copy.requirementsIntro}</p>
+              <ul class="mt-3 space-y-2">
+                {
+                  copy.requirements.map((item) => (
+                    <li class="flex gap-3">
+                      <span class="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
+                      <span>{item}</span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
