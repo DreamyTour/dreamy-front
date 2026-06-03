@@ -33,6 +33,41 @@ interface CheckoutPayload {
 	};
 }
 
+const PAYPAL_FEE_RATE = 0.08;
+const MAX_PASSENGERS_PER_BOOKING = 20;
+
+function jsonResponse(body: unknown, status: number) {
+	return new Response(JSON.stringify(body), {
+		status,
+		headers: { "Content-Type": "application/json" },
+	});
+}
+
+function isValidEmail(email: string) {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function hasPassengerIdentity(passenger: CheckoutPassenger) {
+	return Boolean(
+		passenger.name &&
+			passenger.lastname &&
+			passenger.dob &&
+			passenger.documentNumber,
+	);
+}
+
+function getPaymentAmount({
+	totalPrice,
+	amountToPayLabel,
+}: {
+	totalPrice: number;
+	amountToPayLabel?: "minimum" | "total";
+}) {
+	const subtotal = amountToPayLabel === "total" ? totalPrice : totalPrice / 2;
+
+	return subtotal + subtotal * PAYPAL_FEE_RATE;
+}
+
 export const POST: APIRoute = async ({ request }) => {
 	let resend = null;
 	const resendApiKey =
@@ -50,21 +85,15 @@ export const POST: APIRoute = async ({ request }) => {
 	try {
 		const contentType = request.headers.get("content-type") || "";
 		if (!contentType.includes("application/json")) {
-			return new Response(
-				JSON.stringify({ error: "Content-Type must be application/json" }),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
-				},
+			return jsonResponse(
+				{ error: "Content-Type must be application/json" },
+				400,
 			);
 		}
 
 		const rawBody = await request.text();
 		if (!rawBody.trim()) {
-			return new Response(JSON.stringify({ error: "Empty request body" }), {
-				status: 400,
-				headers: { "Content-Type": "application/json" },
-			});
+			return jsonResponse({ error: "Empty request body" }, 400);
 		}
 
 		const data = JSON.parse(rawBody) as CheckoutPayload;
@@ -79,26 +108,48 @@ export const POST: APIRoute = async ({ request }) => {
 
 		if (!cart?.tourName || !cart.totalPrice) {
 			console.error("Missing cart data");
-			return new Response(JSON.stringify({ error: "Missing cart data" }), {
-				status: 400,
-				headers: { "Content-Type": "application/json" },
-			});
+			return jsonResponse({ error: "Missing cart data" }, 400);
 		}
 
 		if (!contactInfo?.email) {
 			console.error("Missing contact email");
-			return new Response(JSON.stringify({ error: "Missing contact email" }), {
-				status: 400,
-				headers: { "Content-Type": "application/json" },
-			});
+			return jsonResponse({ error: "Missing contact email" }, 400);
 		}
 
 		const totalPrice = Number(cart.totalPrice);
-		const amountPaid = Number(cart.amountPaid);
+		const passengerCount = Number(cart.passengers);
 
-		if (!Number.isFinite(totalPrice)) {
-			throw new Error("Invalid cart.totalPrice value");
+		if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
+			return jsonResponse({ error: "Invalid cart.totalPrice value" }, 400);
 		}
+
+		if (
+			!Number.isInteger(passengerCount) ||
+			passengerCount < 1 ||
+			passengerCount > MAX_PASSENGERS_PER_BOOKING
+		) {
+			return jsonResponse({ error: "Invalid passenger count" }, 400);
+		}
+
+		if (passengers.length !== passengerCount) {
+			return jsonResponse(
+				{ error: "Passenger information does not match passenger count" },
+				400,
+			);
+		}
+
+		if (!passengers.every(hasPassengerIdentity)) {
+			return jsonResponse({ error: "Missing passenger information" }, 400);
+		}
+
+		if (!isValidEmail(contactInfo.email)) {
+			return jsonResponse({ error: "Invalid contact email" }, 400);
+		}
+
+		const amountPaid = getPaymentAmount({
+			totalPrice,
+			amountToPayLabel: cart.amountToPayLabel,
+		});
 
 		let emailSent = false;
 		let emailError: string | null = null;
@@ -186,10 +237,9 @@ export const POST: APIRoute = async ({ request }) => {
 
 		const businessEmail = "info@turismoperu.com.pe";
 		const itemName = encodeURIComponent(cart.tourName);
-		const amount = Number.isFinite(amountPaid)
-			? amountPaid.toFixed(2)
-			: totalPrice.toFixed(2);
-		const checkoutLang = cart.lang === "es" || cart.lang === "pt" ? cart.lang : "en";
+		const amount = amountPaid.toFixed(2);
+		const checkoutLang =
+			cart.lang === "es" || cart.lang === "pt" ? cart.lang : "en";
 		const successPath =
 			checkoutLang === "en"
 				? "/checkout/success"
@@ -202,29 +252,23 @@ export const POST: APIRoute = async ({ request }) => {
 
 		console.log("PayPal URL generated:", paypalUrl);
 
-		return new Response(
-			JSON.stringify({
+		return jsonResponse(
+			{
 				success: true,
 				emailSent,
 				emailError,
 				redirectUrl: paypalUrl,
-			}),
-			{
-				status: 200,
-				headers: { "Content-Type": "application/json" },
 			},
+			200,
 		);
 	} catch (error) {
 		console.error("Checkout API Error:", error);
-		return new Response(
-			JSON.stringify({
+		return jsonResponse(
+			{
 				error: "Internal Server Error",
 				details: String(error),
-			}),
-			{
-				status: 500,
-				headers: { "Content-Type": "application/json" },
 			},
+			500,
 		);
 	}
 };

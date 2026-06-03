@@ -1,10 +1,15 @@
 import { defineMiddleware } from "astro:middleware";
-import { DEFAULT_LANG } from "@/lib/i18n";
+import { collapseRepeatedBlogPath, DEFAULT_LANG } from "@/lib/i18n";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const { pathname, search } = context.url;
 	const defaultPrefix = `/${DEFAULT_LANG}`;
 	const defaultPrefixPattern = new RegExp(`^${defaultPrefix}(?:/|$)`);
+	const collapsedPath = collapseRepeatedBlogPath(pathname);
+
+	if (collapsedPath !== pathname) {
+		return context.redirect(`${collapsedPath}${search}`, 301);
+	}
 
 	if (defaultPrefixPattern.test(pathname)) {
 		const targetPath = pathname.replace(defaultPrefixPattern, "") || "/";

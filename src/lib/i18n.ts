@@ -6,6 +6,8 @@ export const LOCALIZED_LANGS = LANGS.filter(
 );
 
 const LANG_PREFIX_RE = /^\/(en|es|pt)(?=\/|$)/;
+const BLOG_SEGMENT_RE =
+	/^((?:\/(?:en|es|pt))?)\/blog\/([^/?#]+)(?:\/blog\/\2)+(\/)?$/;
 
 export function isValidLang(value: string | undefined): value is Lang {
 	return !!value && LANGS.includes(value as Lang);
@@ -23,8 +25,21 @@ function normalizePath(path: string): string {
 	return path.startsWith("/") ? path : `/${path}`;
 }
 
-export function stripLangPrefix(path: string): string {
+export function collapseRepeatedBlogPath(path: string): string {
 	const { path: pathname, suffix } = splitUrlPath(normalizePath(path));
+	const collapsed = pathname.replace(
+		BLOG_SEGMENT_RE,
+		(_, langPrefix: string, slug: string, trailingSlash: string) =>
+			`${langPrefix}/blog/${slug}${trailingSlash || ""}`,
+	);
+
+	return `${collapsed}${suffix}`;
+}
+
+export function stripLangPrefix(path: string): string {
+	const { path: pathname, suffix } = splitUrlPath(
+		collapseRepeatedBlogPath(path),
+	);
 	const stripped = pathname.replace(LANG_PREFIX_RE, "") || "/";
 	return `${stripped}${suffix}`;
 }
