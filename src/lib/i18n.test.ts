@@ -3,6 +3,7 @@ import {
   collapseRepeatedBlogPath,
   localizePath,
   stripLangPrefix,
+  translatePathForSlug,
 } from "./i18n";
 
 describe("i18n path normalization", () => {
@@ -22,5 +23,15 @@ describe("i18n path normalization", () => {
     expect(localizePath(repeatedPath, "es")).toBe(
       "/es/blog/peruvian-amazon-guide",
     );
+  });
+
+  test("translates blog slugs when production URLs include trailing slash", () => {
+    const translated = translatePathForSlug(
+      "/es/blog/puerto-maldonado/",
+      "peruvian-amazon-guide",
+    );
+
+    expect(translated).toBe("/blog/peruvian-amazon-guide/");
+    expect(localizePath(translated, "en")).toBe("/blog/peruvian-amazon-guide/");
   });
 });

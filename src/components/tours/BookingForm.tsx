@@ -13,6 +13,8 @@ interface BookingFormProps {
 	year?: number;
 	initialMonth?: number;
 	initialRoad?: string;
+	allowedRoads?: string[];
+	selectionDurationDays?: number;
 	initialTickets?: TicketsByDate;
 }
 
@@ -24,6 +26,8 @@ export default function BookingForm({
 	year,
 	initialMonth,
 	initialRoad = "1",
+	allowedRoads,
+	selectionDurationDays = 1,
 	initialTickets,
 }: BookingFormProps) {
 	const [date, setDate] = useState<string>("");
@@ -70,6 +74,7 @@ export default function BookingForm({
 			totalPrice,
 			passengers,
 			date,
+			durationDays: selectionDurationDays,
 			road,
 			availability: selectedAvailability,
 			lang,
@@ -115,6 +120,8 @@ export default function BookingForm({
 						year={year}
 						initialMonth={initialMonth}
 						initialRoad={initialRoad}
+						allowedRoads={allowedRoads}
+						selectionDurationDays={selectionDurationDays}
 						initialTickets={initialTickets}
 						selectedDate={date}
 						compact

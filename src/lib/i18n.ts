@@ -62,3 +62,20 @@ export function rewriteUrl(url: string | undefined, currentLang: Lang): string {
 
 	return localizePath(url, currentLang);
 }
+
+export function translatePathForSlug(
+	path: string,
+	translatedSlug: string,
+): string {
+	const normalized = stripLangPrefix(path);
+	const { path: pathname, suffix } = splitUrlPath(normalized);
+
+	if (pathname.includes("/blog/")) {
+		return `${pathname.replace(
+			/\/blog\/[^/]+(?=\/|$)/,
+			`/blog/${translatedSlug}`,
+		)}${suffix}`;
+	}
+
+	return `${pathname.replace(/\/[^/]+(?=\/|$)/, `/${translatedSlug}`)}${suffix}`;
+}

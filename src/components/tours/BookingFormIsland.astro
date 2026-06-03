@@ -1,6 +1,7 @@
 ---
 import BookingForm from "@/components/tours/BookingForm";
 import type { Lang } from "@/lib/i18n";
+import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 import {
   fetchIncaTrailTickets,
   type TicketsByDate,
@@ -10,14 +11,18 @@ interface Props {
   tourId: string | number;
   tourName: string;
   basePrice?: number;
+  tourSlug?: string;
   lang: Lang;
 }
 
-const { tourId, tourName, basePrice = 620.0, lang } = Astro.props;
+const { tourId, tourName, basePrice = 620.0, tourSlug, lang } = Astro.props;
 const now = new Date();
 const year = now.getFullYear();
 const initialMonth = now.getMonth() + 1;
-const initialRoad = "1";
+const bookingConfig = getIncaTrailBookingConfig(tourSlug);
+const initialRoad = bookingConfig?.road ?? "1";
+const lockedRoads = bookingConfig ? [bookingConfig.road] : undefined;
+const selectionDurationDays = bookingConfig?.durationDays ?? 1;
 
 let initialTickets: TicketsByDate = {};
 
@@ -41,5 +46,7 @@ try {
   year={year}
   initialMonth={initialMonth}
   initialRoad={initialRoad}
+  allowedRoads={lockedRoads}
+  selectionDurationDays={selectionDurationDays}
   initialTickets={initialTickets}
 />

@@ -1,6 +1,12 @@
 ---
 import type { Lang } from "@/lib/i18n";
-import { LANGS, DEFAULT_LANG, localizePath, stripLangPrefix } from "@/lib/i18n";
+import {
+  LANGS,
+  DEFAULT_LANG,
+  localizePath,
+  stripLangPrefix,
+  translatePathForSlug,
+} from "@/lib/i18n";
 import { serializeJsonForHtml } from "@/lib/html";
 
 const DEFAULT_SEO_IMAGE_ALT =
@@ -57,18 +63,6 @@ const fullImageUrl = image
     ? image
     : `${siteUrl}${image}`
   : undefined;
-
-function translatePathForSlug(path: string, translatedSlug: string): string {
-  if (path.includes("/blog/")) {
-    const blogPath = path.replace(
-      /\/blog\/[^/]+(?=\/|$)/,
-      `/blog/${translatedSlug}`,
-    );
-    return blogPath;
-  }
-
-  return path.replace(/\/[^/]+(?=\/|$)/, `/${translatedSlug}`);
-}
 
 // Get alternate language URLs for hreflang
 const alternateUrls = LANGS.map((alternateLang) => {

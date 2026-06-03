@@ -8,7 +8,10 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import type { Lang } from "@/lib/i18n";
 import type { TicketsByDate } from "@/lib/incaTrailAvailability";
-import { INCA_TRAIL_PLACE_ID } from "@/lib/incaTrailAvailability";
+import {
+	INCA_TRAIL_PLACE_ID,
+	INCA_TRAIL_ROUTES,
+} from "@/lib/incaTrailAvailability";
 
 type LoadState = "idle" | "loading" | "error";
 
@@ -23,6 +26,8 @@ interface IncaTrailAvailabilityCalendarProps {
 	year?: number;
 	initialMonth?: number;
 	initialRoad?: string;
+	allowedRoads?: readonly string[];
+	selectionDurationDays?: number;
 	initialTickets?: TicketsByDate;
 	selectedDate?: string;
 	onDateSelect?: (selection: CalendarSelection) => void;
@@ -157,6 +162,17 @@ function getCacheKey(year: number, month: number, road: string) {
 	return `${year}-${month}-${road}`;
 }
 
+function addDaysToDateKey(dateKey: string, daysToAdd: number) {
+	const [year, month, day] = dateKey.split("-").map(Number);
+	const date = new Date(Date.UTC(year, month - 1, day + daysToAdd));
+
+	return formatDateKey(
+		date.getUTCFullYear(),
+		date.getUTCMonth() + 1,
+		date.getUTCDate(),
+	);
+}
+
 async function fetchTickets({
 	year,
 	month,
@@ -182,6 +198,8 @@ export default function IncaTrailAvailabilityCalendar({
 	year = new Date().getFullYear(),
 	initialMonth,
 	initialRoad = "1",
+	allowedRoads,
+	selectionDurationDays = 1,
 	initialTickets = EMPTY_TICKETS,
 	selectedDate = "",
 	onDateSelect,
@@ -191,12 +209,37 @@ export default function IncaTrailAvailabilityCalendar({
 	const now = useMemo(() => new Date(), []);
 	const minMonth = year === now.getFullYear() ? now.getMonth() + 1 : 1;
 	const startingMonth = initialMonth ?? minMonth;
+	const roadOptions = useMemo(() => {
+		const options =
+			allowedRoads && allowedRoads.length > 0
+				? allowedRoads
+				: INCA_TRAIL_ROUTES;
+
+		return options.filter((option, index) => options.indexOf(option) === index);
+	}, [allowedRoads]);
+	const isRoadLocked = roadOptions.length === 1;
 	const [road, setRoad] = useState<string>(initialRoad);
 	const [currentMonth, setCurrentMonth] = useState<number>(startingMonth);
 	const [tickets, setTickets] = useState<TicketsByDate>(initialTickets);
 	const [loadState, setLoadState] = useState<LoadState>("idle");
 	const monthNames = monthNamesByLang[lang] ?? monthNamesByLang.es;
 	const copy = copyByLang[lang] ?? copyByLang.es;
+	const selectedDateKeys = useMemo(() => {
+		if (!selectedDate) return new Set<string>();
+
+		return new Set(
+			Array.from(
+				{ length: Math.max(1, selectionDurationDays) },
+				(_, index) => addDaysToDateKey(selectedDate, index),
+			),
+		);
+	}, [selectedDate, selectionDurationDays]);
+
+	useEffect(() => {
+		if (roadOptions.includes(road)) return;
+
+		setRoad(roadOptions[0] ?? "1");
+	}, [road, roadOptions]);
 
 	useEffect(() => {
 		if (Object.keys(initialTickets).length === 0) return;
@@ -301,22 +344,31 @@ export default function IncaTrailAvailabilityCalendar({
 
 	return (
 		<div className="w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-			<div className="grid grid-cols-1 gap-3 border-b border-gray-100 bg-[#faf8f5] p-4 sm:grid-cols-2">
-				<label className="block">
-					<span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
-						<MapPinned size={14} aria-hidden="true" />
-						{copy.route}
-					</span>
-					<select
-						name="machu-picchu-route"
-						value={road}
-						onChange={(event) => setRoad(event.target.value)}
-						className="h-10 w-full rounded-sm border border-[#db5b24] bg-white px-3 text-sm text-gray-800 outline-none"
-					>
-						<option value="1">Route 1</option>
-						<option value="5">Route 5</option>
-					</select>
-				</label>
+			<div
+				className={`grid grid-cols-1 gap-3 border-b border-gray-100 bg-[#faf8f5] p-4 ${
+					isRoadLocked ? "" : "sm:grid-cols-2"
+				}`}
+			>
+				{!isRoadLocked && (
+					<label className="block">
+						<span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+							<MapPinned size={14} aria-hidden="true" />
+							{copy.route}
+						</span>
+						<select
+							name="machu-picchu-route"
+							value={road}
+							onChange={(event) => setRoad(event.target.value)}
+							className="h-10 w-full rounded-sm border border-[#db5b24] bg-white px-3 text-sm text-gray-800 outline-none"
+						>
+							{roadOptions.map((roadOption) => (
+								<option key={roadOption} value={roadOption}>
+									Route {roadOption}
+								</option>
+							))}
+						</select>
+					</label>
+				)}
 
 				<label className="block">
 					<span className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -405,6 +457,7 @@ export default function IncaTrailAvailabilityCalendar({
 					calendarDays.map(
 						({ day, dateKey, availability, tone, isSelectable }) => {
 							const isSelected = selectedDate === dateKey;
+							const isSelectedRange = selectedDateKeys.has(dateKey);
 							const toneStyles: Record<string, string> = {
 								available:
 									"bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
@@ -426,8 +479,11 @@ export default function IncaTrailAvailabilityCalendar({
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
 									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-px border-b border-r border-gray-100 transition ${toneStyles[tone]} ${
+										isSelectedRange ? "bg-[#fff4ed] text-[#8f3513]" : ""
+									} ${
 										isSelected ? "z-[1] ring-2 ring-inset ring-[#db5b24]" : ""
 									}`}
+									aria-pressed={isSelectedRange}
 									aria-label={`${dateKey}, ${
 										isSelectable
 											? `${availability} ${copy.availableLabel}`
@@ -436,7 +492,9 @@ export default function IncaTrailAvailabilityCalendar({
 								>
 									<span
 										className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold leading-none ${
-											tone === "available"
+											isSelectedRange
+												? "bg-[#db5b24] text-white"
+												: tone === "available"
 												? "bg-emerald-200 text-emerald-900"
 												: tone === "limited"
 													? "bg-red-200 text-red-900"

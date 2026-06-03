@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import { Check, ChevronDown, Languages } from "lucide-react";
-import { LANGS, type Lang, localizePath, stripLangPrefix } from "@/lib/i18n";
+import {
+	LANGS,
+	type Lang,
+	localizePath,
+	stripLangPrefix,
+	translatePathForSlug,
+} from "@/lib/i18n";
 
 const languageNames: Record<Lang, string> = {
 	en: "English",
@@ -66,10 +72,7 @@ export function LanguageSwitcher({ currentLang }: { currentLang: Lang }) {
 				);
 				const targetSlug = slugMap[nextLang];
 				if (targetSlug) {
-					const blogPath = normalizedPath.replace(
-						/\/blog\/[^/]+$/,
-						`/blog/${targetSlug}`,
-					);
+					const blogPath = translatePathForSlug(normalizedPath, targetSlug);
 					return localizePath(blogPath, nextLang);
 				}
 			} catch {}

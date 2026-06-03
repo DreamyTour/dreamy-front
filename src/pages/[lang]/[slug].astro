@@ -3,6 +3,7 @@ import TourLayout from "@/layouts/TourLayout.astro";
 import PageContent from "@/components/content/PageContent.astro";
 import Layout from "@/layouts/main.astro";
 import { fetchAllStrapi } from "@/lib/strapi";
+import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 import { dedupeLocalizedDocuments } from "@/lib/utils";
 import type { Category as TourCategory, Tour } from "@/types/tours";
 import type { Category as PageCategory, Page } from "@/types/page";
@@ -268,12 +269,8 @@ let tourWithCategory = tour;
 // Los arrays toursRelated y toursByCategory ahora vienen listos desde getStaticPaths
 // haciendo el filtrado en la memoria y evitando 500+ peticiones a la API durante el build.
 
-// ====== CHECK INCA TRAIL CATEGORY ======
-const isIncaTrail = tourWithCategory?.categories?.some(
-  (c: TourCategory) =>
-    c.slug.includes("inca-trail") ||
-    c.slug.includes("camino-inca") ||
-    c.slug.includes("trilha-inca"),
+const hasIncaTrailBookingCalendar = Boolean(
+  getIncaTrailBookingConfig(tourWithCategory?.slug),
 );
 
 let seoProps: SEOProps | undefined;
@@ -418,12 +415,13 @@ const heroImageAlt =
 
         <div class="w-full mt-8">
           <TourTabs tour={tour} client:visible>
-            {isIncaTrail ? (
+            {hasIncaTrailBookingCalendar ? (
               <BookingFormIsland
                 server:defer
                 tourId={tour.documentId}
                 tourName={tour.titulo}
                 basePrice={tour.priceTour}
+                tourSlug={tour.slug}
                 lang={lang}
               >
                 <BookingFormFallback slot="fallback" />
