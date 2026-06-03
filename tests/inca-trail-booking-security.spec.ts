@@ -23,6 +23,27 @@ const completeContact = {
 	phone: "999888777",
 };
 
+function addDaysToDateKey(dateKey: string, daysToAdd: number) {
+	const [year, month, day] = dateKey.split("-").map(Number);
+	const date = new Date(Date.UTC(year, month - 1, day + daysToAdd));
+
+	return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
+		2,
+		"0",
+	)}-${String(date.getUTCDate()).padStart(2, "0")}`;
+}
+
+function formatDateRange(dateKey: string, durationDays: number) {
+	const formatDate = (value: string) => {
+		const [year, month, day] = value.split("-");
+		return `${day}/${month}/${year}`;
+	};
+
+	return `${formatDate(dateKey)} a ${formatDate(
+		addDaysToDateKey(dateKey, durationDays - 1),
+	)}`;
+}
+
 const bookingCalendarTours = [
 	{ path: "/inca-trail-4-days", road: "1", durationDays: 4, spaces: 12 },
 	{ path: "/es/camino-inca-4-dias", road: "1", durationDays: 4, spaces: 11 },
@@ -137,6 +158,7 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 		})
 		.click();
 	await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(4);
+	await expect(form.getByText(formatDateRange(testDate, 4))).toBeVisible();
 
 	await form.getByRole("button", { name: /aumentar/i }).click();
 	await form.getByRole("button", { name: /book now/i }).click();
@@ -217,6 +239,9 @@ test("Booking calendar island hydrates with the locked route on every allowed In
 		await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(
 			tour.durationDays,
 		);
+		await expect(
+			form.getByText(formatDateRange(testDate, tour.durationDays)),
+		).toBeVisible();
 		expect(requestedRoads.length).toBeGreaterThan(0);
 		expect(new Set(requestedRoads)).toEqual(new Set([tour.road]));
 	}
@@ -272,6 +297,7 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 		})
 		.click();
 	await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(2);
+	await expect(form.getByText(formatDateRange(testDate, 2))).toBeVisible();
 
 	await form.getByRole("button", { name: /book now/i }).click();
 	await expect(page).toHaveURL(/\/checkout$/);

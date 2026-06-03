@@ -1,4 +1,5 @@
 import {
+	CalendarCheck,
 	CalendarDays,
 	ChevronLeft,
 	ChevronRight,
@@ -112,6 +113,8 @@ const copyByLang = {
 		loading: "Cargando...",
 		error: "No se pudo cargar la disponibilidad.",
 		selected: "Fecha elegida:",
+		start: "Inicio",
+		end: "Fin",
 		availableLabel: "cupos disponibles",
 		unavailableLabel: "sin disponibilidad",
 		moreThanTen: "+10 cupos",
@@ -126,6 +129,8 @@ const copyByLang = {
 		loading: "Loading...",
 		error: "Availability could not be loaded.",
 		selected: "Selected date:",
+		start: "Start",
+		end: "End",
 		availableLabel: "spaces available",
 		unavailableLabel: "no availability",
 		moreThanTen: "+10 spaces",
@@ -140,6 +145,8 @@ const copyByLang = {
 		loading: "Carregando...",
 		error: "Nao foi possivel carregar a disponibilidade.",
 		selected: "Data escolhida:",
+		start: "Inicio",
+		end: "Fim",
 		availableLabel: "vagas disponiveis",
 		unavailableLabel: "sem disponibilidade",
 		moreThanTen: "+10 vagas",
@@ -147,6 +154,12 @@ const copyByLang = {
 		noSpots: "Sem vagas",
 	},
 } as const;
+
+type DateParts = {
+	year: string;
+	month: string;
+	day: string;
+};
 
 function formatDateKey(year: number, month: number, day: number) {
 	return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -171,6 +184,29 @@ function addDaysToDateKey(dateKey: string, daysToAdd: number) {
 		date.getUTCMonth() + 1,
 		date.getUTCDate(),
 	);
+}
+
+function formatDisplayDate(dateKey: string) {
+	const [year, month, day] = dateKey.split("-");
+	return `${day}/${month}/${year}`;
+}
+
+function getDateParts(dateKey: string): DateParts {
+	const [year, month, day] = dateKey.split("-");
+	return { year, month, day };
+}
+
+function formatSelectedDateRange(dateKey: string, durationDays: number) {
+	const normalizedDuration = Math.max(1, durationDays);
+	const startDate = formatDisplayDate(dateKey);
+
+	if (normalizedDuration === 1) return startDate;
+
+	const endDate = formatDisplayDate(
+		addDaysToDateKey(dateKey, normalizedDuration - 1),
+	);
+
+	return `${startDate} a ${endDate}`;
 }
 
 async function fetchTickets({
@@ -224,6 +260,16 @@ export default function IncaTrailAvailabilityCalendar({
 	const [loadState, setLoadState] = useState<LoadState>("idle");
 	const monthNames = monthNamesByLang[lang] ?? monthNamesByLang.es;
 	const copy = copyByLang[lang] ?? copyByLang.es;
+	const selectedDateRange = selectedDate
+		? formatSelectedDateRange(selectedDate, selectionDurationDays)
+		: "";
+	const selectedEndDate = selectedDate
+		? addDaysToDateKey(selectedDate, Math.max(1, selectionDurationDays) - 1)
+		: "";
+	const selectedStartParts = selectedDate ? getDateParts(selectedDate) : null;
+	const selectedEndParts = selectedEndDate
+		? getDateParts(selectedEndDate)
+		: null;
 	const selectedDateKeys = useMemo(() => {
 		if (!selectedDate) return new Set<string>();
 
@@ -479,7 +525,9 @@ export default function IncaTrailAvailabilityCalendar({
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
 									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-px border-b border-r border-gray-100 transition ${toneStyles[tone]} ${
-										isSelectedRange ? "bg-[#fff4ed] text-[#8f3513]" : ""
+										isSelectedRange
+											? "!border-[#db5b24]/30 !bg-[#fff4ed] !text-[#8f3513] shadow-[inset_0_0_0_1px_rgba(219,91,36,0.18)]"
+											: ""
 									} ${
 										isSelected ? "z-[1] ring-2 ring-inset ring-[#db5b24]" : ""
 									}`}
@@ -506,6 +554,8 @@ export default function IncaTrailAvailabilityCalendar({
 									<span
 										className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${
 											!isSelectable ? "line-through" : ""
+										} ${
+											isSelectedRange ? "!text-[#8f3513]" : ""
 										}`}
 									>
 										{availability}
@@ -519,11 +569,44 @@ export default function IncaTrailAvailabilityCalendar({
 
 			{selectedDate && (
 				<div
-					className="mx-4 mt-3 rounded-sm border border-[#db5b24]/20 bg-[#db5b24]/5 px-4 py-3 text-sm text-gray-700"
+					className="mx-4 mt-3 overflow-hidden rounded-md border border-[#db5b24]/25 bg-[#fffaf6] text-sm text-gray-700 shadow-sm"
 					aria-live="polite"
 				>
-					<span className="font-semibold text-gray-900">{copy.selected}</span>{" "}
-					{selectedDate}
+					<div className="flex gap-3 border-l-4 border-[#db5b24] px-4 py-3">
+						<div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#db5b24] text-white shadow-sm">
+							<CalendarCheck size={18} aria-hidden="true" />
+						</div>
+						<div className="min-w-0 flex-1">
+							<p className="text-[11px] font-bold uppercase tracking-wide text-[#8f3513]">
+								{copy.selected}
+							</p>
+							<p className="mt-0.5 text-base font-extrabold leading-tight text-gray-950">
+								{selectedDateRange}
+							</p>
+							{selectedStartParts && selectedEndParts && (
+								<div className="mt-3 grid grid-cols-2 gap-2">
+									<div className="rounded-sm border border-[#db5b24]/20 bg-white px-3 py-2">
+										<span className="block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+											{copy.start}
+										</span>
+										<span className="mt-1 block text-sm font-bold text-gray-900">
+											{selectedStartParts.day}/{selectedStartParts.month}/
+											{selectedStartParts.year}
+										</span>
+									</div>
+									<div className="rounded-sm border border-[#db5b24]/20 bg-white px-3 py-2">
+										<span className="block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+											{copy.end}
+										</span>
+										<span className="mt-1 block text-sm font-bold text-gray-900">
+											{selectedEndParts.day}/{selectedEndParts.month}/
+											{selectedEndParts.year}
+										</span>
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
 				</div>
 			)}
 
