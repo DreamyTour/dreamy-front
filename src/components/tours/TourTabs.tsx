@@ -371,7 +371,7 @@ export default function TourTabs({ tour, children }: Props) {
 				{children && (
 					<div
 						id="tour-contact-form"
-						className="mt-8 min-w-0 scroll-mt-28 lg:sticky lg:top-24 lg:mt-12 lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:pr-2"
+						className="mt-8 min-w-0 scroll-mt-28 lg:mt-12 lg:self-start"
 					>
 						{children}
 					</div>

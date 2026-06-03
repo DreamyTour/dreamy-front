@@ -77,7 +77,10 @@ export default function BookingForm({
 		};
 
 		window.localStorage.setItem("bookingCart", JSON.stringify(cartItem));
-		window.localStorage.setItem("lastBookingTourPath", window.location.pathname);
+		window.localStorage.setItem(
+			"lastBookingTourPath",
+			window.location.pathname,
+		);
 		window.location.href = rewriteUrl("/checkout", lang);
 	};
 
@@ -87,22 +90,18 @@ export default function BookingForm({
 				<h2 className="text-2xl font-bold tracking-wide text-white">Reserva</h2>
 			</div>
 
-			<div className="flex flex-col items-center px-6 py-6 md:px-8">
+			<div className="flex flex-col items-center px-5 py-5 md:px-6">
 				<p className="mb-2 text-center text-lg font-medium text-gray-800">
 					{tourName}
 				</p>
-				<p className="mb-6 text-2xl font-bold text-[#8f3513]">
+				<p className="mb-5 text-2xl font-bold text-[#8f3513]">
 					US${(basePrice || 620).toFixed(2)}
 				</p>
 
-				<div className="mb-6 h-px w-full bg-gray-200" />
+				<div className="mb-5 h-px w-full bg-gray-200" />
 
-				<p className="mb-8 text-sm uppercase tracking-widest text-gray-500">
-					Elija la fecha de su viaje
-				</p>
-
-				<div className="mb-8 w-full">
-					<div className="mb-4 flex items-center gap-3">
+				<div className="mb-6 w-full">
+					<div className="mb-3 flex items-center gap-3">
 						<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#db5b24] text-sm font-bold text-white">
 							1
 						</span>
@@ -129,8 +128,8 @@ export default function BookingForm({
 					/>
 				</div>
 
-				<div className="mb-8 w-full">
-					<div className="mb-4 flex items-center gap-3">
+				<div className="mb-6 w-full">
+					<div className="mb-3 flex items-center gap-3">
 						<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#db5b24] text-sm font-bold text-white">
 							2
 						</span>
@@ -144,7 +143,7 @@ export default function BookingForm({
 						</span>
 					</div>
 
-					<div className="mt-6 flex items-center justify-between">
+					<div className="mt-4 flex items-center justify-between">
 						<span className="text-lg font-bold text-gray-900">Pax</span>
 						<div className="flex items-center gap-4">
 							<button
@@ -173,7 +172,7 @@ export default function BookingForm({
 				</div>
 			</div>
 
-			<div className="border-t border-gray-100 bg-[#f9f9f9] p-6 md:p-8">
+			<div className="border-t border-gray-100 bg-[#f9f9f9] p-5 md:p-6">
 				<div className="mb-2 flex items-center justify-between">
 					<span className="text-lg font-bold text-gray-800">Precio Total</span>
 					<span className="text-xl font-bold text-gray-900">
