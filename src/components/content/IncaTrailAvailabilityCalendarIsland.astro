@@ -11,9 +11,10 @@ interface Props {
   year: number;
   initialMonth: number;
   initialRoad: string;
+  roadLabels?: Record<string, string>;
 }
 
-const { lang, year, initialMonth, initialRoad } = Astro.props;
+const { lang, year, initialMonth, initialRoad, roadLabels } = Astro.props;
 
 let initialTickets: TicketsByDate = {};
 
@@ -34,5 +35,6 @@ try {
   year={year}
   initialMonth={initialMonth}
   initialRoad={initialRoad}
+  roadLabels={roadLabels}
   initialTickets={initialTickets}
 />

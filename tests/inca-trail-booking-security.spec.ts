@@ -342,6 +342,56 @@ test("Unlisted Inca Trail tours use the default contact form instead of the cale
 	).toHaveCount(0);
 });
 
+test("Inca Trail availability page shows tour names instead of route numbers", async ({
+	page,
+}) => {
+	const localizedAvailabilityPages = [
+		{
+			path: "/es/disponibilidad-camino-inca",
+			routeOne: "Camino Inca 4 dias",
+			routeFive: "Camino Inca 2 dias",
+		},
+		{
+			path: "/inca-trail-availability",
+			routeOne: "Classic Inca Trail 4 Days",
+			routeFive: "Short Inca Trail 2 Days",
+		},
+		{
+			path: "/pt/disponibilidade-trilha-inca",
+			routeOne: "Trilha Inca Classica 4 dias",
+			routeFive: "Trilha Inca Curta 2 dias",
+		},
+	] as const;
+
+	await page.route("**/api/calendar-tickets**", async (route) => {
+		await route.fulfill({
+			contentType: "application/json",
+			body: JSON.stringify({
+				tickets: {
+					[testDate]: 12,
+				},
+			}),
+		});
+	});
+
+	for (const availabilityPage of localizedAvailabilityPages) {
+		await page.goto(availabilityPage.path, {
+			waitUntil: "domcontentloaded",
+		});
+
+		const roadSelect = page.locator('select[name="machu-picchu-route"]');
+		await expect(roadSelect).toBeVisible({ timeout: 20000 });
+		await expect(roadSelect.locator('option[value="1"]')).toHaveText(
+			availabilityPage.routeOne,
+		);
+		await expect(roadSelect.locator('option[value="5"]')).toHaveText(
+			availabilityPage.routeFive,
+		);
+		await expect(roadSelect).not.toContainText("Route 1");
+		await expect(roadSelect).not.toContainText("Route 5");
+	}
+});
+
 test("checkout API recalculates payment amount instead of trusting a tampered client amount", async ({
 	request,
 }) => {
