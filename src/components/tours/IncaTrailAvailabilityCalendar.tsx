@@ -390,7 +390,7 @@ export default function IncaTrailAvailabilityCalendar({
 	});
 
 	return (
-		<div className="w-full overflow-hidden rounded-lg border border-[#e7d7c8] bg-[#fffdf9] shadow-[0_18px_60px_-42px_rgba(63,40,18,0.7)]">
+		<div className="w-full overflow-hidden rounded-lg border border-[#e7d7c8] bg-[#fffdf9] font-[inherit] shadow-[0_18px_60px_-42px_rgba(63,40,18,0.7)]">
 			<div
 				className={`grid grid-cols-1 gap-3 border-b border-[#355548]/30 bg-[#244237] p-4 ${
 					isRoadLocked ? "" : "sm:grid-cols-2"

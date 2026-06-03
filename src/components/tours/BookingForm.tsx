@@ -90,7 +90,7 @@ export default function BookingForm({
 	};
 
 	return (
-		<div className="mb-8 flex w-full flex-col overflow-hidden rounded-sm border border-gray-100 bg-white font-sans shadow-lg">
+		<div className="mb-8 flex w-full flex-col overflow-hidden rounded-sm border border-gray-100 bg-white shadow-lg">
 			<div className="bg-[#3a3a3a] py-4 text-center">
 				<h2 className="text-2xl font-bold tracking-wide text-white">Reserva</h2>
 			</div>
