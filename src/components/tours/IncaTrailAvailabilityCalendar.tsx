@@ -118,8 +118,8 @@ const copyByLang = {
 		end: "Fin",
 		availableLabel: "cupos disponibles",
 		unavailableLabel: "sin disponibilidad",
-		moreThanTen: "+10 cupos",
-		oneToTen: "1-10 cupos",
+		moreThanTen: "+50 cupos",
+		oneToTen: "1-50 cupos",
 		noSpots: "Sin cupos",
 	},
 	en: {
@@ -134,8 +134,8 @@ const copyByLang = {
 		end: "End",
 		availableLabel: "spaces available",
 		unavailableLabel: "no availability",
-		moreThanTen: "+10 spaces",
-		oneToTen: "1-10 spaces",
+		moreThanTen: "+50 spaces",
+		oneToTen: "1-50 spaces",
 		noSpots: "No spaces",
 	},
 	pt: {
@@ -150,8 +150,8 @@ const copyByLang = {
 		end: "Fim",
 		availableLabel: "vagas disponiveis",
 		unavailableLabel: "sem disponibilidade",
-		moreThanTen: "+10 vagas",
-		oneToTen: "1-10 vagas",
+		moreThanTen: "+50 vagas",
+		oneToTen: "1-50 vagas",
 		noSpots: "Sem vagas",
 	},
 } as const;
@@ -167,7 +167,7 @@ function formatDateKey(year: number, month: number, day: number) {
 }
 
 function getTone(availability: number) {
-	if (availability > 10) return "available";
+	if (availability > 50) return "available";
 	if (availability > 0) return "limited";
 	return "unavailable";
 }
@@ -506,14 +506,14 @@ export default function IncaTrailAvailabilityCalendar({
 							const isSelected = selectedDate === dateKey;
 							const isSelectedRange = selectedDateKeys.has(dateKey);
 							const toneStyles: Record<string, string> = {
-								available: "bg-[#edf8f1] text-[#1f6c43] hover:bg-[#dff2e7]",
-								limited: "bg-[#fff2ea] text-[#9b3b16] hover:bg-[#ffe8d8]",
-								unavailable: "bg-[#f7f3ee] text-[#aa9d91] cursor-not-allowed",
+								available: "bg-[#e7f7ed] text-[#0f5f35] hover:bg-[#d4f0df]",
+								limited: "bg-[#fff0e5] text-[#9a2f0d] hover:bg-[#ffdcca]",
+								unavailable: "bg-[#f8f4ef] text-[#5f5349] cursor-not-allowed",
 							};
 							const toneLabel: Record<string, string> = {
-								available: "text-[#1f6c43]",
-								limited: "text-[#9b3b16]",
-								unavailable: "text-[#aa9d91]",
+								available: "text-[#07512d]",
+								limited: "text-[#9a2f0d]",
+								unavailable: "text-[#4f453d]",
 							};
 
 							return (
@@ -543,10 +543,10 @@ export default function IncaTrailAvailabilityCalendar({
 											isSelectedRange
 												? "bg-[#db5b24] text-white"
 												: tone === "available"
-													? "bg-[#bfe6ce] text-[#153d28]"
+													? "border border-[#65b883] bg-[#a9dfbd] text-[#064324]"
 													: tone === "limited"
-														? "bg-[#ffd7c1] text-[#71300f]"
-														: "bg-[#e8ddd0] text-[#897a6d]"
+														? "border border-[#ee9c75] bg-[#ffc1a4] text-[#7f2509]"
+														: "border border-[#cbbdac] bg-[#efe5da] text-[#4f453d]"
 										}`}
 									>
 										{day}
