@@ -18,6 +18,7 @@ interface BookingCart {
 	totalPrice: number;
 	passengers: number;
 	date?: string;
+	durationDays?: number;
 	lang?: string;
 	tourPath?: string;
 }
@@ -95,7 +96,7 @@ export default function CheckoutSummary({
 			}
 		}
 		setLoading(false);
-	}, []);
+	}, [initialLang]);
 
 	// Clear error when user starts typing
 	// biome-ignore lint/correctness/useExhaustiveDependencies: This effect intentionally clears stale errors when form state changes.
@@ -246,63 +247,88 @@ export default function CheckoutSummary({
 	const totalPrice = Number(cart.totalPrice) || 620;
 	const pricePerPerson = Number(cart.pricePerPerson) || totalPrice / paxCount;
 	const date = cart.date || "";
+	const durationDays = Math.max(1, Number(cart.durationDays) || 1);
 	const lang = cart.lang || "en";
 
 	let startDateStr = "TBD";
+	let endDateStr = "";
 	if (date) {
 		try {
 			const [y, m, d] = date.split("-").map(Number);
 			const localDate = new Date(y, m - 1, d);
-			startDateStr = localDate.toLocaleDateString(
-				lang === "es" ? "es-ES" : "en-US",
-				{
-					weekday: "long",
-					year: "numeric",
-					month: "long",
-					day: "numeric",
-				},
-			);
+			const endDate = new Date(y, m - 1, d + durationDays - 1);
+			const locale =
+				lang === "es" ? "es-ES" : lang === "pt" ? "pt-BR" : "en-US";
+			const dateFormatOptions = {
+				weekday: "long",
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+			} as const;
+			startDateStr = localDate.toLocaleDateString(locale, dateFormatOptions);
+			endDateStr = endDate.toLocaleDateString(locale, dateFormatOptions);
 		} catch {
 			/* ignore */
 		}
 	}
+	const travelDateStr =
+		durationDays > 1 && endDateStr
+			? `${startDateStr} - ${endDateStr}`
+			: startDateStr;
 
 	const paymentFee =
 		paymentOption === "total" ? totalPrice * 0.08 : (totalPrice / 2) * 0.08;
 	const payAmount = paymentOption === "total" ? totalPrice : totalPrice / 2;
+	const fieldClass =
+		"min-h-12 rounded-sm border border-[#d8cec2] bg-white px-4 py-3 text-base text-[#1f2d29] outline-none transition focus:border-[#1f6c43] focus:ring-2 focus:ring-[#1f6c43]/15";
+	const labelClass = "text-xs font-bold uppercase tracking-wide text-[#5f5349]";
+	const checkoutTitle =
+		initialLang === "es"
+			? "Completa tu reserva"
+			: initialLang === "pt"
+				? "Complete sua reserva"
+				: "Complete your booking";
 
 	return (
-		<div className="w-full max-w-8xl mx-auto p-4 md:p-8 font-sans">
+		<div className="w-full px-4 py-6 md:px-8 md:py-10">
+			<div className="mx-auto mb-6 max-w-8xl">
+				<p className="text-[0.72rem] font-bold uppercase tracking-[0.22em] text-secondary">
+					Checkout
+				</p>
+				<h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#1f2d29] md:text-4xl">
+					{checkoutTitle}
+				</h1>
+			</div>
 			{/* MAIN CONTAINER */}
-			<div className="bg-white rounded-sm shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+			<div className="mx-auto max-w-8xl overflow-hidden rounded-lg border border-[#e7d7c8] bg-white shadow-[0_24px_80px_-54px_rgba(63,40,18,0.72)]">
 				{/* STEPS HEADER - Minimal and clean */}
-				<div className="bg-gray-50/50 px-6 md:px-10 py-6 border-b border-gray-100">
-					<div className="flex flex-col md:flex-row justify-between items-center gap-6">
+				<div className="border-b border-[#355548]/30 bg-[#244237] px-5 py-5 md:px-10">
+					<div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center md:gap-6">
 						{/* Step 1 */}
 						<button
 							type="button"
 							onClick={() => setStep(1)}
 							aria-current={step === 1 ? "step" : undefined}
-							className="flex items-center gap-3 group"
+							className="group flex items-center gap-3"
 						>
 							<div
-								className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+								className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all ${
 									step >= 1
-										? "bg-primary text-white shadow-lg shadow-primary/25"
-										: "bg-gray-200 text-gray-400"
+										? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/20"
+										: "bg-white/12 text-white/45"
 								}`}
 							>
 								{step > 1 ? <Check size={18} /> : "1"}
 							</div>
 							<span
-								className={`font-medium text-sm ${step >= 1 ? "text-gray-800" : "text-gray-400"}`}
+								className={`text-sm font-semibold ${step >= 1 ? "text-white" : "text-white/45"}`}
 							>
 								Itinerary
 							</span>
 						</button>
 
 						{/* Connector */}
-						<div className="hidden md:block w-16 h-px bg-gray-200"></div>
+						<div className="hidden h-px w-16 bg-white/18 md:block"></div>
 
 						{/* Step 2 */}
 						<button
@@ -313,37 +339,37 @@ export default function CheckoutSummary({
 							className={`flex items-center gap-3 ${step > 1 ? "group cursor-pointer" : "cursor-default"}`}
 						>
 							<div
-								className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+								className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all ${
 									step >= 2
-										? "bg-primary text-white shadow-lg shadow-primary/25"
-										: "bg-gray-200 text-gray-400"
+										? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/20"
+										: "bg-white/12 text-white/45"
 								}`}
 							>
 								{step > 2 ? <Check size={18} /> : "2"}
 							</div>
 							<span
-								className={`font-medium text-sm ${step >= 2 ? "text-gray-800" : "text-gray-400"}`}
+								className={`text-sm font-semibold ${step >= 2 ? "text-white" : "text-white/45"}`}
 							>
 								Passengers
 							</span>
 						</button>
 
 						{/* Connector */}
-						<div className="hidden md:block w-16 h-px bg-gray-200"></div>
+						<div className="hidden h-px w-16 bg-white/18 md:block"></div>
 
 						{/* Step 3 */}
 						<div className="flex items-center gap-3">
 							<div
-								className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+								className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all ${
 									step >= 3
-										? "bg-primary text-white shadow-lg shadow-primary/25"
-										: "bg-gray-200 text-gray-400"
+										? "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/20"
+										: "bg-white/12 text-white/45"
 								}`}
 							>
 								3
 							</div>
 							<span
-								className={`font-medium text-sm ${step >= 3 ? "text-gray-800" : "text-gray-400"}`}
+								className={`text-sm font-semibold ${step >= 3 ? "text-white" : "text-white/45"}`}
 							>
 								Payment
 							</span>
@@ -353,65 +379,61 @@ export default function CheckoutSummary({
 
 				{/* ================= STEP 1: ITINERARY SUMMARY ================= */}
 				{step === 1 && (
-					<div className="p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
-						<div className="flex items-start justify-between mb-8">
+					<div className="animate-in fade-in slide-in-from-bottom-4 p-6 duration-300 md:p-10">
+						<div className="mb-8 flex items-start justify-between">
 							<div>
-								<h2 className="text-xs font-bold text-primary tracking-widest uppercase mb-2">
+								<h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-secondary">
 									Booking Summary
 								</h2>
-								<h3 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+								<h3 className="text-2xl font-extrabold leading-tight text-[#1f2d29] md:text-3xl">
 									{tourName}
 								</h3>
 							</div>
 						</div>
 
 						{/* Tour Details Card */}
-						<div className="bg-gray-50/50 rounded-sm p-6 mb-8 border border-gray-100">
-							<div className="flex flex-col md:flex-row gap-8 items-center">
+						<div className="mb-8 rounded-md border border-[#e7d7c8] bg-[#fffdf9] p-5 md:p-6">
+							<div className="grid gap-5 md:grid-cols-3">
 								{/* Date */}
 								<div className="flex items-center gap-3">
-									<div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center">
-										<Calendar className="w-6 h-6 text-primary" />
+									<div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#edf8f1]">
+										<Calendar className="h-6 w-6 text-[#1f6c43]" />
 									</div>
 									<div>
-										<p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-											Start Date
+										<p className="text-xs font-bold uppercase tracking-wide text-[#6f6258]">
+											Travel Dates
 										</p>
-										<p className="text-gray-900 font-semibold">
-											{startDateStr}
+										<p className="font-semibold text-[#1f2d29]">
+											{travelDateStr}
 										</p>
 									</div>
 								</div>
 
-								<div className="hidden md:block w-px h-12 bg-gray-200"></div>
-
 								{/* Passengers */}
 								<div className="flex items-center gap-3">
-									<div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center">
-										<Users className="w-6 h-6 text-primary" />
+									<div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#edf8f1]">
+										<Users className="h-6 w-6 text-[#1f6c43]" />
 									</div>
 									<div>
-										<p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+										<p className="text-xs font-bold uppercase tracking-wide text-[#6f6258]">
 											Travelers
 										</p>
-										<p className="text-gray-900 font-semibold">
+										<p className="font-semibold text-[#1f2d29]">
 											{paxCount} {paxCount === 1 ? "Person" : "People"}
 										</p>
 									</div>
 								</div>
 
-								<div className="hidden md:block w-px h-12 bg-gray-200"></div>
-
 								{/* Price per person */}
 								<div className="flex items-center gap-3">
-									<div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center">
-										<span className="text-primary font-bold">$</span>
+									<div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#fff2ea]">
+										<span className="font-bold text-[#9a2f0d]">$</span>
 									</div>
 									<div>
-										<p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+										<p className="text-xs font-bold uppercase tracking-wide text-[#6f6258]">
 											Per Person
 										</p>
-										<p className="text-gray-900 font-semibold">
+										<p className="font-semibold text-[#1f2d29]">
 											US${pricePerPerson.toFixed(2)}
 										</p>
 									</div>
@@ -420,15 +442,15 @@ export default function CheckoutSummary({
 						</div>
 
 						{/* Total Box */}
-						<div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 md:p-5 bg-primary/5 rounded-sm border border-primary/10">
+						<div className="flex flex-col items-start justify-between gap-4 rounded-sm border border-[#1f6c43]/15 bg-[#edf8f1] p-4 md:flex-row md:items-center md:p-5">
 							<div className="flex items-center gap-3">
-								<div className="w-3 h-3 bg-primary rounded-full"></div>
-								<span className="text-gray-600 font-medium">
+								<div className="h-3 w-3 rounded-full bg-[#1f6c43]"></div>
+								<span className="font-semibold text-[#244237]">
 									Total Tour Price
 								</span>
 							</div>
 							<div className="text-right">
-								<span className="text-2xl md:text-3xl font-black text-primary tracking-tight">
+								<span className="text-2xl font-black tracking-tight text-[#1f6c43] md:text-3xl">
 									US${totalPrice.toFixed(2)}
 								</span>
 							</div>
@@ -439,7 +461,7 @@ export default function CheckoutSummary({
 							<button
 								type="button"
 								onClick={() => setStep(2)}
-								className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-4 rounded-sm shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
+								className="group flex min-h-12 items-center gap-2 rounded-sm bg-[#1f6c43] px-8 py-4 font-semibold text-white shadow-lg shadow-[#1f6c43]/20 transition-all hover:bg-[#185637] hover:shadow-xl hover:shadow-[#1f6c43]/25 active:scale-[0.98]"
 							>
 								Continue
 								<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -450,26 +472,26 @@ export default function CheckoutSummary({
 
 				{/* ================= STEP 2: PASSENGER INFO ================= */}
 				{step === 2 && (
-					<div className="p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
+					<div className="animate-in fade-in slide-in-from-bottom-4 p-6 duration-300 md:p-10">
 						{/* Header */}
-						<div className="flex items-center gap-3 mb-6">
-							<div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-								<Users className="w-5 h-5 text-primary" />
+						<div className="mb-6 flex items-center gap-3">
+							<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#edf8f1]">
+								<Users className="h-5 w-5 text-[#1f6c43]" />
 							</div>
 							<div>
-								<h2 className="text-xl font-bold text-gray-900">
+								<h2 className="text-xl font-extrabold text-[#1f2d29]">
 									Traveler Information
 								</h2>
-								<p className="text-gray-500 text-sm">
+								<p className="text-sm font-medium text-[#6f6258]">
 									Please fill in the details for all travelers
 								</p>
 							</div>
 						</div>
 
 						{/* Alert */}
-						<div className="bg-amber-50/50 border border-amber-200/50 rounded-sm p-4 mb-6 flex gap-3">
-							<AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-							<p className="text-sm text-amber-800">
+						<div className="mb-6 flex gap-3 rounded-sm border border-[#f0d3a5] bg-[#fff8ef] p-4">
+							<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#9a2f0d]" />
+							<p className="text-sm font-medium text-[#71300f]">
 								Your data and passport number must match exactly as they appear
 								in your passport.
 							</p>
@@ -481,34 +503,32 @@ export default function CheckoutSummary({
 								ref={errorRef}
 								role="alert"
 								tabIndex={-1}
-								className="bg-red-50/80 border border-red-200/50 rounded-sm p-4 mb-6 flex gap-3 animate-in fade-in slide-in-from-top-2"
+								className="animate-in fade-in slide-in-from-top-2 mb-6 flex gap-3 rounded-sm border border-red-200 bg-red-50 p-4"
 							>
-								<AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-								<p className="text-sm text-red-700">{error}</p>
+								<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+								<p className="text-sm font-medium text-red-700">{error}</p>
 							</div>
 						)}
 
 						{/* Passengers */}
-						<div className="space-y-6 mb-10">
+						<div className="mb-10 space-y-6">
 							{passengers.map((pax, i) => (
 								<div
 									key={pax.id}
-									className="bg-gray-50/30 rounded-sm p-5 border border-gray-100"
+									className="rounded-md border border-[#e7d7c8] bg-[#fffdf9] p-5"
 								>
-									<div className="flex items-center gap-2 mb-4">
-										<div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm">
+									<div className="mb-4 flex items-center gap-2">
+										<div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
 											{i + 1}
 										</div>
-										<span className="font-semibold text-gray-800">
+										<span className="font-bold text-[#1f2d29]">
 											Traveler {i + 1}
 										</span>
 									</div>
 
 									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 										<label className="flex flex-col gap-1">
-											<span className="text-xs text-gray-500 font-medium">
-												First Name *
-											</span>
+											<span className={labelClass}>First Name *</span>
 											<input
 												ref={i === 0 ? firstPassengerNameRef : undefined}
 												type="text"
@@ -519,13 +539,11 @@ export default function CheckoutSummary({
 												onChange={(e) =>
 													handlePassengerChange(i, "name", e.target.value)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+												className={fieldClass}
 											/>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className="text-xs text-gray-500 font-medium">
-												Last Name *
-											</span>
+											<span className={labelClass}>Last Name *</span>
 											<input
 												type="text"
 												name={`passenger-${i + 1}-family-name`}
@@ -535,13 +553,11 @@ export default function CheckoutSummary({
 												onChange={(e) =>
 													handlePassengerChange(i, "lastname", e.target.value)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+												className={fieldClass}
 											/>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className="text-xs text-gray-500 font-medium">
-												Gender *
-											</span>
+											<span className={labelClass}>Gender *</span>
 											<select
 												name={`passenger-${i + 1}-gender`}
 												required
@@ -549,16 +565,14 @@ export default function CheckoutSummary({
 												onChange={(e) =>
 													handlePassengerChange(i, "gender", e.target.value)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm bg-white"
+												className={fieldClass}
 											>
 												<option value="Male">Male</option>
 												<option value="Female">Female</option>
 											</select>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className="text-xs text-gray-500 font-medium">
-												Date of Birth *
-											</span>
+											<span className={labelClass}>Date of Birth *</span>
 											<input
 												type="date"
 												name={`passenger-${i + 1}-birthdate`}
@@ -568,13 +582,11 @@ export default function CheckoutSummary({
 												onChange={(e) =>
 													handlePassengerChange(i, "dob", e.target.value)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+												className={fieldClass}
 											/>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className="text-xs text-gray-500 font-medium">
-												Document Type *
-											</span>
+											<span className={labelClass}>Document Type *</span>
 											<select
 												name={`passenger-${i + 1}-document-type`}
 												required
@@ -586,16 +598,14 @@ export default function CheckoutSummary({
 														e.target.value,
 													)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm bg-white"
+												className={fieldClass}
 											>
 												<option value="Passport">Passport</option>
 												<option value="ID">ID Card</option>
 											</select>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className="text-xs text-gray-500 font-medium">
-												Document Number *
-											</span>
+											<span className={labelClass}>Document Number *</span>
 											<input
 												type="text"
 												name={`passenger-${i + 1}-document-number`}
@@ -609,13 +619,11 @@ export default function CheckoutSummary({
 														e.target.value,
 													)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+												className={fieldClass}
 											/>
 										</label>
 										<label className="flex flex-col gap-1 md:col-span-2">
-											<span className="text-xs text-gray-500 font-medium">
-												Issuing Country *
-											</span>
+											<span className={labelClass}>Issuing Country *</span>
 											<select
 												name={`passenger-${i + 1}-issuing-country`}
 												autoComplete="country"
@@ -624,7 +632,7 @@ export default function CheckoutSummary({
 												onChange={(e) =>
 													handlePassengerChange(i, "country", e.target.value)
 												}
-												className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm bg-white"
+												className={fieldClass}
 											>
 												{countries.map((c) => (
 													<option key={`country-${c.iso2}`} value={c.iso2}>
@@ -640,15 +648,13 @@ export default function CheckoutSummary({
 
 						{/* Contact Info */}
 						<div className="mb-8">
-							<h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-								<span className="w-2 h-2 bg-primary rounded-full"></span>
+							<h3 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#1f2d29]">
+								<span className="h-2 w-2 rounded-full bg-[#1f6c43]"></span>
 								Contact Details
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<label className="flex flex-col gap-1">
-									<span className="text-xs text-gray-500 font-medium">
-										First Name *
-									</span>
+									<span className={labelClass}>First Name *</span>
 									<input
 										type="text"
 										name="contact-given-name"
@@ -659,13 +665,11 @@ export default function CheckoutSummary({
 										onChange={(e) =>
 											setContact({ ...contact, firstname: e.target.value })
 										}
-										className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+										className={fieldClass}
 									/>
 								</label>
 								<label className="flex flex-col gap-1">
-									<span className="text-xs text-gray-500 font-medium">
-										Last Name *
-									</span>
+									<span className={labelClass}>Last Name *</span>
 									<input
 										type="text"
 										name="contact-family-name"
@@ -676,13 +680,11 @@ export default function CheckoutSummary({
 										onChange={(e) =>
 											setContact({ ...contact, lastname: e.target.value })
 										}
-										className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+										className={fieldClass}
 									/>
 								</label>
 								<label className="flex flex-col gap-1">
-									<span className="text-xs text-gray-500 font-medium">
-										Email Address *
-									</span>
+									<span className={labelClass}>Email Address *</span>
 									<input
 										type="email"
 										name="contact-email"
@@ -694,14 +696,12 @@ export default function CheckoutSummary({
 										onChange={(e) =>
 											setContact({ ...contact, email: e.target.value })
 										}
-										className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+										className={fieldClass}
 									/>
 								</label>
 								<div className="flex flex-col md:flex-row gap-4">
 									<label className="flex flex-col gap-1 w-full md:w-5/12">
-										<span className="text-xs text-gray-500 font-medium">
-											Country Code *
-										</span>
+										<span className={labelClass}>Country Code *</span>
 										<select
 											name="contact-phone-code"
 											autoComplete="tel-country-code"
@@ -710,7 +710,7 @@ export default function CheckoutSummary({
 											onChange={(e) =>
 												setContact({ ...contact, phoneCode: e.target.value })
 											}
-											className="px-3 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm bg-white"
+											className={fieldClass}
 										>
 											{countries
 												.filter((c) => c.phoneCode)
@@ -726,9 +726,7 @@ export default function CheckoutSummary({
 										</select>
 									</label>
 									<label className="flex flex-col gap-1 flex-1">
-										<span className="text-xs text-gray-500 font-medium">
-											Phone *
-										</span>
+										<span className={labelClass}>Phone *</span>
 										<input
 											type="tel"
 											name="contact-phone"
@@ -740,7 +738,7 @@ export default function CheckoutSummary({
 											onChange={(e) =>
 												setContact({ ...contact, phone: e.target.value })
 											}
-											className="px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all text-sm"
+											className={fieldClass}
 										/>
 									</label>
 								</div>
@@ -748,27 +746,27 @@ export default function CheckoutSummary({
 						</div>
 
 						{/* Terms */}
-						<label className="flex items-start gap-3 mb-8 cursor-pointer p-4 bg-gray-50/30 rounded-sm border border-gray-100">
+						<label className="mb-8 flex cursor-pointer items-start gap-3 rounded-sm border border-[#e7d7c8] bg-[#fffdf9] p-4">
 							<input
 								type="checkbox"
 								name="acceptedTerms"
 								required
 								checked={acceptedTerms}
 								onChange={(e) => setAcceptedTerms(e.target.checked)}
-								className="w-5 h-5 accent-primary cursor-pointer mt-0.5 rounded"
+								className="mt-0.5 h-5 w-5 cursor-pointer rounded accent-[#1f6c43]"
 							/>
-							<span className="text-gray-600 text-sm">
+							<span className="text-sm font-medium text-[#5f5349]">
 								I have read and accept the{" "}
 								<a
 									href="/terms-and-conditions"
-									className="text-primary font-semibold hover:underline"
+									className="font-bold text-[#1f6c43] hover:underline"
 								>
 									Terms and Conditions
 								</a>{" "}
 								and{" "}
 								<a
 									href="/booking-policies"
-									className="text-primary font-semibold hover:underline"
+									className="font-bold text-[#1f6c43] hover:underline"
 								>
 									Booking Policies
 								</a>
@@ -777,11 +775,11 @@ export default function CheckoutSummary({
 						</label>
 
 						{/* Navigation */}
-						<div className="flex justify-between items-center pt-6 border-t border-gray-100">
+						<div className="flex flex-col-reverse items-stretch justify-between gap-3 border-t border-[#eadfd3] pt-6 sm:flex-row sm:items-center">
 							<button
 								type="button"
 								onClick={() => setStep(1)}
-								className="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-800 transition-colors"
+								className="flex min-h-12 items-center justify-center gap-2 rounded-sm border border-[#e7d7c8] px-5 font-semibold text-[#5f5349] transition-colors hover:bg-[#fff8ef] hover:text-[#1f2d29] sm:justify-start sm:border-0 sm:px-0"
 							>
 								<ArrowLeft className="w-4 h-4" />
 								Back to Itinerary
@@ -791,7 +789,7 @@ export default function CheckoutSummary({
 								onClick={() => {
 									if (validateStep2()) setStep(3);
 								}}
-								className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-4 rounded-sm shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
+								className="flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#1f6c43] px-8 py-4 font-semibold text-white shadow-lg shadow-[#1f6c43]/20 transition-all hover:bg-[#185637] hover:shadow-xl hover:shadow-[#1f6c43]/25 active:scale-[0.98]"
 							>
 								Continue to Payment
 								<ArrowRight className="w-5 h-5" />
@@ -802,54 +800,54 @@ export default function CheckoutSummary({
 
 				{/* ================= STEP 3: PAYMENT ================= */}
 				{step === 3 && (
-					<div className="flex flex-col lg:flex-row animate-in fade-in slide-in-from-right-4 duration-300">
-						{/* LEFT MAIN CONTENT - 40% */}
-						<div className="w-full lg:w-[40%] p-4 md:p-6">
+					<div className="animate-in fade-in slide-in-from-right-4 grid duration-300 lg:grid-cols-[minmax(0,1fr)_360px]">
+						{/* LEFT MAIN CONTENT */}
+						<div className="w-full p-5 md:p-8">
 							{/* Info Banner */}
-							<div className="bg-primary/5 border border-primary/10 rounded-sm p-5 mb-6 flex gap-4 items-start">
-								<div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-									<Shield className="w-5 h-5 text-primary" />
+							<div className="mb-6 flex items-start gap-4 rounded-sm border border-[#1f6c43]/15 bg-[#edf8f1] p-5">
+								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
+									<Shield className="h-5 w-5 text-[#1f6c43]" />
 								</div>
-								<div className="text-sm text-gray-600 space-y-1">
+								<div className="space-y-1 text-sm font-medium text-[#244237]">
 									<p>
 										You can make changes by writing to{" "}
-										<strong className="text-primary">info@dreamy.tours</strong>
+										<strong className="text-[#1f6c43]">
+											info@dreamy.tours
+										</strong>
 									</p>
 									<p>PayPal charges an 8% fee for secure payment processing.</p>
 								</div>
 							</div>
 
 							{/* Payment Method */}
-							<h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-								<span className="w-2 h-2 bg-primary rounded-full"></span>
+							<h3 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#1f2d29]">
+								<span className="h-2 w-2 rounded-full bg-[#1f6c43]"></span>
 								Payment Method
 							</h3>
 							<div className="mb-8">
-								<div className="flex items-center justify-between p-5 rounded-sm border-2 cursor-pointer transition-all border-primary bg-primary/5 shadow-lg shadow-primary/10">
+								<div className="flex cursor-pointer items-center justify-between rounded-sm border-2 border-[#1f6c43] bg-[#edf8f1] p-5 shadow-lg shadow-[#1f6c43]/10 transition-all">
 									<div className="flex items-center gap-4">
-										<div className="w-12 h-12 bg-[#003087] rounded-lg flex items-center justify-center">
-											<span className="text-white font-bold text-sm">
+										<div className="flex h-12 w-12 items-center justify-center rounded-sm bg-[#003087]">
+											<span className="text-sm font-bold text-white">
 												PayPal
 											</span>
 										</div>
 										<div>
-											<span className="font-semibold text-gray-900">
-												PayPal
-											</span>
+											<span className="font-bold text-[#1f2d29]">PayPal</span>
 											<p className="text-xs text-gray-500">
 												Secure payment • 8% fee applies
 											</p>
 										</div>
 									</div>
-									<div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-										<Check className="w-4 h-4 text-white" />
+									<div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1f6c43]">
+										<Check className="h-4 w-4 text-white" />
 									</div>
 								</div>
 							</div>
 
 							{/* Payment Amount - The stars of the show */}
-							<h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-								<span className="w-2 h-2 bg-primary rounded-full"></span>
+							<h3 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#1f2d29]">
+								<span className="h-2 w-2 rounded-full bg-[#1f6c43]"></span>
 								Payment Amount
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -858,31 +856,31 @@ export default function CheckoutSummary({
 									type="button"
 									onClick={() => setPaymentOption("minimum")}
 									aria-pressed={paymentOption === "minimum"}
-									className={`relative flex flex-col min-h-[180px] p-5 rounded-sm border-2 cursor-pointer transition-all duration-300 ${
+									className={`relative flex min-h-[180px] cursor-pointer flex-col rounded-sm border-2 p-5 text-left transition-all duration-300 ${
 										paymentOption === "minimum"
-											? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-											: "border-gray-200 hover:border-primary/30 hover:shadow-md"
+											? "border-[#1f6c43] bg-[#edf8f1] shadow-lg shadow-[#1f6c43]/10"
+											: "border-[#e7d7c8] bg-white hover:border-[#1f6c43]/35 hover:shadow-md"
 									}`}
 								>
 									{paymentOption === "minimum" && (
-										<div className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-primary text-white text-[10px] font-bold rounded-full">
+										<div className="absolute -top-2.5 left-4 rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold text-secondary-foreground">
 											POPULAR
 										</div>
 									)}
 									<div className="flex justify-between items-start mb-4">
 										<div>
-											<span className="font-semibold text-gray-900 text-sm">
+											<span className="text-sm font-bold text-[#1f2d29]">
 												Pay Now
 											</span>
-											<p className="text-[11px] text-gray-500 mt-0.5">
+											<p className="mt-0.5 text-[11px] font-medium text-[#5f5349]">
 												Secure your booking
 											</p>
 										</div>
 										<div
 											className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
 												paymentOption === "minimum"
-													? "border-primary bg-primary"
-													: "border-gray-300"
+													? "border-[#1f6c43] bg-[#1f6c43]"
+													: "border-[#cbbdac]"
 											}`}
 										>
 											{paymentOption === "minimum" && (
@@ -894,18 +892,18 @@ export default function CheckoutSummary({
 										<span
 											className={`text-2xl font-black tracking-tight ${
 												paymentOption === "minimum"
-													? "text-primary"
-													: "text-gray-400"
+													? "text-[#1f6c43]"
+													: "text-[#6f6258]"
 											}`}
 										>
 											US${(totalPrice / 2).toFixed(2)}
 										</span>
 									</div>
 									<div className="flex justify-between items-center pt-3 border-t border-gray-100">
-										<span className="text-[11px] text-gray-500">
+										<span className="text-[11px] font-medium text-[#6f6258]">
 											PayPal Fee (8%)
 										</span>
-										<span className="text-xs font-medium text-gray-700">
+										<span className="text-xs font-bold text-[#1f2d29]">
 											+US${((totalPrice / 2) * 0.08).toFixed(2)}
 										</span>
 									</div>
@@ -916,26 +914,26 @@ export default function CheckoutSummary({
 									type="button"
 									onClick={() => setPaymentOption("total")}
 									aria-pressed={paymentOption === "total"}
-									className={`relative flex flex-col min-h-[180px] p-5 rounded-sm border-2 cursor-pointer transition-all duration-300 ${
+									className={`relative flex min-h-[180px] cursor-pointer flex-col rounded-sm border-2 p-5 text-left transition-all duration-300 ${
 										paymentOption === "total"
-											? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-											: "border-gray-200 hover:border-primary/30 hover:shadow-md"
+											? "border-[#1f6c43] bg-[#edf8f1] shadow-lg shadow-[#1f6c43]/10"
+											: "border-[#e7d7c8] bg-white hover:border-[#1f6c43]/35 hover:shadow-md"
 									}`}
 								>
 									<div className="flex justify-between items-start mb-4">
 										<div>
-											<span className="font-semibold text-gray-900 text-sm">
+											<span className="text-sm font-bold text-[#1f2d29]">
 												Pay Full
 											</span>
-											<p className="text-[11px] text-gray-500 mt-0.5">
+											<p className="mt-0.5 text-[11px] font-medium text-[#5f5349]">
 												Complete your payment
 											</p>
 										</div>
 										<div
 											className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
 												paymentOption === "total"
-													? "border-primary bg-primary"
-													: "border-gray-300"
+													? "border-[#1f6c43] bg-[#1f6c43]"
+													: "border-[#cbbdac]"
 											}`}
 										>
 											{paymentOption === "total" && (
@@ -947,18 +945,18 @@ export default function CheckoutSummary({
 										<span
 											className={`text-2xl font-black tracking-tight ${
 												paymentOption === "total"
-													? "text-primary"
-													: "text-gray-400"
+													? "text-[#1f6c43]"
+													: "text-[#6f6258]"
 											}`}
 										>
 											US${totalPrice.toFixed(2)}
 										</span>
 									</div>
 									<div className="flex justify-between items-center pt-3 border-t border-gray-100">
-										<span className="text-[11px] text-gray-500">
+										<span className="text-[11px] font-medium text-[#6f6258]">
 											PayPal Fee (8%)
 										</span>
-										<span className="text-xs font-medium text-gray-700">
+										<span className="text-xs font-bold text-[#1f2d29]">
 											+US${(totalPrice * 0.08).toFixed(2)}
 										</span>
 									</div>
@@ -966,10 +964,10 @@ export default function CheckoutSummary({
 							</div>
 
 							{/* Total to Pay */}
-							<div className="bg-gray-900 rounded-sm p-4 md:p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
+							<div className="mb-6 flex flex-col items-center justify-between gap-3 rounded-sm bg-[#1f2d29] p-4 md:flex-row md:p-5">
 								<div className="flex items-center gap-2">
 									<Lock className="w-4 h-4 text-white/70" />
-									<span className="text-white/70 text-sm font-medium">
+									<span className="text-sm font-medium text-white/70">
 										Total to pay today
 									</span>
 								</div>
@@ -981,11 +979,11 @@ export default function CheckoutSummary({
 							</div>
 
 							{/* Pay Button */}
-							<div className="flex justify-between items-center">
+							<div className="flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
 								<button
 									type="button"
 									onClick={() => setStep(2)}
-									className="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-800 transition-colors"
+									className="flex min-h-12 items-center justify-center gap-2 rounded-sm border border-[#e7d7c8] px-5 font-semibold text-[#5f5349] transition-colors hover:bg-[#fff8ef] hover:text-[#1f2d29] sm:justify-start sm:border-0 sm:px-0"
 								>
 									<ArrowLeft className="w-4 h-4" />
 									Back to Passengers
@@ -994,7 +992,7 @@ export default function CheckoutSummary({
 									type="button"
 									onClick={handlePayNow}
 									disabled={isSubmitting}
-									className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-10 rounded-sm shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+									className="flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#1f6c43] px-8 py-4 text-lg font-bold text-white shadow-xl shadow-[#1f6c43]/20 transition-all hover:bg-[#185637] hover:shadow-2xl hover:shadow-[#1f6c43]/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
 								>
 									{isSubmitting ? (
 										<>
@@ -1004,7 +1002,7 @@ export default function CheckoutSummary({
 									) : (
 										<>
 											<Lock className="w-5 h-5" />
-											Pay Now
+											Pay US${(payAmount + paymentFee).toFixed(2)}
 										</>
 									)}
 								</button>
@@ -1012,39 +1010,43 @@ export default function CheckoutSummary({
 						</div>
 
 						{/* RIGHT SIDEBAR - Order Summary */}
-						<div className="w-full lg:flex-1 bg-gray-50/50 border-t lg:border-t-0 lg:border-l border-gray-100 p-6">
-							<h4 className="text-sm font-bold text-primary tracking-widest uppercase mb-5">
+						<div className="w-full border-t border-[#eadfd3] bg-[#fffdf9] p-6 lg:border-l lg:border-t-0">
+							<h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-secondary">
 								Summary
 							</h4>
 
-							<div className="space-y-2 mb-5">
-								<p className="text-gray-900 font-semibold text-base leading-tight line-clamp-2">
+							<div className="mb-5 space-y-2">
+								<p className="line-clamp-2 text-base font-bold leading-tight text-[#1f2d29]">
 									{tourName}
 								</p>
-								<p className="text-sm text-gray-500">
-									{startDateStr} · {paxCount} Pax
+								<p className="text-sm font-medium text-[#5f5349]">
+									{travelDateStr} · {paxCount} Pax
 								</p>
 							</div>
 
-							<div className="h-px bg-gray-200 my-5"></div>
+							<div className="my-5 h-px bg-[#eadfd3]"></div>
 
 							<div className="space-y-3">
-								<div className="flex justify-between items-center text-base">
-									<span className="text-gray-500">Total</span>
-									<span className="text-gray-900 font-semibold">
-										US${totalPrice.toFixed(2)}
+								<div className="flex items-center justify-between text-base">
+									<span className="font-medium text-[#6f6258]">
+										Selected payment
+									</span>
+									<span className="font-bold text-[#1f2d29]">
+										US${payAmount.toFixed(2)}
 									</span>
 								</div>
-								<div className="flex justify-between items-center text-base">
-									<span className="text-gray-500">Fee</span>
-									<span className="text-gray-900 font-semibold">
+								<div className="flex items-center justify-between text-base">
+									<span className="font-medium text-[#6f6258]">PayPal fee</span>
+									<span className="font-bold text-[#1f2d29]">
 										US${paymentFee.toFixed(2)}
 									</span>
 								</div>
-								<div className="h-px bg-gray-200 my-4"></div>
-								<div className="flex justify-between items-center">
-									<span className="text-primary font-bold text-lg">Total</span>
-									<span className="text-primary font-bold text-xl">
+								<div className="my-4 h-px bg-[#eadfd3]"></div>
+								<div className="flex items-center justify-between rounded-sm bg-[#edf8f1] px-3 py-3">
+									<span className="text-lg font-bold text-[#1f6c43]">
+										Pay today
+									</span>
+									<span className="text-xl font-extrabold text-[#1f6c43]">
 										US${(payAmount + paymentFee).toFixed(2)}
 									</span>
 								</div>

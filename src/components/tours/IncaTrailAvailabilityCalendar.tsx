@@ -406,7 +406,7 @@ export default function IncaTrailAvailabilityCalendar({
 							name="machu-picchu-route"
 							value={road}
 							onChange={(event) => setRoad(event.target.value)}
-							className="h-11 w-full rounded-sm border border-white/20 bg-white px-3 text-sm font-semibold text-[#1f2d29] shadow-sm outline-none transition focus-visible:border-[#db5b24] focus-visible:ring-2 focus-visible:ring-[#db5b24]/35"
+							className="h-11 w-full rounded-sm border border-white/20 bg-white px-3 text-sm font-semibold text-[#1f2d29] shadow-sm outline-none transition focus-visible:border-secondary focus-visible:ring-2 focus-visible:ring-secondary/35"
 						>
 							{roadOptions.map((roadOption) => (
 								<option key={roadOption} value={roadOption}>
@@ -426,7 +426,7 @@ export default function IncaTrailAvailabilityCalendar({
 						name="travel-month"
 						value={currentMonth}
 						onChange={(event) => setCurrentMonth(Number(event.target.value))}
-						className="h-11 w-full rounded-sm border border-white/20 bg-white px-3 text-sm font-semibold text-[#1f2d29] shadow-sm outline-none transition focus-visible:border-[#db5b24] focus-visible:ring-2 focus-visible:ring-[#db5b24]/35"
+						className="h-11 w-full rounded-sm border border-white/20 bg-white px-3 text-sm font-semibold text-[#1f2d29] shadow-sm outline-none transition focus-visible:border-secondary focus-visible:ring-2 focus-visible:ring-secondary/35"
 					>
 						{monthNames.slice(minMonth - 1).map((monthName, index) => (
 							<option key={monthName} value={minMonth + index}>
@@ -445,7 +445,7 @@ export default function IncaTrailAvailabilityCalendar({
 					}
 					disabled={currentMonth <= minMonth}
 					aria-label={copy.previous}
-					className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e6d4c1] bg-white text-[#244237] shadow-sm transition hover:border-[#db5b24]/40 hover:text-[#db5b24] disabled:cursor-not-allowed disabled:opacity-35"
+					className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e6d4c1] bg-white text-[#244237] shadow-sm transition hover:border-secondary/40 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-35"
 				>
 					<ChevronLeft size={20} aria-hidden="true" />
 				</button>
@@ -461,13 +461,13 @@ export default function IncaTrailAvailabilityCalendar({
 					onClick={() => setCurrentMonth((month) => Math.min(12, month + 1))}
 					disabled={currentMonth === 12}
 					aria-label={copy.next}
-					className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e6d4c1] bg-white text-[#244237] shadow-sm transition hover:border-[#db5b24]/40 hover:text-[#db5b24] disabled:cursor-not-allowed disabled:opacity-35"
+					className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e6d4c1] bg-white text-[#244237] shadow-sm transition hover:border-secondary/40 hover:text-secondary disabled:cursor-not-allowed disabled:opacity-35"
 				>
 					<ChevronRight size={20} aria-hidden="true" />
 				</button>
 			</div>
 
-			<div className="grid grid-cols-7 border-b border-[#eadfd3] bg-[#f6efe6] text-center text-[0.7rem] font-bold uppercase tracking-wide text-[#8f3513]">
+			<div className="grid grid-cols-7 border-b border-[#eadfd3] bg-[#f6efe6] text-center text-[0.7rem] font-bold uppercase tracking-wide text-secondary">
 				{weekdayLabels.map(({ key, label }) => (
 					<div key={key} className="py-2">
 						{label}
@@ -481,7 +481,7 @@ export default function IncaTrailAvailabilityCalendar({
 						<div className="flex items-center gap-2 rounded-full border border-[#ead9c7] bg-white px-4 py-2 text-sm font-semibold text-[#244237] shadow-sm">
 							<Loader2
 								size={16}
-								className="animate-spin text-[#db5b24]"
+								className="animate-spin text-secondary"
 								aria-hidden="true"
 							/>
 							{copy.loading}
@@ -507,12 +507,12 @@ export default function IncaTrailAvailabilityCalendar({
 							const isSelectedRange = selectedDateKeys.has(dateKey);
 							const toneStyles: Record<string, string> = {
 								available: "bg-[#e7f7ed] text-[#0f5f35] hover:bg-[#d4f0df]",
-								limited: "bg-[#fff0e5] text-[#9a2f0d] hover:bg-[#ffdcca]",
+								limited: "bg-secondary/10 text-secondary hover:bg-secondary/15",
 								unavailable: "bg-[#f8f4ef] text-[#5f5349] cursor-not-allowed",
 							};
 							const toneLabel: Record<string, string> = {
 								available: "text-[#07512d]",
-								limited: "text-[#9a2f0d]",
+								limited: "text-secondary",
 								unavailable: "text-[#4f453d]",
 							};
 
@@ -526,10 +526,10 @@ export default function IncaTrailAvailabilityCalendar({
 									}
 									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-px border-b border-r border-[#f0e5d9] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
 										isSelectedRange
-											? "!border-[#db5b24]/35 !bg-[#fff4ed] !text-[#8f3513] shadow-[inset_0_0_0_1px_rgba(219,91,36,0.22)]"
+											? "!border-secondary/35 !bg-secondary/10 !text-secondary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--secondary)_24%,transparent)]"
 											: ""
 									} ${
-										isSelected ? "z-[1] ring-2 ring-inset ring-[#db5b24]" : ""
+										isSelected ? "z-[1] ring-2 ring-inset ring-secondary" : ""
 									}`}
 									aria-pressed={isSelectedRange}
 									aria-label={`${dateKey}, ${
@@ -541,11 +541,11 @@ export default function IncaTrailAvailabilityCalendar({
 									<span
 										className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold leading-none ${
 											isSelectedRange
-												? "bg-[#db5b24] text-white"
+												? "bg-secondary text-secondary-foreground"
 												: tone === "available"
 													? "border border-[#65b883] bg-[#a9dfbd] text-[#064324]"
 													: tone === "limited"
-														? "border border-[#ee9c75] bg-[#ffc1a4] text-[#7f2509]"
+														? "border border-secondary/35 bg-secondary/20 text-secondary"
 														: "border border-[#cbbdac] bg-[#efe5da] text-[#4f453d]"
 										}`}
 									>
@@ -554,7 +554,7 @@ export default function IncaTrailAvailabilityCalendar({
 									<span
 										className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${
 											!isSelectable ? "line-through" : ""
-										} ${isSelectedRange ? "!text-[#8f3513]" : ""}`}
+										} ${isSelectedRange ? "!text-secondary" : ""}`}
 									>
 										{availability}
 									</span>
@@ -567,44 +567,57 @@ export default function IncaTrailAvailabilityCalendar({
 
 			{selectedDate && (
 				<div
-					className="mx-4 mt-3 overflow-hidden rounded-md border border-[#db5b24]/25 bg-[#fffaf6] text-sm text-gray-700 shadow-[0_14px_40px_-30px_rgba(143,53,19,0.65)]"
+					className={
+						compact
+							? "mx-4 mt-3 pb-4 text-sm text-gray-700"
+							: "mx-4 mt-3 overflow-hidden rounded-md border border-secondary/25 bg-[#fffaf6] text-sm text-gray-700 shadow-[0_14px_40px_-30px_color-mix(in_oklab,var(--secondary)_34%,transparent)]"
+					}
 					aria-live="polite"
 				>
-					<div className="flex gap-3 border-l-4 border-[#db5b24] px-4 py-3">
-						<div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#db5b24] text-white shadow-sm">
-							<CalendarCheck size={18} aria-hidden="true" />
-						</div>
-						<div className="min-w-0 flex-1">
-							<p className="text-[11px] font-bold uppercase tracking-wide text-[#8f3513]">
-								{copy.selected}
-							</p>
-							<p className="mt-0.5 text-base font-extrabold leading-tight text-gray-950">
-								{selectedDateRange}
-							</p>
-							{selectedStartParts && selectedEndParts && (
-								<div className="mt-3 grid grid-cols-2 gap-2">
-									<div className="rounded-sm border border-[#db5b24]/20 bg-white px-3 py-2">
-										<span className="block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-											{copy.start}
-										</span>
-										<span className="mt-1 block text-sm font-bold text-gray-900">
-											{selectedStartParts.day}/{selectedStartParts.month}/
-											{selectedStartParts.year}
-										</span>
+					{compact ? (
+						<p className="text-sm leading-tight text-gray-950">
+							<span className="font-semibold text-[#6f6258]">
+								{copy.selected}{" "}
+							</span>
+							<span className="font-bold">{selectedDateRange}</span>
+						</p>
+					) : (
+						<div className="flex gap-3 border-l-4 border-secondary px-4 py-3">
+							<div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground shadow-sm">
+								<CalendarCheck size={18} aria-hidden="true" />
+							</div>
+							<div className="min-w-0 flex-1">
+								<p className="text-[11px] font-bold uppercase tracking-wide text-secondary">
+									{copy.selected}
+								</p>
+								<p className="mt-0.5 text-base font-extrabold leading-tight text-gray-950">
+									{selectedDateRange}
+								</p>
+								{selectedStartParts && selectedEndParts && (
+									<div className="mt-3 grid grid-cols-2 gap-2">
+										<div className="rounded-sm border border-secondary/20 bg-white px-3 py-2">
+											<span className="block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+												{copy.start}
+											</span>
+											<span className="mt-1 block text-sm font-bold text-gray-900">
+												{selectedStartParts.day}/{selectedStartParts.month}/
+												{selectedStartParts.year}
+											</span>
+										</div>
+										<div className="rounded-sm border border-secondary/20 bg-white px-3 py-2">
+											<span className="block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+												{copy.end}
+											</span>
+											<span className="mt-1 block text-sm font-bold text-gray-900">
+												{selectedEndParts.day}/{selectedEndParts.month}/
+												{selectedEndParts.year}
+											</span>
+										</div>
 									</div>
-									<div className="rounded-sm border border-[#db5b24]/20 bg-white px-3 py-2">
-										<span className="block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-											{copy.end}
-										</span>
-										<span className="mt-1 block text-sm font-bold text-gray-900">
-											{selectedEndParts.day}/{selectedEndParts.month}/
-											{selectedEndParts.year}
-										</span>
-									</div>
-								</div>
-							)}
+								)}
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			)}
 
@@ -614,7 +627,7 @@ export default function IncaTrailAvailabilityCalendar({
 					{copy.moreThanTen}
 				</span>
 				<span className="flex items-center gap-1.5">
-					<span className="inline-block h-3 w-3 rounded-sm border border-[#ffd7c1] bg-[#fff2ea]" />
+					<span className="inline-block h-3 w-3 rounded-sm border border-secondary/35 bg-secondary/20" />
 					{copy.oneToTen}
 				</span>
 				<span className="flex items-center gap-1.5">

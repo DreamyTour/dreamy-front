@@ -327,41 +327,26 @@ const videoTitle = title || "Reproducir video";
       aspect-ratio: 16/9;
       width: 100%;
       height: auto;
-      border: 2px solid var(--color-accent);
+      overflow: hidden;
+      border: 0;
       transition: all 0.3s ease;
-      box-shadow: 0px 0px 15px rgb(212, 255, 0, 0.1);
+      box-shadow: none;
     }
 
     /* gradient */
     lite-youtube::before {
-      content: attr(data-title);
+      content: "";
       display: block;
       position: absolute;
-      top: 0;
-      /* Pixel-perfect port of YT's gradient PNG, using https://github.com/bluesmoon/pngtocss plus optimizations */
+      inset: 0;
       background-image: linear-gradient(
-        180deg,
-        rgb(0 0 0 / 67%) 0%,
-        rgb(0 0 0 / 54%) 14%,
-        rgb(0 0 0 / 15%) 54%,
-        rgb(0 0 0 / 5%) 72%,
-        rgb(0 0 0 / 0%) 94%
+        0deg,
+        rgb(0 0 0 / 42%) 0%,
+        rgb(0 0 0 / 16%) 36%,
+        rgb(0 0 0 / 0%) 72%
       );
-      height: 99px;
       width: 100%;
-      font-family: "YouTube Noto", Roboto, Arial, Helvetica, sans-serif;
-      color: hsl(0deg 0% 93.33%);
-      text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-      font-size: 18px;
-      padding: 25px 20px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      box-sizing: border-box;
-    }
-
-    lite-youtube:hover::before {
-      color: white;
+      pointer-events: none;
     }
 
     lite-youtube::after {
@@ -388,34 +373,74 @@ const videoTitle = title || "Reproducir video";
       width: 100%;
       height: 100%;
       /* …but visually it's still the same size */
-      background: no-repeat center/100px 100px;
+      background: transparent;
       /* YT's actual play button svg */
-      background-color: white;
+      background-color: transparent;
       -webkit-mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path><path d="M719.4 499.1l-296.1-215A15.9 15.9 0 0 0 398 297v430c0 13.1 14.8 20.5 25.3 12.9l296.1-215a15.9 15.9 0 0 0 0-25.8zm-257.6 134V390.9L628.5 512 461.8 633.1z"></path></svg>')
-        no-repeat center/100px 100px;
+        no-repeat center/0 0;
       mask: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path><path d="M719.4 499.1l-296.1-215A15.9 15.9 0 0 0 398 297v430c0 13.1 14.8 20.5 25.3 12.9l296.1-215a15.9 15.9 0 0 0 0-25.8zm-257.6 134V390.9L628.5 512 461.8 633.1z"></path></svg>')
-        no-repeat center/100px 100px;
+        no-repeat center/0 0;
+      -webkit-mask: none;
+      mask: none;
       position: absolute;
       cursor: pointer;
       z-index: 1;
-      filter: grayscale(100%);
+      filter: none;
       transition:
-        filter 0.1s cubic-bezier(0, 0, 0.2, 1),
+        background-color 0.2s ease,
         transform 0.3s ease;
       border: 0;
       z-index: 1;
     }
 
+    lite-youtube > .lty-playbtn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 58px;
+      height: 58px;
+      border-radius: 999px;
+      background: rgb(8 15 12 / 76%);
+      border: 1px solid rgb(255 255 255 / 48%);
+      box-shadow: 0 18px 42px -22px rgb(0 0 0 / 80%);
+      backdrop-filter: blur(8px);
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    lite-youtube > .lty-playbtn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 0;
+      height: 0;
+      transform: translateX(3px);
+      border-block: 10px solid transparent;
+      border-inline-start: 16px solid white;
+      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 45%));
+    }
+
     lite-youtube:hover > .lty-playbtn,
     lite-youtube .lty-playbtn:focus {
-      background-color: oklch(0.66 0.18 148);
-      filter: none;
-      transform: scale(1.23);
+      background-color: rgb(0 0 0 / 8%);
+    }
+
+    lite-youtube:hover > .lty-playbtn::before,
+    lite-youtube .lty-playbtn:focus::before {
+      background: var(--primary);
+      border-color: rgb(255 255 255 / 70%);
+      transform: scale(1.06);
     }
 
     @media (prefers-reduced-motion) {
       lite-youtube:hover > .lty-playbtn,
-      lite-youtube .lty-playbtn:focus {
+      lite-youtube .lty-playbtn:focus,
+      lite-youtube:hover > .lty-playbtn::before,
+      lite-youtube .lty-playbtn:focus::before {
         transition: 0s;
         transform: scale(1);
       }

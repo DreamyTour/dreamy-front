@@ -90,27 +90,23 @@ export default function BookingForm({
 	};
 
 	return (
-		<div className="mb-8 flex w-full flex-col overflow-hidden rounded-sm border border-gray-100 bg-white shadow-lg">
-			<div className="bg-[#3a3a3a] py-4 text-center">
-				<h2 className="text-2xl font-bold tracking-wide text-white">Reserva</h2>
-			</div>
-
-			<div className="flex flex-col items-center px-5 py-5 md:px-6">
-				<p className="mb-2 text-center text-lg font-medium text-gray-800">
+		<div className="mb-8 flex w-full flex-col overflow-hidden rounded-lg border border-[#e7d7c8] bg-white shadow-[0_24px_70px_-48px_rgba(63,40,18,0.68)]">
+			<div className="border-b border-[#355548]/30 bg-[#244237] px-5 py-5 text-white md:px-6">
+				<h2 className="text-2xl font-extrabold tracking-tight text-white">
+					Reserva
+				</h2>
+				<p className="mt-1 text-sm font-semibold leading-6 text-[#f0dbc8]">
 					{tourName}
 				</p>
-				<p className="mb-5 text-2xl font-bold text-[#8f3513]">
-					US${(basePrice || 620).toFixed(2)}
-				</p>
+			</div>
 
-				<div className="mb-5 h-px w-full bg-gray-200" />
-
-				<div className="mb-6 w-full">
+			<div className="flex flex-col px-4 py-5 md:px-5">
+				<div className="mb-5 w-full">
 					<div className="mb-3 flex items-center gap-3">
-						<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#db5b24] text-sm font-bold text-white">
+						<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-extrabold text-secondary-foreground shadow-sm">
 							1
 						</span>
-						<span className="font-medium text-gray-800">
+						<span className="text-sm font-extrabold uppercase tracking-wide text-[#244237]">
 							Seleccione la fecha
 						</span>
 					</div>
@@ -135,34 +131,41 @@ export default function BookingForm({
 					/>
 				</div>
 
-				<div className="mb-6 w-full">
+				<div className="w-full rounded-md border border-[#e8e2da] bg-white p-4 shadow-sm">
 					<div className="mb-3 flex items-center gap-3">
-						<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#db5b24] text-sm font-bold text-white">
+						<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-extrabold text-secondary-foreground shadow-sm">
 							2
 						</span>
-						<span className="flex items-center gap-2 font-medium text-gray-800">
+						<span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-extrabold uppercase tracking-wide text-[#244237]">
 							Pasajeros
 							{!date && (
-								<span className="text-sm font-normal text-[#8f3513]">
-									(Primero seleccione una fecha)
+								<span className="text-xs font-bold normal-case tracking-normal text-secondary">
+									Primero seleccione una fecha
 								</span>
 							)}
 						</span>
 					</div>
 
-					<div className="mt-4 flex items-center justify-between">
-						<span className="text-lg font-bold text-gray-900">Pax</span>
-						<div className="flex items-center gap-4">
+					<div className="mt-4 flex items-center justify-between gap-4">
+						<div>
+							<span className="block text-lg font-extrabold text-[#1f2d29]">
+								Pax
+							</span>
+							<span className="text-sm font-semibold text-[#5f5349]">
+								Personas para esta salida
+							</span>
+						</div>
+						<div className="flex items-center overflow-hidden rounded-full border border-[#e6d4c1] bg-white shadow-sm">
 							<button
 								type="button"
 								onClick={handleMinus}
 								disabled={passengers <= 1 || !date}
 								aria-label="Reducir cantidad de pasajeros"
-								className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-600 transition-colors hover:bg-gray-50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+								className="flex h-11 w-11 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 							>
 								<Minus size={20} aria-hidden="true" />
 							</button>
-							<span className="w-4 text-center text-xl font-bold">
+							<span className="flex h-11 min-w-12 items-center justify-center border-x border-[#eadfd3] px-3 text-center text-xl font-extrabold text-[#1f2d29]">
 								{passengers}
 							</span>
 							<button
@@ -170,7 +173,7 @@ export default function BookingForm({
 								onClick={handlePlus}
 								disabled={!date}
 								aria-label="Aumentar cantidad de pasajeros"
-								className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-600 transition-colors hover:bg-gray-50 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+								className="flex h-11 w-11 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 							>
 								<Plus size={20} aria-hidden="true" />
 							</button>
@@ -179,25 +182,28 @@ export default function BookingForm({
 				</div>
 			</div>
 
-			<div className="border-t border-gray-100 bg-[#f9f9f9] p-5 md:p-6">
-				<div className="mb-2 flex items-center justify-between">
-					<span className="text-lg font-bold text-gray-800">Precio Total</span>
-					<span className="text-xl font-bold text-gray-900">
-						US${(totalPrice || 620).toFixed(2)}
+			<div className="border-t border-[#eadfd3] bg-white p-5 md:p-6">
+				<div className="mb-3 flex items-center justify-between rounded-sm border border-[#e8e2da] bg-[#faf8f5] px-3 py-2">
+					<span className="text-sm font-semibold text-[#5f5349]">
+						Precio por Persona
 					</span>
-				</div>
-				<div className="mb-6 flex items-center justify-between">
-					<span className="font-medium text-gray-500">Precio por Persona</span>
-					<span className="text-gray-600">
+					<span className="text-sm font-extrabold text-[#1f2d29]">
 						US${(basePrice || 620).toFixed(2)}
 					</span>
 				</div>
-
+				<div className="mb-3 flex items-center justify-between gap-4">
+					<span className="text-sm font-extrabold uppercase tracking-wide text-[#244237]">
+						Precio Total
+					</span>
+					<span className="text-2xl font-extrabold tracking-tight text-[#1f2d29]">
+						US${(totalPrice || 620).toFixed(2)}
+					</span>
+				</div>
 				<button
 					type="button"
 					onClick={handleBookNow}
 					disabled={!date}
-					className="w-full rounded-sm bg-[#20b26b] py-4 text-lg font-bold text-white shadow-md transition-colors hover:bg-[#1a9358] disabled:cursor-not-allowed disabled:opacity-60"
+					className="w-full rounded-sm bg-[#1f6c43] py-4 text-lg font-extrabold text-white shadow-[0_18px_40px_-26px_rgba(31,108,67,0.9)] transition-all hover:-translate-y-0.5 hover:bg-[#185637] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6c43] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
 				>
 					Book Now
 				</button>

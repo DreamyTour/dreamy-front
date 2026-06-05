@@ -76,55 +76,66 @@ const pageStats =
     class="content-shell max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12"
   >
     <section
-      class="content-hero relative isolate bg-background pt-4 pb-8 md:pt-6 md:pb-12"
+      class="content-hero relative isolate overflow-hidden rounded-sm border border-border/70 bg-[#fbf7f1] px-4 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12"
     >
       <div
-        class="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16"
+        class="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.82fr)] lg:items-center lg:gap-12"
       >
         <div class="max-w-3xl">
-          <div class="mt-6 space-y-5">
+          <span
+            class="inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-primary"
+          >
+            <span class="h-px w-8 bg-primary/55"></span>
+            {pageCopy.eyebrow}
+          </span>
+          <div class="mt-5 space-y-5">
             <h1
-              class="content-hero-title max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]"
+              class="content-hero-title max-w-3xl text-4xl font-semibold leading-[1.04] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-[3.6rem]"
             >
               {page.titulo}
             </h1>
             {
               page.content && (
-                <p class="max-w-3xl text-base leading-8 text-muted-foreground md:pt-1 lg:max-w-2xl lg:text-[1.08rem]">
+                <p class="max-w-2xl text-base leading-8 text-[#4f473e] md:pt-1 lg:text-[1.04rem]">
                   {page.content}
                 </p>
               )
             }
           </div>
 
-          <div class="mt-8 flex flex-wrap items-center gap-6 sm:gap-8">
+          <div
+            class="mt-8 flex w-full max-w-xl flex-col gap-4 border-t border-[#e4d8ca] pt-6 sm:flex-row sm:items-center"
+          >
             <a
               href="#category-tours"
-              class="group inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30"
+              class="group inline-flex items-center justify-center gap-3 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_-24px_var(--primary)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#fbf7f1]"
             >
               {pageCopy.exploreCta}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-sm bg-white/14 transition-transform duration-300 group-hover:translate-x-0.5"
+                aria-hidden="true"
               >
-                <path
-                  fill-rule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clip-rule="evenodd"></path>
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </span>
             </a>
 
             {
               pageStats.map((stat) => (
-                <div class="flex items-center gap-3">
-                  <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background shadow-sm">
-                    <span class="text-[1.05rem] font-bold text-foreground">
-                      {stat.value}
-                    </span>
-                  </div>
-                  <span class="text-sm font-medium tracking-wide text-muted-foreground capitalize">
+                <div class="flex items-center gap-3 text-left sm:border-l sm:border-[#d7cabc] sm:pl-5">
+                  <span class="text-2xl font-semibold leading-none tracking-[-0.03em] text-foreground">
+                    {stat.value}
+                  </span>
+                  <span class="max-w-28 text-sm font-medium leading-tight text-[#655b51] capitalize">
                     {stat.label}
                   </span>
                 </div>
@@ -134,22 +145,13 @@ const pageStats =
         </div>
 
         <div class="relative">
-          <div
-            class="absolute -left-4 top-8 hidden h-24 w-24 rounded-full border border-primary/15 bg-primary/10 blur-2xl lg:block"
-          >
-          </div>
-          <div
-            class="absolute -bottom-8 right-6 hidden h-24 w-24 rounded-full border border-secondary/20 bg-secondary/10 blur-2xl lg:block"
-          >
-          </div>
-
           {
             pageVideoId ? (
               <div
                 id="category-video"
-                class="relative overflow-hidden rounded-sm border border-border/70 bg-background/80 p-3 shadow-[0_30px_70px_-34px_color-mix(in_oklab,var(--foreground)_28%,transparent)] backdrop-blur-md"
+                class="relative overflow-hidden rounded-sm shadow-[0_24px_60px_-46px_color-mix(in_oklab,var(--foreground)_42%,transparent)]"
               >
-                <div class="overflow-hidden rounded-sm bg-background/95">
+                <div class="overflow-hidden rounded-sm bg-background">
                   <LiteYouTube
                     videoId={pageVideoId}
                     title={page.titulo || "Video"}
@@ -159,9 +161,9 @@ const pageStats =
                 </div>
               </div>
             ) : (
-              <div class="relative overflow-hidden rounded-sm border border-border/70 bg-background/80 p-8 shadow-[0_30px_70px_-34px_color-mix(in_oklab,var(--foreground)_28%,transparent)] backdrop-blur-md">
-                <div class="rounded-sm border border-dashed border-primary/20 bg-gradient-to-br from-primary/8 via-white to-secondary/8 px-8 py-14 text-center">
-                  <p class="text-base leading-7 text-muted-foreground">
+              <div class="relative overflow-hidden rounded-sm border border-[#dfd2c3] bg-white p-8 shadow-[0_22px_55px_-42px_color-mix(in_oklab,var(--foreground)_36%,transparent)]">
+                <div class="rounded-sm border border-dashed border-primary/20 bg-[#fbf7f1] px-8 py-14 text-center">
+                  <p class="text-base leading-7 text-[#4f473e]">
                     {page.content}
                   </p>
                 </div>
@@ -176,13 +178,6 @@ const pageStats =
       toursByCategory.length > 0 && (
         <section id="category-tours" class="w-full py-10 md:py-12">
           <div class="max-w-8xl mx-auto px-6">
-            <div class="mb-8 flex justify-center md:mb-10">
-              <span class="inline-flex items-center gap-2 rounded-sm border border-secondary/15 bg-secondary/5 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-secondary">
-                <span class="h-2 w-2 rounded-full bg-secondary" />
-                {page.categories?.find((c: Category) => c.slug !== "peru-tours")
-                  ?.nombre || page.titulo}
-              </span>
-            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 ">
               {toursByCategory.map((tour) => (
                 <TourCard tour={tour} lang={lang} />
