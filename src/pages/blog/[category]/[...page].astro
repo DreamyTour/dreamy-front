@@ -7,6 +7,7 @@ import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
 import { LANGS, DEFAULT_LANG } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
+import { getCategoryPostCounts } from "@/lib/blogCategories";
 import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 
@@ -24,6 +25,8 @@ type BlogCategoryProps = {
   categorySlug: string;
   socialLogos: Logo[];
   slugMap: Record<string, string>;
+  categoryPostCounts: Record<string, number>;
+  totalPostCount: number;
 };
 type Paginate = (
   data: Blog[],
@@ -87,6 +90,8 @@ export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
     const blogsList = blogsByLang[lang] || [];
     const allCategories = categoriesByLang[lang] || [];
     const socialLogos = socialLogosByLang[lang] || [];
+    const categoryPostCounts = getCategoryPostCounts(blogsList);
+    const totalPostCount = blogsList.length;
 
     for (const category of allCategories) {
       const categorySlug = category.slug;
@@ -102,6 +107,8 @@ export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
         categorySlug,
         socialLogos,
         slugMap: categorySlugsByDocId[category.documentId] ?? {},
+        categoryPostCounts,
+        totalPostCount,
       };
 
       // Si hay posts, usar paginate normal
@@ -141,6 +148,8 @@ const {
   categorySlug,
   socialLogos,
   slugMap,
+  categoryPostCounts,
+  totalPostCount,
 } = props;
 
 const lang: Lang = DEFAULT_LANG;
@@ -359,6 +368,8 @@ const seoProps =
         currentSlug={categorySlug}
         lang={lang}
         socialLogos={socialLogos}
+        categoryPostCounts={categoryPostCounts}
+        totalPostCount={totalPostCount}
       />
     </div>
   </div>

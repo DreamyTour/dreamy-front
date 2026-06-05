@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const cart = {
   tourId: "test-inca-trail",
@@ -12,7 +12,7 @@ const cart = {
   lang: "en",
 };
 
-async function typeAndKeepFocus(page, selector: string, text: string) {
+async function typeAndKeepFocus(page: Page, selector: string, text: string) {
   const locator = page.locator(selector);
   await locator.waitFor({ state: "visible" });
   await locator.click();

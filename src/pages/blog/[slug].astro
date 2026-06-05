@@ -10,6 +10,7 @@ import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
 import TableOfContents from "@/components/ui/TableOfContents.astro";
+import { getCategoryPostCounts } from "@/lib/blogCategories";
 import {
   getImageAlt,
   getImageSrcSet,
@@ -28,6 +29,8 @@ type BlogPostProps = {
   slugMap: Record<string, string>;
   globalData: GlobalData;
   relatedBlogs: Blog[];
+  categoryPostCounts: Record<string, number>;
+  totalPostCount: number;
 };
 type BlogImage = Imagen & { caption?: string };
 
@@ -162,8 +165,11 @@ export async function getStaticPaths() {
       locale: lang,
     });
     const allCategories = cats && Array.isArray(cats) ? cats : [];
+    const blogsList = allBlogsByLang[lang] || [];
+    const categoryPostCounts = getCategoryPostCounts(blogsList);
+    const totalPostCount = blogsList.length;
 
-    for (const blog of allBlogsByLang[lang]) {
+    for (const blog of blogsList) {
       paths.push({
         params: { slug: blog.slug },
         props: {
@@ -173,6 +179,8 @@ export async function getStaticPaths() {
           slugMap: slugsByDocId[blog.documentId] ?? {},
           globalData: globalDataByLang[lang],
           relatedBlogs: relatedBlogsByLang[lang][blog.documentId] || [],
+          categoryPostCounts,
+          totalPostCount,
         },
       });
     }
@@ -181,8 +189,16 @@ export async function getStaticPaths() {
   return paths;
 }
 
-const { blog, lang, allCategories, slugMap, globalData, relatedBlogs } =
-  Astro.props as BlogPostProps;
+const {
+  blog,
+  lang,
+  allCategories,
+  slugMap,
+  globalData,
+  relatedBlogs,
+  categoryPostCounts,
+  totalPostCount,
+} = Astro.props as BlogPostProps;
 
 const socialLogos =
   globalData?.footer?.socialLogo || globalData?.socialLogo || [];
@@ -526,6 +542,8 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
         currentSlug={blog.category_blogs?.[0]?.slug}
         lang={lang}
         socialLogos={socialLogos}
+        categoryPostCounts={categoryPostCounts}
+        totalPostCount={totalPostCount}
       />
     </div>
   </div>
