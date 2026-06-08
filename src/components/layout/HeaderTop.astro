@@ -1,6 +1,6 @@
 ---
 import type { HeaderTop as HeaderTopType } from "@/types/global";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import LanguageSwitcherInline from "@/components/LanguageSwitcherInline.astro";
 import type { Lang } from "@/lib/i18n";
 import { localizePath } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
@@ -95,7 +95,7 @@ const getLinkProps = (
             ))
           }
         </div>
-        <LanguageSwitcher currentLang={lang} client:idle />
+        <LanguageSwitcherInline currentLang={lang} />
       </div>
     </div>
   </div>

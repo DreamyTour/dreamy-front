@@ -1,0 +1,219 @@
+---
+import { LANGS, type Lang } from "@/lib/i18n";
+
+interface Props {
+  currentLang: Lang;
+}
+
+const { currentLang } = Astro.props;
+
+const languageNames: Record<Lang, string> = {
+  en: "English",
+  es: "Español",
+  pt: "Português",
+};
+---
+
+<div class="language-switcher relative" data-language-switcher>
+  <button
+    type="button"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-label="Cambiar idioma"
+    class="inline-flex h-9 min-w-[116px] items-center justify-between gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold text-slate-800 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
+    data-language-toggle
+  >
+    <span class="inline-flex items-center gap-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="size-4 text-slate-600"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m5 8 6 6"></path>
+        <path d="m4 14 6-6 2-3"></path>
+        <path d="M2 5h12"></path>
+        <path d="M7 2h1"></path>
+        <path d="m22 22-5-10-5 10"></path>
+        <path d="M14 18h6"></path>
+      </svg>
+      <span>{languageNames[currentLang]}</span>
+    </span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="size-4 text-slate-500 transition-transform duration-200"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      data-language-chevron
+    >
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </button>
+
+  <div
+    role="menu"
+    class="absolute right-0 z-50 mt-2 hidden min-w-[150px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
+    data-language-menu
+  >
+    {
+      LANGS.map((lang) => {
+        const selected = lang === currentLang;
+
+        return (
+          <button
+            type="button"
+            role="menuitemradio"
+            aria-checked={selected ? "true" : "false"}
+            class={`flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm transition-colors duration-150 focus-visible:outline-none ${
+              selected
+                ? "bg-primary/10 font-semibold text-primary ring-1 ring-inset ring-primary/15 hover:bg-primary/12 focus-visible:bg-primary/12"
+                : "text-slate-700 hover:bg-slate-100 focus-visible:bg-slate-100"
+            }`}
+            data-language-option={lang}
+          >
+            <span>{languageNames[lang]}</span>
+            {selected && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="size-4 text-primary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            )}
+          </button>
+        );
+      })
+    }
+  </div>
+</div>
+
+<script
+  is:inline
+  define:vars={{
+    currentLang,
+    langs: LANGS,
+    defaultLang: "en",
+  }}
+>
+  (() => {
+    if (window.__dreamyLanguageSwitcherReady) return;
+    window.__dreamyLanguageSwitcherReady = true;
+
+    const stripLangPrefix = (path) => {
+      const parts = path.split("/").filter(Boolean);
+      if (parts[0] && langs.includes(parts[0])) {
+        return `/${parts.slice(1).join("/")}` || "/";
+      }
+      return path || "/";
+    };
+
+    const localizePath = (path, lang) => {
+      const normalized = stripLangPrefix(path);
+      if (lang === defaultLang) return normalized;
+      return normalized === "/" ? `/${lang}` : `/${lang}${normalized}`;
+    };
+
+    const translatePathForSlug = (path, slug) => {
+      const normalized = stripLangPrefix(path);
+      const segments = normalized.split("/").filter(Boolean);
+      if (segments.length === 0) return `/${slug}`;
+      segments[segments.length - 1] = slug;
+      return `/${segments.join("/")}`;
+    };
+
+    const resolveLocalizedPath = (nextLang) => {
+      const pathname = window.location.pathname;
+      const normalizedPath = stripLangPrefix(pathname);
+
+      for (const id of ["tour-slug-map", "page-slug-map"]) {
+        const slugMapEl = document.getElementById(id);
+        if (!slugMapEl) continue;
+
+        try {
+          const slugMap = JSON.parse(slugMapEl.textContent || "{}");
+          const targetSlug = slugMap[nextLang];
+          if (targetSlug) return localizePath(`/${targetSlug}`, nextLang);
+        } catch {}
+      }
+
+      const blogSlugMapEl = document.getElementById("blog-slug-map");
+      if (blogSlugMapEl) {
+        try {
+          const slugMap = JSON.parse(blogSlugMapEl.textContent || "{}");
+          const targetSlug = slugMap[nextLang];
+          if (targetSlug) {
+            return localizePath(
+              translatePathForSlug(normalizedPath, targetSlug),
+              nextLang,
+            );
+          }
+        } catch {}
+      }
+
+      return localizePath(normalizedPath, nextLang);
+    };
+
+    const closeSwitcher = (switcher) => {
+      const toggle = switcher.querySelector("[data-language-toggle]");
+      const menu = switcher.querySelector("[data-language-menu]");
+      const chevron = switcher.querySelector("[data-language-chevron]");
+      toggle?.setAttribute("aria-expanded", "false");
+      menu?.classList.add("hidden");
+      chevron?.classList.remove("rotate-180");
+    };
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      const activeSwitcher = target.closest?.("[data-language-switcher]");
+
+      document.querySelectorAll("[data-language-switcher]").forEach((item) => {
+        if (item !== activeSwitcher) closeSwitcher(item);
+      });
+
+      const toggle = target.closest?.("[data-language-toggle]");
+      if (toggle && activeSwitcher) {
+        const expanded = toggle.getAttribute("aria-expanded") === "true";
+        const menu = activeSwitcher.querySelector("[data-language-menu]");
+        const chevron = activeSwitcher.querySelector("[data-language-chevron]");
+        toggle.setAttribute("aria-expanded", expanded ? "false" : "true");
+        menu?.classList.toggle("hidden", expanded);
+        chevron?.classList.toggle("rotate-180", !expanded);
+        return;
+      }
+
+      const option = target.closest?.("[data-language-option]");
+      if (option) {
+        const nextLang = option.getAttribute("data-language-option");
+        if (nextLang === currentLang) {
+          if (activeSwitcher) closeSwitcher(activeSwitcher);
+          return;
+        }
+        window.location.href = resolveLocalizedPath(nextLang);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      document.querySelectorAll("[data-language-switcher]").forEach((item) => {
+        closeSwitcher(item);
+      });
+    });
+  })();
+</script>
