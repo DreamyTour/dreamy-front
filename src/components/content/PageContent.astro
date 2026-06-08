@@ -177,12 +177,10 @@ const pageStats =
     {
       toursByCategory.length > 0 && (
         <section id="category-tours" class="w-full py-10 md:py-12">
-          <div class="max-w-8xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-8 ">
-              {toursByCategory.map((tour) => (
-                <TourCard tour={tour} lang={lang} />
-              ))}
-            </div>
+          <div class="grid grid-cols-1 gap-x-2 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+            {toursByCategory.map((tour) => (
+              <TourCard tour={tour} lang={lang} />
+            ))}
           </div>
         </section>
       )
@@ -193,7 +191,7 @@ const pageStats =
         page.preguntasAcordeon &&
         page.preguntasAcordeon.length > 0 && (
           <section class="w-full py-16">
-            <div class="max-w-8xl mx-auto px-6">
+            <div class="w-full">
               <div class="mx-auto mb-10 max-w-3xl text-center">
                 <h2 class="text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
                   {page.tituloPreguntas}
