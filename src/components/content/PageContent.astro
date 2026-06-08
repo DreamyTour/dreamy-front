@@ -73,30 +73,30 @@ const pageStats =
     set:html={serializeJsonForHtml(pageSlugMap)}
   />
   <div
-    class="content-shell max-w-8xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12"
+    class="content-shell max-w-8xl mx-auto px-4 py-6 md:px-6 md:py-8 lg:px-8 lg:py-10"
   >
     <section
-      class="content-hero relative isolate overflow-hidden rounded-sm border border-border/70 bg-[#fbf7f1] px-4 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12"
+      class="content-hero page-hero-agency relative isolate overflow-hidden rounded-sm bg-background text-foreground shadow-[0_30px_80px_-66px_color-mix(in_oklab,var(--foreground)_38%,transparent)]"
     >
       <div
-        class="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.82fr)] lg:items-center lg:gap-12"
+        class="relative grid gap-8 px-5 py-8 md:px-8 md:py-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(460px,0.82fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-12 xl:px-14"
       >
-        <div class="max-w-3xl">
+        <div class="max-w-3xl self-center">
           <span
-            class="inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-primary"
+            class="inline-flex items-center gap-3 rounded-sm bg-primary/[0.06] px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.24em] text-primary"
           >
-            <span class="h-px w-8 bg-primary/55"></span>
+            <span class="h-2 w-2 rounded-full bg-primary"></span>
             {pageCopy.eyebrow}
           </span>
-          <div class="mt-5 space-y-5">
+          <div class="mt-5 space-y-6">
             <h1
-              class="content-hero-title max-w-3xl text-4xl font-semibold leading-[1.04] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-[3.6rem]"
+              class="content-hero-title max-w-3xl text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-[4rem]"
             >
               {page.titulo}
             </h1>
             {
               page.content && (
-                <p class="max-w-2xl text-base leading-8 text-[#4f473e] md:pt-1 lg:text-[1.04rem]">
+                <p class="page-hero-summary max-w-2xl text-base leading-8 text-muted-foreground lg:text-[1.06rem]">
                   {page.content}
                 </p>
               )
@@ -104,11 +104,11 @@ const pageStats =
           </div>
 
           <div
-            class="mt-8 flex w-full max-w-xl flex-col gap-4 border-t border-[#e4d8ca] pt-6 sm:flex-row sm:items-center"
+            class="mt-9 flex w-full flex-col gap-4 sm:flex-row sm:items-center"
           >
             <a
               href="#category-tours"
-              class="group inline-flex items-center justify-center gap-3 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_-24px_var(--primary)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#fbf7f1]"
+              class="group inline-flex min-h-12 items-center justify-center gap-3 rounded-sm bg-primary px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_34px_-24px_color-mix(in_oklab,var(--primary)_80%,black)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {pageCopy.exploreCta}
               <span
@@ -131,11 +131,11 @@ const pageStats =
 
             {
               pageStats.map((stat) => (
-                <div class="flex items-center gap-3 text-left sm:border-l sm:border-[#d7cabc] sm:pl-5">
+                <div class="flex min-h-12 items-center gap-3 rounded-sm bg-muted/35 px-4 text-left sm:ml-1">
                   <span class="text-2xl font-semibold leading-none tracking-[-0.03em] text-foreground">
                     {stat.value}
                   </span>
-                  <span class="max-w-28 text-sm font-medium leading-tight text-[#655b51] capitalize">
+                  <span class="max-w-28 text-sm font-semibold leading-tight text-muted-foreground capitalize">
                     {stat.label}
                   </span>
                 </div>
@@ -144,14 +144,14 @@ const pageStats =
           </div>
         </div>
 
-        <div class="relative">
+        <div class="relative self-center lg:pb-1">
           {
             pageVideoId ? (
               <div
                 id="category-video"
-                class="relative overflow-hidden rounded-sm shadow-[0_24px_60px_-46px_color-mix(in_oklab,var(--foreground)_42%,transparent)]"
+                class="page-hero-media relative overflow-hidden rounded-sm bg-background p-2 shadow-[0_28px_74px_-52px_color-mix(in_oklab,var(--foreground)_54%,transparent)]"
               >
-                <div class="overflow-hidden rounded-sm bg-background">
+                <div class="overflow-hidden rounded-sm bg-foreground">
                   <LiteYouTube
                     videoId={pageVideoId}
                     title={page.titulo || "Video"}
@@ -161,9 +161,9 @@ const pageStats =
                 </div>
               </div>
             ) : (
-              <div class="relative overflow-hidden rounded-sm border border-[#dfd2c3] bg-white p-8 shadow-[0_22px_55px_-42px_color-mix(in_oklab,var(--foreground)_36%,transparent)]">
-                <div class="rounded-sm border border-dashed border-primary/20 bg-[#fbf7f1] px-8 py-14 text-center">
-                  <p class="text-base leading-7 text-[#4f473e]">
+              <div class="page-hero-media relative overflow-hidden rounded-sm bg-background p-8 shadow-[0_28px_74px_-52px_color-mix(in_oklab,var(--foreground)_54%,transparent)]">
+                <div class="rounded-sm border border-dashed border-primary/18 bg-primary/[0.035] px-8 py-14 text-center">
+                  <p class="text-base leading-7 text-muted-foreground">
                     {page.content}
                   </p>
                 </div>
@@ -306,3 +306,53 @@ const pageStats =
     }
   </div>
 </PageLayout>
+
+<style>
+  .page-hero-agency {
+    background:
+      linear-gradient(
+        115deg,
+        color-mix(in oklab, var(--background) 94%, var(--primary) 6%) 0%,
+        var(--background) 46%,
+        color-mix(in oklab, var(--background) 92%, var(--muted) 8%) 100%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--primary) 7%, transparent),
+        transparent 34%
+      );
+  }
+
+  .page-hero-agency::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: -1;
+    height: 3px;
+    background: color-mix(in oklab, var(--primary) 88%, white 12%);
+    content: "";
+  }
+
+  .page-hero-media::before {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border: 1px solid color-mix(in oklab, var(--background) 76%, transparent);
+    content: "";
+    pointer-events: none;
+  }
+
+  .page-hero-summary {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+  }
+
+  @media (max-width: 768px) {
+    .page-hero-summary {
+      -webkit-line-clamp: 4;
+    }
+  }
+</style>
