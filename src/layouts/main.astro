@@ -18,9 +18,16 @@ interface Props {
   lang?: Lang;
   lcpImageUrl?: string;
   lcpImageSrcSet?: string;
+  enableClientRouter?: boolean;
 }
 
-const { seo, lang: langProp, lcpImageUrl, lcpImageSrcSet } = Astro.props;
+const {
+  seo,
+  lang: langProp,
+  lcpImageUrl,
+  lcpImageSrcSet,
+  enableClientRouter = true,
+} = Astro.props;
 
 // 1. Detectamos el idioma desde los params de la vista de forma automática
 // o desde la prop que se pasa desde la página
@@ -76,7 +83,7 @@ const seoProps = seo || {
         fetchpriority="high"
       />
     )}
-    <ClientRouter />
+    {enableClientRouter && <ClientRouter />}
     <Font cssVariable="--font-outfit" preload />
     <SEO {...seoProps} />
   </head>

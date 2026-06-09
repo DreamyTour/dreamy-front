@@ -11,6 +11,6 @@ interface Props {
 const { seo, lang } = Astro.props;
 ---
 
-<Layout seo={seo} lang={lang}>
+<Layout seo={seo} lang={lang} enableClientRouter={false}>
   <slot />
 </Layout>

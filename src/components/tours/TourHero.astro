@@ -416,46 +416,46 @@ const galleryImagesJson = serializeJsonForHtml(
   </div>
 </div>
 
-<style>
+<style is:inline>
   /* Hide scrollbar for Chrome, Safari and Opera */
-  .hide-scrollbar::-webkit-scrollbar {
+  .tour-hero-container .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
   /* Hide scrollbar for IE, Edge and Firefox */
-  .hide-scrollbar {
+  .tour-hero-container .hide-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
 
-  .tour-hero-container :global(.text-slate-800),
-  .tour-hero-container :global(.text-slate-950) {
+  .tour-hero-container .text-slate-800,
+  .tour-hero-container .text-slate-950 {
     color: #020617;
   }
 
-  .tour-hero-container :global(.bg-white) {
+  .tour-hero-container .bg-white {
     background-color: #ffffff;
   }
 
-  .tour-hero-container :global(.hero-cta-book) {
+  .tour-hero-container .hero-cta-book {
     background-color: var(--primary);
     color: var(--primary-foreground);
   }
 
-  .tour-hero-container :global(.hero-cta-book:hover) {
+  .tour-hero-container .hero-cta-book:hover {
     background-color: color-mix(in oklab, var(--primary) 88%, black);
   }
 
-  .tour-hero-container :global(.hero-cta-whatsapp) {
+  .tour-hero-container .hero-cta-whatsapp {
     border-color: var(--primary);
     color: var(--primary);
   }
 
-  .tour-hero-container :global(.hero-cta-whatsapp:hover) {
+  .tour-hero-container .hero-cta-whatsapp:hover {
     background-color: var(--primary);
     color: var(--primary-foreground);
   }
 
-  .animate-fade-in-up {
+  .tour-hero-container .animate-fade-in-up {
     animation: tour-fade-up 0.7s ease-out both;
   }
 
@@ -481,23 +481,23 @@ const galleryImagesJson = serializeJsonForHtml(
     }
   }
 
-  .tour-specs-card {
+  .tour-hero-container .tour-specs-card {
     border-left: 3px solid var(--secondary);
   }
 
-  .tour-gallery-slide.is-active {
+  .tour-hero-container .tour-gallery-slide.is-active {
     display: flex;
   }
 
-  .tour-gallery-slide.is-active img {
+  .tour-hero-container .tour-gallery-slide.is-active img {
     animation: gallery-image-in 0.28s ease-out both;
   }
 
-  .tour-gallery-caption {
+  .tour-hero-container .tour-gallery-caption {
     text-wrap: balance;
   }
 
-  .tour-gallery-close {
+  .tour-hero-container .tour-gallery-close {
     color: rgba(255, 255, 255, 0.92);
     background: color-mix(in oklab, var(--foreground) 34%, transparent);
     border: 1px solid rgba(255, 255, 255, 0.26);
@@ -510,18 +510,18 @@ const galleryImagesJson = serializeJsonForHtml(
       transform 0.2s ease;
   }
 
-  .tour-gallery-close:hover {
+  .tour-hero-container .tour-gallery-close:hover {
     color: var(--secondary-foreground);
     background: var(--secondary);
     border-color: var(--secondary);
     transform: translateY(-1px);
   }
 
-  .tour-gallery-close:active {
+  .tour-hero-container .tour-gallery-close:active {
     transform: translateY(0) scale(0.96);
   }
 
-  .tour-gallery-nav {
+  .tour-hero-container .tour-gallery-nav {
     color: rgba(255, 255, 255, 0.9);
     background: color-mix(in oklab, var(--foreground) 28%, transparent);
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -534,17 +534,17 @@ const galleryImagesJson = serializeJsonForHtml(
       transform 0.2s ease;
   }
 
-  .tour-gallery-nav:hover {
+  .tour-hero-container .tour-gallery-nav:hover {
     color: var(--primary-foreground);
     background: var(--primary);
     border-color: var(--primary);
   }
 
-  .tour-gallery-nav:active {
+  .tour-hero-container .tour-gallery-nav:active {
     background: color-mix(in oklab, var(--primary) 88%, black);
   }
 
-  .tour-gallery-nav::before {
+  .tour-hero-container .tour-gallery-nav::before {
     content: "";
     position: absolute;
     inset-block: 10px;
@@ -554,21 +554,21 @@ const galleryImagesJson = serializeJsonForHtml(
     transition: background-color 0.2s ease;
   }
 
-  .tour-gallery-nav-prev::before {
+  .tour-hero-container .tour-gallery-nav-prev::before {
     left: -1px;
   }
 
-  .tour-gallery-nav-next::before {
+  .tour-hero-container .tour-gallery-nav-next::before {
     right: -1px;
   }
 
-  .tour-gallery-nav:hover::before,
-  .tour-gallery-nav:active::before {
+  .tour-hero-container .tour-gallery-nav:hover::before,
+  .tour-hero-container .tour-gallery-nav:active::before {
     background: var(--primary-foreground);
   }
 
   @media (min-width: 1280px) {
-    .tour-gallery-nav::before {
+    .tour-hero-container .tour-gallery-nav::before {
       inset-block: 12px;
     }
   }
