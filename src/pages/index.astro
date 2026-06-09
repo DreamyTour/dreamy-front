@@ -12,6 +12,7 @@ import PaquetesBolivia from "@/components/sections/PaquetesBolivia.astro";
 import HomePost from "@/components/sections/HomePost.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
+import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 
 const lang = DEFAULT_LANG;
 
@@ -38,7 +39,7 @@ const seoProps = {
 };
 ---
 
-<Layout seo={seoProps}>
+<Layout seo={seoProps} lcpImageUrl={backgroundImageMobile.src}>
   <Hero data={homeData?.hero} lang={lang} />
   <About data={homeData?.about} lang={lang} />
   <Certifications data={homeData?.premios?.premios} lang={lang} />

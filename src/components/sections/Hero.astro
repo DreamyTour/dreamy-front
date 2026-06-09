@@ -82,7 +82,6 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
         />
         <video
           class="absolute inset-0 hidden h-full w-full object-cover md:block"
-          src={videoUrl}
           width={backgroundImageMobile.width}
           height={backgroundImageMobile.height}
           autoplay
@@ -91,7 +90,9 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
           playsinline
           preload="metadata"
           poster={backgroundImageMobile.src}
-        />
+        >
+          <source src={videoUrl} type="video/mp4" media="(min-width: 768px)" />
+        </video>
       </>
     ) : (
       <img

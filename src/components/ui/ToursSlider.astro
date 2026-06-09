@@ -13,14 +13,11 @@ interface Props {
 }
 
 const { tours, lang } = Astro.props;
-// Solo hacemos el bucle infinito si hay más de 3 tours (para que no parezcan repetidos en pantalla)
 const shouldLoop = tours.length > 3;
-const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
 ---
 
 <div class="relative" data-tours-slider>
   <div class="overflow-hidden">
-    <!-- Slider Container - horizontal scroll -->
     <div
       class="flex gap-6 overflow-x-auto py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
       id={`slider-${Math.random().toString(36).slice(2, 11)}`}
@@ -29,7 +26,7 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
       data-is-looped={shouldLoop ? "true" : "false"}
     >
       {
-        loopedTours.map((tour) => (
+        tours.map((tour) => (
           <div class="flex-shrink-0 w-full md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] snap-start">
             <TourCard tour={tour} lang={lang} />
           </div>
@@ -38,7 +35,6 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
     </div>
   </div>
 
-  <!-- Navigation Arrows -->
   <button
     class="slider-prev absolute -left-3 top-[calc((100vw-3rem)*0.75+1rem)] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:-left-7 md:top-1/2 md:h-14 md:w-14"
     aria-label="Ver tours anteriores"
@@ -68,7 +64,7 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
   document.addEventListener("astro:page-load", () => {
     const sliderRoots = document.querySelectorAll("[data-tours-slider]");
 
-    sliderRoots.forEach((root) => {
+    const initializeSlider = (root: Element) => {
       const sliderRoot = root as HTMLElement;
       const container = sliderRoot.querySelector(
         "[data-slider-track]",
@@ -91,18 +87,11 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
       container.dataset.sliderInitialized = "true";
 
       const slides = Array.from(container.children) as HTMLElement[];
-      const originalSlidesCount = Number(
-        container.dataset.originalCount || slides.length,
-      );
       const isLooped = container.dataset.isLooped === "true";
-
       const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
       const autoPlayDelay = 2000;
-      const normalizeDelay = 320;
       let autoPlay: number | undefined;
       let scrollAmount = 0;
-      let loopWidth = 0;
-      let isAdjustingScroll = false;
 
       const calculateMetrics = () => {
         const slideWidth =
@@ -112,34 +101,31 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
         const gap = Number.parseFloat(gapValue);
 
         scrollAmount = slideWidth + gap;
-        loopWidth = originalSlidesCount * scrollAmount;
       };
 
       const setScrollPosition = (left: number) => {
-        isAdjustingScroll = true;
         container.scrollTo({ left, behavior: "auto" });
-        window.setTimeout(() => {
-          isAdjustingScroll = false;
-        }, 0);
-      };
-
-      const normalizeScroll = () => {
-        if (!isLooped || slides.length <= 1 || isAdjustingScroll) return;
-
-        if (container.scrollLeft >= loopWidth * 2 - scrollAmount / 2) {
-          setScrollPosition(container.scrollLeft - loopWidth);
-        } else if (container.scrollLeft < loopWidth - scrollAmount / 2) {
-          setScrollPosition(container.scrollLeft + loopWidth);
-        }
       };
 
       const moveSlider = (direction: 1 | -1) => {
-        normalizeScroll();
+        const maxScrollLeft = container.scrollWidth - container.clientWidth;
+        const atEnd = container.scrollLeft >= maxScrollLeft - scrollAmount / 2;
+        const atStart = container.scrollLeft <= scrollAmount / 2;
+
+        if (isLooped && direction === 1 && atEnd) {
+          setScrollPosition(0);
+          return;
+        }
+
+        if (isLooped && direction === -1 && atStart) {
+          setScrollPosition(maxScrollLeft);
+          return;
+        }
+
         container.scrollBy({
           left: scrollAmount * direction,
           behavior: motionQuery.matches ? "auto" : "smooth",
         });
-        window.setTimeout(normalizeScroll, normalizeDelay);
       };
 
       const stopAutoPlay = () => {
@@ -163,31 +149,24 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
             : 0;
         calculateMetrics();
         setScrollPosition(currentIndex * scrollAmount);
-        normalizeScroll();
       };
 
-      calculateMetrics();
-
-      if (isLooped && slides.length > 1) {
-        requestAnimationFrame(() => {
-          calculateMetrics();
-          setScrollPosition(loopWidth);
-        });
-      }
+      requestAnimationFrame(calculateMetrics);
 
       prevBtn.addEventListener("click", () => {
+        if (scrollAmount === 0) calculateMetrics();
         stopAutoPlay();
         moveSlider(-1);
         startAutoPlay();
       });
 
       nextBtn.addEventListener("click", () => {
+        if (scrollAmount === 0) calculateMetrics();
         stopAutoPlay();
         moveSlider(1);
         startAutoPlay();
       });
 
-      container.addEventListener("scroll", normalizeScroll, { passive: true });
       container.addEventListener("mouseenter", stopAutoPlay);
       container.addEventListener("mouseleave", startAutoPlay);
       container.addEventListener("focusin", stopAutoPlay);
@@ -199,6 +178,24 @@ const loopedTours = shouldLoop ? [...tours, ...tours, ...tours] : tours;
       });
 
       startAutoPlay();
-    });
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      sliderRoots.forEach(initializeSlider);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          initializeSlider(entry.target);
+        });
+      },
+      { rootMargin: "400px 0px" },
+    );
+
+    sliderRoots.forEach((root) => observer.observe(root));
   });
 </script>
