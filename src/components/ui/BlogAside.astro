@@ -78,7 +78,7 @@ const getSocialHoverClass = (label: string = "", url: string = "") => {
           ${
             !currentSlug
               ? "bg-primary/10 text-primary font-semibold"
-              : "text-gray-600 hover:text-primary hover:bg-primary/5"
+              : "text-foreground/80 hover:text-primary hover:bg-primary/5"
           }`}
       >
         <span class="min-w-0 truncate">
@@ -92,7 +92,7 @@ const getSocialHoverClass = (label: string = "", url: string = "") => {
         </span>
         <span
           class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-            !currentSlug ? "bg-primary text-white" : "bg-gray-100 text-gray-600"
+            !currentSlug ? "bg-primary text-white" : "bg-gray-100 text-foreground/80"
           }`}
         >
           {totalPostCount}
@@ -110,7 +110,7 @@ const getSocialHoverClass = (label: string = "", url: string = "") => {
                 ${
                   isActive
                     ? "bg-primary/10 text-primary font-semibold"
-                    : "text-gray-600 hover:text-primary hover:bg-primary/5"
+                    : "text-foreground/80 hover:text-primary hover:bg-primary/5"
                 }`}
             >
               <span class="min-w-0 truncate">{cat.nombre}</span>
@@ -118,7 +118,7 @@ const getSocialHoverClass = (label: string = "", url: string = "") => {
                 class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
                   isActive
                     ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-600"
+                    : "bg-gray-100 text-foreground/80"
                 }`}
               >
                 {count}

@@ -395,7 +395,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
               ).map((block: any) => {
                   if (block.type === "paragraph") {
                     return (
-                      <p class="mb-5 text-base leading-relaxed text-muted-foreground">
+                      <p class="mb-5 text-base leading-relaxed text-foreground/80">
                         {block.children?.map((child: StrapiBlockChild) => {
                           let text = child.text;
                           if (child.bold)
@@ -483,8 +483,8 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
                     const ListTag = block.format === "ordered" ? "ol" : "ul";
                     const listClasses =
                       block.format === "ordered"
-                        ? "mb-5 list-decimal space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground"
-                        : "mb-5 list-disc space-y-1.5 pl-6 text-base leading-relaxed text-muted-foreground";
+                        ? "mb-5 list-decimal space-y-1.5 pl-6 text-base leading-relaxed text-foreground/80"
+                        : "mb-5 list-disc space-y-1.5 pl-6 text-base leading-relaxed text-foreground/80";
                     return (
                       <ListTag class={listClasses}>
                         {block.children?.map((item: StrapiBlockChild) => (
