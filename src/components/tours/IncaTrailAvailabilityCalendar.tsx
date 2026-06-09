@@ -390,7 +390,7 @@ export default function IncaTrailAvailabilityCalendar({
 	});
 
 	return (
-		<div className="w-full overflow-hidden rounded-lg border border-[#e7d7c8] bg-[#fffdf9] font-[inherit] shadow-[0_18px_60px_-42px_rgba(63,40,18,0.7)]">
+		<div className="w-full overflow-hidden rounded-lg border border-[#e7d7c8] bg-neutral-50 font-[inherit] shadow-[0_18px_60px_-42px_rgba(63,40,18,0.7)]">
 			<div
 				className={`grid grid-cols-1 gap-3 border-b border-[#355548]/30 bg-[#244237] p-4 ${
 					isRoadLocked ? "" : "sm:grid-cols-2"
@@ -437,7 +437,7 @@ export default function IncaTrailAvailabilityCalendar({
 				</label>
 			</div>
 
-			<div className="flex items-center justify-between border-b border-[#eadfd3] bg-[#fff8ef] px-3 py-3">
+			<div className="flex items-center justify-between border-b border-[#eadfd3] bg-neutral-50 px-3 py-3">
 				<button
 					type="button"
 					onClick={() =>
@@ -467,7 +467,7 @@ export default function IncaTrailAvailabilityCalendar({
 				</button>
 			</div>
 
-			<div className="grid grid-cols-7 border-b border-[#eadfd3] bg-[#f6efe6] text-center text-[0.7rem] font-bold uppercase tracking-wide text-secondary">
+			<div className="grid grid-cols-7 border-b border-[#eadfd3] bg-neutral-50 text-center text-[0.7rem] font-bold uppercase tracking-wide text-secondary">
 				{weekdayLabels.map(({ key, label }) => (
 					<div key={key} className="py-2">
 						{label}
@@ -492,7 +492,7 @@ export default function IncaTrailAvailabilityCalendar({
 				{emptyCells.map((key) => (
 					<div
 						key={key}
-						className={`${compact ? "h-14" : "h-16"} border-b border-r border-[#f0e5d9] bg-[#fbf6ef]`}
+						className={`${compact ? "h-14" : "h-16"} border-b border-r border-[#f0e5d9] bg-neutral-50`}
 					/>
 				))}
 
@@ -507,13 +507,13 @@ export default function IncaTrailAvailabilityCalendar({
 							const isSelectedRange = selectedDateKeys.has(dateKey);
 							const toneStyles: Record<string, string> = {
 								available: "bg-[#e7f7ed] text-[#0f5f35] hover:bg-[#d4f0df]",
-								limited: "bg-secondary/10 text-secondary hover:bg-secondary/15",
-								unavailable: "bg-[#f8f4ef] text-[#5f5349] cursor-not-allowed",
+								limited: "bg-amber-50 text-amber-700 hover:bg-amber-100",
+								unavailable: "bg-secondary/10 text-secondary cursor-not-allowed",
 							};
 							const toneLabel: Record<string, string> = {
 								available: "text-[#07512d]",
-								limited: "text-secondary",
-								unavailable: "text-[#4f453d]",
+								limited: "text-amber-700",
+								unavailable: "text-secondary",
 							};
 
 							return (
@@ -524,7 +524,7 @@ export default function IncaTrailAvailabilityCalendar({
 									onClick={() =>
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
-									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-px border-b border-r border-[#f0e5d9] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
+									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-1 border-b border-r border-[#f0e5d9] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
 										isSelectedRange
 											? "!border-secondary/35 !bg-secondary/10 !text-secondary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--secondary)_24%,transparent)]"
 											: ""
@@ -539,24 +539,22 @@ export default function IncaTrailAvailabilityCalendar({
 									}`}
 								>
 									<span
-										className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold leading-none ${
+										className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold leading-none ${
 											isSelectedRange
 												? "bg-secondary text-secondary-foreground"
 												: tone === "available"
 													? "border border-[#65b883] bg-[#a9dfbd] text-[#064324]"
 													: tone === "limited"
-														? "border border-secondary/35 bg-secondary/20 text-secondary"
-														: "border border-[#cbbdac] bg-[#efe5da] text-[#4f453d]"
+														? "border border-amber-300 bg-amber-100 text-amber-700"
+														: "border border-secondary/35 bg-secondary/20 text-secondary line-through"
 										}`}
 									>
-										{day}
+										{availability}
 									</span>
 									<span
-										className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${
-											!isSelectable ? "line-through" : ""
-										} ${isSelectedRange ? "!text-secondary" : ""}`}
+										className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${isSelectedRange ? "!text-secondary" : ""}`}
 									>
-										{availability}
+										{day}
 									</span>
 								</button>
 							);
@@ -570,7 +568,7 @@ export default function IncaTrailAvailabilityCalendar({
 					className={
 						compact
 							? "mx-4 mt-3 pb-4 text-sm text-gray-700"
-							: "mx-4 mt-3 overflow-hidden rounded-md border border-secondary/25 bg-[#fffaf6] text-sm text-gray-700 shadow-[0_14px_40px_-30px_color-mix(in_oklab,var(--secondary)_34%,transparent)]"
+							: "mx-4 mt-3 overflow-hidden rounded-md border border-secondary/25 bg-neutral-50 text-sm text-gray-700 shadow-[0_14px_40px_-30px_color-mix(in_oklab,var(--secondary)_34%,transparent)]"
 					}
 					aria-live="polite"
 				>
@@ -621,17 +619,17 @@ export default function IncaTrailAvailabilityCalendar({
 				</div>
 			)}
 
-			<div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#f0e5d9] bg-[#fffaf4] px-4 py-3 text-[11px] font-medium text-[#6f6258]">
+			<div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#f0e5d9] bg-neutral-50 px-4 py-3 text-[11px] font-medium text-[#6f6258]">
 				<span className="flex items-center gap-1.5">
 					<span className="inline-block h-3 w-3 rounded-sm border border-[#bfe6ce] bg-[#edf8f1]" />
 					{copy.moreThanTen}
 				</span>
 				<span className="flex items-center gap-1.5">
-					<span className="inline-block h-3 w-3 rounded-sm border border-secondary/35 bg-secondary/20" />
+					<span className="inline-block h-3 w-3 rounded-sm border border-amber-300 bg-amber-100" />
 					{copy.oneToTen}
 				</span>
 				<span className="flex items-center gap-1.5">
-					<span className="inline-block h-3 w-3 rounded-sm border border-[#e8ddd0] bg-[#f7f3ee]" />
+					<span className="inline-block h-3 w-3 rounded-sm border border-secondary/35 bg-secondary/20" />
 					{copy.noSpots}
 				</span>
 			</div>
