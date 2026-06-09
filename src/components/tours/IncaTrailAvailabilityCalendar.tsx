@@ -524,7 +524,7 @@ export default function IncaTrailAvailabilityCalendar({
 									onClick={() =>
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
-									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-1 border-b border-r border-[#f0e5d9] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
+									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-2 border-b border-r border-[#f0e5d9] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
 										isSelectedRange
 											? "!border-secondary/35 !bg-secondary/10 !text-secondary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--secondary)_24%,transparent)]"
 											: ""
