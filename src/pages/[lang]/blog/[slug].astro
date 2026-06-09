@@ -18,7 +18,7 @@ import {
   getThumbnailUrl,
 } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
-import { normalizeLists } from "@/lib/strapiBlocks";
+import { normalizeLists, groupStrapiRichTextBlocks } from "@/lib/strapiBlocks";
 import { serializeJsonForHtml } from "@/lib/html";
 
 type GlobalData = { footer?: { socialLogo?: Logo[] }; socialLogo?: Logo[] };
@@ -390,8 +390,9 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
         <div class="w-full text-foreground">
           {
             blog.contenido && Array.isArray(blog.contenido) ? (
-              normalizeLists(blog.contenido as StrapiBlock[]).map(
-                (block: StrapiBlock) => {
+              groupStrapiRichTextBlocks(
+                normalizeLists(blog.contenido as StrapiBlock[])
+              ).map((block: any) => {
                   if (block.type === "paragraph") {
                     return (
                       <p class="mb-5 text-base leading-relaxed text-muted-foreground">
@@ -543,6 +544,45 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
                           </figcaption>
                         )}
                       </figure>
+                    );
+                  }
+                  if (block.type === "gallery") {
+                    const images = (block as any).images || [];
+                    const gridColsClass =
+                      images.length === 2
+                        ? "grid-cols-1 md:grid-cols-2"
+                        : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3";
+                    return (
+                      <div class={`grid gap-4 my-10 ${gridColsClass}`}>
+                        {images.map((imgBlock: any) => {
+                          const image = imgBlock.image as BlogImage | undefined;
+                          return (
+                            <figure class="mx-auto w-full flex flex-col justify-between">
+                              <img
+                                src={getImageUrl(image, "large")}
+                                srcset={
+                                  getImageSrcSet(image, [
+                                    "thumbnail",
+                                    "small",
+                                    "medium",
+                                    "large",
+                                  ]) || undefined
+                                }
+                                sizes="(max-width: 1023px) 100vw, 33vw"
+                                alt={getImageAlt(image, "Blog image")}
+                                class="h-64 w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              {image?.caption && (
+                                <figcaption class="mt-2 text-center text-xs font-medium text-muted-foreground line-clamp-2">
+                                  {image.caption}
+                                </figcaption>
+                              )}
+                            </figure>
+                          );
+                        })}
+                      </div>
                     );
                   }
                   if (

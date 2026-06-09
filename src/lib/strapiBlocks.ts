@@ -2,6 +2,11 @@ import type { StrapiBlock } from "@/types/tours";
 
 type ListBlock = StrapiBlock & { format?: string };
 
+export type GalleryBlock = {
+	type: "gallery";
+	images: StrapiBlock[];
+};
+
 /**
  * Agrupa bloques de lista consecutivos del mismo formato en un único bloque.
  * El backend de Strapi v5 a veces devuelve cada item de lista como un bloque
@@ -29,4 +34,42 @@ export function normalizeLists(content: StrapiBlock[]): StrapiBlock[] {
 		}
 		return acc;
 	}, []);
+}
+
+/**
+ * Agrupa bloques de imágenes consecutivas en un único bloque de tipo 'gallery'.
+ * Esto permite mostrarlas en un grid en lugar de una debajo de la otra.
+ */
+export function groupStrapiRichTextBlocks(
+	blocks: StrapiBlock[] = [],
+): Array<StrapiBlock | GalleryBlock> {
+	const grouped: Array<StrapiBlock | GalleryBlock> = [];
+	let imageBuffer: StrapiBlock[] = [];
+
+	function flushImages() {
+		while (imageBuffer.length > 0) {
+			if (imageBuffer.length === 1) {
+				grouped.push(imageBuffer.shift()!);
+			} else {
+				grouped.push({
+					type: "gallery",
+					images: imageBuffer.splice(0, 3),
+				});
+			}
+		}
+	}
+
+	for (const block of blocks) {
+		if (block.type === "image") {
+			imageBuffer.push(block);
+			continue;
+		}
+
+		flushImages();
+		grouped.push(block);
+	}
+
+	flushImages();
+
+	return grouped;
 }
