@@ -15,7 +15,9 @@ import type { ManualSEO } from "@/lib/seo";
 import { generateDescription } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 import { serializeJsonForHtml } from "@/lib/html";
-import { getImageUrl, getImageSrcSet } from "@/lib/helpers";
+import { getImageAlt, getImageUrl, getImageSrcSet } from "@/lib/helpers";
+import { buildTourSchemas } from "@/lib/tourSchema";
+import { buildCollectionSchemas } from "@/lib/collectionSchema";
 
 import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
@@ -287,22 +289,62 @@ if (type === "mdx" && mdxFrontmatter) {
     slugMap: pageSlugMap,
   });
 } else if (type === "tour" && tour) {
+  const siteUrl = Astro.site?.origin || "https://dreamy.tours";
+  const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
+  const tourDescription = generateDescription(tour.content);
+  const tourImage =
+    Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
+      ? getImageUrl(tour.imagenDestacada[0], "large")
+      : undefined;
+  const tourImageAlt =
+    Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
+      ? getImageAlt(tour.imagenDestacada[0], tour.titulo)
+      : tour.titulo;
+  const tourSchemaImage = tour.seo?.metaImage
+    ? getImageUrl(tour.seo.metaImage, "large")
+    : tourImage;
+
   seoProps = buildSEOProps({
     seo: tour.seo,
     fallbackTitle: tour.titulo || "Tour",
-    fallbackDescription: generateDescription(tour.content),
-    type: "article",
+    fallbackDescription: tourDescription,
+    fallbackImage: tourImage,
+    fallbackImageAlt: tourImageAlt,
+    type: "website",
     lang: lang,
     slugMap,
+    schemas: buildTourSchemas({
+      tour,
+      canonicalUrl,
+      siteUrl,
+      lang,
+      description: tour.seo?.metaDescription || tourDescription,
+      imageUrl: tourSchemaImage,
+    }),
   });
 } else if (type === "page" && page) {
+  const siteUrl = Astro.site?.origin || "https://dreamy.tours";
+  const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
+  const pageDescription = generateDescription(page.content);
+
   seoProps = buildSEOProps({
     seo: page.seo,
     fallbackTitle: page.titulo || "Página",
-    fallbackDescription: generateDescription(page.content),
+    fallbackDescription: pageDescription,
     type: "website",
     lang: lang,
     slugMap: pageSlugMap,
+    schemas:
+      toursByCategory.length > 0
+        ? buildCollectionSchemas({
+            page,
+            tours: toursByCategory,
+            canonicalUrl,
+            siteUrl,
+            lang,
+            description: pageDescription,
+          })
+        : undefined,
   });
 }
 

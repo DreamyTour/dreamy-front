@@ -1,0 +1,107 @@
+---
+import type { Lang } from "@/lib/i18n";
+import { rewriteUrl } from "@/lib/utils";
+import { WhatsAppIcon } from "@/components/icons/SocialContactIcons";
+
+interface Props {
+  lang: Lang;
+  title?: string;
+}
+
+const { lang, title } = Astro.props;
+
+const copy = {
+  es: {
+    eyebrow: "Asesoría personalizada",
+    title: "Planea tu viaje con Dreamy Tours",
+    description:
+      "Emprenda un viaje a su medida con nuestros exclusivos tours y viajes a medida por Perú y otros países de Latinoamérica.",
+    primary: "Diseñar mi viaje",
+    secondary: "Hablar por WhatsApp",
+    whatsapp: "Hola, quiero planear un viaje a medida con Dreamy Tours.",
+  },
+  en: {
+    eyebrow: "Personal travel advice",
+    title: "Plan your trip with Dreamy Tours",
+    description:
+      "Start a tailored journey with our exclusive tours and custom trips across Peru and other Latin American countries.",
+    primary: "Plan my trip",
+    secondary: "Chat on WhatsApp",
+    whatsapp: "Hello, I want to plan a custom trip with Dreamy Tours.",
+  },
+  pt: {
+    eyebrow: "Assessoria personalizada",
+    title: "Planeje sua viagem com Dreamy Tours",
+    description:
+      "Comece uma viagem sob medida com nossos tours exclusivos e viagens personalizadas pelo Peru e outros países da América Latina.",
+    primary: "Planejar minha viagem",
+    secondary: "Falar no WhatsApp",
+    whatsapp: "Olá, quero planejar uma viagem personalizada com Dreamy Tours.",
+  },
+} satisfies Record<
+  Lang,
+  {
+    eyebrow: string;
+    title: string;
+    description: string;
+    primary: string;
+    secondary: string;
+    whatsapp: string;
+  }
+>;
+
+const t = copy[lang];
+const planTripPath =
+  lang === "es"
+    ? "/planea-tu-viaje"
+    : lang === "pt"
+      ? "/planeje-sua-viagem"
+      : "/plan-your-trip";
+const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
+  `${t.whatsapp}${title ? ` Post: ${title}` : ""}`,
+)}`;
+---
+
+<section
+  class="mt-12 overflow-hidden rounded-lg border border-border bg-white shadow-[0_12px_34px_rgba(15,23,42,0.06)]"
+  aria-labelledby="blog-contact-title"
+>
+  <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
+    <div class="p-6 sm:p-8">
+      <p
+        class="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-primary"
+      >
+        {t.eyebrow}
+      </p>
+      <h2
+        id="blog-contact-title"
+        class="max-w-2xl text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
+      >
+        {t.title}
+      </h2>
+      <p class="mt-4 max-w-3xl text-base leading-relaxed text-foreground/70">
+        {t.description}
+      </p>
+    </div>
+
+    <div
+      class="flex flex-col justify-center gap-3 border-t border-border bg-muted/20 p-6 sm:flex-row sm:items-center lg:min-w-[280px] lg:flex-col lg:items-stretch lg:border-l lg:border-t-0"
+    >
+      <a
+        href={rewriteUrl(planTripPath, lang)}
+        class="inline-flex items-center justify-center rounded-sm bg-primary px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-primary-foreground shadow-sm shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      >
+        {t.primary}
+      </a>
+      <a
+        href={whatsappHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2 rounded-sm border border-primary/30 bg-white px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-primary transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-sm:mr-16"
+      >
+        <WhatsAppIcon className="size-4" />
+        {t.secondary}
+      </a>
+    </div>
+  </div>
+</section>

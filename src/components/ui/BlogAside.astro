@@ -39,124 +39,123 @@ const formatUrl = (url: string) =>
 
 const getSocialHoverClass = (label: string = "", url: string = "") => {
   const text = `${label} ${url}`.toLowerCase();
-  if (text.includes("youtube")) {
-    return "hover:bg-red-600 hover:shadow-[0_8px_20px_rgba(16,185,129,0.3)]";
-  }
-  if (text.includes("facebook")) {
-    return "hover:bg-blue-600 hover:shadow-[0_8px_20px_rgba(37,99,235,0.3)]";
-  }
-  if (text.includes("instagram") || text.includes("insta")) {
-    return "hover:bg-gradient-to-tr hover:from-purple-600 hover:to-pink-500 hover:shadow-[0_8px_20px_rgba(236,72,153,0.3)]";
-  }
-  if (text.includes("pinterest") || text.includes(" pint ")) {
-    return "hover:bg-red-600 hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)]";
-  }
-  return "hover:bg-primary hover:shadow-[0_8px_20px_rgba(34,197,94,0.3)]";
+  if (text.includes("youtube")) return "hover:border-red-200 hover:bg-red-50";
+  if (text.includes("facebook"))
+    return "hover:border-blue-200 hover:bg-blue-50";
+  if (text.includes("instagram") || text.includes("insta"))
+    return "hover:border-pink-200 hover:bg-pink-50";
+  if (text.includes("pinterest") || text.includes(" pint "))
+    return "hover:border-red-200 hover:bg-red-50";
+  return "hover:border-primary/30 hover:bg-primary/5";
 };
 ---
 
 <aside class="w-full shrink-0 lg:w-[30%] xl:w-[25%]">
   <div
-    class="mt-10 rounded-lg border border-gray-100 bg-white p-5 shadow-[0_8px_28px_rgba(0,0,0,0.04)] transition-shadow duration-300 hover:shadow-[0_8px_28px_rgba(0,0,0,0.07)] lg:sticky lg:top-10 lg:mt-0 lg:border-t-4 lg:border-t-primary lg:p-6"
+    class="mt-10 overflow-hidden rounded-lg border border-border bg-white shadow-[0_12px_34px_rgba(15,23,42,0.06)] lg:sticky lg:top-10 lg:mt-0"
   >
-    {/* Categorías */}
-    <h2
-      class="mb-4 text-[0.7rem] font-bold uppercase tracking-wider text-slate-800"
-    >
-      {
-        lang === "es"
-          ? "Categorías"
-          : lang === "pt"
+    <div class="border-t-4 border-primary p-5 lg:p-6">
+      <h2 class="mb-4 text-base font-bold tracking-tight text-foreground">
+        {
+          lang === "es"
             ? "Categorias"
-            : "Categories"
-      }
-    </h2>
-    <div class="flex flex-col gap-1.5">
-      <a
-        href={rewriteUrl("/blog", lang)}
-        class={`flex items-center justify-between gap-4 rounded-md border border-transparent px-3.5 py-2.5 text-sm font-medium transition-colors duration-200
-          ${
+            : lang === "pt"
+              ? "Categorias"
+              : "Categories"
+        }
+      </h2>
+
+      <nav class="flex flex-col gap-1.5" aria-label="Blog categories">
+        <a
+          href={rewriteUrl("/blog", lang)}
+          class={`flex items-center justify-between gap-4 rounded-md border px-3.5 py-2.5 text-sm font-medium transition-colors duration-200 ${
             !currentSlug
-              ? "bg-primary/10 text-primary font-semibold"
-              : "text-slate-700 hover:text-primary hover:bg-primary/5"
-          }`}
-      >
-        <span class="min-w-0 truncate">
-          {
-            lang === "es"
-              ? "Ver Todos"
-              : lang === "pt"
-                ? "Ver Todos"
-                : "View All"
-          }
-        </span>
-        <span
-          class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-            !currentSlug ? "bg-primary text-white" : "bg-gray-100 text-slate-700"
+              ? "border-primary/20 bg-primary/10 text-primary"
+              : "border-transparent text-foreground/75 hover:border-primary/10 hover:bg-primary/5 hover:text-primary"
           }`}
         >
-          {totalPostCount}
-        </span>
-      </a>
+          <span class="min-w-0 truncate">
+            {
+              lang === "es"
+                ? "Ver todos"
+                : lang === "pt"
+                  ? "Ver todos"
+                  : "View all"
+            }
+          </span>
+          <span
+            class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
+              !currentSlug
+                ? "bg-primary text-white"
+                : "bg-muted text-foreground/70"
+            }`}
+          >
+            {totalPostCount}
+          </span>
+        </a>
 
-      {
-        categories.map((cat: Category) => {
-          const isActive = currentSlug === cat.slug;
-          const count = categoryPostCounts[cat.slug] ?? 0;
-          return (
-            <a
-              href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-              class={`flex items-center justify-between gap-4 rounded-md border border-transparent px-3.5 py-2.5 text-sm font-medium transition-colors duration-200
-                ${
+        {
+          categories.map((cat: Category) => {
+            const isActive = currentSlug === cat.slug;
+            const count = categoryPostCounts[cat.slug] ?? 0;
+            return (
+              <a
+                href={rewriteUrl(`/blog/${cat.slug}`, lang)}
+                class={`flex items-center justify-between gap-4 rounded-md border px-3.5 py-2.5 text-sm font-medium transition-colors duration-200 ${
                   isActive
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-slate-700 hover:text-primary hover:bg-primary/5"
-                }`}
-            >
-              <span class="min-w-0 truncate">{cat.nombre}</span>
-              <span
-                class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                  isActive
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-slate-700"
+                    ? "border-primary/20 bg-primary/10 text-primary"
+                    : "border-transparent text-foreground/75 hover:border-primary/10 hover:bg-primary/5 hover:text-primary"
                 }`}
               >
-                {count}
-              </span>
-            </a>
-          );
-        })
-      }
+                <span class="min-w-0 truncate">{cat.nombre}</span>
+                <span
+                  class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    isActive
+                      ? "bg-primary text-white"
+                      : "bg-muted text-foreground/70"
+                  }`}
+                >
+                  {count}
+                </span>
+              </a>
+            );
+          })
+        }
+      </nav>
     </div>
 
-    {/* Redes Sociales */}
     {
       Array.isArray(socialLogos) && socialLogos.length > 0 && (
-        <div class="mt-6 border-t border-gray-100 pt-6">
-          <h2 class="mb-4 text-[0.7rem] font-bold uppercase tracking-wider text-slate-800">
+        <div class="border-t border-border bg-muted/25 p-5 lg:p-6">
+          <h2 class="mb-4 text-sm font-bold tracking-tight text-foreground">
             {lang === "es"
-              ? "Compartir"
+              ? "Síguenos"
               : lang === "pt"
-                ? "Compartilhar"
-                : "Share"}
+                ? "Siga-nos"
+                : "Follow us"}
           </h2>
-          <div class="flex flex-wrap gap-3">
+          <div class="flex flex-wrap gap-2.5">
             {socialLogos.map((social: SocialLogo) => (
               <a
                 href={formatUrl(social.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 title={social.label || "Social"}
-                class={`group flex h-10 w-10 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-transparent ${getSocialHoverClass(social.label, social.url)}`}
+                aria-label={social.label || "Social"}
+                class={`group flex size-10 items-center justify-center rounded-md border border-border bg-white transition-all duration-200 hover:-translate-y-0.5 ${getSocialHoverClass(social.label, social.url)}`}
               >
-                {social.imagen?.url && (
+                {social.imagen?.url ? (
                   <img
                     src={getImageUrl(social.imagen)}
                     alt={social.label || "Social"}
-                    class="h-5 w-5 object-contain brightness-0 opacity-50 transition-all duration-300 group-hover:brightness-100 group-hover:opacity-100"
+                    class="h-5 w-5 object-contain brightness-0 opacity-70 transition-opacity duration-200 group-hover:opacity-100"
                     loading="lazy"
                     decoding="async"
                   />
+                ) : (
+                  <span class="text-xs font-bold uppercase text-foreground/70">
+                    {(social.label || "S").charAt(0)}
+                  </span>
                 )}
               </a>
             ))}

@@ -8,6 +8,7 @@ import { LANGS, DEFAULT_LANG } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogContactCta from "@/components/ui/BlogContactCta.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
 import TableOfContents from "@/components/ui/TableOfContents.astro";
 import { getCategoryPostCounts } from "@/lib/blogCategories";
@@ -574,6 +575,9 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
             )
           }
         </div>
+
+        <BlogContactCta lang={lang} title={blog.titulo} />
+      </article>
       </article>
 
       {/* Sidebar Right */}

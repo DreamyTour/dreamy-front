@@ -16,6 +16,11 @@ const OG_LOCALE_BY_LANG: Record<Lang, string> = {
   es: "es_PE",
   pt: "pt_BR",
 };
+const HREFLANG_BY_LANG: Record<Lang, string> = {
+  en: "en",
+  es: "es-PE",
+  pt: "pt-BR",
+};
 
 export interface SEOProps {
   title: string;
@@ -30,11 +35,12 @@ export interface SEOProps {
   publishedTime?: string;
   author?: string;
   slugMap?: Record<string, string>; // Para traducciones de slug en hreflang
+  schemas?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title,
-  description = "Explora los mejores tours y paquetes turísticos en Perú y Bolivia. Machu Picchu, Lago Titicaca, salar de Uyuni y más.",
+  description: rawDescription,
   image,
   imageAlt = DEFAULT_SEO_IMAGE_ALT,
   keywords,
@@ -45,7 +51,16 @@ const {
   publishedTime,
   author,
   slugMap,
+  schemas = [],
 } = Astro.props;
+
+const defaultDescriptionByLang: Record<Lang, string> = {
+  en: "Explore tours and travel packages in Peru and Bolivia with Dreamy Tours. Machu Picchu, Cusco, Lake Titicaca, Uyuni Salt Flat, and more unique destinations.",
+  es: "Explora tours y paquetes turísticos en Perú y Bolivia con Dreamy Tours. Machu Picchu, Cusco, Lago Titicaca, Salar de Uyuni y más destinos únicos.",
+  pt: "Explore passeios e pacotes turísticos no Peru e na Bolívia com a Dreamy Tours. Machu Picchu, Cusco, Lago Titicaca, Salar de Uyuni e mais destinos únicos.",
+};
+
+const description = rawDescription || defaultDescriptionByLang[lang as Lang] || defaultDescriptionByLang[DEFAULT_LANG];
 
 //Get site URL from astro.config
 const siteUrl = Astro.site?.origin || "https://dreamy.tours";
@@ -56,6 +71,19 @@ const canonical =
   canonicalUrl || `${siteUrl}${localizePath(currentPath, lang)}`;
 const ogLocale =
   OG_LOCALE_BY_LANG[lang as Lang] || OG_LOCALE_BY_LANG[DEFAULT_LANG];
+const schemaLanguageByLang: Record<Lang, string> = {
+  en: "en-US",
+  es: "es-PE",
+  pt: "pt-BR",
+};
+const schemaLanguage =
+  schemaLanguageByLang[lang as Lang] || schemaLanguageByLang.en;
+const homeLabelByLang: Record<Lang, string> = {
+  en: "Home",
+  es: "Inicio",
+  pt: "Início",
+};
+const homeLabel = homeLabelByLang[lang as Lang] || homeLabelByLang.en;
 
 // Generate full image URL
 const fullImageUrl = image
@@ -76,6 +104,7 @@ const alternateUrls = LANGS.map((alternateLang) => {
   return {
     lang: alternateLang,
     locale: OG_LOCALE_BY_LANG[alternateLang],
+    hreflang: HREFLANG_BY_LANG[alternateLang] || alternateLang,
     url: `${siteUrl}${localizePath(urlPath, alternateLang)}`,
   };
 });
@@ -87,13 +116,37 @@ if (slugMap && slugMap["en"]) {
 }
 const xDefaultUrl = `${siteUrl}${localizePath(xDefaultPath, DEFAULT_LANG)}`;
 
+const orgDescriptionByLang: Record<Lang, string> = {
+  en: "Dreamy Tours is a travel agency in Peru specialized in tours and travel packages to Machu Picchu, Cusco, Lake Titicaca, Bolivia, and other destinations in Latin America.",
+  es: "Dreamy Tours es una agencia de viajes en Perú especializada en tours y paquetes turísticos a Machu Picchu, Cusco, Lago Titicaca, Bolivia y otros destinos de Latinoamérica.",
+  pt: "A Dreamy Tours é uma agência de viagens no Peru especializada em passeios e pacotes turísticos para Machu Picchu, Cusco, Lago Titicaca, Bolívia e outros destinos na América Latina.",
+};
+const orgDescription = orgDescriptionByLang[lang as Lang] || orgDescriptionByLang[DEFAULT_LANG];
+
 // Schema.org JSON-LD
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${siteUrl}/#website`,
+  url: `${siteUrl}/`,
+  name: "Dreamy Tours",
+  alternateName: [
+    "Dreamy Tours Peru",
+  ],
+  description: orgDescription,
+  inLanguage: schemaLanguage,
+  publisher: {
+    "@id": `${siteUrl}/#organization`,
+  },
+};
+
 const organizationSchema = {
   "@context": "https://schema.org",
-  "@type": "TravelAgency",
+  "@type": ["Organization", "TravelAgency"],
+  "@id": `${siteUrl}/#organization`,
   name: "Dreamy Tours",
-  description:
-    description || "Agencia de tours y paquetes turísticos en Perú y Bolivia",
+  alternateName: ["Dreamy Tours Peru", "Dreamy Tours Bolivia"],
+  description: orgDescription,
   url: siteUrl,
   logo: `${siteUrl}/logo-dreamytours.svg`,
   ...(fullImageUrl ? { image: fullImageUrl } : {}),
@@ -120,11 +173,12 @@ const organizationSchema = {
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
+  "@id": `${canonical}#breadcrumb`,
   itemListElement: [
     {
       "@type": "ListItem",
       position: 1,
-      name: "Inicio",
+      name: homeLabel,
       item: siteUrl,
     },
   ],
@@ -147,16 +201,23 @@ const articleSchema =
     ? {
         "@context": "https://schema.org",
         "@type": "Article",
+        "@id": `${canonical}#article`,
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": canonical,
+        },
         headline: title,
         description: description,
         ...(fullImageUrl ? { image: fullImageUrl } : {}),
         datePublished: publishedTime,
         author: {
           "@type": "Organization",
+          "@id": `${siteUrl}/#organization`,
           name: author || "Dreamy Tours",
         },
         publisher: {
           "@type": "Organization",
+          "@id": `${siteUrl}/#organization`,
           name: "Dreamy Tours",
           logo: {
             "@type": "ImageObject",
@@ -165,6 +226,10 @@ const articleSchema =
         },
       }
     : null;
+
+const additionalSchemas = (Array.isArray(schemas) ? schemas : [schemas]).filter(
+  Boolean,
+) as Record<string, unknown>[];
 ---
 
 <!-- Canonical URL -->
@@ -173,7 +238,7 @@ const articleSchema =
 <!-- Alternate Languages (hreflang) -->
 {
   alternateUrls.map((alt) => (
-    <link rel="alternate" hreflang={alt.lang} href={alt.url} />
+    <link rel="alternate" hreflang={alt.hreflang} href={alt.url} />
   ))
 }
 
@@ -204,9 +269,11 @@ const articleSchema =
 
 {/* Alternate locales for OG */}
 {
-  alternateUrls.map((alt) => (
-    <meta property="og:locale:alternate" content={alt.locale} />
-  ))
+  alternateUrls
+    .filter((alt) => alt.lang !== lang)
+    .map((alt) => (
+      <meta property="og:locale:alternate" content={alt.locale} />
+    ))
 }
 
 {/* Article specific meta tags */}
@@ -239,14 +306,17 @@ const articleSchema =
 }
 
 <!-- Additional SEO -->
-<meta name="author" content={author || "Turismo Perú Bolivia"} />
+<meta name="author" content={author || "Dreamy Tours"} />
 <meta name="robots" content={robots} />
 <meta name="googlebot" content={robots} />
 
-<!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
 <!-- Schema.org JSON-LD -->
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={serializeJsonForHtml(websiteSchema)}
+/>
 <script
   is:inline
   type="application/ld+json"
@@ -265,4 +335,13 @@ const articleSchema =
       set:html={serializeJsonForHtml(articleSchema)}
     />
   )
+}
+{
+  additionalSchemas.map((schema) => (
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={serializeJsonForHtml(schema)}
+    />
+  ))
 }
