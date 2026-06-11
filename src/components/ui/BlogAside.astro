@@ -37,97 +37,126 @@ const {
 const formatUrl = (url: string) =>
   url?.startsWith("http") ? url : `https://${url}`;
 
-const getSocialHoverClass = (label: string = "", url: string = "") => {
+const getSocialBrandStyle = (label: string = "", url: string = "") => {
   const text = `${label} ${url}`.toLowerCase();
-  if (text.includes("youtube")) return "hover:border-red-200 hover:bg-red-50";
-  if (text.includes("facebook"))
-    return "hover:border-blue-200 hover:bg-blue-50";
+  if (text.includes("youtube")) return "--social-brand: #FF0000;";
+  if (text.includes("facebook")) return "--social-brand: #1877F2;";
   if (text.includes("instagram") || text.includes("insta"))
-    return "hover:border-pink-200 hover:bg-pink-50";
-  if (text.includes("pinterest") || text.includes(" pint "))
-    return "hover:border-red-200 hover:bg-red-50";
-  return "hover:border-primary/30 hover:bg-primary/5";
+    return "--social-brand: #E4405F;";
+  if (text.includes("pinterest") || text.includes("pint"))
+    return "--social-brand: #BD081C;";
+  if (text.includes("tiktok")) return "--social-brand: #000000;";
+  if (text.includes("twitter") || text.includes("x.com"))
+    return "--social-brand: #1DA1F2;";
+  return "--social-brand: var(--primary);";
+};
+
+const getCategoryIcon = (slug: string) => {
+  const s = (slug || "").toLowerCase();
+  
+  if (s.includes("machu") || s.includes("picchu") || s.includes("monta") || s.includes("mountain")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>`;
+  }
+  if (s.includes("trail") || s.includes("camino") || s.includes("trilha") || s.includes("trek") || s.includes("hike") || s.includes("walk")) {
+    // Walker / hiking stick SVG matching the walker icon in the mockup
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 8v5"/><path d="m14 13-1-3-2-1-3 1"/><path d="m12 18-2-5 2 5"/><path d="m10 21 2-3 2 3"/><path d="M17 10v12"/></svg>`;
+  }
+  if (s.includes("cusco") || s.includes("pin") || s.includes("destino") || s.includes("destination") || s.includes("ubica") || s.includes("location")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+  }
+  if (s.includes("weather") || s.includes("clima") || s.includes("tiempo") || s.includes("cloud") || s.includes("nube")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19A3.5 3.5 0 0 0 21 15.5c0-2.79-2.54-4.5-5-4.5-.47 0-.89.09-1.3.27A6 6 0 0 0 3 12c0 3.31 2.69 6 6 6h8.5Z"/></svg>`;
+  }
+  if (s.includes("lake") || s.includes("lago") || s.includes("titicaca") || s.includes("water") || s.includes("waves")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>`;
+  }
+  if (s.includes("amazon") || s.includes("selva") || s.includes("jungle") || s.includes("tree") || s.includes("arbol") || s.includes("forest") || s.includes("floresta")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 13-7 4h14l-7-4z"/><path d="m12 9-6 4h12l-6-4z"/><path d="m12 5-5 4h10l-5-4z"/><path d="M12 17v4"/></svg>`;
+  }
+  if (s.includes("itinerar") || s.includes("map") || s.includes("plan") || s.includes("guia") || s.includes("guide") || s.includes("ruta") || s.includes("route")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`;
+  }
+  if (s.includes("peru") || s.includes("travel") || s.includes("viaje") || s.includes("turis") || s.includes("tour") || s.includes("viag")) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`;
+  }
+  
+  // Default icon: compass
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`;
 };
 ---
 
 <aside class="w-full shrink-0 lg:w-[30%] xl:w-[25%]">
   <div
-    class="mt-10 overflow-hidden rounded-lg border border-border bg-white shadow-[0_12px_34px_rgba(15,23,42,0.06)] lg:sticky lg:top-10 lg:mt-0"
+    class="mt-10 overflow-hidden rounded-2xl border border-[#F2EAE5]/60 bg-[#FCF9F6] p-6 shadow-[0_8px_30px_rgba(200,180,170,0.06)] lg:sticky lg:top-10 lg:mt-0"
   >
-    <div class="border-t-4 border-primary p-5 lg:p-6">
-      <h2 class="mb-4 text-base font-bold tracking-tight text-foreground">
+    <div class="mb-5 flex items-center justify-between border-b border-[#F2EAE5]/70 pb-3.5">
+      <h2 class="text-[13px] font-bold tracking-wider text-foreground/80 uppercase">
         {
           lang === "es"
-            ? "Categorias"
+            ? "Categorías"
             : lang === "pt"
               ? "Categorias"
               : "Categories"
         }
       </h2>
-
-      <nav class="flex flex-col gap-1.5" aria-label="Blog categories">
-        <a
-          href={rewriteUrl("/blog", lang)}
-          class={`flex items-center justify-between gap-4 rounded-md border px-3.5 py-2.5 text-sm font-medium transition-colors duration-200 ${
-            !currentSlug
-              ? "border-primary/20 bg-primary/10 text-primary"
-              : "border-transparent text-foreground/75 hover:border-primary/10 hover:bg-primary/5 hover:text-primary"
-          }`}
-        >
-          <span class="min-w-0 truncate">
-            {
-              lang === "es"
-                ? "Ver todos"
-                : lang === "pt"
-                  ? "Ver todos"
-                  : "View all"
-            }
-          </span>
-          <span
-            class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-              !currentSlug
-                ? "bg-primary text-white"
-                : "bg-muted text-foreground/70"
-            }`}
-          >
-            {totalPostCount}
-          </span>
-        </a>
-
+      <a
+        href={rewriteUrl("/blog", lang)}
+        class={`text-xs font-semibold transition-colors duration-200 ${
+          !currentSlug
+            ? "text-secondary font-bold"
+            : "text-secondary/80 hover:text-secondary"
+        }`}
+      >
         {
-          categories.map((cat: Category) => {
-            const isActive = currentSlug === cat.slug;
-            const count = categoryPostCounts[cat.slug] ?? 0;
-            return (
-              <a
-                href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-                class={`flex items-center justify-between gap-4 rounded-md border px-3.5 py-2.5 text-sm font-medium transition-colors duration-200 ${
-                  isActive
-                    ? "border-primary/20 bg-primary/10 text-primary"
-                    : "border-transparent text-foreground/75 hover:border-primary/10 hover:bg-primary/5 hover:text-primary"
+          lang === "es"
+            ? `Ver todo (${totalPostCount})`
+            : lang === "pt"
+              ? `Ver todos (${totalPostCount})`
+              : `View all (${totalPostCount})`
+        }
+      </a>
+    </div>
+
+    <nav class="flex flex-col gap-1" aria-label="Blog categories">
+      {
+        categories.map((cat: Category) => {
+          const isActive = currentSlug === cat.slug;
+          const count = categoryPostCounts[cat.slug] ?? 0;
+          return (
+            <a
+              href={rewriteUrl(`/blog/${cat.slug}`, lang)}
+              class={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-[14px] transition-all duration-200 ${
+                isActive
+                  ? "bg-secondary/10 text-secondary font-bold"
+                  : "text-foreground/70 hover:bg-secondary/5 hover:text-secondary"
+              }`}
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <span 
+                  class={`shrink-0 flex items-center justify-center transition-colors duration-200 ${
+                    isActive ? "text-secondary" : "text-foreground/45"
+                  }`}
+                  set:html={getCategoryIcon(cat.slug)}
+                />
+                <span class="truncate">{cat.nombre}</span>
+              </div>
+              <span
+                class={`shrink-0 text-xs transition-colors duration-200 ${
+                  isActive ? "text-secondary font-bold" : "text-foreground/45"
                 }`}
               >
-                <span class="min-w-0 truncate">{cat.nombre}</span>
-                <span
-                  class={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : "bg-muted text-foreground/70"
-                  }`}
-                >
-                  {count}
-                </span>
-              </a>
-            );
-          })
-        }
-      </nav>
-    </div>
+                ({count})
+              </span>
+            </a>
+          );
+        })
+      }
+    </nav>
 
     {
       Array.isArray(socialLogos) && socialLogos.length > 0 && (
-        <div class="border-t border-border bg-muted/25 p-5 lg:p-6">
-          <h2 class="mb-4 text-sm font-bold tracking-tight text-foreground">
+        <div class="mt-6 border-t border-[#F2EAE5]/70 pt-6">
+          <h2 class="mb-4 text-[13px] font-bold tracking-wider text-foreground/80 uppercase">
             {lang === "es"
               ? "Síguenos"
               : lang === "pt"
@@ -142,18 +171,19 @@ const getSocialHoverClass = (label: string = "", url: string = "") => {
                 rel="noopener noreferrer"
                 title={social.label || "Social"}
                 aria-label={social.label || "Social"}
-                class={`group flex size-10 items-center justify-center rounded-md border border-border bg-white transition-all duration-200 hover:-translate-y-0.5 ${getSocialHoverClass(social.label, social.url)}`}
+                class="social-brand-link group flex size-10 items-center justify-center rounded-xl border border-[#F2EAE5]/60 bg-white transition-all duration-300 ease-out hover:-translate-y-1"
+                style={getSocialBrandStyle(social.label, social.url)}
               >
                 {social.imagen?.url ? (
                   <img
                     src={getImageUrl(social.imagen)}
                     alt={social.label || "Social"}
-                    class="h-5 w-5 object-contain brightness-0 opacity-70 transition-opacity duration-200 group-hover:opacity-100"
+                    class="h-5 w-5 object-contain brightness-0 opacity-70 transition-all duration-300 ease-out group-hover:brightness-0 group-hover:invert group-hover:opacity-100"
                     loading="lazy"
                     decoding="async"
                   />
                 ) : (
-                  <span class="text-xs font-bold uppercase text-foreground/70">
+                  <span class="text-xs font-bold uppercase text-foreground/70 transition-colors duration-300 ease-out group-hover:text-white">
                     {(social.label || "S").charAt(0)}
                   </span>
                 )}
@@ -165,3 +195,10 @@ const getSocialHoverClass = (label: string = "", url: string = "") => {
     }
   </div>
 </aside>
+
+<style>
+  .social-brand-link:hover {
+    background-color: var(--social-brand) !important;
+    border-color: var(--social-brand) !important;
+  }
+</style>
