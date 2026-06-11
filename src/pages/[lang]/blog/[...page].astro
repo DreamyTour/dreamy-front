@@ -2,12 +2,16 @@
 import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
 import type { Blog, CategoryBlog } from "@/types/blog";
+import type { Logo } from "@/types/common";
 import CardPost from "@/components/ui/CardPost.astro";
+import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogCategoryRail from "@/components/ui/BlogCategoryRail.astro";
 import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
-import { rewriteUrl } from "@/lib/utils";
+import { getCategoryPostCounts } from "@/lib/blogCategories";
 
+type GlobalData = { footer?: { socialLogo?: Logo[] }; socialLogo?: Logo[] };
 type PaginatedPage = {
   data: Blog[];
   currentPage: number;
@@ -17,6 +21,9 @@ type PaginatedPage = {
 type BlogListProps = {
   page: PaginatedPage;
   allCategories: CategoryBlog[];
+  socialLogos: Logo[];
+  categoryPostCounts: Record<string, number>;
+  totalPostCount: number;
 };
 type Paginate = (
   data: Blog[],
@@ -49,10 +56,23 @@ export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
     });
     const allCategories = cats && Array.isArray(cats) ? cats : [];
 
+    const globalData = await fetchApi<GlobalData>({
+      endpoint: "global",
+      wrappedByKey: "data",
+      locale: lang,
+    });
+    const socialLogos =
+      globalData?.footer?.socialLogo || globalData?.socialLogo || [];
+
     const paginatedPaths = paginate(blogsList, {
       params: { lang },
       pageSize: 9,
-      props: { allCategories },
+      props: {
+        allCategories,
+        socialLogos,
+        categoryPostCounts: getCategoryPostCounts(blogsList),
+        totalPostCount: blogsList.length,
+      },
     });
 
     allPaths.push(...paginatedPaths);
@@ -61,11 +81,14 @@ export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
   return allPaths;
 }
 
-const { page, allCategories } = Astro.props as BlogListProps;
+const { page, allCategories, socialLogos, categoryPostCounts, totalPostCount } =
+  Astro.props as BlogListProps;
 const routeParams = Astro.params as { lang?: string };
 const lang = isValidLang(routeParams.lang) ? routeParams.lang : DEFAULT_LANG;
 const currentLang: Lang = lang;
 const blogsList = page.data;
+const featuredBlog = page.currentPage === 1 ? blogsList[0] : null;
+const remainingBlogs = featuredBlog ? blogsList.slice(1) : blogsList;
 const blogSeoByLang: Record<
   Lang,
   { title: string; description: string; pageLabel: string }
@@ -102,180 +125,219 @@ const seoProps = buildSEOProps({
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <div class="w-full py-20 md:py-28">
-    <div class="max-w-8xl mx-auto px-6">
-      <div class="mb-14 md:mb-20 text-center">
+  <div class="blog-index-page w-full py-16 md:py-24">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto mb-12 max-w-4xl text-center md:mb-16">
+        <p
+          class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary"
+        >
+          Dreamy Journal
+        </p>
         <h1
-          class="text-3xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-6 relative inline-block"
+          class="text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl"
         >
-          <span class="relative z-10">Blog</span>
-          <span
-            class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/20 z-0 rounded-full blur-sm"
-          ></span>
+          Blog
         </h1>
-        <div class="flex items-center justify-center gap-3 mt-4">
-          <div
-            class="h-px w-16 bg-linear-to-r from-transparent to-secondary/50"
-          >
-          </div>
-          <div class="w-12 h-1.5 bg-secondary/50 rounded-full relative">
-            <div
-              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full"
-            >
-            </div>
-          </div>
-          <div
-            class="h-px w-16 bg-linear-to-l from-transparent to-secondary/50"
-          >
-          </div>
-        </div>
+        <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-foreground/68 md:text-lg">
+          {blogSeo.description}
+        </p>
       </div>
 
-      {/* Categorías (Pastillas) */}
-      <div class="flex flex-wrap items-center justify-center gap-3 mb-12">
-        <a
-          href={rewriteUrl("/blog", lang)}
-          class="px-5 py-2 rounded-full text-sm font-medium transition-all shadow-sm border
-                 bg-primary text-white border-primary shadow-primary/20 scale-105"
-        >
-          {lang === "es" ? "Todos" : lang === "pt" ? "Todos" : "All"}
-        </a>
-
-        {
-          allCategories &&
-            allCategories.map((cat: CategoryBlog) => (
-              <a
-                href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-                class="px-5 py-2 rounded-full text-sm font-medium transition-all shadow-sm 
-                   bg-white text-foreground/80 border border-gray-200 hover:border-primary hover:text-primary"
-              >
-                {cat.nombre}
-              </a>
-            ))
-        }
+      <div class="lg:hidden">
+        <BlogCategoryRail
+          categories={allCategories}
+          lang={lang}
+          categoryPostCounts={categoryPostCounts}
+          totalPostCount={totalPostCount}
+        />
       </div>
 
-      {
-        blogsList.length > 0 ? (
-          <div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-x-8 md:gap-y-16">
-              {blogsList.map((blog: Blog) => (
-                <CardPost blog={blog} lang={lang} />
-              ))}
-            </div>
+      <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        {/* Main content grid */}
+        <div class="w-full min-w-0">
+          {
+            blogsList.length > 0 ? (
+              <div>
+                <div class="blog-post-grid">
+                  {featuredBlog && (
+                    <CardPost
+                      blog={featuredBlog}
+                      lang={lang}
+                      isFeatured
+                      showDescription
+                    />
+                  )}
+                  {remainingBlogs.map((blog: Blog) => (
+                    <CardPost blog={blog} lang={lang} />
+                  ))}
+                </div>
 
-            {/* Pagination Controls */}
-            {page.lastPage > 1 && (
-              <div class="flex items-center justify-center gap-4 mt-16 font-medium">
-                {page.url.prev ? (
-                  <a
-                    href={page.url.prev}
-                    class="px-5 py-2.5 rounded-sm border border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors flex items-center gap-2 bg-white shadow-sm hover:shadow-md"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                    {currentLang === "es"
-                      ? "Anterior"
-                      : currentLang === "pt"
-                        ? "Anterior"
-                        : "Previous"}
-                  </a>
-                ) : (
-                  <span class="px-5 py-2.5 rounded-sm border border-gray-100 text-gray-400 bg-gray-50 flex items-center gap-2 cursor-not-allowed">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                    {currentLang === "es"
-                      ? "Anterior"
-                      : currentLang === "pt"
-                        ? "Anterior"
-                        : "Previous"}
-                  </span>
-                )}
+                {/* Pagination Controls */}
+                {page.lastPage > 1 && (
+                  <div class="flex flex-wrap items-center justify-center gap-4 mt-16 font-medium">
+                    {page.url.prev ? (
+                      <a
+                        href={page.url.prev}
+                        class="px-5 py-2.5 rounded-sm border border-border text-foreground transition-colors flex items-center gap-2 bg-card shadow-sm hover:border-secondary/60 hover:text-secondary hover:shadow-md"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
+                        {currentLang === "es"
+                          ? "Anterior"
+                          : currentLang === "pt"
+                            ? "Anterior"
+                            : "Previous"}
+                      </a>
+                    ) : (
+                      <span class="px-5 py-2.5 rounded-sm border border-border/70 text-muted-foreground/60 bg-muted/60 flex items-center gap-2 cursor-not-allowed">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
+                        {currentLang === "es"
+                          ? "Anterior"
+                          : currentLang === "pt"
+                            ? "Anterior"
+                            : "Previous"}
+                      </span>
+                    )}
 
-                <span class="text-gray-600 bg-white px-4 py-2.5 rounded-sm border border-gray-100 shadow-sm flex items-center gap-2">
-                  {page.currentPage} <span class="text-gray-400">/</span>{" "}
-                  {page.lastPage}
-                </span>
+                    <span class="text-muted-foreground bg-card px-4 py-2.5 rounded-sm border border-border shadow-sm flex items-center gap-2">
+                      {page.currentPage} <span class="text-muted-foreground/50">/</span>{" "}
+                      {page.lastPage}
+                    </span>
 
-                {page.url.next ? (
-                  <a
-                    href={page.url.next}
-                    class="px-5 py-2.5 rounded-sm border border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors flex items-center gap-2 bg-white shadow-sm hover:shadow-md"
-                  >
-                    {currentLang === "es"
-                      ? "Siguiente"
-                      : currentLang === "pt"
-                        ? "Próximo"
-                        : "Next"}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </a>
-                ) : (
-                  <span class="px-5 py-2.5 rounded-sm border border-gray-100 text-gray-400 bg-gray-50 flex items-center gap-2 cursor-not-allowed">
-                    {currentLang === "es"
-                      ? "Siguiente"
-                      : currentLang === "pt"
-                        ? "Próximo"
-                        : "Next"}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
+                    {page.url.next ? (
+                      <a
+                        href={page.url.next}
+                        class="px-5 py-2.5 rounded-sm border border-border text-foreground transition-colors flex items-center gap-2 bg-card shadow-sm hover:border-secondary/60 hover:text-secondary hover:shadow-md"
+                      >
+                        {currentLang === "es"
+                          ? "Siguiente"
+                          : currentLang === "pt"
+                            ? "Próximo"
+                            : "Next"}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span class="px-5 py-2.5 rounded-sm border border-border/70 text-muted-foreground/60 bg-muted/60 flex items-center gap-2 cursor-not-allowed">
+                        {currentLang === "es"
+                          ? "Siguiente"
+                          : currentLang === "pt"
+                            ? "Próximo"
+                            : "Next"}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
-            )}
-          </div>
-        ) : (
-          <p class="text-center text-gray-500">No hay blogs disponibles</p>
-        )
-      }
+            ) : (
+              <p class="text-center text-muted-foreground">No hay blogs disponibles</p>
+            )
+          }
+        </div>
+
+        {/* Sidebar */}
+        <div class="w-full shrink-0">
+          <BlogAside
+            categories={allCategories}
+            lang={lang}
+            socialLogos={socialLogos}
+            categoryPostCounts={categoryPostCounts}
+            totalPostCount={totalPostCount}
+          />
+        </div>
+      </div>
     </div>
   </div>
 </Layout>
+
+<style>
+  .blog-index-page {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--blog-surface) 82%, white) 0%,
+        white 44%,
+        color-mix(in oklab, var(--blog-surface) 70%, white) 100%
+      );
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .blog-post-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1rem, 1.5vw, 1.5rem);
+    align-items: stretch;
+  }
+
+  @media (min-width: 768px) {
+    .blog-post-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .blog-post-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

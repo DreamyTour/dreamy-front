@@ -289,7 +289,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
   {/* Hero Image con título, categoría y fecha como fondo */}
   {
     blog.portadaImage ? (
-      <div class="mt-8 relative w-full max-w-8xl mx-auto h-[50vh] min-h-[400px] max-h-[600px] overflow-hidden rounded-sm">
+      <div class="relative mx-auto mt-8 h-[54vh] min-h-[420px] max-h-[620px] w-full max-w-8xl overflow-hidden rounded-sm">
         <img
           src={heroImage}
           srcset={heroImageSrcSet || undefined}
@@ -302,21 +302,21 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
           decoding="async"
         />
         {/* Overlay oscuro */}
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,23,17,0.32)_0%,rgba(8,23,17,0.18)_38%,rgba(8,23,17,0.78)_100%)]" />
 
         {/* Contenido sobre la imagen */}
-        <div class="relative z-10 max-w-8xl mx-auto px-4 md:px-8 h-full flex flex-col justify-end pb-12">
+        <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col justify-end px-4 pb-12 md:px-8">
           {/* Categoría */}
           <div class="flex flex-wrap gap-3 mb-4">
             {blog.category_blogs?.map((cat: CategoryBlog) => (
-              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-primary/20 backdrop-blur-sm text-white uppercase tracking-wider border border-primary">
+              <span class="rounded-[3px] border border-white/35 bg-black/20 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md">
                 {cat.nombre}
               </span>
             ))}
           </div>
 
           {/* Título */}
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 drop-shadow-lg">
+          <h1 class="mb-4 max-w-5xl text-4xl font-semibold leading-[1.02] text-white drop-shadow-lg md:text-5xl lg:text-6xl">
             {blog.titulo}
           </h1>
 
@@ -381,10 +381,10 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
   }
 
   {/* Contenido del post */}
-  <div class="max-w-8xl mx-auto px-4 md:px-8 py-12 lg:py-16">
-    <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 justify-between">
+  <div class="blog-post-body mx-auto max-w-8xl px-4 py-12 md:px-8 lg:py-16">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
       {/* Principal Post Column */}
-      <article class="w-full lg:w-[70%] xl:w-[75%] mx-auto lg:mx-0">
+      <article class="mx-auto w-full max-w-[50rem] min-w-0 lg:mx-0">
         {/* Tabla de Contenidos */}
         <TableOfContents headings={tocHeadings} />
 
@@ -652,9 +652,9 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
   {/* Posts Relacionados */}
   {
     relatedBlogs && relatedBlogs.length > 0 && (
-      <section class="max-w-8xl mx-auto px-4 md:px-8 py-16 lg:py-20 border-t border-gray-100 mt-12">
+      <section class="mx-auto mt-12 max-w-8xl border-t border-border px-4 py-16 md:px-8 lg:py-20">
         <div class="text-center mb-10">
-          <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 relative inline-block">
+          <h2 class="relative mb-6 inline-block text-2xl font-bold text-foreground md:text-3xl">
             <span class="relative z-10">
               {lang === "es"
                 ? "Posts Relacionados"
@@ -681,6 +681,18 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
     )
   }
 </Layout>
+
+<style>
+  .blog-post-body {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 0%,
+        white 30%,
+        color-mix(in oklab, var(--blog-surface) 66%, white) 100%
+      );
+  }
+</style>
 
 {
   slugMap && Object.keys(slugMap).length > 0 && (

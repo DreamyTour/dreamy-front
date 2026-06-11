@@ -1,3 +1,4 @@
+/* Hallmark · macrostructure: Editorial Blog · tone: warm travel journal · anchor hue: forest-green */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -674,6 +675,9 @@ html {
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-warm: var(--accent-warm);
+  --color-accent-warm-foreground: var(--accent-warm-foreground);
+  --color-blog-surface: var(--blog-surface);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -698,6 +702,8 @@ html {
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.5 0.19 20);
   --secondary-foreground: oklch(1 0 0);
+  --accent-warm: oklch(0.82 0.09 80);
+  --accent-warm-foreground: oklch(0.38 0.08 60);
 
   /* Neutral support */
   --muted: oklch(0.97 0 0);
@@ -709,6 +715,12 @@ html {
   --ring: color-mix(in oklab, var(--primary) 35%, white);
 
   --destructive: oklch(0.62 0.25 25);
+  --blog-surface: oklch(0.985 0.005 80);
+  --blog-card-shadow: oklch(0.38 0.06 40 / 0.08);
+  --blog-card-shadow-strong: oklch(0.34 0.07 35 / 0.16);
+  --blog-image-shade: oklch(0.12 0.04 150);
+  --blog-aside-surface: oklch(0.985 0.012 65);
+  --blog-aside-border: oklch(0.92 0.024 58);
 
   color-scheme: light dark;
   accent-color: var(--primary);

@@ -1,0 +1,206 @@
+---
+import type { Lang } from "@/lib/i18n";
+import { rewriteUrl } from "@/lib/utils";
+import { getCategoryIcon } from "@/lib/blogCategories";
+
+interface Category {
+  slug: string;
+  nombre: string;
+}
+
+interface Props {
+  categories: Category[];
+  currentSlug?: string;
+  lang: Lang;
+  categoryPostCounts?: Record<string, number>;
+  totalPostCount?: number;
+}
+
+const {
+  categories = [],
+  currentSlug,
+  lang,
+  categoryPostCounts = {},
+  totalPostCount = 0,
+} = Astro.props;
+
+const allLabel = lang === "es" ? "Todos" : lang === "pt" ? "Todos" : "All";
+const ariaLabel =
+  lang === "es"
+    ? "Categorías del blog"
+    : lang === "pt"
+      ? "Categorias do blog"
+      : "Blog categories";
+---
+
+<nav class="blog-category-rail" aria-label={ariaLabel}>
+  <div class="blog-category-rail__scroller">
+    <a
+      href={rewriteUrl("/blog", lang)}
+      class:list={[
+        "blog-category-rail__item",
+        !currentSlug && "blog-category-rail__item--active",
+      ]}
+    >
+      <span class="blog-category-rail__icon" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </svg>
+      </span>
+      <span class="blog-category-rail__label">{allLabel}</span>
+      <span class="blog-category-rail__count">{totalPostCount}</span>
+    </a>
+
+    {
+      categories.map((cat) => {
+        const isActive = currentSlug === cat.slug;
+        return (
+          <a
+            href={rewriteUrl(`/blog/${cat.slug}`, lang)}
+            class:list={[
+              "blog-category-rail__item",
+              isActive && "blog-category-rail__item--active",
+            ]}
+          >
+            <span
+              class="blog-category-rail__icon"
+              aria-hidden="true"
+              set:html={getCategoryIcon(cat.slug)}
+            />
+            <span class="blog-category-rail__label">{cat.nombre}</span>
+            <span class="blog-category-rail__count">
+              {categoryPostCounts[cat.slug] ?? 0}
+            </span>
+          </a>
+        );
+      })
+    }
+  </div>
+</nav>
+
+<style>
+  .blog-category-rail {
+    position: relative;
+    margin-inline: auto;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+    max-width: 72rem;
+    border-block: 1px solid color-mix(in oklab, var(--primary) 12%, transparent);
+    padding-block: 0.85rem;
+  }
+
+  .blog-category-rail::before,
+  .blog-category-rail::after {
+    position: absolute;
+    inset-block: 0.85rem;
+    z-index: 2;
+    width: 2.25rem;
+    pointer-events: none;
+    content: "";
+  }
+
+  .blog-category-rail::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--background), transparent);
+  }
+
+  .blog-category-rail::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--background), transparent);
+  }
+
+  .blog-category-rail__scroller {
+    display: flex;
+    gap: 0.65rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-inline: 0.25rem;
+    scroll-snap-type: inline proximity;
+    scrollbar-width: none;
+  }
+
+  .blog-category-rail__scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  .blog-category-rail__item {
+    display: inline-flex;
+    min-height: 2.75rem;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    align-items: center;
+    gap: 0.55rem;
+    border: 1px solid color-mix(in oklab, var(--primary) 12%, var(--border));
+    border-radius: 999px;
+    background: color-mix(in oklab, white 84%, var(--blog-surface));
+    padding: 0.55rem 0.6rem 0.55rem 0.85rem;
+    color: color-mix(in oklab, var(--foreground) 72%, white);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: 0 12px 32px color-mix(in oklab, var(--foreground) 8%, transparent);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .blog-category-rail__item:hover {
+    border-color: color-mix(in oklab, var(--secondary) 42%, var(--border));
+    color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  .blog-category-rail__item--active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 14px 32px color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+
+  .blog-category-rail__icon {
+    display: grid;
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: 0 0 1.1rem;
+    place-items: center;
+  }
+
+  .blog-category-rail__icon :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .blog-category-rail__label {
+    white-space: nowrap;
+  }
+
+  .blog-category-rail__count {
+    display: inline-grid;
+    min-width: 1.65rem;
+    height: 1.65rem;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(in oklab, currentColor 10%, transparent);
+    font-size: 0.7rem;
+    letter-spacing: 0;
+  }
+
+  .blog-category-rail__item--active .blog-category-rail__count {
+    background: rgb(255 255 255 / 0.18);
+  }
+</style>

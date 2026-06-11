@@ -5,6 +5,7 @@ import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogCategoryRail from "@/components/ui/BlogCategoryRail.astro";
 import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
 import { getCategoryPostCounts } from "@/lib/blogCategories";
@@ -206,7 +207,7 @@ const seoProps =
   {/* Hero con imagen destacada 100% width */}
   {
     currentCategory?.imagenDestacada ? (
-      <div class="relative w-full h-[50vh] min-h-[400px] max-h-[600px] overflow-hidden">
+      <div class="relative h-[54vh] min-h-[420px] max-h-[620px] w-full overflow-hidden">
         <img
           src={heroImage}
           srcset={heroImageSrcSet || undefined}
@@ -219,22 +220,29 @@ const seoProps =
           decoding="async"
         />
         {/* Overlay oscuro */}
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,23,17,0.34)_0%,rgba(8,23,17,0.18)_36%,rgba(8,23,17,0.76)_100%)]" />
+        <div class="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(0deg,color-mix(in_oklab,var(--blog-surface)_92%,transparent),transparent)]" />
 
         {/* Contenido sobre la imagen */}
-        <div class="relative z-10 max-w-8xl h-full mx-auto flex flex-col justify-end pb-16 ">
+        <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col justify-end px-4 pb-16 sm:px-6 lg:px-8">
+          <p class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary">
+            Dreamy Journal
+          </p>
           {/* Título */}
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4 drop-shadow-lg max-w-4xl">
+          <h1 class="mb-4 max-w-4xl text-4xl font-semibold leading-[0.98] text-white drop-shadow-lg md:text-6xl lg:text-7xl">
             {currentCategory.nombre}
           </h1>
         </div>
       </div>
     ) : (
       /* Fallback sin imagen */
-      <div class="w-full bg-muted py-16">
-        <div class="max-w-8xl mx-auto px-4 md:px-8">
-          <div class="text-center">
-            <h1 class="mb-4 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+      <div class="w-full bg-[color-mix(in_oklab,var(--blog-surface)_78%,white)] py-16 md:py-20">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-4xl text-center">
+            <p class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary">
+              Dreamy Journal
+            </p>
+            <h1 class="mb-4 text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl">
               {currentCategory?.nombre}
             </h1>
           </div>
@@ -244,13 +252,23 @@ const seoProps =
   }
 
   {/* Contenido principal con layout 70/30 */}
-  <div class="max-w-8xl mx-auto px-4 md:px-8 py-12 lg:py-16">
-    <div class="flex flex-col lg:flex-row gap-12 lg:gap-16 justify-between">
+  <div class="blog-category-page py-12 lg:py-16">
+    <div class="max-w-8xl mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
       {/* Grid de Posts */}
-      <div class="w-full lg:w-[70%] xl:w-[75%] mx-auto lg:mx-0">
+      <div class="w-full min-w-0">
+        <div class="lg:hidden">
+          <BlogCategoryRail
+            categories={allCategories}
+            currentSlug={categorySlug}
+            lang={lang}
+            categoryPostCounts={categoryPostCounts}
+            totalPostCount={totalPostCount}
+          />
+        </div>
+
         {
           currentCategory?.descripcion && (
-            <p class="my-4 text-lg text-muted-foreground">
+            <p class="mb-8 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
               {currentCategory.descripcion}
             </p>
           )
@@ -258,9 +276,14 @@ const seoProps =
         {
           blogsList.length > 0 ? (
             <div>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 md:gap-x-8 md:gap-y-16">
-                {blogsList.map((blog: Blog) => (
-                  <CardPost blog={blog} lang={lang} />
+              <div class="blog-category-grid">
+                {blogsList.map((blog: Blog, index: number) => (
+                  <CardPost
+                    blog={blog}
+                    lang={lang}
+                    isFeatured={index === 0}
+                    showDescription={index === 0 || index === 1}
+                  />
                 ))}
               </div>
 
@@ -392,3 +415,22 @@ const seoProps =
     </div>
   </div>
 </Layout>
+
+<style>
+  .blog-category-page {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+        white 42%,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
+      );
+  }
+
+  .blog-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: stretch;
+  }
+</style>
