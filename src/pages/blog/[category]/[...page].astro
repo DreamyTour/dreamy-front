@@ -5,7 +5,6 @@ import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
-import BlogCategoryRail from "@/components/ui/BlogCategoryRail.astro";
 import { LANGS, DEFAULT_LANG } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
 import { getCategoryPostCounts } from "@/lib/blogCategories";
@@ -244,16 +243,6 @@ const seoProps =
     <div class="max-w-8xl mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
       {/* Grid de Posts */}
       <div class="w-full min-w-0">
-        <div class="lg:hidden">
-          <BlogCategoryRail
-            categories={allCategories}
-            currentSlug={categorySlug}
-            lang={lang}
-            categoryPostCounts={categoryPostCounts}
-            totalPostCount={totalPostCount}
-          />
-        </div>
-
         {
           currentCategory?.descripcion && (
             <p class="mb-8 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">

@@ -5,7 +5,6 @@ import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
-import BlogCategoryRail from "@/components/ui/BlogCategoryRail.astro";
 import { LANGS, DEFAULT_LANG, isValidLang } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
@@ -141,15 +140,6 @@ const seoProps = buildSEOProps({
         <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-foreground/68 md:text-lg">
           {blogSeo.description}
         </p>
-      </div>
-
-      <div class="lg:hidden">
-        <BlogCategoryRail
-          categories={allCategories}
-          lang={lang}
-          categoryPostCounts={categoryPostCounts}
-          totalPostCount={totalPostCount}
-        />
       </div>
 
       <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">

@@ -5,7 +5,6 @@ import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
-import BlogCategoryRail from "@/components/ui/BlogCategoryRail.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
 import { rewriteUrl } from "@/lib/utils";
@@ -121,15 +120,6 @@ const seoProps = buildSEOProps({
           Travel stories, guides and practical inspiration for Peru, Bolivia,
           Machu Picchu, Lake Titicaca and Uyuni.
         </p>
-      </div>
-
-      <div class="lg:hidden">
-        <BlogCategoryRail
-          categories={allCategories}
-          lang={lang}
-          categoryPostCounts={categoryPostCounts}
-          totalPostCount={totalPostCount}
-        />
       </div>
 
       <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
