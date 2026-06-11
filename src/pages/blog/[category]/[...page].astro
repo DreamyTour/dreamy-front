@@ -200,7 +200,7 @@ const seoProps =
   {/* Hero con imagen destacada 100% width */}
   {
     currentCategory?.imagenDestacada ? (
-      <div class="relative h-[54vh] min-h-[420px] max-h-[620px] w-full overflow-hidden">
+      <div class="relative h-[46vh] min-h-[300px] max-h-[460px] w-full overflow-hidden">
         <img
           src={heroImage}
           srcset={heroImageSrcSet || undefined}
@@ -212,30 +212,25 @@ const seoProps =
           fetchpriority="high"
           decoding="async"
         />
-        {/* Overlay oscuro */}
-        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,23,17,0.34)_0%,rgba(8,23,17,0.18)_36%,rgba(8,23,17,0.76)_100%)]" />
-        <div class="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(0deg,color-mix(in_oklab,var(--blog-surface)_92%,transparent),transparent)]" />
+        <div class="absolute inset-0 bg-black/55" />
 
-        {/* Contenido sobre la imagen */}
-        <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col justify-end px-4 pb-16 sm:px-6 lg:px-8">
-          <p class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary">
+        <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+          <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-white/70">
             Dreamy Journal
           </p>
-          {/* Título */}
-          <h1 class="mb-4 max-w-4xl text-4xl font-semibold leading-[0.98] text-white drop-shadow-lg md:text-6xl lg:text-7xl">
+          <h1 class="max-w-3xl text-3xl font-semibold leading-[1.05] text-white drop-shadow-md md:text-5xl lg:text-6xl">
             {currentCategory.nombre}
           </h1>
         </div>
       </div>
     ) : (
-      /* Fallback sin imagen */
-      <div class="w-full bg-[color-mix(in_oklab,var(--blog-surface)_78%,white)] py-16 md:py-20">
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="mx-auto max-w-4xl text-center">
-            <p class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary">
+      <div class="w-full bg-[color-mix(in_oklab,var(--blog-surface)_80%,white)] py-14 md:py-20">
+        <div class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-3xl text-center">
+            <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-secondary/70">
               Dreamy Journal
             </p>
-            <h1 class="mb-4 text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl">
+            <h1 class="text-3xl font-semibold leading-[1.05] text-primary md:text-5xl lg:text-6xl">
               {currentCategory?.nombre}
             </h1>
           </div>

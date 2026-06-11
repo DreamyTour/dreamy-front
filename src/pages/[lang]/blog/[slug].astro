@@ -692,6 +692,27 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
         color-mix(in oklab, var(--blog-surface) 66%, white) 100%
       );
   }
+
+  .hero-image {
+    animation: hero-zoom 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .hero-item {
+    animation: hero-fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-item:nth-child(1) { animation-delay: 0.1s; }
+  .hero-item:nth-child(2) { animation-delay: 0.25s; }
+  .hero-item:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes hero-zoom {
+    from { transform: scale(1.06); opacity: 0.7; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes hero-fade-up {
+    from { opacity: 0; transform: translateY(1.25rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 
 {
