@@ -74,7 +74,7 @@ const getSocialBrandStyle = (label: string = "", url: string = "") => {
 
 <aside class="w-full shrink-0 lg:w-80 xl:w-[21rem]">
   <div
-    class="overflow-hidden rounded-[3px] border border-[var(--blog-aside-border)] bg-[color-mix(in_oklab,var(--blog-aside-surface)_82%,white)] p-5 shadow-[0_18px_55px_var(--blog-card-shadow)] lg:sticky lg:top-10"
+    class="overflow-hidden rounded-[3px] border border-[var(--blog-aside-border)] bg-[var(--blog-aside-surface)] p-5 shadow-[0_18px_55px_var(--blog-card-shadow)] lg:sticky lg:top-10"
   >
     <div class="mb-5 flex items-center justify-between gap-4 border-b border-[var(--blog-aside-border)] pb-4">
       <h2 class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-primary">
@@ -85,7 +85,7 @@ const getSocialBrandStyle = (label: string = "", url: string = "") => {
         class={`shrink-0 text-xs font-semibold transition-colors duration-200 ${
           !currentSlug
             ? "text-secondary font-bold"
-            : "text-secondary/80 hover:text-secondary"
+            : "text-secondary/90 hover:text-secondary"
         }`}
       >
         {copy.viewAll}
@@ -102,14 +102,14 @@ const getSocialBrandStyle = (label: string = "", url: string = "") => {
               href={rewriteUrl(`/blog/${cat.slug}`, lang)}
               class={`flex items-center justify-between gap-3 rounded-[3px] border px-3 py-2.5 text-[14px] transition-all duration-200 ${
                 isActive
-                  ? "border-primary/20 bg-primary/8 text-primary font-bold shadow-sm"
-                  : "border-transparent text-foreground/70 hover:border-secondary/20 hover:bg-white/75 hover:text-primary"
+                  ? "border-secondary/25 bg-secondary/8 text-primary font-bold shadow-sm"
+                  : "border-transparent text-foreground hover:border-[#d6beaa] hover:bg-white/75 hover:text-primary"
               }`}
             >
               <div class="flex items-center gap-3 min-w-0">
                 <span 
                   class={`shrink-0 flex items-center justify-center transition-colors duration-200 ${
-                    isActive ? "text-primary" : "text-foreground/45"
+                    isActive ? "text-primary" : "text-foreground/75"
                   }`}
                   set:html={getCategoryIcon(cat.slug)}
                 />
@@ -117,7 +117,7 @@ const getSocialBrandStyle = (label: string = "", url: string = "") => {
               </div>
               <span
                 class={`shrink-0 text-xs transition-colors duration-200 ${
-                  isActive ? "text-primary font-bold" : "text-foreground/45"
+                  isActive ? "text-primary font-bold" : "text-foreground/75"
                 }`}
               >
                 ({count})
