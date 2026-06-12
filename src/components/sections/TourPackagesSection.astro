@@ -1,17 +1,40 @@
 ---
-import type { boliviaPaquetes } from "@/types/home";
-import type { Lang } from "@/lib/i18n";
-import { useTranslations } from "@/i18n/ui";
-import { fetchToursByCategory } from "@/lib/strapiQueries";
 import ToursSlider from "@/components/ui/ToursSlider.astro";
+import { useTranslations } from "@/i18n/ui";
+import type { Lang } from "@/lib/i18n";
+import { fetchToursByCategory } from "@/lib/strapiQueries";
 import { rewriteUrl } from "@/lib/utils";
+import type { Category } from "@/types/home";
+
+type TourSectionData = {
+  id: number;
+  titulo: string;
+  description?: string;
+  limit?: number;
+  category?: Category;
+};
 
 interface Props {
-  data?: boliviaPaquetes;
+  data?: TourSectionData;
   lang: Lang;
+  titleId: string;
+  sectionId?: string;
+  defaultLimit?: number;
+  href: string;
+  highlighted?: boolean;
+  ctaLabelKey?: "section.verMas" | "section.verMasPaquetes";
 }
 
-const { data, lang } = Astro.props;
+const {
+  data,
+  lang,
+  titleId,
+  sectionId,
+  defaultLimit = 3,
+  href,
+  highlighted = false,
+  ctaLabelKey = "section.verMas",
+} = Astro.props;
 
 const t = useTranslations(lang);
 
@@ -20,10 +43,11 @@ if (!data) return;
 const tours = await fetchToursByCategory({
   categorySlug: data.category?.slug,
   lang,
-  limit: data.limit || 3,
+  limit: data.limit || defaultLimit,
 });
 
 const hasTours = tours.length > 0;
+const availabilityTitleId = `${titleId.replace(/-title$/, "")}-availability-title`;
 const badgeText =
   {
     en: "Adventure Awaits",
@@ -39,17 +63,20 @@ const availabilityText = {
 ---
 
 <section
-  aria-labelledby="bolivia-packages-title"
-  class="content-deferred content-deferred--tall w-full py-16 bg-primary/5"
+  id={sectionId}
+  aria-labelledby={titleId}
+  class:list={[
+    "content-deferred content-deferred--tall w-full py-16",
+    highlighted && "bg-primary/5",
+  ]}
 >
-  <div class="max-w-8xl mx-auto px-6">
+  <div class="mx-auto max-w-8xl px-6">
     <div
-      class="mb-14 md:mb-20 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-between"
+      class="mb-14 flex flex-col items-start justify-between gap-8 md:mb-20 lg:flex-row lg:gap-12"
     >
-      {/* Lado izquierdo */}
       <header class="max-w-3xl flex-1 text-left">
         <p
-          class="flex w-fit items-center gap-2 px-3 py-1 bg-secondary/15 text-secondary text-sm font-semibold rounded-full mb-4"
+          class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
         >
           <svg
             class="h-4 w-4"
@@ -66,62 +93,47 @@ const availabilityText = {
         </p>
 
         <h2
-          id="bolivia-packages-title"
-          class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 relative inline-block"
+          id={titleId}
+          class="relative mb-2 inline-block text-3xl font-bold text-gray-900 md:text-4xl"
         >
           <span class="relative z-10">{data.titulo}</span>
           <span
-            class="absolute bottom-0 left-0 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm"
+            class="absolute bottom-0 left-0 -z-0 h-3 w-24 rounded-full bg-secondary/30 blur-sm"
           ></span>
         </h2>
 
         <div
-          class="flex items-center justify-start gap-3 mt-4 mb-6"
+          class="mb-6 mt-4 flex items-center justify-start gap-3"
           aria-hidden="true"
         >
-          <div
-            class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary"
-          >
+          <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary">
           </div>
-          <div class="w-12 h-1.5 bg-secondary rounded-full relative">
+          <div class="relative h-1.5 w-12 rounded-full bg-secondary">
             <div
-              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full"
+              class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
             >
             </div>
           </div>
-          <div
-            class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary"
-          >
+          <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary">
           </div>
         </div>
 
-        {
-          data.description ? (
-            <p class="text-gray-600 leading-relaxed text-base">
-              {data.description}
-            </p>
-          ) : (
-            <p class="text-gray-600 leading-relaxed text-base">
-              The ancestral trails of the Andes are waiting for you to live a
-              transforming experience. Each route is a unique adventure,
-              designed for different levels of experience and physical
-              condition. Our guides will accompany you every step of the way,
-              sharing stories, knowledge and guaranteeing a safe and memorable
-              experience.
-            </p>
-          )
-        }
+        <p class="text-base leading-relaxed text-gray-600">
+          {
+            data.description ||
+              "The ancestral trails of the Andes are waiting for you to live a transforming experience. Each route is a unique adventure, designed for different levels of experience and physical condition. Our guides will accompany you every step of the way, sharing stories, knowledge and guaranteeing a safe and memorable experience."
+          }
+        </p>
       </header>
 
-      {/* Lado derecho (Card con el Botón) */}
       {
         data.category?.slug && (
           <aside
-            aria-labelledby="bolivia-packages-availability-title"
-            class="w-full lg:w-[380px] shrink-0 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 border-l-[6px] border-secondary flex flex-col justify-center"
+            aria-labelledby={availabilityTitleId}
+            class="flex w-full shrink-0 flex-col justify-center rounded-2xl border-l-[6px] border-secondary bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] lg:w-[380px]"
           >
-            <div class="flex items-center gap-4 mb-5">
-              <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white shadow-md">
+            <div class="mb-5 flex items-center gap-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-white shadow-md">
                 <svg
                   class="h-6 w-6"
                   fill="none"
@@ -139,8 +151,8 @@ const availabilityText = {
               </div>
               <div>
                 <h3
-                  id="bolivia-packages-availability-title"
-                  class="font-bold text-gray-900 text-[1.05rem]"
+                  id={availabilityTitleId}
+                  class="text-[1.05rem] font-bold text-gray-900"
                 >
                   {availabilityText.title}
                 </h3>
@@ -150,9 +162,9 @@ const availabilityText = {
               </div>
             </div>
             <a
-              href={rewriteUrl(`/bolivia`, lang)}
+              href={rewriteUrl(href, lang)}
               aria-label={t("aria.verMasSeccion")}
-              class="w-full flex justify-between items-center border-secondary border hover:text-white hover:bg-secondary text-secondary bg-secondary/10 font-semibold py-3.5 px-5 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:border-transparent"
+              class="flex w-full items-center justify-between rounded-xl border border-secondary bg-secondary/10 px-5 py-3.5 font-semibold text-secondary shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-secondary hover:text-white hover:shadow-lg"
             >
               <div class="flex items-center gap-2">
                 <svg
@@ -169,7 +181,7 @@ const availabilityText = {
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span>{t("section.verMas")}</span>
+                <span>{t(ctaLabelKey)}</span>
               </div>
               <svg
                 class="h-5 w-5"
@@ -195,13 +207,14 @@ const availabilityText = {
       hasTours ? (
         <ToursSlider tours={tours} lang={lang} />
       ) : (
-        <div class="text-center py-12 px-6 bg-white/60 rounded-2xl border border-dashed border-secondary/30">
+        <div class="rounded-2xl border border-dashed border-secondary/30 bg-white/60 px-6 py-12 text-center">
           <svg
-            class="mx-auto h-12 w-12 text-secondary/40 mb-4"
+            class="mx-auto mb-4 h-12 w-12 text-secondary/40"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
             stroke-width="1.5"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -209,7 +222,7 @@ const availabilityText = {
               d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p class="text-gray-500 text-lg font-medium">
+          <p class="text-lg font-medium text-gray-500">
             {t("section.sinTours")}
           </p>
         </div>

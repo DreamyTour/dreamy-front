@@ -5,10 +5,8 @@ import type { Home } from "@/types/home";
 import Hero from "@/components/sections/Hero.astro";
 import About from "@/components/sections/About.astro";
 import Certifications from "@/components/sections/Certifications.astro";
-import Machupicchu from "@/components/sections/Machupicchu.astro";
-import PaquetesPeru from "@/components/sections/PaquetesPeru.astro";
+import TourPackagesSection from "@/components/sections/TourPackagesSection.astro";
 import PeruGuide from "@/components/sections/PeruGuide.astro";
-import PaquetesBolivia from "@/components/sections/PaquetesBolivia.astro";
 import HomePost from "@/components/sections/HomePost.astro";
 import type { Lang } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
@@ -47,9 +45,33 @@ const seoProps = {
   <Hero data={homeData?.hero} lang={lang} />
   <About data={homeData?.about} lang={lang} />
   <Certifications data={homeData?.premios?.premios} lang={lang} />
-  <Machupicchu data={homeData?.sectionMapi} lang={lang} />
-  <PaquetesPeru data={homeData?.peruPaquetes} lang={lang} />
+  <TourPackagesSection
+    data={homeData?.sectionMapi}
+    lang={lang}
+    sectionId="machupicchu"
+    titleId="machupicchu-title"
+    href={`/${homeData?.sectionMapi?.category?.slug || "machu-picchu"}`}
+    defaultLimit={10}
+    highlighted
+    ctaLabelKey="section.verMasPaquetes"
+  />
+  <TourPackagesSection
+    data={homeData?.peruPaquetes}
+    lang={lang}
+    titleId="peru-packages-title"
+    href={{
+      es: "/paquetes-peru",
+      en: "/peru-packages",
+      pt: "/pacotes-peru",
+    }[lang] || "/peru-packages"}
+  />
   <PeruGuide lang={lang} />
-  <PaquetesBolivia data={homeData?.boliviaPaquetes} lang={lang} />
+  <TourPackagesSection
+    data={homeData?.boliviaPaquetes}
+    lang={lang}
+    titleId="bolivia-packages-title"
+    href="/bolivia"
+    highlighted
+  />
   <HomePost data={homeData?.cardPost} lang={lang} />
 </Layout>

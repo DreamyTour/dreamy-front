@@ -1,0 +1,174 @@
+import * as React from "react";
+import { ChevronIcon } from "@/components/icons/NavigationIcons";
+import { normalizeLists } from "@/lib/strapiBlocks";
+import { cn } from "@/lib/utils";
+import type {
+	Acordeon as AcordeonType,
+	StrapiBlock,
+	StrapiBlockChild,
+} from "@/types/tours";
+
+interface Props {
+	items: AcordeonType[];
+	openFirst?: boolean;
+	asList?: boolean;
+}
+
+function renderTextNodes(children: StrapiBlockChild[]) {
+	return children.map((child) => {
+		if (!child.text) return null;
+
+		let textElement: React.ReactNode = child.text;
+		if (child.bold) textElement = <strong>{textElement}</strong>;
+		if (child.italic) textElement = <em>{textElement}</em>;
+		if (child.underline) textElement = <u>{textElement}</u>;
+		if (child.strikethrough) textElement = <s>{textElement}</s>;
+		if (child.code) {
+			textElement = (
+				<code className="rounded bg-gray-100 px-1 text-sm">{textElement}</code>
+			);
+		}
+
+		return (
+			<React.Fragment key={JSON.stringify(child)}>{textElement}</React.Fragment>
+		);
+	});
+}
+
+function AccordionContent({ content }: { content: StrapiBlock[] }) {
+	if (!Array.isArray(content)) return null;
+
+	const normalized = normalizeLists(content);
+
+	return (
+		<div className="space-y-2">
+			{normalized.map((block) => {
+				const blockKey = JSON.stringify(block);
+
+				if (block.type === "paragraph") {
+					return (
+						<p
+							key={blockKey}
+							className="text-base leading-7 text-muted-foreground"
+						>
+							{renderTextNodes(block.children || [])}
+						</p>
+					);
+				}
+
+				if (block.type === "heading") {
+					const level = block.level as number | undefined;
+					const className =
+						level === 1
+							? "text-xl font-bold text-foreground"
+							: level === 2
+								? "text-lg font-bold text-foreground"
+								: "text-base font-semibold text-foreground";
+
+					return (
+						<h2 key={blockKey} className={className}>
+							{renderTextNodes(block.children || [])}
+						</h2>
+					);
+				}
+
+				if (block.type === "list") {
+					const format = (block as StrapiBlock & { format?: string }).format;
+					const ListTag = format === "ordered" ? "ol" : "ul";
+
+					return (
+						<ListTag
+							key={blockKey}
+							className={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-base text-muted-foreground`}
+						>
+							{(block.children || []).map((listItem: StrapiBlockChild) => (
+								<li
+									key={JSON.stringify(listItem)}
+									className="text-muted-foreground"
+								>
+									{renderTextNodes(listItem.children || [])}
+								</li>
+							))}
+						</ListTag>
+					);
+				}
+
+				return null;
+			})}
+		</div>
+	);
+}
+
+function AccordionItem({
+	item,
+	defaultOpen,
+}: {
+	item: AcordeonType;
+	defaultOpen: boolean;
+}) {
+	const [isOpen, setIsOpen] = React.useState(defaultOpen);
+	const contentId = React.useId();
+
+	return (
+		<div className="overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]">
+			<button
+				type="button"
+				aria-expanded={isOpen}
+				aria-controls={contentId}
+				className="flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-200 hover:bg-primary/[0.03] md:px-6"
+				onClick={() => setIsOpen((current) => !current)}
+			>
+				<span className="text-left text-sm font-semibold text-foreground md:text-base">
+					{item.titulo}
+				</span>
+				<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary">
+					<ChevronIcon
+						className={cn(
+							"h-5 w-5 transition-transform duration-200",
+							isOpen && "rotate-180",
+						)}
+					/>
+				</span>
+			</button>
+			<div
+				id={contentId}
+				className={cn(
+					"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+					isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+				)}
+			>
+				<div className="overflow-hidden">
+					<div className="border-t border-primary/10 px-5 pb-5 pt-4 md:px-6 md:pb-6">
+						<AccordionContent content={item.contenido} />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+export default function TourAccordionList({
+	items,
+	openFirst = false,
+	asList = false,
+}: Props) {
+	const content = items.map((item, index) => (
+		<AccordionItem
+			key={item.titulo}
+			item={item}
+			defaultOpen={openFirst && index === 0}
+		/>
+	));
+
+	if (asList) {
+		return (
+			<ul className="m-0 list-none space-y-4 p-0">
+				{content.map((item, index) => (
+					<li key={items[index].titulo}>{item}</li>
+				))}
+			</ul>
+		);
+	}
+
+	return <div className="space-y-4">{content}</div>;
+}
