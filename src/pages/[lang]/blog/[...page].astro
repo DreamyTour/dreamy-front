@@ -124,6 +124,7 @@ const seoProps = buildSEOProps({
 ---
 
 <Layout seo={seoProps} lang={lang}>
+  <div class="blog-page-shell">
   <div class="blog-index-page w-full py-16 md:py-24">
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="mx-auto mb-12 max-w-4xl text-center md:mb-16">
@@ -289,17 +290,22 @@ const seoProps = buildSEOProps({
       </div>
     </div>
   </div>
+  </div>
 </Layout>
 
 <style>
-  .blog-index-page {
+  .blog-page-shell {
     background:
       linear-gradient(
         180deg,
-        color-mix(in oklab, var(--blog-surface) 82%, white) 0%,
-        white 44%,
-        color-mix(in oklab, var(--blog-surface) 70%, white) 100%
+        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
       );
+  }
+
+  .blog-index-page {
+    background: transparent;
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */

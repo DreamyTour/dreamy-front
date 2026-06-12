@@ -186,6 +186,7 @@ const seoProps =
 ---
 
 <Layout seo={seoProps} lang={lang}>
+  <div class="blog-page-shell">
   {
     slugMap && Object.keys(slugMap).length > 0 && (
       <script
@@ -223,7 +224,7 @@ const seoProps =
         </div>
       </div>
     ) : (
-      <div class="w-full bg-[color-mix(in_oklab,var(--blog-surface)_80%,white)] py-14 md:py-20">
+      <div class="w-full py-14 md:py-20">
         <div class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
           <div class="mx-auto max-w-3xl text-center">
             <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-secondary/70">
@@ -391,17 +392,22 @@ const seoProps =
       />
     </div>
   </div>
+  </div>
 </Layout>
 
 <style>
-  .blog-category-page {
+  .blog-page-shell {
     background:
       linear-gradient(
         180deg,
         color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
-        white 42%,
+        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
         color-mix(in oklab, var(--blog-surface) 72%, white) 100%
       );
+  }
+
+  .blog-category-page {
+    background: transparent;
   }
 
   .blog-category-grid {

@@ -286,6 +286,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
 ---
 
 <Layout seo={seoProps} lang={lang}>
+  <div class="blog-post-page">
   {/* Hero Image con título, categoría y fecha como fondo */}
   {
     blog.portadaImage ? (
@@ -381,8 +382,8 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
   }
 
   {/* Contenido del post */}
-  <div class="blog-post-body mx-auto max-w-8xl px-4 py-12 md:px-8 lg:py-16">
-    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
+  <div class="blog-post-body w-full py-12 lg:py-16">
+    <div class="mx-auto grid max-w-8xl gap-12 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
       {/* Principal Post Column */}
       <article class="mx-auto w-full max-w-[56rem] min-w-0 lg:mx-0">
         {/* Tabla de Contenidos */}
@@ -680,17 +681,22 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
       </section>
     )
   }
+  </div>
 </Layout>
 
 <style>
-  .blog-post-body {
+  .blog-post-page {
     background:
       linear-gradient(
         180deg,
-        color-mix(in oklab, var(--blog-surface) 72%, white) 0%,
-        white 30%,
-        color-mix(in oklab, var(--blog-surface) 66%, white) 100%
+        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
       );
+  }
+
+  .blog-post-body {
+    background: transparent;
   }
 
   .hero-image {
