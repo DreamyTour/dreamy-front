@@ -369,12 +369,13 @@ export default function TourTabs({ tour, children }: Props) {
 
 				{/* Booking / Contact Form */}
 				{children && (
-					<div
+					<aside
 						id="tour-contact-form"
+						aria-label="Reserva y contacto"
 						className="mt-8 min-w-0 scroll-mt-28 lg:mt-12 lg:self-start"
 					>
 						{children}
-					</div>
+					</aside>
 				)}
 			</div>
 		</div>

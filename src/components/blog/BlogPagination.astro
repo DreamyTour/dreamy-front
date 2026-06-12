@@ -1,0 +1,112 @@
+---
+import type { Lang } from "@/lib/i18n";
+import type { PaginatedBlogPage } from "@/lib/blogRoutes";
+
+interface Props {
+  page: PaginatedBlogPage;
+  lang: Lang;
+}
+
+const { page, lang } = Astro.props;
+const previousLabel = lang === "es" ? "Anterior" : lang === "pt" ? "Anterior" : "Previous";
+const nextLabel = lang === "es" ? "Siguiente" : lang === "pt" ? "Proximo" : "Next";
+const linkClass =
+  "px-5 py-2.5 rounded-sm border border-border text-foreground transition-colors flex items-center gap-2 bg-card shadow-sm hover:border-secondary/60 hover:text-secondary hover:shadow-md";
+const disabledClass =
+  "px-5 py-2.5 rounded-sm border border-border/70 text-muted-foreground/60 bg-muted/60 flex items-center gap-2 cursor-not-allowed";
+---
+
+{
+  page.lastPage > 1 && (
+    <nav
+      class="mt-16 flex flex-wrap items-center justify-center gap-4 font-medium"
+      aria-label="Blog pagination"
+    >
+      {page.url.prev ? (
+        <a href={page.url.prev} class={linkClass}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          {previousLabel}
+        </a>
+      ) : (
+        <span class={disabledClass} aria-disabled="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          {previousLabel}
+        </span>
+      )}
+
+      <span class="flex items-center gap-2 rounded-sm border border-border bg-card px-4 py-2.5 text-muted-foreground shadow-sm">
+        {page.currentPage}
+        <span class="text-muted-foreground/50">/</span>
+        {page.lastPage}
+      </span>
+
+      {page.url.next ? (
+        <a href={page.url.next} class={linkClass}>
+          {nextLabel}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </a>
+      ) : (
+        <span class={disabledClass} aria-disabled="true">
+          {nextLabel}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </span>
+      )}
+    </nav>
+  )
+}

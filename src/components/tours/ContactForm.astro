@@ -13,8 +13,9 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
 );
 ---
 
-<div
+<section
   data-contact-form-root
+  aria-labelledby="contact-form-title"
   class="bg-white rounded-sm p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col relative overflow-hidden"
 >
   <div
@@ -22,8 +23,9 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
   >
   </div>
 
-  <div class="mb-6 mt-2">
+  <header class="mb-6 mt-2">
     <span
+      id="contact-form-title"
       class="text-secondary font-bold tracking-wider uppercase text-xs inline-block mb-1"
       >Reserva tu aventura</span
     >
@@ -34,7 +36,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         </h3>
       )
     }
-  </div>
+  </header>
 
   <a
     id="contact-whatsapp-btn"
@@ -222,7 +224,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       </svg>
     </button>
   </form>
-</div>
+</section>
 
 <script>
   type ContactFormRoot = HTMLElement & {

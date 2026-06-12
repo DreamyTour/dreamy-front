@@ -63,6 +63,7 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 ---
 
 <section
+  aria-labelledby="home-hero-title"
   class="hero-section relative w-full min-h-[60vh] md:min-h-[80vh] flex items-end overflow-hidden"
 >
   {/* ──── Video de fondo ──── */}
@@ -110,9 +111,10 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
   }
 
   {/* ──── Overlay oscuro + gradiente inferior ──── */}
-  <div class="absolute inset-0 bg-black/40"></div>
+  <div class="absolute inset-0 bg-black/40" aria-hidden="true"></div>
   <div
     class="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent"
+    aria-hidden="true"
   >
   </div>
 
@@ -143,6 +145,7 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
     }
 
     <h1
+      id="home-hero-title"
       class="hero-title font-bold text-white leading-[1.05] tracking-tight mb-5 max-w-5xl"
     >
       {data.titulo}

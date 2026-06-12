@@ -1,0 +1,520 @@
+---
+import BlogContactCta from "@/components/ui/BlogContactCta.astro";
+import BlogAside from "@/components/ui/BlogAside.astro";
+import CardPost from "@/components/ui/CardPost.astro";
+import LiteYouTube from "@/components/content/LiteYouTube.astro";
+import TableOfContents from "@/components/ui/TableOfContents.astro";
+import Layout from "@/layouts/main.astro";
+import { getImageAlt, getImageSrcSet, getImageUrl, getThumbnailUrl } from "@/lib/helpers";
+import { serializeJsonForHtml } from "@/lib/html";
+import type { BlogPostProps } from "@/lib/blogRoutes";
+import { buildSEOProps } from "@/lib/seo";
+import { groupStrapiRichTextBlocks, normalizeLists } from "@/lib/strapiBlocks";
+import type { Blog, CategoryBlog } from "@/types/blog";
+import type { Imagen } from "@/types/common";
+import type { StrapiBlock, StrapiBlockChild } from "@/types/page";
+
+type BlogImage = Imagen & { caption?: string };
+
+function generateDescription(blocks: unknown, maxLength = 160): string {
+  if (!Array.isArray(blocks)) return "";
+
+  let plainText = "";
+  for (const block of blocks) {
+    if (typeof block !== "object" || block === null) continue;
+    const currentBlock = block as {
+      type?: string;
+      children?: Array<{ text?: string }>;
+    };
+    if (currentBlock.type === "paragraph" && currentBlock.children) {
+      plainText += `${currentBlock.children.map((child) => child.text || "").join(" ")} `;
+    }
+  }
+
+  plainText = plainText.replace(/\s+/g, " ").trim();
+  return plainText.length > maxLength
+    ? `${plainText.substring(0, maxLength)}...`
+    : plainText;
+}
+
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function extractHeadings(blocks: unknown): { id: string; text: string }[] {
+  if (!Array.isArray(blocks)) return [];
+
+  const headings: { id: string; text: string }[] = [];
+  for (const block of blocks) {
+    if (block.type !== "heading" || block.level !== 2) continue;
+    const text =
+      block.children?.map((child: StrapiBlockChild) => child.text).join("") ||
+      "";
+    headings.push({ id: generateSlug(text), text });
+  }
+
+  return headings;
+}
+
+function getYouTubeVideoId(url: string | undefined): string | null {
+  if (!url) return null;
+
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s?]+)/,
+    /^([a-zA-Z0-9_-]{11})$/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+
+  return null;
+}
+
+const {
+  blog,
+  lang,
+  allCategories,
+  slugMap,
+  globalData,
+  relatedBlogs,
+  categoryPostCounts,
+  totalPostCount,
+} = Astro.props as BlogPostProps;
+
+const socialLogos = globalData?.footer?.socialLogo || globalData?.socialLogo || [];
+const seoProps = buildSEOProps({
+  seo: blog.seo,
+  fallbackTitle: blog.titulo || "Blog",
+  fallbackDescription: generateDescription(blog.contenido),
+  type: "article",
+  lang,
+  publishedTime: blog.publishedAt,
+  slugMap,
+});
+const tocHeadings = extractHeadings(blog.contenido);
+const heroImage = getImageUrl(blog.portadaImage, "large");
+const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
+  "small",
+  "medium",
+  "large",
+]);
+---
+
+<Layout seo={seoProps} lang={lang}>
+  <main class="blog-post-page">
+    {
+      blog.portadaImage ? (
+        <header class="relative mx-auto mt-8 h-[54vh] min-h-[420px] max-h-[620px] w-full max-w-8xl overflow-hidden rounded-sm">
+          <img
+            src={heroImage}
+            srcset={heroImageSrcSet || undefined}
+            sizes="100vw"
+            alt=""
+            aria-hidden="true"
+            class="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+          <div
+            class="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,23,17,0.32)_0%,rgba(8,23,17,0.18)_38%,rgba(8,23,17,0.78)_100%)]"
+            aria-hidden="true"
+          />
+
+          <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col justify-end px-4 pb-12 md:px-8">
+            <div class="mb-4 flex flex-wrap gap-3">
+              {blog.category_blogs?.map((category: CategoryBlog) => (
+                <span class="rounded-[3px] border border-white/35 bg-black/20 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+                  {category.nombre}
+                </span>
+              ))}
+            </div>
+
+            <h1 class="mb-4 max-w-5xl text-4xl font-semibold leading-[1.02] text-white drop-shadow-lg md:text-5xl lg:text-6xl">
+              {blog.titulo}
+            </h1>
+
+            {blog.publishedAt && (
+              <span class="flex items-center gap-2 text-sm font-medium text-white/80">
+                <svg
+                  class="h-4 w-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                {new Date(blog.publishedAt).toLocaleDateString(
+                  lang === "es" ? "es-ES" : lang === "pt" ? "pt-BR" : "en-US",
+                  { year: "numeric", month: "long", day: "numeric" },
+                )}
+              </span>
+            )}
+          </div>
+        </header>
+      ) : (
+        <header class="mx-auto max-w-8xl px-4 py-16 md:px-8">
+          <div class="text-center">
+            <div class="mb-6 flex flex-wrap justify-center gap-3">
+              {blog.category_blogs?.map((category: CategoryBlog) => (
+                <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                  {category.nombre}
+                </span>
+              ))}
+            </div>
+            <h1 class="mb-4 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+              {blog.titulo}
+            </h1>
+            {blog.publishedAt && (
+              <span class="flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground">
+                <svg
+                  class="h-4 w-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                {new Date(blog.publishedAt).toLocaleDateString(
+                  lang === "es" ? "es-ES" : lang === "pt" ? "pt-BR" : "en-US",
+                  { year: "numeric", month: "long", day: "numeric" },
+                )}
+              </span>
+            )}
+          </div>
+        </header>
+      )
+    }
+
+    <section class="blog-post-body w-full py-12 lg:py-16">
+      <div class="mx-auto grid max-w-8xl gap-12 px-4 md:px-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <article class="mx-auto w-full max-w-[56rem] min-w-0 lg:mx-0">
+          <TableOfContents headings={tocHeadings} />
+
+          <div class="w-full text-foreground">
+            {
+              blog.contenido && Array.isArray(blog.contenido) ? (
+                groupStrapiRichTextBlocks(
+                  normalizeLists(blog.contenido as StrapiBlock[]),
+                ).map((block: any) => {
+                  if (block.type === "paragraph") {
+                    return (
+                      <p class="mb-5 text-base leading-relaxed text-foreground/80">
+                        {block.children?.map((child: StrapiBlockChild) => {
+                          const text = child.text;
+                          if (child.bold)
+                            return (
+                              <strong class="font-semibold text-foreground">
+                                {text}
+                              </strong>
+                            );
+                          if (child.italic)
+                            return <em class="italic">{text}</em>;
+                          if (child.underline)
+                            return (
+                              <u class="underline underline-offset-4">{text}</u>
+                            );
+                          if (child.code)
+                            return (
+                              <code class="rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm text-primary">
+                                {text}
+                              </code>
+                            );
+                          return text;
+                        })}
+                      </p>
+                    );
+                  }
+
+                  if (block.type === "heading") {
+                    const level = block.level as number | undefined;
+                    const headingText =
+                      block.children
+                        ?.map((child: StrapiBlockChild) => child.text)
+                        .join("") || "";
+                    const headingId = generateSlug(headingText);
+                    if (level === 1 || level === 2)
+                      return (
+                        <div class="relative mb-3 mt-7 scroll-mt-24 pl-5">
+                          <span class="absolute left-0 top-0 h-full w-1 rounded-full bg-primary" />
+                          <h2
+                            id={headingId}
+                            class={level === 1 ? "text-3xl font-bold tracking-tight text-foreground" : "text-2xl font-bold tracking-tight text-foreground"}
+                          >
+                            {headingText}
+                          </h2>
+                        </div>
+                      );
+                    if (level === 3)
+                      return (
+                        <h3
+                          id={headingId}
+                          class="mb-2 mt-6 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground"
+                        >
+                          {headingText}
+                        </h3>
+                      );
+                    if (level === 4)
+                      return (
+                        <h4
+                          id={headingId}
+                          class="mb-2 mt-5 scroll-mt-24 text-lg font-semibold text-foreground"
+                        >
+                          {headingText}
+                        </h4>
+                      );
+                    return (
+                      <h5
+                        id={headingId}
+                        class="mb-1 mt-4 scroll-mt-24 text-base font-semibold text-foreground"
+                      >
+                        {headingText}
+                      </h5>
+                    );
+                  }
+
+                  if (block.type === "list") {
+                    const ListTag = block.format === "ordered" ? "ol" : "ul";
+                    const listClasses =
+                      block.format === "ordered"
+                        ? "mb-5 list-decimal space-y-1.5 pl-6 text-base leading-relaxed text-foreground/80"
+                        : "mb-5 list-disc space-y-1.5 pl-6 text-base leading-relaxed text-foreground/80";
+                    return (
+                      <ListTag class={listClasses}>
+                        {block.children?.map((item: StrapiBlockChild) => (
+                          <li class="pl-1">
+                            {item.children?.map((child: StrapiBlockChild) => {
+                              const text = child.text;
+                              if (child.bold)
+                                return (
+                                  <strong class="font-semibold text-foreground">
+                                    {text}
+                                  </strong>
+                                );
+                              if (child.italic)
+                                return <em class="italic">{text}</em>;
+                              if (child.underline)
+                                return (
+                                  <u class="underline underline-offset-4">
+                                    {text}
+                                  </u>
+                                );
+                              if (child.code)
+                                return (
+                                  <code class="rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm text-primary">
+                                    {text}
+                                  </code>
+                                );
+                              return text;
+                            })}
+                          </li>
+                        ))}
+                      </ListTag>
+                    );
+                  }
+
+                  if (block.type === "image") {
+                    const image = block.image as BlogImage | undefined;
+                    return (
+                      <figure class="mx-auto my-10">
+                        <img
+                          src={getImageUrl(image, "large")}
+                          srcset={
+                            getImageSrcSet(image, [
+                              "thumbnail",
+                              "small",
+                              "medium",
+                              "large",
+                            ]) || undefined
+                          }
+                          sizes="(max-width: 1023px) 100vw, 75vw"
+                          alt={getImageAlt(image, "Blog image")}
+                          class="h-auto w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        {image?.caption && (
+                          <figcaption class="mt-3 text-center text-sm font-medium text-muted-foreground">
+                            {image.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    );
+                  }
+
+                  if (block.type === "gallery") {
+                    const images = (block as any).images || [];
+                    const gridColsClass =
+                      images.length === 2
+                        ? "grid-cols-1 md:grid-cols-2"
+                        : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3";
+                    return (
+                      <div class={`my-10 grid gap-4 ${gridColsClass}`}>
+                        {images.map((imgBlock: any) => {
+                          const image = imgBlock.image as BlogImage | undefined;
+                          return (
+                            <figure class="mx-auto flex w-full flex-col justify-between">
+                              <img
+                                src={getImageUrl(image, "large")}
+                                srcset={
+                                  getImageSrcSet(image, [
+                                    "thumbnail",
+                                    "small",
+                                    "medium",
+                                    "large",
+                                  ]) || undefined
+                                }
+                                sizes="(max-width: 1023px) 100vw, 33vw"
+                                alt={getImageAlt(image, "Blog image")}
+                                class="h-64 w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              {image?.caption && (
+                                <figcaption class="mt-2 line-clamp-2 text-center text-xs font-medium text-muted-foreground">
+                                  {image.caption}
+                                </figcaption>
+                              )}
+                            </figure>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  if (
+                    block.type === "component" &&
+                    (block.__component === "shared.video" ||
+                      block.component === "shared.video")
+                  ) {
+                    const videoUrl =
+                      typeof block.videoURL === "string"
+                        ? block.videoURL
+                        : typeof block.videoUrl === "string"
+                          ? block.videoUrl
+                          : undefined;
+                    const videoTitle =
+                      typeof block.title === "string" ? block.title : "Video";
+                    const videoId = getYouTubeVideoId(videoUrl);
+                    if (!videoId) return null;
+
+                    const thumbnailUrl = getThumbnailUrl(block.thumbnail);
+                    return (
+                      <div class="my-10">
+                        <div class="flex flex-col items-start gap-8 lg:flex-row">
+                          <div class="hidden shrink-0 lg:block lg:w-[380px]">
+                            <LiteYouTube
+                              videoId={videoId}
+                              title={videoTitle}
+                              backgroundImage={thumbnailUrl || undefined}
+                              withShadowImage={!!thumbnailUrl}
+                            />
+                          </div>
+                          <div class="w-full lg:hidden">
+                            <LiteYouTube
+                              videoId={videoId}
+                              title={videoTitle}
+                              backgroundImage={thumbnailUrl || undefined}
+                              withShadowImage={!!thumbnailUrl}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return null;
+                })
+              ) : (
+                <p class="italic text-muted-foreground">No content available.</p>
+              )
+            }
+          </div>
+
+          <BlogContactCta lang={lang} title={blog.titulo} />
+        </article>
+
+        <BlogAside
+          categories={allCategories}
+          currentSlug={blog.category_blogs?.[0]?.slug}
+          lang={lang}
+          socialLogos={socialLogos}
+          categoryPostCounts={categoryPostCounts}
+          totalPostCount={totalPostCount}
+        />
+      </div>
+    </section>
+
+    {
+      relatedBlogs && relatedBlogs.length > 0 && (
+        <section class="mx-auto mt-12 max-w-8xl border-t border-border px-4 py-16 md:px-8 lg:py-20">
+          <div class="mb-10 text-center">
+            <h2 class="relative mb-6 inline-block text-2xl font-bold text-foreground md:text-3xl">
+              <span class="relative z-10">
+                {lang === "es"
+                  ? "Posts Relacionados"
+                  : lang === "pt"
+                    ? "Posts Relacionados"
+                    : "Related Posts"}
+              </span>
+              <span class="absolute bottom-0 left-1/2 -z-0 h-3 w-24 -translate-x-1/2 rounded-full bg-secondary/30 blur-sm" />
+            </h2>
+            <div class="mt-4 flex items-center justify-center gap-3" aria-hidden="true">
+              <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary" />
+              <div class="relative h-1.5 w-12 rounded-full bg-secondary">
+                <div class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+              </div>
+              <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
+            {relatedBlogs.map((relatedBlog: Blog) => (
+              <CardPost blog={relatedBlog} lang={lang} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </main>
+</Layout>
+
+<style>
+  .blog-post-page {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
+      );
+  }
+
+  .blog-post-body {
+    background: transparent;
+  }
+</style>
+
+{
+  slugMap && Object.keys(slugMap).length > 0 && (
+    <script
+      is:inline
+      id="blog-slug-map"
+      type="application/json"
+      set:html={serializeJsonForHtml(slugMap)}
+    />
+  )
+}

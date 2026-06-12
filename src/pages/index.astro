@@ -1,51 +1,8 @@
 ---
-import Layout from "@/layouts/main.astro";
-import fetchApi from "@/lib/strapi";
-import type { Home } from "@/types/home";
-import Hero from "@/components/sections/Hero.astro";
-import About from "@/components/sections/About.astro";
-import Certifications from "@/components/sections/Certifications.astro";
-import Machupicchu from "@/components/sections/Machupicchu.astro";
-import PaquetesPeru from "@/components/sections/PaquetesPeru.astro";
-import PeruGuide from "@/components/sections/PeruGuide.astro";
-import PaquetesBolivia from "@/components/sections/PaquetesBolivia.astro";
-import HomePost from "@/components/sections/HomePost.astro";
+import HomePage from "@/components/pages/HomePage.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
-import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
-import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 
 const lang = DEFAULT_LANG;
-
-const homeData = await fetchApi<Home>({
-  endpoint: "home",
-  wrappedByKey: "data",
-  query: {
-    locale: lang,
-    populate: "*",
-  },
-});
-
-const seoProps = {
-  ...buildSEOProps({
-    seo: homeData?.seo,
-    fallbackTitle: "Turismo Perú Bolivia - Tours y Paquetes Turísticos",
-    fallbackDescription:
-      "Organiza tu viaje a Perú y Bolivia con los mejores tours: Machu Picchu, Lago Titicaca, Salar de Uyuni y más. Paquetes turísticos completos.",
-    type: "website",
-    lang,
-  }),
-  image: DEFAULT_SEO_IMAGE,
-  imageAlt: "Dreamy Tours - tours y paquetes turisticos en Peru y Bolivia",
-};
 ---
 
-<Layout seo={seoProps} lcpImageUrl={backgroundImageMobile.src}>
-  <Hero data={homeData?.hero} lang={lang} />
-  <About data={homeData?.about} lang={lang} />
-  <Certifications data={homeData?.premios?.premios} lang={lang} />
-  <Machupicchu data={homeData?.sectionMapi} lang={lang} />
-  <PaquetesPeru data={homeData?.peruPaquetes} lang={lang} />
-  <PeruGuide lang={lang} />
-  <PaquetesBolivia data={homeData?.boliviaPaquetes} lang={lang} />
-  <HomePost data={homeData?.cardPost} lang={lang} />
-</Layout>
+<HomePage lang={lang} />

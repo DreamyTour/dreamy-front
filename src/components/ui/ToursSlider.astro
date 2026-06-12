@@ -16,10 +16,10 @@ const { tours, lang } = Astro.props;
 const shouldLoop = tours.length > 3;
 ---
 
-<div class="relative" data-tours-slider>
+<section class="relative" data-tours-slider aria-label="Tours destacados">
   <div class="overflow-hidden">
-    <div
-      class="flex gap-6 overflow-x-auto py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
+    <ul
+      class="flex list-none gap-6 overflow-x-auto px-0 py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
       id={`slider-${Math.random().toString(36).slice(2, 11)}`}
       data-slider-track
       data-original-count={tours.length}
@@ -27,12 +27,12 @@ const shouldLoop = tours.length > 3;
     >
       {
         tours.map((tour) => (
-          <div class="flex-shrink-0 w-full md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] snap-start">
+          <li class="flex-shrink-0 w-full md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] snap-start">
             <TourCard tour={tour} lang={lang} />
-          </div>
+          </li>
         ))
       }
-    </div>
+    </ul>
   </div>
 
   <button
@@ -48,7 +48,7 @@ const shouldLoop = tours.length > 3;
   >
     <ArrowRightIcon className="w-6 h-6 text-current" aria-hidden="true" />
   </button>
-</div>
+</section>
 
 <style>
   .scrollbar-hide::-webkit-scrollbar {

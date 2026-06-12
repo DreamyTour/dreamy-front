@@ -35,17 +35,26 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
 
 {
   postsList.length > 0 && (
-    <section class="content-deferred content-deferred--tall w-full bg-[linear-gradient(180deg,_color-mix(in_oklab,var(--accent-warm)_18%,var(--background))_0%,var(--background)_38%)] py-16">
+    <section
+      aria-labelledby="home-posts-title"
+      class="content-deferred content-deferred--tall w-full bg-[linear-gradient(180deg,_color-mix(in_oklab,var(--accent-warm)_18%,var(--background))_0%,var(--background)_38%)] py-16"
+    >
       <div class="max-w-8xl mx-auto px-6">
         {/* Header */}
-        <div class="mb-14 md:mb-20 text-center">
+        <header class="mb-14 md:mb-20 text-center">
           {data.titulo && (
-            <h2 class="text-2xl md:text-3xl font-bold text-foreground mb-6 relative inline-block">
+            <h2
+              id="home-posts-title"
+              class="text-2xl md:text-3xl font-bold text-foreground mb-6 relative inline-block"
+            >
               <span class="relative z-10">{data.titulo}</span>
               <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm" />
             </h2>
           )}
-          <div class="flex items-center justify-center gap-3 mt-4">
+          <div
+            class="flex items-center justify-center gap-3 mt-4"
+            aria-hidden="true"
+          >
             <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
             <div class="w-12 h-1.5 bg-secondary rounded-full relative">
               <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-background rounded-full" />
@@ -57,14 +66,16 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
               {data.description}
             </p>
           )}
-        </div>
+        </header>
 
         {/* Grid de Posts */}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-x-8 md:gap-y-16">
+        <ul class="grid list-none grid-cols-1 gap-10 p-0 md:grid-cols-2 md:gap-x-8 md:gap-y-16 lg:grid-cols-3">
           {postsList.map((blog: Blog) => (
-            <CardPost blog={blog} lang={lang} />
+            <li class="min-w-0">
+              <CardPost blog={blog} lang={lang} />
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Botón ver más */}
         <div class="mt-12 flex justify-center">

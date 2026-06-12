@@ -1,0 +1,157 @@
+---
+import Layout from "@/layouts/main.astro";
+import CardPost from "@/components/ui/CardPost.astro";
+import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogPagination from "@/components/blog/BlogPagination.astro";
+import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
+import { buildSEOProps } from "@/lib/seo";
+import type { Blog } from "@/types/blog";
+import type { BlogListProps } from "@/lib/blogRoutes";
+
+interface Props extends BlogListProps {
+  lang: Lang;
+}
+
+const {
+  page,
+  allCategories,
+  socialLogos,
+  categoryPostCounts,
+  totalPostCount,
+  lang = DEFAULT_LANG,
+} = Astro.props;
+
+const blogsList = page.data;
+const featuredBlog = page.currentPage === 1 ? blogsList[0] : null;
+const remainingBlogs = featuredBlog ? blogsList.slice(1) : blogsList;
+
+const blogSeoByLang: Record<
+  Lang,
+  { title: string; description: string; pageLabel: string; empty: string }
+> = {
+  en: {
+    title: "Travel Blog - Peru and Bolivia Tours | Dreamy Tours",
+    description:
+      "Travel guides, tips and destination inspiration for Peru, Bolivia, Machu Picchu, Lake Titicaca and Uyuni.",
+    pageLabel: "Page",
+    empty: "No blog posts available",
+  },
+  es: {
+    title: "Blog de Viajes - Tours en Peru y Bolivia | Dreamy Tours",
+    description:
+      "Guias de viaje, consejos e inspiracion para Peru, Bolivia, Machu Picchu, Lago Titicaca y Uyuni.",
+    pageLabel: "Pagina",
+    empty: "No hay blogs disponibles",
+  },
+  pt: {
+    title: "Blog de Viagens - Tours no Peru e Bolivia | Dreamy Tours",
+    description:
+      "Guias de viagem, dicas e inspiracao para Peru, Bolivia, Machu Picchu, Lago Titicaca e Uyuni.",
+    pageLabel: "Pagina",
+    empty: "Nao ha posts disponiveis",
+  },
+};
+const blogSeo = blogSeoByLang[lang];
+const seoProps = buildSEOProps({
+  fallbackTitle:
+    page.currentPage > 1
+      ? `${blogSeo.title} - ${blogSeo.pageLabel} ${page.currentPage}`
+      : blogSeo.title,
+  fallbackDescription: blogSeo.description,
+  type: "website",
+  lang,
+});
+---
+
+<Layout seo={seoProps} lang={lang}>
+  <div class="blog-page-shell">
+    <div class="blog-index-page w-full py-16 md:py-24">
+      <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="mx-auto mb-12 max-w-4xl text-center md:mb-16">
+          <p class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary">
+            Dreamy Journal
+          </p>
+          <h1 class="text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl">
+            Blog
+          </h1>
+          <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-foreground/68 md:text-lg">
+            {blogSeo.description}
+          </p>
+        </header>
+
+        <section class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div class="w-full min-w-0">
+            {
+              blogsList.length > 0 ? (
+                <div>
+                  <div class="blog-post-grid">
+                    {featuredBlog && (
+                      <CardPost
+                        blog={featuredBlog}
+                        lang={lang}
+                        isFeatured
+                        showDescription
+                      />
+                    )}
+                    {remainingBlogs.map((blog: Blog) => (
+                      <CardPost blog={blog} lang={lang} />
+                    ))}
+                  </div>
+
+                  <BlogPagination page={page} lang={lang} />
+                </div>
+              ) : (
+                <p class="text-center text-muted-foreground">{blogSeo.empty}</p>
+              )
+            }
+          </div>
+
+          <div class="w-full shrink-0">
+            <BlogAside
+              categories={allCategories}
+              lang={lang}
+              socialLogos={socialLogos}
+              categoryPostCounts={categoryPostCounts}
+              totalPostCount={totalPostCount}
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .blog-page-shell {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
+      );
+  }
+
+  .blog-index-page {
+    background: transparent;
+  }
+
+  .blog-post-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1rem, 1.5vw, 1.5rem);
+    align-items: stretch;
+  }
+
+  @media (min-width: 768px) {
+    .blog-post-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .blog-post-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

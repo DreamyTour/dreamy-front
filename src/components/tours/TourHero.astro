@@ -90,18 +90,19 @@ const galleryImagesJson = serializeJsonForHtml(
 );
 ---
 
-<div class="tour-hero-container w-full pt-4 pb-8 relative">
+<section
+  class="tour-hero-container w-full pt-4 pb-8 relative"
+  aria-labelledby="tour-title"
+>
   {/* DESKTOP GRID (Hidden on mobile) */}
   <div
     class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 lg:gap-4 mb-8 lg:mb-12 h-[350px] md:h-[450px] lg:h-[500px]"
   >
     {/* Left Large Image - spans 2 columns and 2 rows */}
-    <div
+    <figure
       class="col-span-2 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
       data-gallery-open={galleryId}
       data-gallery-index="0"
-      role="button"
-      tabindex="0"
       aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
     >
       <img
@@ -146,7 +147,7 @@ const galleryImagesJson = serializeJsonForHtml(
         </svg>
         {galleryLabel.open} ({images.length})
       </button>
-    </div>
+    </figure>
 
     {
       galleryPreviewImages.map((img, index) => (
@@ -179,12 +180,10 @@ const galleryImagesJson = serializeJsonForHtml(
     >
       {
         images.slice(0, 3).map((img, i) => (
-          <div
+          <figure
             class="w-[85vw] h-[320px] shrink-0 snap-center rounded-sm overflow-hidden relative shadow-sm cursor-pointer"
             data-gallery-open={galleryId}
             data-gallery-index={String(i)}
-            role="button"
-            tabindex="0"
             aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
           >
             <img
@@ -215,7 +214,7 @@ const galleryImagesJson = serializeJsonForHtml(
                 {galleryLabel.open} ({images.length})
               </button>
             )}
-          </div>
+          </figure>
         ))
       }
     </div>
@@ -236,6 +235,7 @@ const galleryImagesJson = serializeJsonForHtml(
           )
         }
         <h1
+          id="tour-title"
           class="mb-5 text-3xl font-extrabold leading-[1.15] tracking-tight text-slate-950 md:mb-6 md:text-4xl lg:text-[42px]"
         >
           {tour.titulo}
@@ -251,7 +251,7 @@ const galleryImagesJson = serializeJsonForHtml(
           <div class="lg:w-[380px] xl:w-[420px] shrink-0">
             <div class="rounded-lg border border-border bg-background p-1 shadow-sm">
               {/* Badges Grid */}
-              <div class="grid grid-cols-2 overflow-hidden rounded-md divide-x divide-y divide-border bg-muted/50">
+              <dl class="grid grid-cols-2 overflow-hidden rounded-md divide-x divide-y divide-border bg-muted/50">
                 {badges.map((badge, index) => {
                   return (
                     <div
@@ -266,17 +266,17 @@ const galleryImagesJson = serializeJsonForHtml(
                         />
                       </div>
                       <div class="flex flex-col min-w-0">
-                        <span class="text-[0.6rem] font-semibold uppercase tracking-wider text-slate-950 lg:text-[0.65rem]">
+                        <dt class="text-[0.6rem] font-semibold uppercase tracking-wider text-slate-950 lg:text-[0.65rem]">
                           {badge.titulo}
-                        </span>
-                        <span class="text-sm font-medium leading-tight text-slate-950 transition-colors group-hover:text-slate-950">
+                        </dt>
+                        <dd class="text-sm font-medium leading-tight text-slate-950 transition-colors group-hover:text-slate-950">
                           {badge.content}
-                        </span>
+                        </dd>
                       </div>
                     </div>
                   );
                 })}
-              </div>
+              </dl>
 
               {/* CTA Buttons */}
               <div class="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
@@ -414,7 +414,7 @@ const galleryImagesJson = serializeJsonForHtml(
       />
     </div>
   </div>
-</div>
+</section>
 
 <style is:inline>
   /* Hide scrollbar for Chrome, Safari and Opera */

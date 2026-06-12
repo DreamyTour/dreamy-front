@@ -40,6 +40,7 @@ const availabilityText = {
 
 <section
   id="machupicchu"
+  aria-labelledby="machupicchu-title"
   class="content-deferred content-deferred--tall w-full py-16 bg-primary/5"
 >
   <div class="max-w-8xl mx-auto px-6">
@@ -47,20 +48,26 @@ const availabilityText = {
       class="mb-14 md:mb-20 flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-between"
     >
       {/* Lado izquierdo */}
-      <div class="max-w-3xl flex-1 text-left">
-        <div
+      <header class="max-w-3xl flex-1 text-left">
+        <p
           class="flex w-fit items-center gap-2 px-3 py-1 bg-secondary/15 text-secondary text-sm font-semibold rounded-full mb-4"
         >
-          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <svg
+            class="h-4 w-4"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
             <path
               fill-rule="evenodd"
               d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
               clip-rule="evenodd"></path>
           </svg>
           {badgeText}
-        </div>
+        </p>
 
         <h2
+          id="machupicchu-title"
           class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 relative inline-block"
         >
           <span class="relative z-10">{data.titulo}</span>
@@ -69,7 +76,10 @@ const availabilityText = {
           ></span>
         </h2>
 
-        <div class="flex items-center justify-start gap-3 mt-4 mb-6">
+        <div
+          class="flex items-center justify-start gap-3 mt-4 mb-6"
+          aria-hidden="true"
+        >
           <div
             class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary"
           >
@@ -102,12 +112,15 @@ const availabilityText = {
             </p>
           )
         }
-      </div>
+      </header>
 
       {/* Lado derecho (Card con el Botón) */}
       {
         data.category?.slug && (
-          <div class="w-full lg:w-[380px] shrink-0 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 border-l-[6px] border-secondary flex flex-col justify-center">
+          <aside
+            aria-labelledby="machupicchu-availability-title"
+            class="w-full lg:w-[380px] shrink-0 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-2xl p-6 border-l-[6px] border-secondary flex flex-col justify-center"
+          >
             <div class="flex items-center gap-4 mb-5">
               <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white shadow-md">
                 <svg
@@ -115,6 +128,7 @@ const availabilityText = {
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  aria-hidden="true"
                 >
                   <path
                     stroke-linecap="round"
@@ -125,7 +139,10 @@ const availabilityText = {
                 </svg>
               </div>
               <div>
-                <h3 class="font-bold text-gray-900 text-[1.05rem]">
+                <h3
+                  id="machupicchu-availability-title"
+                  class="font-bold text-gray-900 text-[1.05rem]"
+                >
                   {availabilityText.title}
                 </h3>
                 <p class="text-[0.85rem] text-gray-500">
@@ -145,6 +162,7 @@ const availabilityText = {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   stroke-width="2"
+                  aria-hidden="true"
                 >
                   <path
                     stroke-linecap="round"
@@ -160,6 +178,7 @@ const availabilityText = {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 stroke-width="2"
+                aria-hidden="true"
               >
                 <path
                   stroke-linecap="round"
@@ -168,7 +187,7 @@ const availabilityText = {
                 />
               </svg>
             </a>
-          </div>
+          </aside>
         )
       }
     </div>

@@ -14,15 +14,13 @@ interface ItineraryTabProps {
 
 export default function ItineraryTab({ items }: ItineraryTabProps) {
 	return (
-		<div className="space-y-4">
+		<ul className="m-0 list-none space-y-4 p-0">
 			{items.map((item, index) => (
-				<AccordionItem
-					key={item.titulo}
-					item={item}
-					defaultOpen={index === 0}
-				/>
+				<li key={item.titulo}>
+					<AccordionItem item={item} defaultOpen={index === 0} />
+				</li>
 			))}
-		</div>
+		</ul>
 	);
 }
 

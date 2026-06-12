@@ -1,0 +1,202 @@
+---
+import Layout from "@/layouts/main.astro";
+import CardPost from "@/components/ui/CardPost.astro";
+import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogPagination from "@/components/blog/BlogPagination.astro";
+import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
+import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { buildSEOProps } from "@/lib/seo";
+import { serializeJsonForHtml } from "@/lib/html";
+import type { Blog } from "@/types/blog";
+import type { BlogCategoryProps } from "@/lib/blogRoutes";
+
+interface Props extends BlogCategoryProps {
+  lang: Lang;
+}
+
+const {
+  page,
+  allCategories,
+  currentCategory,
+  categorySlug,
+  socialLogos,
+  slugMap,
+  categoryPostCounts,
+  totalPostCount,
+  lang = DEFAULT_LANG,
+} = Astro.props;
+
+const blogsList = page.data;
+const heroImage = currentCategory?.imagenDestacada
+  ? getImageUrl(currentCategory.imagenDestacada, "large")
+  : "";
+const heroImageSrcSet = currentCategory?.imagenDestacada
+  ? getImageSrcSet(currentCategory.imagenDestacada, [
+      "small",
+      "medium",
+      "large",
+    ])
+  : "";
+
+const pageLabelByLang: Record<Lang, string> = {
+  en: "Page",
+  es: "Pagina",
+  pt: "Pagina",
+};
+const emptyByLang: Record<Lang, string> = {
+  en: "No blog posts available in this category",
+  es: "No hay blogs disponibles en esta categoria",
+  pt: "Nao ha posts disponiveis nesta categoria",
+};
+const categorySeoProps = buildSEOProps({
+  seo: currentCategory?.seo,
+  fallbackTitle: currentCategory?.nombre || "Blog",
+  fallbackDescription: currentCategory?.descripcion || "",
+  type: "website",
+  lang,
+  slugMap,
+});
+const seoProps =
+  page.currentPage > 1
+    ? {
+        ...categorySeoProps,
+        title: `${categorySeoProps.title} - ${pageLabelByLang[lang]} ${page.currentPage}`,
+      }
+    : categorySeoProps;
+---
+
+<Layout seo={seoProps} lang={lang}>
+  <div class="blog-page-shell">
+    {
+      slugMap && Object.keys(slugMap).length > 0 && (
+        <script
+          is:inline
+          id="blog-slug-map"
+          type="application/json"
+          set:html={serializeJsonForHtml(slugMap)}
+        />
+      )
+    }
+
+    {
+      currentCategory?.imagenDestacada ? (
+        <header class="relative h-[46vh] min-h-[300px] max-h-[460px] w-full overflow-hidden">
+          <img
+            src={heroImage}
+            srcset={heroImageSrcSet || undefined}
+            sizes="100vw"
+            alt=""
+            aria-hidden="true"
+            class="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+          <div class="absolute inset-0 bg-black/55" aria-hidden="true" />
+
+          <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+            <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-white/70">
+              Dreamy Journal
+            </p>
+            <h1 class="max-w-3xl text-3xl font-semibold leading-[1.05] text-white drop-shadow-md md:text-5xl lg:text-6xl">
+              {currentCategory.nombre}
+            </h1>
+          </div>
+        </header>
+      ) : (
+        <header class="w-full py-14 md:py-20">
+          <div class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-3xl text-center">
+              <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-secondary/70">
+                Dreamy Journal
+              </p>
+              <h1 class="text-3xl font-semibold leading-[1.05] text-primary md:text-5xl lg:text-6xl">
+                {currentCategory?.nombre}
+              </h1>
+            </div>
+          </div>
+        </header>
+      )
+    }
+
+    <div class="blog-category-page py-12 lg:py-16">
+      <div class="max-w-8xl mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div class="w-full min-w-0">
+          {
+            currentCategory?.descripcion && (
+              <p class="mb-8 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
+                {currentCategory.descripcion}
+              </p>
+            )
+          }
+          {
+            blogsList.length > 0 ? (
+              <div>
+                <div class="blog-category-grid">
+                  {blogsList.map((blog: Blog, index: number) => (
+                    <CardPost
+                      blog={blog}
+                      lang={lang}
+                      isFeatured={index === 0}
+                      showDescription={index === 0 || index === 1}
+                    />
+                  ))}
+                </div>
+
+                <BlogPagination page={page} lang={lang} />
+              </div>
+            ) : (
+              <p class="text-center text-muted-foreground">
+                {emptyByLang[lang]}
+              </p>
+            )
+          }
+        </div>
+
+        <BlogAside
+          categories={allCategories}
+          currentSlug={categorySlug}
+          lang={lang}
+          socialLogos={socialLogos}
+          categoryPostCounts={categoryPostCounts}
+          totalPostCount={totalPostCount}
+        />
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .blog-page-shell {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
+      );
+  }
+
+  .blog-category-page {
+    background: transparent;
+  }
+
+  .blog-category-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: stretch;
+  }
+
+  @media (min-width: 768px) {
+    .blog-category-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .blog-category-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

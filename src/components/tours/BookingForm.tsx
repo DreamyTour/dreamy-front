@@ -90,15 +90,21 @@ export default function BookingForm({
 	};
 
 	return (
-		<div className="mb-8 flex w-full flex-col overflow-hidden rounded-lg border border-[#e7d7c8] bg-white shadow-[0_24px_70px_-48px_rgba(63,40,18,0.68)]">
-			<div className="border-b border-[#355548]/30 bg-[#244237] px-5 py-5 text-white md:px-6">
-				<h2 className="text-2xl font-extrabold tracking-tight text-white">
+		<section
+			aria-labelledby="booking-form-title"
+			className="mb-8 flex w-full flex-col overflow-hidden rounded-lg border border-[#e7d7c8] bg-white shadow-[0_24px_70px_-48px_rgba(63,40,18,0.68)]"
+		>
+			<header className="border-b border-[#355548]/30 bg-[#244237] px-5 py-5 text-white md:px-6">
+				<h2
+					id="booking-form-title"
+					className="text-2xl font-extrabold tracking-tight text-white"
+				>
 					Reserva
 				</h2>
 				<p className="mt-1 text-sm font-semibold leading-6 text-[#f0dbc8]">
 					{tourName}
 				</p>
-			</div>
+			</header>
 
 			<div className="flex flex-col px-4 py-5 md:px-5">
 				<div className="mb-5 w-full">
@@ -182,7 +188,7 @@ export default function BookingForm({
 				</div>
 			</div>
 
-			<div className="border-t border-[#eadfd3] bg-white p-5 md:p-6">
+			<footer className="border-t border-[#eadfd3] bg-white p-5 md:p-6">
 				<div className="mb-3 flex items-center justify-between rounded-sm border border-[#e8e2da] bg-[#faf8f5] px-3 py-2">
 					<span className="text-sm font-semibold text-[#5f5349]">
 						Precio por Persona
@@ -207,7 +213,7 @@ export default function BookingForm({
 				>
 					Book Now
 				</button>
-			</div>
-		</div>
+			</footer>
+		</section>
 	);
 }
