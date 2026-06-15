@@ -1,0 +1,1080 @@
+---
+import type { Lang } from "@/lib/i18n";
+import { useTranslations } from "@/i18n/ui";
+import TripAdvisorLogo from "@/assets/certification/certificado-tripadvisor.svg?url";
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section
+	class="reviews-wall bg-white py-14 sm:py-16"
+	aria-labelledby="reviews-wall-title"
+	data-reviews-wall
+	data-lang={lang}
+	data-tripadvisor-logo={TripAdvisorLogo}
+>
+	<div class="mx-auto max-w-8xl px-6">
+		<header class="mb-12 max-w-3xl">
+			<p class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary">
+				<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+					<path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+				</svg>
+				{t("reviews.kicker")}
+			</p>
+			<h2 id="reviews-wall-title" class="relative mb-2 inline-block text-3xl font-bold text-gray-900 md:text-4xl">
+				<span class="relative z-10">{t("reviews.title")}</span>
+				<span class="absolute bottom-0 left-0 -z-0 h-3 w-24 rounded-full bg-secondary/30 blur-sm"></span>
+			</h2>
+			<div class="mb-6 mt-4 flex items-center justify-start gap-3" aria-hidden="true">
+				<div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary"></div>
+				<div class="relative h-1.5 w-12 rounded-full bg-secondary">
+					<div class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"></div>
+				</div>
+				<div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary"></div>
+			</div>
+			<p class="text-base leading-relaxed text-gray-600">{t("reviews.description")}</p>
+		</header>
+		<div class="reviews-rows" data-review-rows aria-live="polite" aria-busy="true">
+			{
+				["tripadvisor", "google"].map((source) => (
+					<div class={`review-source-row review-source-row--${source}`}>
+						<aside class="review-source-panel">
+							<div class="review-logo-skeleton"></div>
+							<div class="review-meta-skeleton"></div>
+							<div class="review-score-skeleton"></div>
+						</aside>
+						<div class="review-row-cards">
+							{Array.from({ length: 3 }).map(() => (
+								<article class="review-card review-card--loading" aria-hidden="true">
+									<div class="review-card__header">
+										<span class="review-skeleton-avatar" />
+										<span class="review-skeleton-lines">
+											<span />
+											<span />
+										</span>
+									</div>
+									<span class="review-skeleton-title" />
+									<span class="review-skeleton-copy" />
+									<span class="review-skeleton-copy review-skeleton-copy--small" />
+								</article>
+							))}
+						</div>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<script>
+	type ReviewSource = "tripadvisor" | "google";
+	type Review = {
+		id: string;
+		source: ReviewSource;
+		author: string;
+		title?: string;
+		text: string;
+		rating: number;
+		date?: string;
+		url?: string;
+		avatar?: string;
+	};
+	type SourceSummary = {
+		source: ReviewSource;
+		name: string;
+		rating?: number;
+		reviewCount?: number;
+		url?: string;
+		configured: boolean;
+		error?: string;
+	};
+	type ReviewsPayload = {
+		sources: SourceSummary[];
+		reviews: Review[];
+		updatedAt: string;
+	};
+
+	const copy = {
+		es: {
+			brandTour: "Dreamy Tours",
+			basedOn: "Basado en",
+			reviews: "opiniones",
+			of: "De 5 estrellas",
+			full: "Ver la opinión completa",
+			empty: "Reseñas dinámicas no disponibles.",
+			config: "Conecta la API para mostrar las últimas reseñas.",
+		},
+		en: {
+			brandTour: "Dreamy Tours",
+			basedOn: "Based on",
+			reviews: "reviews",
+			of: "Out of 5 stars",
+			full: "Read full review",
+			empty: "Dynamic reviews are not available.",
+			config: "Connect the API to show the latest reviews.",
+		},
+		pt: {
+			brandTour: "Dreamy Tours",
+			basedOn: "Baseado em",
+			reviews: "avaliações",
+			of: "De 5 estrelas",
+			full: "Ver avaliação completa",
+			empty: "Avaliações dinâmicas não disponíveis.",
+			config: "Conecte a API para mostrar as últimas avaliações.",
+		},
+	};
+
+	const sourceOrder: ReviewSource[] = ["tripadvisor", "google"];
+	const tripadvisorLogoUrl =
+		document.querySelector<HTMLElement>("[data-reviews-wall]")?.dataset
+			.tripadvisorLogo || "";
+
+	const brand = {
+		tripadvisor: {
+			name: "Tripadvisor",
+			compact: "TA",
+			panelClass: "review-source-panel--tripadvisor",
+			cardClass: "review-card--tripadvisor",
+		},
+		google: {
+			name: "Google Reviews",
+			compact: "G",
+			panelClass: "review-source-panel--google",
+			cardClass: "review-card--google",
+		},
+	} as const;
+
+	const fallbackSources = (): SourceSummary[] => [
+		{
+			source: "tripadvisor",
+			name: "Tripadvisor",
+			configured: false,
+			url: "https://www.tripadvisor.com.pe/Attraction_Review-g294314-d17325827-Reviews-Dreamy_Tours-Cusco_Cusco_Region.html",
+		},
+		{
+			source: "google",
+			name: "Google Reviews",
+			configured: false,
+			url: "https://www.google.com/maps/place/Dreamy+Tours/@-13.524429,-71.9506049,1057m/data=!3m2!1e3!4b1!4m6!3m5!1s0x916dd587b52c49c5:0xdaa973fe4585e28a!8m2!3d-13.5244342!4d-71.94803!16s%2Fg%2F11fkv9g6rk",
+		},
+	];
+
+	const formatDate = (date: string | undefined, lang: string) => {
+		if (!date) return "";
+		const parsed = new Date(date);
+		if (Number.isNaN(parsed.getTime())) return "";
+		return new Intl.DateTimeFormat(lang, {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		}).format(parsed);
+	};
+
+	const makeLogo = (source: ReviewSource) => {
+		const logo = document.createElement("span");
+		logo.className = `review-brand-logo review-brand-logo--${source}`;
+		logo.setAttribute("aria-label", brand[source].name);
+
+		if (source === "google") {
+			logo.innerHTML = `<span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span><span class="review-google-word">Reviews</span>`;
+			return logo;
+		}
+
+		if (tripadvisorLogoUrl) {
+			logo.innerHTML = `<img class="tripadvisor-logo-img" src="${tripadvisorLogoUrl}" alt="" loading="lazy" decoding="async" />`;
+		} else {
+			logo.textContent = "Tripadvisor";
+		}
+		return logo;
+	};
+
+	const makePlatformBadge = (source: ReviewSource) => {
+		const badge = document.createElement("span");
+		badge.className = `review-platform-badge review-platform-badge--${source}`;
+		badge.setAttribute("aria-label", brand[source].name);
+		if (source === "google") {
+			badge.innerHTML = `<span class="g-blue">G</span>`;
+		} else {
+			badge.innerHTML = tripadvisorLogoUrl
+				? `<img class="review-platform-badge-img" src="${tripadvisorLogoUrl}" alt="" loading="lazy" decoding="async" />`
+				: `<span>Tripadvisor</span>`;
+		}
+		return badge;
+	};
+
+	const createStars = (rating = 5, source: ReviewSource) => {
+		const stars = document.createElement("span");
+		stars.className = `review-stars review-stars--${source}`;
+		stars.setAttribute("aria-label", `${rating} / 5`);
+
+		for (let index = 0; index < 5; index += 1) {
+			const item = document.createElement("span");
+			item.className = index < Math.round(rating) ? "is-filled" : "";
+			stars.append(item);
+		}
+
+		return stars;
+	};
+
+	const makeAvatar = (review: Review) => {
+		if (review.avatar) {
+			const img = document.createElement("img");
+			img.className = "review-avatar";
+			img.src = review.avatar;
+			img.alt = "";
+			img.loading = "lazy";
+			img.decoding = "async";
+			return img;
+		}
+
+		const avatar = document.createElement("span");
+		avatar.className = "review-avatar review-avatar--initials";
+		avatar.textContent = review.author.slice(0, 2).toUpperCase();
+		avatar.setAttribute("aria-hidden", "true");
+		return avatar;
+	};
+
+	const renderPanel = (summary: SourceSummary, lang: string) => {
+		const labels = copy[lang as keyof typeof copy] || copy.es;
+		const panel = document.createElement(summary.url ? "a" : "aside");
+		panel.className = `review-source-panel ${brand[summary.source].panelClass}`;
+
+		if (panel instanceof HTMLAnchorElement && summary.url) {
+			panel.href = summary.url;
+			panel.target = "_blank";
+			panel.rel = "noopener noreferrer";
+		}
+
+		panel.append(makeLogo(summary.source));
+
+		const tour = document.createElement("span");
+		tour.className = "review-source-tour";
+		tour.textContent = labels.brandTour;
+		panel.append(tour);
+
+		const scoreLine = document.createElement("span");
+		scoreLine.className = "review-score-line";
+
+		const score = document.createElement("span");
+		score.className = "review-score";
+		score.textContent = summary.rating ? summary.rating.toFixed(1) : "--";
+		scoreLine.append(score);
+
+		const descriptor = document.createElement("span");
+		descriptor.className = "review-score-descriptor";
+		descriptor.textContent = labels.of;
+		scoreLine.append(descriptor, createStars(summary.rating || 5, summary.source));
+		panel.append(scoreLine);
+
+		const total = document.createElement("span");
+		total.className = "review-total";
+		total.textContent = summary.reviewCount
+			? `${labels.basedOn} ${new Intl.NumberFormat(lang).format(summary.reviewCount)} ${labels.reviews}`
+			: labels.config;
+		panel.append(total);
+
+		return panel;
+	};
+
+	const renderCard = (review: Review, lang: string) => {
+		const labels = copy[lang as keyof typeof copy] || copy.es;
+		const article = document.createElement("article");
+		article.className = `review-card ${brand[review.source].cardClass}`;
+
+		const header = document.createElement("div");
+		header.className = "review-card__header";
+		header.append(makeAvatar(review));
+
+		const authorWrap = document.createElement("div");
+		authorWrap.className = "review-card__author";
+
+		const author = document.createElement("h3");
+		author.className = "review-author";
+		author.textContent = review.author;
+
+		const date = document.createElement("p");
+		date.className = "review-date";
+		date.textContent = formatDate(review.date, lang);
+		authorWrap.append(author, date);
+		header.append(authorWrap);
+
+		const title = document.createElement("p");
+		title.className = "review-title";
+		title.textContent = review.title || brand[review.source].name;
+
+		const text = document.createElement("p");
+		text.className = "review-text";
+		text.textContent = review.text;
+
+		article.append(makePlatformBadge(review.source), header, title);
+		article.append(createStars(review.rating, review.source), text);
+
+		if (review.url) {
+			const link = document.createElement("a");
+			link.className = "review-link";
+			link.href = review.url;
+			link.target = "_blank";
+			link.rel = "noopener noreferrer";
+			link.textContent = labels.full;
+			article.append(link);
+
+			const arrow = document.createElement("span");
+			arrow.className = "review-card-arrow";
+			arrow.setAttribute("aria-hidden", "true");
+			article.append(arrow);
+		}
+
+		return article;
+	};
+
+	const renderEmptyCard = (source: ReviewSource, lang: string) => {
+		const labels = copy[lang as keyof typeof copy] || copy.es;
+		const card = document.createElement("article");
+		card.className = `review-card review-card--empty ${brand[source].cardClass}`;
+		card.append(makePlatformBadge(source));
+
+		const title = document.createElement("p");
+		title.className = "review-title";
+		title.textContent = labels.empty;
+
+		const text = document.createElement("p");
+		text.className = "review-text";
+		text.textContent = labels.config;
+		card.append(title, text);
+		return card;
+	};
+
+	const renderRows = (
+		root: HTMLElement,
+		sources: SourceSummary[],
+		reviews: Review[],
+		lang: string,
+	) => {
+		const rows = root.querySelector<HTMLElement>("[data-review-rows]");
+		if (!rows) return;
+
+		const fragments = sourceOrder.map((source) => {
+			const summary =
+				sources.find((item) => item.source === source) ||
+				fallbackSources().find((item) => item.source === source);
+			const sourceReviews = reviews
+				.filter((review) => review.source === source)
+				.slice(0, 3);
+			const row = document.createElement("div");
+			row.className = `review-source-row review-source-row--${source}`;
+
+			if (summary) row.append(renderPanel(summary, lang));
+
+			const cards = document.createElement("div");
+			cards.className = "review-row-cards";
+
+			if (sourceReviews.length) {
+				cards.append(...sourceReviews.map((review) => renderCard(review, lang)));
+			} else {
+				cards.append(renderEmptyCard(source, lang));
+			}
+
+			row.append(cards);
+			return row;
+		});
+
+		rows.replaceChildren(...fragments);
+		rows.setAttribute("aria-busy", "false");
+		root.classList.add("is-loaded");
+	};
+
+	document.querySelectorAll<HTMLElement>("[data-reviews-wall]").forEach(async (root) => {
+		const lang = root.dataset.lang || "es";
+
+		try {
+			const response = await fetch(`/api/reviews?lang=${encodeURIComponent(lang)}`);
+			if (!response.ok) throw new Error(String(response.status));
+			const payload = (await response.json()) as ReviewsPayload;
+			renderRows(root, payload.sources || [], payload.reviews || [], lang);
+		} catch {
+			renderRows(root, fallbackSources(), [], lang);
+		}
+	});
+</script>
+
+<style is:global>
+	.reviews-wall {
+		position: relative;
+		overflow: clip;
+		background:
+			linear-gradient(180deg, #fff 0%, color-mix(in oklab, var(--muted) 68%, white) 100%);
+		color: var(--foreground);
+	}
+
+	.reviews-wall::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background-image:
+			linear-gradient(color-mix(in oklab, var(--border) 32%, transparent) 1px, transparent 1px),
+			linear-gradient(90deg, color-mix(in oklab, var(--border) 32%, transparent) 1px, transparent 1px);
+		background-size: 42px 42px;
+		mask-image: linear-gradient(180deg, transparent 0%, black 22%, black 72%, transparent 100%);
+		opacity: 0.4;
+	}
+
+	.reviews-wall > div {
+		position: relative;
+	}
+
+	.reviews-rows {
+		display: grid;
+		gap: 1.2rem;
+		container-type: inline-size;
+	}
+
+	.review-source-row {
+		display: grid;
+		grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+		gap: 1.15rem;
+		align-items: stretch;
+	}
+
+	.review-source-panel {
+		position: relative;
+		display: flex;
+		min-height: 18rem;
+		flex-direction: column;
+		justify-content: center;
+		overflow: hidden;
+		border: 1px solid color-mix(in oklab, var(--border) 74%, white);
+		border-radius: 8px;
+		background:
+			linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9)),
+			radial-gradient(circle at 16% 10%, color-mix(in oklab, var(--secondary) 14%, transparent), transparent 34%);
+		padding: 2rem 1.8rem;
+		color: inherit;
+		box-shadow: 0 16px 38px rgba(15, 23, 42, 0.07);
+		text-decoration: none;
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			transform 180ms ease;
+	}
+
+	.review-source-panel::before {
+		content: "";
+		position: absolute;
+		inset-block: 1rem;
+		inset-inline-start: 0;
+		width: 0.22rem;
+		border-radius: 999px;
+		background: var(--secondary);
+	}
+
+	.review-source-panel--tripadvisor::before {
+		background: #19c89c;
+	}
+
+	.review-source-panel--google::before {
+		background: linear-gradient(180deg, #4285f4 0%, #34a853 48%, #fbbc04 72%, #ea4335 100%);
+	}
+
+	.review-source-panel:hover .review-brand-logo {
+		transform: translateY(-2px);
+	}
+
+	.review-source-panel:hover {
+		border-color: color-mix(in oklab, var(--secondary) 44%, var(--border));
+		box-shadow: 0 22px 52px rgba(15, 23, 42, 0.1);
+		transform: translateY(-1px);
+	}
+
+	.review-brand-logo {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.62rem;
+		width: max-content;
+		max-width: 100%;
+		font-weight: 900;
+		letter-spacing: 0;
+		transition: transform 180ms ease;
+	}
+
+	.review-brand-logo--tripadvisor {
+		display: block;
+		width: min(100%, 14.6rem);
+	}
+
+	.tripadvisor-logo-img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.tripadvisor-mark {
+		position: relative;
+		display: inline-flex;
+		width: 2.6rem;
+		height: 2.6rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		background: #20d6a2;
+		box-shadow: inset 0 -0.35rem 0 rgba(0, 0, 0, 0.06);
+	}
+
+	.tripadvisor-mark::before,
+	.tripadvisor-mark::after {
+		content: "";
+		position: absolute;
+		top: 0.55rem;
+		width: 0.74rem;
+		height: 0.74rem;
+		border: 0.16rem solid #081711;
+		border-radius: 999px;
+		background: white;
+	}
+
+	.tripadvisor-mark::before {
+		left: 0.52rem;
+	}
+
+	.tripadvisor-mark::after {
+		right: 0.52rem;
+	}
+
+	.tripadvisor-mark > span {
+		position: absolute;
+		top: 0.84rem;
+		z-index: 1;
+		width: 0.24rem;
+		height: 0.24rem;
+		border-radius: 999px;
+		background: #081711;
+	}
+
+	.tripadvisor-mark > span:first-child {
+		left: 0.77rem;
+	}
+
+	.tripadvisor-mark > span:last-child {
+		right: 0.77rem;
+	}
+
+	.tripadvisor-mark > span:last-child::after {
+		content: "";
+		position: absolute;
+		top: 0.48rem;
+		right: 0.25rem;
+		width: 0.52rem;
+		height: 0.36rem;
+		border-inline: 0.16rem solid transparent;
+		border-top: 0.24rem solid #081711;
+	}
+
+	.tripadvisor-word {
+		color: #111827;
+		font-size: clamp(1.9rem, 3vw, 2.65rem);
+		line-height: 1;
+	}
+
+	.review-brand-logo--google {
+		gap: 0;
+		font-size: clamp(1.95rem, 3vw, 2.75rem);
+		line-height: 1;
+	}
+
+	.review-google-word {
+		margin-left: 0.55rem;
+		align-self: flex-end;
+		padding-bottom: 0.18rem;
+		color: #5f6368;
+		font-size: 1.03rem;
+		font-weight: 700;
+		letter-spacing: 0;
+	}
+
+	.g-blue {
+		color: #4285f4;
+	}
+
+	.g-red {
+		color: #ea4335;
+	}
+
+	.g-yellow {
+		color: #fbbc04;
+	}
+
+	.g-green {
+		color: #34a853;
+	}
+
+	.review-source-tour {
+		margin-top: 1.75rem;
+		font-size: 1rem;
+		font-weight: 800;
+		color: color-mix(in oklab, var(--foreground) 84%, white);
+	}
+
+	.review-score-line {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		margin-top: 0.7rem;
+		flex-wrap: wrap;
+	}
+
+	.review-score {
+		font-size: 2.95rem;
+		font-weight: 900;
+		line-height: 0.95;
+		color: color-mix(in oklab, var(--foreground) 80%, black);
+	}
+
+	.review-score-descriptor {
+		max-width: 4rem;
+		font-size: 0.95rem;
+		line-height: 1.05;
+		color: color-mix(in oklab, var(--foreground) 62%, white);
+	}
+
+	.review-total {
+		margin-top: 0.65rem;
+		font-size: 0.95rem;
+		color: color-mix(in oklab, var(--foreground) 62%, white);
+	}
+
+	.review-total::first-letter,
+	.review-link {
+		color: var(--secondary);
+	}
+
+	.review-row-cards {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1.15rem;
+	}
+
+	.review-card {
+		position: relative;
+		min-height: 18rem;
+		overflow: hidden;
+		border: 1px solid color-mix(in oklab, var(--border) 70%, white);
+		border-radius: 8px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.98), color-mix(in oklab, var(--muted) 42%, white)),
+			white;
+		padding: 1.35rem 1.35rem 3rem;
+		opacity: 0;
+		transform: translateY(14px);
+		box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+		animation: review-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			transform 180ms ease;
+	}
+
+	.review-card::before {
+		content: "";
+		position: absolute;
+		inset-block-start: 0;
+		inset-inline: 0;
+		height: 0.22rem;
+		background: var(--secondary);
+		opacity: 0.95;
+	}
+
+	.review-card--tripadvisor::before {
+		background: #19c89c;
+	}
+
+	.review-card--google::before {
+		background: linear-gradient(90deg, #4285f4 0%, #34a853 38%, #fbbc04 66%, #ea4335 100%);
+	}
+
+	.review-card:hover {
+		border-color: color-mix(in oklab, var(--secondary) 45%, var(--border));
+		box-shadow: 0 22px 46px rgba(15, 23, 42, 0.1);
+		transform: translateY(-3px);
+	}
+
+	.review-card:nth-child(2) {
+		animation-delay: 70ms;
+	}
+
+	.review-card:nth-child(3) {
+		animation-delay: 140ms;
+	}
+
+	.review-card--loading {
+		opacity: 1;
+		transform: none;
+		animation: none;
+	}
+
+	.review-card__header {
+		display: flex;
+		align-items: center;
+		gap: 0.78rem;
+		padding-right: 2.8rem;
+	}
+
+	.review-card__author {
+		min-width: 0;
+	}
+
+	.review-avatar {
+		display: inline-flex;
+		width: 3.85rem;
+		height: 3.85rem;
+		flex: 0 0 auto;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		object-fit: cover;
+		background:
+			linear-gradient(135deg, color-mix(in oklab, var(--primary) 28%, white), color-mix(in oklab, var(--secondary) 22%, white));
+		color: var(--primary);
+		font-size: 1.15rem;
+		font-weight: 800;
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.78),
+			0 8px 18px rgba(15, 23, 42, 0.08);
+	}
+
+	.review-avatar--initials {
+		color: color-mix(in oklab, var(--primary) 80%, black);
+	}
+
+	.review-author {
+		position: relative;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: 1.02rem;
+		font-weight: 800;
+		color: color-mix(in oklab, var(--foreground) 84%, black);
+	}
+
+	.review-author::before {
+		content: "";
+		display: inline-block;
+		width: 0.75rem;
+		height: 0.75rem;
+		margin-right: 0.25rem;
+		border-radius: 999px;
+		background: color-mix(in oklab, var(--muted-foreground) 34%, white);
+		box-shadow:
+			0 0.62rem 0 -0.16rem color-mix(in oklab, var(--muted-foreground) 34%, white),
+			0.54rem 0.62rem 0 -0.16rem color-mix(in oklab, var(--muted-foreground) 34%, white);
+	}
+
+	.review-date {
+		margin-top: 0.2rem;
+		font-size: 0.82rem;
+		font-style: italic;
+		color: color-mix(in oklab, var(--foreground) 54%, white);
+	}
+
+	.review-title {
+		margin-top: 1.15rem;
+		font-size: 1.05rem;
+		font-weight: 800;
+		line-height: 1.25;
+		color: color-mix(in oklab, var(--foreground) 84%, black);
+	}
+
+	.review-stars {
+		display: flex;
+		align-items: center;
+		gap: 0.28rem;
+		margin-top: 0.65rem;
+		margin-bottom: 0.8rem;
+		line-height: 1;
+	}
+
+	.review-stars--tripadvisor span {
+		width: 0.82rem;
+		height: 0.82rem;
+		border-radius: 999px;
+		border: 1px solid #21c89d;
+		background: transparent;
+	}
+
+	.review-stars--tripadvisor span.is-filled {
+		background: #21c89d;
+	}
+
+	.review-stars--google span {
+		width: 1rem;
+		height: 1rem;
+		background: color-mix(in oklab, #fbbc04 18%, var(--border));
+		clip-path: polygon(
+			50% 0%,
+			61% 34%,
+			98% 34%,
+			68% 55%,
+			79% 90%,
+			50% 68%,
+			21% 90%,
+			32% 55%,
+			2% 34%,
+			39% 34%
+		);
+	}
+
+	.review-stars--google span.is-filled {
+		background: #fbbc04;
+	}
+
+	.review-text {
+		display: -webkit-box;
+		min-height: 6.95rem;
+		overflow: clip;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 5;
+		line-clamp: 5;
+		font-size: 0.97rem;
+		line-height: 1.5;
+		color: color-mix(in oklab, var(--foreground) 62%, white);
+	}
+
+	.review-link {
+		position: absolute;
+		right: 1.25rem;
+		bottom: 1.05rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		text-decoration: none;
+		transition:
+			color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.review-link:hover {
+		transform: translateX(-0.1rem);
+	}
+
+	.review-card-arrow {
+		position: absolute;
+		top: 50%;
+		right: 1.1rem;
+		width: 0.95rem;
+		height: 0.95rem;
+		border-top: 2px solid color-mix(in oklab, var(--secondary) 45%, white);
+		border-right: 2px solid color-mix(in oklab, var(--secondary) 45%, white);
+		transform: translateY(-50%) rotate(45deg);
+		transition:
+			border-color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.review-card:hover .review-card-arrow {
+		border-color: var(--secondary);
+		transform: translate(0.16rem, -50%) rotate(45deg);
+	}
+
+	.review-platform-badge {
+		position: absolute;
+		top: 0.62rem;
+		right: 0.62rem;
+		display: inline-flex;
+		width: 2.15rem;
+		height: 2.15rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: 999px;
+		font-size: 0.74rem;
+		font-weight: 900;
+		box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+	}
+
+	.review-platform-badge--tripadvisor {
+		width: 4.15rem;
+		height: auto;
+		min-height: 2.15rem;
+		padding: 0.28rem 0.35rem;
+		border-radius: 999px;
+		background: white;
+		box-shadow:
+			inset 0 0 0 1px color-mix(in oklab, var(--border) 65%, white),
+			0 8px 16px rgba(15, 23, 42, 0.08);
+	}
+
+	.review-platform-badge-img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.review-platform-badge--google {
+		background: white;
+		color: #4285f4;
+		font-size: 1.28rem;
+		box-shadow:
+			inset 0 0 0 1px color-mix(in oklab, var(--border) 70%, white),
+			0 8px 16px rgba(15, 23, 42, 0.08);
+	}
+
+	.review-card--empty {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.review-card--empty .review-text {
+		min-height: auto;
+	}
+
+	.review-logo-skeleton,
+	.review-meta-skeleton,
+	.review-score-skeleton,
+	.review-skeleton-avatar,
+	.review-skeleton-lines span,
+	.review-skeleton-title,
+	.review-skeleton-copy {
+		background: linear-gradient(
+			90deg,
+			color-mix(in oklab, var(--muted) 88%, white),
+			color-mix(in oklab, var(--border) 70%, white),
+			color-mix(in oklab, var(--muted) 88%, white)
+		);
+		background-size: 220% 100%;
+		animation: review-shimmer 1200ms ease-in-out infinite;
+	}
+
+	.review-logo-skeleton {
+		width: 72%;
+		height: 3.2rem;
+	}
+
+	.review-meta-skeleton {
+		margin-top: 1.7rem;
+		width: 62%;
+		height: 1rem;
+	}
+
+	.review-score-skeleton {
+		margin-top: 1rem;
+		width: 84%;
+		height: 2.8rem;
+	}
+
+	.review-skeleton-avatar {
+		width: 4rem;
+		height: 4rem;
+		border-radius: 999px;
+	}
+
+	.review-skeleton-lines {
+		display: block;
+		width: 58%;
+	}
+
+	.review-skeleton-lines span {
+		display: block;
+		height: 0.78rem;
+		margin-bottom: 0.6rem;
+	}
+
+	.review-skeleton-lines span:last-child {
+		width: 70%;
+		margin-bottom: 0;
+	}
+
+	.review-skeleton-title,
+	.review-skeleton-copy {
+		display: block;
+		height: 0.9rem;
+		margin-top: 1.35rem;
+	}
+
+	.review-skeleton-copy {
+		height: 4.8rem;
+	}
+
+	.review-skeleton-copy--small {
+		width: 64%;
+		height: 0.9rem;
+	}
+
+	@keyframes review-rise {
+		from {
+			opacity: 0;
+			transform: translateY(14px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes review-shimmer {
+		to {
+			background-position: -220% 0;
+		}
+	}
+
+	@media (max-width: 1180px) {
+		.review-source-row {
+			grid-template-columns: 16rem minmax(0, 1fr);
+		}
+
+		.review-row-cards {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 820px) {
+		.reviews-wall {
+			padding-block: 3rem;
+		}
+
+		.review-source-row {
+			grid-template-columns: 1fr;
+		}
+
+		.review-source-panel {
+			min-height: auto;
+			padding: 1.25rem 1.75rem;
+		}
+
+		.review-brand-logo--tripadvisor {
+			width: min(100%, 10rem);
+		}
+
+		.review-row-cards {
+			display: flex;
+			gap: 0.85rem;
+			overflow-x: auto;
+			padding-bottom: 0.75rem;
+			scroll-snap-type: x mandatory;
+			scrollbar-width: thin;
+		}
+
+		.review-card {
+			width: min(86vw, 22rem);
+			flex: 0 0 auto;
+			scroll-snap-align: start;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.review-card,
+		.review-logo-skeleton,
+		.review-meta-skeleton,
+		.review-score-skeleton,
+		.review-skeleton-avatar,
+		.review-skeleton-lines span,
+		.review-skeleton-title,
+		.review-skeleton-copy {
+			animation: none;
+			opacity: 1;
+			transform: none;
+		}
+	}
+</style>
