@@ -619,7 +619,7 @@ export default function IncaTrailAvailabilityCalendar({
 				</div>
 			)}
 
-			<div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#f0e5d9] bg-neutral-50 px-4 py-3 text-[11px] font-medium text-[#6f6258]">
+			<div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#f0e5d9] bg-neutral-50 px-4 py-3 text-base font-medium text-[#6f6258]">
 				<span className="flex items-center gap-1.5">
 					<span className="inline-block h-3 w-3 rounded-sm border border-[#bfe6ce] bg-[#edf8f1]" />
 					{copy.moreThanTen}
