@@ -281,23 +281,34 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
                       </NavigationMenuTrigger>
 
                       <NavigationMenuContent>
-                        <ul className="grid w-full grid-cols-3 gap-x-8 gap-y-1.5 p-6">
+                        <div className="px-6 pb-3 pt-5">
+                          <p className="border-b border-border pb-3 text-base font-medium uppercase text-foreground/72">
+                            <span className="inline-block border-b-2 border-secondary pb-3">
+                              {menuItem.link.label}
+                            </span>
+                          </p>
+                        </div>
+
+                        <ul className="grid w-full grid-flow-col grid-rows-6 gap-x-8 px-6 pb-3">
                           {menuItem.item.map((subItem: Link) => (
-                            <li key={subItem.id}>
+                            <li key={subItem.id} className="border-b border-border">
                               <NavigationMenuLink asChild variant="dropdown">
-                                <a href={rewriteUrl(subItem.url, lang)}>
+                                <a
+                                  href={rewriteUrl(subItem.url, lang)}
+                                  className="py-3 pl-5 text-[15px]"
+                                >
                                   <ChevronRight
                                     size={14}
                                     strokeWidth={2.2}
-                                    className="shrink-0 text-primary/45 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary"
+                                    className="pointer-events-none absolute left-0 top-1/2 -translate-x-2 -translate-y-1/2 opacity-0 text-primary transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus:translate-x-0 group-focus:opacity-100"
                                     aria-hidden="true"
                                     focusable="false"
                                   />
-                                  <span className="min-w-0 flex-1 whitespace-normal text-balance leading-snug">
+                                  <span className="min-w-0 whitespace-normal leading-snug">
                                     {subItem.label}
                                   </span>
                                   {subItem.badge ? (
-                                    <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-secondary px-2 py-1 text-[10px] font-bold leading-none text-secondary-foreground">
+                                    <span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm border border-secondary/20 bg-secondary px-2 py-0.5 text-[10px] font-semibold leading-none text-secondary-foreground">
                                       {subItem.badge}
                                     </span>
                                   ) : null}

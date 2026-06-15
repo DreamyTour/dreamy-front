@@ -64,26 +64,35 @@ const seoProps = buildSEOProps({
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <div class="blog-page-shell">
+  <section class="blog-page-shell" aria-labelledby="blog-index-title">
     <div class="blog-index-page w-full py-16 md:py-24">
       <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <header class="mx-auto mb-12 max-w-4xl text-center md:mb-16">
-          <p class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary">
+          <p
+            class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary"
+          >
             Dreamy Journal
           </p>
-          <h1 class="text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl">
+          <h1
+            id="blog-index-title"
+            class="text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl"
+          >
             Blog
           </h1>
-          <p class="mx-auto mt-6 max-w-2xl text-base leading-7 text-foreground/68 md:text-lg">
+          <p
+            class="mx-auto mt-6 max-w-2xl text-base leading-7 text-foreground/68 md:text-lg"
+          >
             {blogSeo.description}
           </p>
         </header>
 
-        <section class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <section
+          class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]"
+        >
           <div class="w-full min-w-0">
             {
               blogsList.length > 0 ? (
-                <div>
+                <>
                   <div class="blog-post-grid">
                     {featuredBlog && (
                       <CardPost
@@ -99,37 +108,34 @@ const seoProps = buildSEOProps({
                   </div>
 
                   <BlogPagination page={page} lang={lang} />
-                </div>
+                </>
               ) : (
                 <p class="text-center text-muted-foreground">{blogSeo.empty}</p>
               )
             }
           </div>
 
-          <div class="w-full shrink-0">
-            <BlogAside
-              categories={allCategories}
-              lang={lang}
-              socialLogos={socialLogos}
-              categoryPostCounts={categoryPostCounts}
-              totalPostCount={totalPostCount}
-            />
-          </div>
+          <BlogAside
+            categories={allCategories}
+            lang={lang}
+            socialLogos={socialLogos}
+            categoryPostCounts={categoryPostCounts}
+            totalPostCount={totalPostCount}
+          />
         </section>
       </div>
     </div>
-  </div>
+  </section>
 </Layout>
 
 <style>
   .blog-page-shell {
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
-        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
-        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
-      );
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+      color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+      color-mix(in oklab, var(--blog-surface) 72%, white) 100%
+    );
   }
 
   .blog-index-page {

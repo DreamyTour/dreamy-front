@@ -75,7 +75,7 @@ const navigationMenuItemStyle = "static";
 /* -------------------------------------------------------------------------- */
 
 const navigationMenuTriggerStyle = cva(
-	"group relative inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap bg-background px-3.5 pb-3 pt-2 text-sm font-semibold text-foreground/82 transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 focus:text-primary focus:outline-none data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-4",
+	"group relative inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap bg-background px-3.5 pb-3 pt-2 text-[15px] font-semibold text-foreground/82 transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 focus:text-primary focus:outline-none data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-4",
 );
 
 function NavigationMenuTrigger({
@@ -154,9 +154,9 @@ const navigationMenuLinkStyle = cva(
 		variants: {
 			variant: {
 				default:
-					"relative inline-flex h-11 items-center gap-2 whitespace-nowrap px-3.5 pb-3 pt-2 text-sm font-semibold after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:after:scale-x-100 xl:px-4",
+					"relative inline-flex h-11 items-center gap-2 whitespace-nowrap px-3.5 pb-3 pt-2 text-[15px] font-semibold after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:after:scale-x-100 xl:px-4",
 				dropdown:
-					"group relative flex min-w-0 items-start justify-between gap-3 rounded-none px-4 py-4 text-sm font-semibold text-foreground/78 transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-linear-to-r after:from-transparent after:via-border after:to-transparent hover:text-primary focus:text-primary",
+					"group relative flex min-w-0 items-center justify-start gap-2 rounded-none px-0 py-0 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus:text-primary",
 			},
 		},
 		defaultVariants: {

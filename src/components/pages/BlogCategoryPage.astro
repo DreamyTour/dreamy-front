@@ -66,7 +66,7 @@ const seoProps =
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <div class="blog-page-shell">
+  <section class="blog-page-shell" aria-labelledby="blog-category-title">
     {
       slugMap && Object.keys(slugMap).length > 0 && (
         <script
@@ -98,7 +98,10 @@ const seoProps =
             <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-white/70">
               Dreamy Journal
             </p>
-            <h1 class="max-w-3xl text-3xl font-semibold leading-[1.05] text-white drop-shadow-md md:text-5xl lg:text-6xl">
+            <h1
+              id="blog-category-title"
+              class="max-w-3xl text-3xl font-semibold leading-[1.05] text-white drop-shadow-md md:text-5xl lg:text-6xl"
+            >
               {currentCategory.nombre}
             </h1>
           </div>
@@ -110,7 +113,10 @@ const seoProps =
               <p class="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-secondary/70">
                 Dreamy Journal
               </p>
-              <h1 class="text-3xl font-semibold leading-[1.05] text-primary md:text-5xl lg:text-6xl">
+              <h1
+                id="blog-category-title"
+                class="text-3xl font-semibold leading-[1.05] text-primary md:text-5xl lg:text-6xl"
+              >
                 {currentCategory?.nombre}
               </h1>
             </div>
@@ -120,7 +126,9 @@ const seoProps =
     }
 
     <div class="blog-category-page py-12 lg:py-16">
-      <div class="max-w-8xl mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div
+        class="max-w-8xl mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8 xl:grid-cols-[minmax(0,1fr)_22rem]"
+      >
         <div class="w-full min-w-0">
           {
             currentCategory?.descripcion && (
@@ -131,7 +139,7 @@ const seoProps =
           }
           {
             blogsList.length > 0 ? (
-              <div>
+              <>
                 <div class="blog-category-grid">
                   {blogsList.map((blog: Blog, index: number) => (
                     <CardPost
@@ -144,7 +152,7 @@ const seoProps =
                 </div>
 
                 <BlogPagination page={page} lang={lang} />
-              </div>
+              </>
             ) : (
               <p class="text-center text-muted-foreground">
                 {emptyByLang[lang]}
@@ -163,18 +171,17 @@ const seoProps =
         />
       </div>
     </div>
-  </div>
+  </section>
 </Layout>
 
 <style>
   .blog-page-shell {
-    background:
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
-        color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
-        color-mix(in oklab, var(--blog-surface) 72%, white) 100%
-      );
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
+      color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
+      color-mix(in oklab, var(--blog-surface) 72%, white) 100%
+    );
   }
 
   .blog-category-page {
