@@ -58,23 +58,24 @@ const seoProps = {
     highlighted
     ctaLabelKey="section.verMasPaquetes"
   />
-  <TourPackagesSection
-    data={homeData?.peruPaquetes}
-    lang={lang}
-    titleId="peru-packages-title"
-    href={{
-      es: "/paquetes-peru",
-      en: "/peru-packages",
-      pt: "/pacotes-peru",
-    }[lang] || "/peru-packages"}
-  />
+  <div class="bg-white">
+    <TourPackagesSection
+      data={homeData?.peruPaquetes}
+      lang={lang}
+      titleId="peru-packages-title"
+      href={{
+        es: "/paquetes-peru",
+        en: "/peru-packages",
+        pt: "/pacotes-peru",
+      }[lang] || "/peru-packages"}
+    />
+  </div>
   <PeruGuide lang={lang} />
   <TourPackagesSection
     data={homeData?.boliviaPaquetes}
     lang={lang}
     titleId="bolivia-packages-title"
     href="/bolivia"
-    highlighted
   />
   <HomePost data={homeData?.cardPost} lang={lang} />
   <ReviewsWall lang={lang} />
