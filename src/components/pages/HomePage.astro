@@ -3,6 +3,7 @@ import Layout from "@/layouts/main.astro";
 import fetchApi from "@/lib/strapi";
 import type { Home } from "@/types/home";
 import Hero from "@/components/sections/Hero.astro";
+import HomeStats from "@/components/sections/HomeStats.astro";
 import About from "@/components/sections/About.astro";
 import Certifications from "@/components/sections/Certifications.astro";
 import TourPackagesSection from "@/components/sections/TourPackagesSection.astro";
@@ -43,6 +44,7 @@ const seoProps = {
 
 <Layout seo={seoProps} lang={lang} lcpImageUrl={backgroundImageMobile.src}>
   <Hero data={homeData?.hero} lang={lang} />
+  <HomeStats lang={lang} />
   <About data={homeData?.about} lang={lang} />
   <Certifications data={homeData?.premios?.premios} lang={lang} />
   <TourPackagesSection
