@@ -8,7 +8,7 @@ import type { Global } from "@/types/global";
 import { DEFAULT_LANG, isValidLang, type Lang } from "@/lib/i18n";
 import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
-import ReviewsWall from "@/components/sections/ReviewsWall.astro";
+
 import WhatsAppFloatingButton from "@/components/layout/WhatsAppFloatingButton.astro";
 import { rewriteMenuUrls } from "@/lib/utils";
 import SEO from "@/components/layout/SEO.astro";
@@ -98,7 +98,6 @@ const seoProps = seo || {
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
-    <ReviewsWall lang={currentLang} />
     <Footer data={globalData?.footer} lang={currentLang} />
     <WhatsAppFloatingButton />
   </body>

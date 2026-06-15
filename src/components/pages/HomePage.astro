@@ -9,6 +9,7 @@ import Certifications from "@/components/sections/Certifications.astro";
 import TourPackagesSection from "@/components/sections/TourPackagesSection.astro";
 import PeruGuide from "@/components/sections/PeruGuide.astro";
 import HomePost from "@/components/sections/HomePost.astro";
+import ReviewsWall from "@/components/sections/ReviewsWall.astro";
 import type { Lang } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
@@ -76,4 +77,5 @@ const seoProps = {
     highlighted
   />
   <HomePost data={homeData?.cardPost} lang={lang} />
+  <ReviewsWall lang={lang} />
 </Layout>
