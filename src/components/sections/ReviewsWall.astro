@@ -9,12 +9,168 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+
+type ReviewSource = "tripadvisor" | "google";
+type Review = {
+	id: string;
+	source: ReviewSource;
+	author: string;
+	title?: string;
+	text: string;
+	rating: number;
+	date?: string;
+	url?: string;
+};
+type SourceSummary = {
+	source: ReviewSource;
+	name: string;
+	rating: number;
+	reviewCount: number;
+	url: string;
+};
+
+const sourceOrder: ReviewSource[] = ["tripadvisor", "google"];
+const sourceLabels = {
+	tripadvisor: {
+		name: "Tripadvisor",
+		panelClass: "review-source-panel--tripadvisor",
+		cardClass: "review-card--tripadvisor",
+	},
+	google: {
+		name: "Google Reviews",
+		panelClass: "review-source-panel--google",
+		cardClass: "review-card--google",
+	},
+} as const;
+
+const reviewCopy = {
+	es: {
+		brandTour: "Dreamy Tours",
+		basedOn: "Basado en",
+		reviews: "opiniones",
+		of: "De 5 estrellas",
+		full: "Ver la opinion completa",
+	},
+	en: {
+		brandTour: "Dreamy Tours",
+		basedOn: "Based on",
+		reviews: "reviews",
+		of: "Out of 5 stars",
+		full: "Read full review",
+	},
+	pt: {
+		brandTour: "Dreamy Tours",
+		basedOn: "Baseado em",
+		reviews: "avaliacoes",
+		of: "De 5 estrelas",
+		full: "Ver avaliacao completa",
+	},
+};
+
+const reviewLabels = reviewCopy[lang as keyof typeof reviewCopy] || reviewCopy.es;
+const tripadvisorUrl =
+	"https://www.tripadvisor.com.pe/Attraction_Review-g294314-d17325827-Reviews-Dreamy_Tours-Cusco_Cusco_Region.html";
+const googleUrl =
+	"https://www.google.com/maps/place/Dreamy+Tours/@-13.524429,-71.9506049,1057m/data=!3m2!1e3!4b1!4m6!3m5!1s0x916dd587b52c49c5:0xdaa973fe4585e28a!8m2!3d-13.5244342!4d-71.94803!16s%2Fg%2F11fkv9g6rk";
+
+const sources: SourceSummary[] = [
+	{
+		source: "tripadvisor",
+		name: "Tripadvisor",
+		rating: 4.9,
+		reviewCount: 12910,
+		url: tripadvisorUrl,
+	},
+	{
+		source: "google",
+		name: "Google Reviews",
+		rating: 4.9,
+		reviewCount: 552,
+		url: googleUrl,
+	},
+];
+
+const reviews: Review[] = [
+	{
+		id: "tripadvisor-static-1",
+		source: "tripadvisor",
+		author: "Cliente Tripadvisor",
+		title: "Estuvo todo excelente",
+		text: "Fue una experiencia increible. Mucho mas de lo que imaginaba. El guia llevo un ritmo acorde para llegar bien, la comida fue variada y abundante. Todo de 10.",
+		rating: 5,
+		date: "2026-05-04",
+		url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294318-d26448780-r1059010011-Inca_Trail_Machu_Picchu_4_Days-Machu_Picchu_Sacred_Valley_Cusco_Region.html",
+	},
+	{
+		id: "tripadvisor-static-2",
+		source: "tripadvisor",
+		author: "Cliente Tripadvisor",
+		title: "Excelente experiencia visitando Valle Sagrado y Machu Picchu",
+		text: "Excelente agencia. Super responsables, puntuales y serviciales.",
+		rating: 5,
+		date: "2026-05-04",
+		url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294314-d23904536-r1059015163-2_Day_Guided_Tour_to_Sacred_Valley_and_Machu_Picchu_by_Train-Cusco_Cusco_Regio.html",
+	},
+	{
+		id: "tripadvisor-static-3",
+		source: "tripadvisor",
+		author: "Cliente Tripadvisor",
+		title: "Experiencia muy gratificante",
+		text: "Fue una experiencia unica, la atencion fue genial, muy amigables y cumplieron con todo. Me voy satisfecho.",
+		rating: 5,
+		date: "2026-04-29",
+		url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294314-d28270483-r1058317381-5_day_adventure_Trek_Salkantay_to_Machu_Picchu-Cusco_Cusco_Region.html",
+	},
+	{
+		id: "google-static-1",
+		source: "google",
+		author: "Victor Jean Pierrr Parimango Alvarez",
+		text: "Nuestro viaje familiar a Cusco y Machu Picchu con Dreamy Tours fue increible. La agencia organizo todo perfectamente: traslados puntuales, un guia excelente y recomendaciones geniales.",
+		rating: 5,
+		date: "2025-09-15",
+		url: googleUrl,
+	},
+	{
+		id: "google-static-2",
+		source: "google",
+		author: "Johanna Nava Hayden",
+		text: "Contratamos la agencia desde Argentina, y de principio a fin la experiencia fue excelente. Muy buena atencion, siempre estan en contacto para lo que necesites.",
+		rating: 5,
+		date: "2024-06-15",
+		url: googleUrl,
+	},
+	{
+		id: "google-static-3",
+		source: "google",
+		author: "Carla Miguez",
+		text: "Me gusto mucho el tour, pude disfrutar hermosos paisajes y aprender sobre la forma de vida local. Excelente guia y buen manejo de los horarios.",
+		rating: 5,
+		date: "2022-06-15",
+		url: googleUrl,
+	},
+];
+
+const formatDate = (date: string | undefined) => {
+	if (!date) return "";
+	const parsed = new Date(date);
+	if (Number.isNaN(parsed.getTime())) return "";
+	return new Intl.DateTimeFormat(lang, {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	}).format(parsed);
+};
+
+const getSourceReviews = (source: ReviewSource) =>
+	reviews
+		.filter((review) => review.source === source)
+		.sort((a, b) => Date.parse(b.date || "") - Date.parse(a.date || ""))
+		.slice(0, 3);
 ---
 
 <section
 	class="reviews-wall bg-white py-14 sm:py-16"
 	aria-labelledby="reviews-wall-title"
-	data-reviews-wall
 	data-lang={lang}
 	data-tripadvisor-logo={TripAdvisorLogo}
 >
@@ -39,28 +195,129 @@ const t = useTranslations(lang);
 			</div>
 			<p class="text-base leading-relaxed text-gray-600">{t("reviews.description")}</p>
 		</header>
-		<div class="reviews-rows" data-review-rows aria-live="polite" aria-busy="true">
+		<div class="reviews-rows" data-review-rows aria-live="polite" aria-busy="false">
 			{
-				["tripadvisor", "google"].map((source) => (
+				sourceOrder.map((source) => (
 					<div class={`review-source-row review-source-row--${source}`}>
-						<aside class="review-source-panel">
-							<div class="review-logo-skeleton"></div>
-							<div class="review-meta-skeleton"></div>
-							<div class="review-score-skeleton"></div>
-						</aside>
+						<a
+							class={`review-source-panel ${sourceLabels[source].panelClass}`}
+							href={sources.find((item) => item.source === source)?.url}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<span
+								class={`review-brand-logo review-brand-logo--${source}`}
+								aria-label={sourceLabels[source].name}
+							>
+								{source === "google" ? (
+									<>
+										<span class="g-blue">G</span>
+										<span class="g-red">o</span>
+										<span class="g-yellow">o</span>
+										<span class="g-blue">g</span>
+										<span class="g-green">l</span>
+										<span class="g-red">e</span>
+										<span class="review-google-word">Reviews</span>
+									</>
+								) : (
+									<img
+										class="tripadvisor-logo-img"
+										src={TripAdvisorLogo}
+										alt=""
+										loading="lazy"
+										decoding="async"
+									/>
+								)}
+							</span>
+							<span class="review-source-tour">{reviewLabels.brandTour}</span>
+							<span class="review-score-line">
+								<span class="review-score">
+									{sources.find((item) => item.source === source)?.rating.toFixed(1)}
+								</span>
+								<span class="review-score-descriptor">{reviewLabels.of}</span>
+								<span
+									class={`review-stars review-stars--${source}`}
+									aria-label={`${sources.find((item) => item.source === source)?.rating || 5} / 5`}
+								>
+									{Array.from({ length: 5 }).map((_, index) => (
+										<span
+											class:list={{
+												"is-filled":
+													index <
+													Math.round(
+														sources.find((item) => item.source === source)?.rating ||
+															5,
+													),
+											}}
+										/>
+									))}
+								</span>
+							</span>
+							<span class="review-total">
+								{reviewLabels.basedOn}{" "}
+								{new Intl.NumberFormat(lang).format(
+									sources.find((item) => item.source === source)?.reviewCount || 0,
+								)}{" "}
+								{reviewLabels.reviews}
+							</span>
+						</a>
 						<div class="review-row-cards">
-							{Array.from({ length: 3 }).map(() => (
-								<article class="review-card review-card--loading" aria-hidden="true">
+							{getSourceReviews(source).map((review) => (
+								<article class={`review-card ${sourceLabels[source].cardClass}`}>
+									<span
+										class={`review-platform-badge review-platform-badge--${source}`}
+										aria-label={sourceLabels[source].name}
+									>
+										{source === "google" ? (
+											<span class="g-blue">G</span>
+										) : (
+											<img
+												class="review-platform-badge-img"
+												src={TripAdvisorLogo}
+												alt=""
+												loading="lazy"
+												decoding="async"
+											/>
+										)}
+									</span>
 									<div class="review-card__header">
-										<span class="review-skeleton-avatar" />
-										<span class="review-skeleton-lines">
-											<span />
-											<span />
+										<span class="review-avatar review-avatar--initials" aria-hidden="true">
+											{review.author.slice(0, 2).toUpperCase()}
 										</span>
+										<div class="review-card__author">
+											<h3 class="review-author">{review.author}</h3>
+											<p class="review-date">{formatDate(review.date)}</p>
+										</div>
 									</div>
-									<span class="review-skeleton-title" />
-									<span class="review-skeleton-copy" />
-									<span class="review-skeleton-copy review-skeleton-copy--small" />
+									<p class="review-title">
+										{review.title || sourceLabels[source].name}
+									</p>
+									<span
+										class={`review-stars review-stars--${source}`}
+										aria-label={`${review.rating} / 5`}
+									>
+										{Array.from({ length: 5 }).map((_, index) => (
+											<span
+												class:list={{ "is-filled": index < Math.round(review.rating) }}
+											/>
+										))}
+									</span>
+									<p class="review-text">{review.text}</p>
+									{
+										review.url && (
+											<>
+												<a
+													class="review-link"
+													href={review.url}
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													{reviewLabels.full}
+												</a>
+												<span class="review-card-arrow" aria-hidden="true" />
+											</>
+										)
+									}
 								</article>
 							))}
 						</div>
@@ -388,18 +645,6 @@ const t = useTranslations(lang);
 		root.classList.add("is-loaded");
 	};
 
-	document.querySelectorAll<HTMLElement>("[data-reviews-wall]").forEach(async (root) => {
-		const lang = root.dataset.lang || "es";
-
-		try {
-			const response = await fetch(`/api/reviews?lang=${encodeURIComponent(lang)}`);
-			if (!response.ok) throw new Error(String(response.status));
-			const payload = (await response.json()) as ReviewsPayload;
-			renderRows(root, payload.sources || [], payload.reviews || [], lang);
-		} catch {
-			renderRows(root, fallbackSources(), [], lang);
-		}
-	});
 </script>
 
 <style is:global>
