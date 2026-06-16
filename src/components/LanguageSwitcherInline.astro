@@ -12,6 +12,12 @@ const languageNames: Record<Lang, string> = {
   es: "Español",
   pt: "Português",
 };
+
+const languageFlags: Record<Lang, string> = {
+  en: "/imagenes/flag/um.svg",
+  es: "/imagenes/flag/es.svg",
+  pt: "/imagenes/flag/br.svg",
+};
 ---
 
 <div class="language-switcher relative" data-language-switcher>
@@ -20,28 +26,21 @@ const languageNames: Record<Lang, string> = {
     aria-haspopup="menu"
     aria-expanded="false"
     aria-label="Cambiar idioma"
-    class="inline-flex h-9 min-w-[116px] items-center justify-between gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold text-slate-800 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
+    class="inline-flex h-9 min-w-[124px] items-center justify-between gap-2 rounded-md border border-border bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
     data-language-toggle
   >
     <span class="inline-flex items-center gap-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="size-4 text-slate-600"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
+      <span
+        class="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-[0_1px_2px_rgba(15,23,42,0.12)]"
       >
-        <path d="m5 8 6 6"></path>
-        <path d="m4 14 6-6 2-3"></path>
-        <path d="M2 5h12"></path>
-        <path d="M7 2h1"></path>
-        <path d="m22 22-5-10-5 10"></path>
-        <path d="M14 18h6"></path>
-      </svg>
+        <img
+          src={languageFlags[currentLang]}
+          alt=""
+          aria-hidden="true"
+          class="h-full w-full object-cover"
+          loading="eager"
+        />
+      </span>
       <span>{languageNames[currentLang]}</span>
     </span>
     <svg
@@ -62,7 +61,7 @@ const languageNames: Record<Lang, string> = {
 
   <div
     role="menu"
-    class="absolute right-0 z-50 mt-2 hidden min-w-[150px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
+    class="absolute right-0 z-50 mt-2 hidden min-w-[170px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
     data-language-menu
   >
     {
@@ -81,7 +80,18 @@ const languageNames: Record<Lang, string> = {
             }`}
             data-language-option={lang}
           >
-            <span>{languageNames[lang]}</span>
+            <span class="inline-flex items-center gap-2.5">
+              <span class="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-[0_1px_2px_rgba(15,23,42,0.12)]">
+                <img
+                  src={languageFlags[lang]}
+                  alt=""
+                  aria-hidden="true"
+                  class="h-full w-full object-cover"
+                  loading="eager"
+                />
+              </span>
+              <span>{languageNames[lang]}</span>
+            </span>
             {selected && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
