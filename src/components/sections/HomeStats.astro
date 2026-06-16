@@ -79,9 +79,8 @@ const formatValue = (value: number, suffix: string) =>
 </section>
 
 <script>
-	const roots = document.querySelectorAll<HTMLElement>("[data-home-stats]");
-	const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	const numberFormatter = new Intl.NumberFormat("en-US");
+	let homeStatsObserver: IntersectionObserver | undefined;
 
 	const setFinalValues = (root: HTMLElement) => {
 		root.querySelectorAll<HTMLElement>("[data-stat-number]").forEach((node) => {
@@ -117,23 +116,36 @@ const formatValue = (value: number, suffix: string) =>
 		});
 	};
 
-	if (reduceMotion || !("IntersectionObserver" in window)) {
-		roots.forEach(setFinalValues);
-	} else {
-		const observer = new IntersectionObserver(
+	const initHomeStats = () => {
+		const roots = document.querySelectorAll<HTMLElement>("[data-home-stats]");
+		const reduceMotion = window.matchMedia(
+			"(prefers-reduced-motion: reduce)",
+		).matches;
+
+		homeStatsObserver?.disconnect();
+
+		if (reduceMotion || !("IntersectionObserver" in window)) {
+			roots.forEach(setFinalValues);
+			return;
+		}
+
+		homeStatsObserver = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
 					if (!entry.isIntersecting) return;
 					const root = entry.target as HTMLElement;
 					animateRoot(root);
-					observer.unobserve(root);
+					homeStatsObserver?.unobserve(root);
 				});
 			},
 			{ threshold: 0.35 },
 		);
 
-		roots.forEach((root) => observer.observe(root));
-	}
+		roots.forEach((root) => homeStatsObserver?.observe(root));
+	};
+
+	document.addEventListener("astro:page-load", initHomeStats);
+	initHomeStats();
 </script>
 
 <style>
