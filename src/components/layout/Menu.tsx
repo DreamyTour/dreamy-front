@@ -266,9 +266,9 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 			{/* =======================
           DESKTOP (xl+)
           ======================= */}
-			<div className="hidden border-y border-border/70 bg-white shadow-[0_14px_38px_-34px_var(--foreground)] xl:block">
-				<NavigationMenu className="w-full max-w-8xl mx-auto px-4 py-3">
-					<NavigationMenuList className="w-full justify-center gap-3">
+			<div className="hidden border-y border-border/70 bg-white shadow-[0_14px_34px_-30px_rgba(15,23,42,0.38)] xl:block">
+				<NavigationMenu className="w-full max-w-8xl mx-auto px-4">
+					<NavigationMenuList className="h-[60px] w-full justify-center gap-0">
 						{menu?.menuItems?.map((menuItem: MenuItem) => {
 							const hasChildren =
 								Array.isArray(menuItem.item) && menuItem.item.length > 0;
@@ -276,7 +276,7 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 							return (
 								<NavigationMenuItem
 									key={menuItem.id}
-									className="flex justify-center"
+									className="flex h-full justify-center"
 								>
 									{hasChildren ? (
 										<>
@@ -297,29 +297,29 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 											</NavigationMenuTrigger>
 
 											<NavigationMenuContent>
-												<div className="px-6 pb-3 pt-5">
-													<p className="border-b border-border pb-3 text-base font-medium uppercase text-foreground/72">
+												<div className="border-b border-[#d8d1c6] bg-[#fbfaf6] px-7 pb-4 pt-5">
+													<p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#081711]/72">
 														<span className="inline-block border-b-2 border-secondary pb-3">
 															{menuItem.link.label}
 														</span>
 													</p>
 												</div>
 
-												<ul className="grid w-full grid-flow-col grid-rows-6 gap-x-8 px-6 pb-3">
+												<ul className="grid w-full grid-flow-col grid-rows-6 gap-x-9 px-7 py-4">
 													{menuItem.item.map((subItem: Link) => (
 														<li
 															key={subItem.id}
-															className="border-b border-border"
+															className="border-b border-[#e4ded4]"
 														>
 															<NavigationMenuLink asChild variant="dropdown">
 																<a
 																	href={rewriteUrl(subItem.url, lang)}
-																	className="py-3 pl-5 text-[15px]"
+																	className="py-3 pl-5 text-[15px] hover:bg-[#fbfaf6]"
 																>
 																	<ChevronRight
 																		size={14}
 																		strokeWidth={2.2}
-																		className="pointer-events-none absolute left-0 top-1/2 -translate-x-2 -translate-y-1/2 opacity-0 text-primary transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus:translate-x-0 group-focus:opacity-100"
+																		className="pointer-events-none absolute left-0 top-1/2 -translate-x-1.5 -translate-y-1/2 opacity-0 text-secondary transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus:translate-x-0 group-focus:opacity-100"
 																		aria-hidden="true"
 																		focusable="false"
 																	/>

@@ -75,7 +75,7 @@ const navigationMenuItemStyle = "static";
 /* -------------------------------------------------------------------------- */
 
 const navigationMenuTriggerStyle = cva(
-	"group relative inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap bg-background px-3.5 pb-3 pt-2 text-[15px] font-semibold text-foreground/82 transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 focus:text-primary focus:outline-none data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-4",
+	"group relative inline-flex h-full min-h-[60px] items-center justify-center gap-2 whitespace-nowrap bg-transparent px-4 text-[15px] font-semibold text-[#16241d] transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white data-[state=open]:bg-[#f4f5f5] data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-5",
 );
 
 function NavigationMenuTrigger({
@@ -91,7 +91,7 @@ function NavigationMenuTrigger({
 		>
 			{children}
 			<ChevronDownIcon
-				className="ml-1 size-3 transition-transform duration-200 group-data-[state=open]:rotate-180"
+				className="ml-1 size-3 text-[#16241d]/55 transition-transform duration-200 group-hover:text-primary/80 group-data-[state=open]:rotate-180 group-data-[state=open]:text-primary/80"
 				aria-hidden="true"
 			/>
 		</NavigationMenuPrimitive.Trigger>
@@ -126,7 +126,7 @@ function NavigationMenuContent({
 }
 
 const navigationMenuContentStyle =
-	"absolute left-0 right-0 top-full z-50 mt-3 w-full overflow-hidden rounded-2xl border border-border/80 bg-white p-0 shadow-[0_30px_90px_-56px_var(--foreground)]";
+	"absolute left-0 right-0 top-full z-50 w-full overflow-hidden rounded-b-md border border-[#d8d1c6] border-t-0 bg-white p-0 shadow-[0_28px_76px_-54px_rgba(8,23,17,0.85)]";
 
 /* -------------------------------------------------------------------------- */
 /* LINK                                                                       */
@@ -149,14 +149,14 @@ function NavigationMenuLink({
 }
 
 const navigationMenuLinkStyle = cva(
-	"text-foreground/80 transition-colors duration-200 hover:text-primary focus:text-primary focus:outline-none",
+	"text-[#16241d] transition-colors duration-200 focus:outline-none",
 	{
 		variants: {
 			variant: {
 				default:
-					"relative inline-flex h-11 items-center gap-2 whitespace-nowrap px-3.5 pb-3 pt-2 text-[15px] font-semibold after:pointer-events-none after:absolute after:inset-x-4 after:bottom-1.5 after:h-px after:origin-center after:scale-x-0 after:bg-linear-to-r after:from-transparent after:via-primary after:to-transparent after:transition-transform after:duration-300 hover:after:scale-x-100 xl:px-4",
+					"relative inline-flex h-full min-h-[60px] items-center gap-2 whitespace-nowrap px-4 text-[15px] font-semibold after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white xl:px-5",
 				dropdown:
-					"group relative flex min-w-0 items-center justify-start gap-2 rounded-none px-0 py-0 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary focus:text-primary",
+					"group relative flex min-w-0 items-center justify-start gap-2 rounded-none px-0 py-0 text-sm font-medium text-[#24362d]/72 transition-colors duration-200 hover:text-[#081711] focus:text-[#081711]",
 			},
 		},
 		defaultVariants: {
