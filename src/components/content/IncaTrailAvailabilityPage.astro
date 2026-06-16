@@ -1,7 +1,7 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
 import TourCard from "@/components/ui/TourCard.astro";
-import IncaTrailAvailabilityCalendarIsland from "@/components/content/IncaTrailAvailabilityCalendarIsland.astro";
+import IncaTrailAvailabilityBookingIsland from "@/components/content/IncaTrailAvailabilityBookingIsland.astro";
 import { fetchAllStrapi } from "@/lib/strapi";
 import { dedupeLocalizedDocuments } from "@/lib/utils";
 import type { Lang } from "@/lib/i18n";
@@ -9,6 +9,7 @@ import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { Tour, Category as TourCategory } from "@/types/tours";
 import { serializeJsonForHtml } from "@/lib/html";
 import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
+import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 
 interface Props {
   lang: Lang;
@@ -255,6 +256,36 @@ const toursRaw = await fetchAllStrapi<Tour>({
 const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
   .filter((tour) => tour.categories?.some(isIncaTrailCategory))
   .sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+
+type AvailabilityBookingTour = {
+  road: string;
+  durationDays: number;
+  tourId: string | number;
+  tourName: string;
+  basePrice?: number;
+  slug: string;
+};
+
+const bookingToursByRoad = new Map<string, AvailabilityBookingTour>();
+
+for (const tour of tours) {
+  const bookingConfig = getIncaTrailBookingConfig(tour.slug);
+
+  if (!bookingConfig || bookingToursByRoad.has(bookingConfig.road)) continue;
+
+  bookingToursByRoad.set(bookingConfig.road, {
+    road: bookingConfig.road,
+    durationDays: bookingConfig.durationDays,
+    tourId: tour.documentId || tour.id,
+    tourName: tour.titulo,
+    basePrice: tour.priceTour,
+    slug: tour.slug,
+  });
+}
+
+const bookingTours = Array.from(bookingToursByRoad.values()).sort(
+  (a, b) => Number(a.road) - Number(b.road),
+);
 ---
 
 <PageLayout seo={seo} lang={lang}>
@@ -337,13 +368,14 @@ const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
               </p>
             </div>
           </div>
-          <IncaTrailAvailabilityCalendarIsland
+          <IncaTrailAvailabilityBookingIsland
             server:defer
             lang={lang}
             year={calendarYear}
             initialMonth={initialMonth}
             initialRoad={initialRoad}
             roadLabels={calendarRoadLabelsByLang[lang]}
+            tours={bookingTours}
           >
             <div
               slot="fallback"
@@ -370,7 +402,7 @@ const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
                 }
               </div>
             </div>
-          </IncaTrailAvailabilityCalendarIsland>
+          </IncaTrailAvailabilityBookingIsland>
         </div>
       </div>
     </section>

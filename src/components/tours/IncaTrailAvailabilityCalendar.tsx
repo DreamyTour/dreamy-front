@@ -35,6 +35,7 @@ interface IncaTrailAvailabilityCalendarProps {
 	onDateSelect?: (selection: CalendarSelection) => void;
 	onViewChange?: (view: { road: string; month: number }) => void;
 	compact?: boolean;
+	showSelectedSummary?: boolean;
 }
 
 const EMPTY_TICKETS: TicketsByDate = {};
@@ -121,6 +122,7 @@ const copyByLang = {
 		moreThanTen: "+50 cupos",
 		oneToTen: "1-50 cupos",
 		noSpots: "Sin cupos",
+		book: "Book",
 	},
 	en: {
 		route: "Route",
@@ -137,6 +139,7 @@ const copyByLang = {
 		moreThanTen: "+50 spaces",
 		oneToTen: "1-50 spaces",
 		noSpots: "No spaces",
+		book: "Book",
 	},
 	pt: {
 		route: "Rota",
@@ -153,6 +156,7 @@ const copyByLang = {
 		moreThanTen: "+50 vagas",
 		oneToTen: "1-50 vagas",
 		noSpots: "Sem vagas",
+		book: "Book",
 	},
 } as const;
 
@@ -243,6 +247,7 @@ export default function IncaTrailAvailabilityCalendar({
 	onDateSelect,
 	onViewChange,
 	compact = false,
+	showSelectedSummary = true,
 }: IncaTrailAvailabilityCalendarProps) {
 	const now = useMemo(() => new Date(), []);
 	const minMonth = year === now.getFullYear() ? now.getMonth() + 1 : 1;
@@ -475,7 +480,7 @@ export default function IncaTrailAvailabilityCalendar({
 				))}
 			</div>
 
-			<div className="relative grid grid-cols-7 bg-white">
+			<div className="relative grid grid-cols-7 gap-1.5 bg-white p-2 sm:gap-2">
 				{loadState === "loading" && (
 					<div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 backdrop-blur-[1px]">
 						<div className="flex items-center gap-2 rounded-full border border-[#ead9c7] bg-white px-4 py-2 text-sm font-semibold text-[#244237] shadow-sm">
@@ -492,7 +497,7 @@ export default function IncaTrailAvailabilityCalendar({
 				{emptyCells.map((key) => (
 					<div
 						key={key}
-						className={`${compact ? "h-14" : "h-16"} border-b border-r border-[#f0e5d9] bg-neutral-50`}
+						className={`${compact ? "h-[64px] sm:h-[72px]" : "h-[68px] sm:h-[82px]"} rounded-md bg-neutral-50`}
 					/>
 				))}
 
@@ -506,14 +511,27 @@ export default function IncaTrailAvailabilityCalendar({
 							const isSelected = selectedDate === dateKey;
 							const isSelectedRange = selectedDateKeys.has(dateKey);
 							const toneStyles: Record<string, string> = {
-								available: "bg-[#e7f7ed] text-[#0f5f35] hover:bg-[#d4f0df]",
-								limited: "bg-amber-50 text-amber-700 hover:bg-amber-100",
-								unavailable: "bg-secondary/10 text-secondary cursor-not-allowed",
+								available:
+									"border-[#bfe6ce] bg-white text-[#0f5f35] hover:border-[#8fd8aa] hover:bg-[#f4fbf7]",
+								limited:
+									"border-amber-300 bg-white text-amber-700 hover:border-amber-400 hover:bg-amber-50",
+								unavailable:
+									"border-secondary/25 bg-white text-secondary cursor-not-allowed opacity-75",
 							};
-							const toneLabel: Record<string, string> = {
-								available: "text-[#07512d]",
-								limited: "text-amber-700",
+							const toneHeader: Record<string, string> = {
+								available: "bg-[#8fd8aa] text-[#064324]",
+								limited: "bg-amber-300 text-amber-900",
+								unavailable: "bg-secondary/45 text-white",
+							};
+							const toneIcon: Record<string, string> = {
+								available: "text-[#064324]",
+								limited: "text-amber-800",
 								unavailable: "text-secondary",
+							};
+							const toneText: Record<string, string> = {
+								available: "text-[#0f5f35]",
+								limited: "text-amber-700",
+								unavailable: "text-secondary/65",
 							};
 
 							return (
@@ -524,9 +542,9 @@ export default function IncaTrailAvailabilityCalendar({
 									onClick={() =>
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
-									className={`relative flex ${compact ? "h-14" : "h-16"} flex-col items-center justify-center gap-2 border-b border-r border-[#f0e5d9] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
+									className={`relative flex ${compact ? "h-[64px] sm:h-[72px]" : "h-[68px] sm:h-[82px]"} flex-col overflow-hidden rounded-md border shadow-[0_8px_20px_-18px_rgba(31,45,41,0.62)] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
 										isSelectedRange
-											? "!border-secondary/35 !bg-secondary/10 !text-secondary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--secondary)_24%,transparent)]"
+											? "!border-secondary/55 !bg-white !text-secondary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--secondary)_28%,transparent),0_14px_28px_-22px_color-mix(in_oklab,var(--secondary)_55%,transparent)]"
 											: ""
 									} ${
 										isSelected ? "z-[1] ring-2 ring-inset ring-secondary" : ""
@@ -539,22 +557,23 @@ export default function IncaTrailAvailabilityCalendar({
 									}`}
 								>
 									<span
-										className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold leading-none ${
-											isSelectedRange
-												? "bg-secondary text-secondary-foreground"
-												: tone === "available"
-													? "border border-[#65b883] bg-[#a9dfbd] text-[#064324]"
-													: tone === "limited"
-														? "border border-amber-300 bg-amber-100 text-amber-700"
-														: "border border-secondary/35 bg-secondary/20 text-secondary line-through"
-										}`}
+										className={`flex h-6 w-full items-center justify-end px-2 text-sm font-extrabold leading-none ${isSelectedRange ? "bg-secondary text-secondary-foreground" : toneHeader[tone]}`}
 									>
-										{availability}
+										{String(day).padStart(2, "0")}
 									</span>
-									<span
-										className={`text-[10px] font-bold leading-none ${toneLabel[tone]} ${isSelectedRange ? "!text-secondary" : ""}`}
-									>
-										{day}
+									<span className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5 px-1.5 py-1.5">
+										<span
+											className={`inline-flex max-w-full items-center text-sm font-black leading-none tracking-normal [text-box:trim-both_cap_alphabetic] sm:text-xl ${
+												isSelectedRange ? "text-secondary" : toneIcon[tone]
+											}`}
+										>
+											<span>{availability}</span>
+										</span>
+										<span
+											className={`text-[10px] font-semibold leading-none ${isSelectedRange ? "text-secondary" : toneText[tone]}`}
+										>
+											{copy.book}
+										</span>
 									</span>
 								</button>
 							);
@@ -563,7 +582,7 @@ export default function IncaTrailAvailabilityCalendar({
 				)}
 			</div>
 
-			{selectedDate && (
+			{showSelectedSummary && selectedDate && (
 				<div
 					className={
 						compact
