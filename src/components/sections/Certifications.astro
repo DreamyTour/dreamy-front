@@ -34,10 +34,7 @@ const sliderData = [...premios, ...premios];
         class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-3 bg-secondary/30 -z-0 rounded-full blur-sm"
       ></span>
     </h2>
-    <div
-      class="flex items-center justify-center gap-3 mt-4"
-      aria-hidden="true"
-    >
+    <div class="flex items-center justify-center gap-3 mt-4" aria-hidden="true">
       <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary">
       </div>
       <div class="w-12 h-1.5 bg-secondary rounded-full relative">
@@ -50,7 +47,7 @@ const sliderData = [...premios, ...premios];
       </div>
     </div>
   </header>
-  <ul class="slider-track m-0 w-full list-none p-0">
+  <ul class="slider-track m-0 list-none p-0">
     {
       sliderData.map((cert, index) => {
         const imageUrl = getImageUrl(cert.logo);
@@ -84,6 +81,10 @@ const sliderData = [...premios, ...premios];
 
 <style>
   .slider-container {
+    --slider-gap: 6rem;
+    --slider-gap-half: 3rem;
+    --slider-duration: 45s;
+
     overflow: hidden;
     position: relative;
     /* Efecto de desenfoque a los bordes con mask-image */
@@ -106,10 +107,10 @@ const sliderData = [...premios, ...premios];
   .slider-track {
     display: flex;
     align-items: center;
-    gap: 6rem; /* Espacio entre logos */
-    width: 100%;
-    /* Animación CSS infinita */
-    animation: scroll 25s linear infinite;
+    gap: var(--slider-gap);
+    width: max-content;
+    will-change: transform;
+    animation: scroll var(--slider-duration) linear infinite;
   }
 
   .slider-container:hover .slider-track {
@@ -210,14 +211,15 @@ const sliderData = [...premios, ...premios];
     }
     100% {
       /* Se traslada la mitad exacta de todo el ancho + la mitad del gap para un loop perfecto */
-      transform: translateX(calc(-50% - 1.5rem));
+      transform: translateX(calc(-50% - var(--slider-gap-half)));
     }
   }
 
   @media (max-width: 767px) {
-    .slider-track {
-      gap: 3rem;
-      animation-duration: 8s;
+    .slider-container {
+      --slider-gap: 3rem;
+      --slider-gap-half: 1.5rem;
+      --slider-duration: 36s;
     }
   }
 </style>

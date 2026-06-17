@@ -110,217 +110,255 @@ const features = {
 
 <section
   aria-labelledby="about-title"
-  class="content-deferred relative w-full overflow-hidden bg-[#fafqfa] py-16"
+  class="about-section content-deferred relative w-full overflow-hidden bg-[#fafqfa] py-16"
 >
-  <!-- Fondos decorativos -->
   <div
-    class="pointer-events-none absolute -left-48 -top-48 h-96 w-96 rounded-full bg-[#10b981]/5 blur-3xl"
-    aria-hidden="true"
+    class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 lg:grid-cols-2 lg:gap-24 lg:px-8"
   >
-  </div>
-  <div
-    class="pointer-events-none absolute -bottom-48 -right-48 h-96 w-96 rounded-full bg-[#fbbf24]/10 blur-3xl"
-    aria-hidden="true"
-  >
-  </div>
-
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-24">
-      {/* Lado de texto */}
-      <div class="relative z-10 w-full max-w-2xl">
-        <div
-          class="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
-        >
-          <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-              clip-rule="evenodd"></path>
-          </svg>
-          <span class="uppercase tracking-wider">{eyebrowByLang[lang]}</span>
-        </div>
-
-        <h2
-          id="about-title"
-          class="text-4xl font-bold tracking-tight text-[#181311] sm:text-5xl"
-        >
-          {data.titulo}
-        </h2>
-
-        {/* Decoración de subrayado */}
-        <div
-          class="mt-4 flex h-1 w-24 overflow-hidden rounded-full"
+    {/* Lado de texto */}
+    <article class="relative z-10 w-full max-w-2xl">
+      <p
+        class="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
+      >
+        <svg
+          class="h-3.5 w-3.5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
           aria-hidden="true"
         >
-          <div class="h-full w-1/2 bg-primary/80"></div>
-          <div class="h-full w-1/2 bg-secondary/80"></div>
-        </div>
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+            clip-rule="evenodd"></path>
+        </svg>
+        <span class="uppercase tracking-wider">{eyebrowByLang[lang]}</span>
+      </p>
 
-        <div class="mt-8 space-y-4">
-          {
-            contentParagraphs.length > 0 ? (
-              contentParagraphs.map((paragraph) => (
-                <p class="text-base leading-relaxed text-[#181311]/70">
-                  {paragraph
-                    .split(emphasisPattern)
-                    .map((part) =>
-                      emphasisPattern.test(part) ? (
-                        <strong class="text-primary font-bold">{part}</strong>
-                      ) : (
-                        part
-                      ),
-                    )}
-                </p>
-              ))
-            ) : (
+      <h2
+        id="about-title"
+        class="about-heading text-4xl font-bold tracking-tight text-[#181311] sm:text-5xl"
+      >
+        {data.titulo}
+      </h2>
+
+      <div class="mt-8 space-y-4">
+        {
+          contentParagraphs.length > 0 ? (
+            contentParagraphs.map((paragraph) => (
               <p class="text-base leading-relaxed text-[#181311]/70">
-                {data.content}
+                {paragraph
+                  .split(emphasisPattern)
+                  .map((part) =>
+                    emphasisPattern.test(part) ? (
+                      <strong class="font-bold text-primary">{part}</strong>
+                    ) : (
+                      part
+                    ),
+                  )}
               </p>
-            )
-          }
-        </div>
-
-        {/* Features en grid 2x2 */}
-        <ul class="mt-10 grid list-none gap-6 p-0 sm:grid-cols-2">
-          {
-            features[lang].map((act) => (
-              <li class="flex items-start gap-4">
-                <div
-                  class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border bg-white shadow-sm ${act.color === "green" ? "border-primary/15 text-primary" : "border-secondary/15 text-secondary"}`}
-                >
-                  {act.icon === "award" && (
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
-                      <circle cx="12" cy="8" r="5" />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8.5 12.5 7 22l5-3 5 3-1.5-9.5"
-                      />
-                    </svg>
-                  )}
-                  {act.icon === "user" && (
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M16 19a4 4 0 0 0-8 0"
-                      />
-                      <circle cx="12" cy="8" r="3.5" />
-                    </svg>
-                  )}
-                  {act.icon === "shield" && (
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 3 19 6v5c0 4.5-2.9 8.3-7 10-4.1-1.7-7-5.5-7-10V6l7-3z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m9.5 12 1.8 1.8 3.7-4"
-                      />
-                    </svg>
-                  )}
-                  {act.icon === "leaf" && (
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M5 19c2.5-5 6-8.5 10.5-10.5"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <div class="pt-0.5">
-                  <h3 class="text-sm font-bold text-[#181311]">{act.title}</h3>
-                  <p class="mt-1 text-xs text-[#181311]/70">{act.desc}</p>
-                </div>
-              </li>
             ))
-          }
-        </ul>
+          ) : (
+            <p class="text-base leading-relaxed text-[#181311]/70">
+              {data.content}
+            </p>
+          )
+        }
       </div>
 
-      {/* Lado de imagen */}
-      {
-        imagenUrl !== "/og-default.jpg" && (
-          <figure class="relative w-full max-w-xl mx-auto lg:ml-auto lg:mr-0 z-10 pt-4 pr-4">
-            {/* Marco rotado de fondo */}
-            <div
-              class="absolute inset-0 bg-[#10b981]/15 rounded-3xl -rotate-3 transform-gpu w-full h-full"
-              aria-hidden="true"
-            />
-
-            <div class="relative overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl">
-              <div
-                class="absolute inset-0 bg-linear-to-t from-[#181311]/40 via-transparent to-transparent z-10"
+      {/* Features en grid 2x2 */}
+      <ul class="mt-10 grid list-none gap-6 p-0 sm:grid-cols-2">
+        {
+          features[lang].map((act) => (
+            <li class="flex items-start gap-4">
+              <span
+                class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border bg-white shadow-sm ${act.color === "green" ? "border-primary/15 text-primary" : "border-secondary/15 text-secondary"}`}
                 aria-hidden="true"
-              />
-              <img
-                src={imagenUrl}
-                srcset={imageSrcSet || undefined}
-                sizes="(max-width: 1023px) 100vw, 50vw"
-                alt={imageAlt}
-                class="aspect-[4/3] w-full object-cover object-center"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
+              >
+                {act.icon === "award" && (
+                  <svg
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="8" r="5" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.5 12.5 7 22l5-3 5 3-1.5-9.5"
+                    />
+                  </svg>
+                )}
+                {act.icon === "user" && (
+                  <svg
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M16 19a4 4 0 0 0-8 0"
+                    />
+                    <circle cx="12" cy="8" r="3.5" />
+                  </svg>
+                )}
+                {act.icon === "shield" && (
+                  <svg
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3 19 6v5c0 4.5-2.9 8.3-7 10-4.1-1.7-7-5.5-7-10V6l7-3z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m9.5 12 1.8 1.8 3.7-4"
+                    />
+                  </svg>
+                )}
+                {act.icon === "leaf" && (
+                  <svg
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 19c2.5-5 6-8.5 10.5-10.5"
+                    />
+                  </svg>
+                )}
+              </span>
+              <hgroup class="pt-0.5">
+                <h3 class="text-sm font-bold text-[#181311]">{act.title}</h3>
+                <p class="mt-1 text-xs text-[#181311]/70">{act.desc}</p>
+              </hgroup>
+            </li>
+          ))
+        }
+      </ul>
+    </article>
 
-            {/* Widget flotante +500 Happy Travelers */}
-            <figcaption class="absolute -bottom-6 -left-6 z-20 flex items-center gap-4 rounded-xl bg-white p-4 pr-6 shadow-2xl ring-1 ring-black/5">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
-                <svg
-                  class="h-6 w-6"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </div>
-              <div class="flex flex-col">
-                <span class="text-sm font-bold leading-tight text-[#181311]">
-                  +500
-                </span>
-                <span class="text-xs font-medium text-[#181311]/60">
-                  Happy Travelers
-                </span>
-              </div>
-            </figcaption>
-          </figure>
-        )
-      }
-    </div>
+    {/* Lado de imagen */}
+    {
+      imagenUrl !== "/og-default.jpg" && (
+        <figure class="about-figure relative z-10 mx-auto w-full max-w-xl pt-4 pr-4 lg:mr-0 lg:ml-auto">
+          <picture class="about-picture relative z-10 block overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl">
+            <img
+              src={imagenUrl}
+              srcset={imageSrcSet || undefined}
+              sizes="(max-width: 1023px) 100vw, 50vw"
+              alt={imageAlt}
+              class="aspect-[4/3] w-full object-cover object-center"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+
+          {/* Widget flotante +500 Happy Travelers */}
+          <figcaption class="absolute -bottom-6 -left-6 z-20 flex items-center gap-4 rounded-xl bg-white p-4 pr-6 shadow-2xl ring-1 ring-black/5">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
+              <svg
+                class="h-6 w-6"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </span>
+            <span class="flex flex-col">
+              <span class="text-sm font-bold leading-tight text-[#181311]">
+                +500
+              </span>
+              <span class="text-xs font-medium text-[#181311]/60">
+                Happy Travelers
+              </span>
+            </span>
+          </figcaption>
+        </figure>
+      )
+    }
   </div>
 </section>
+
+<style>
+  .about-section::before,
+  .about-section::after {
+    position: absolute;
+    width: 24rem;
+    height: 24rem;
+    border-radius: 9999px;
+    pointer-events: none;
+    content: "";
+    filter: blur(64px);
+  }
+
+  .about-section::before {
+    top: -12rem;
+    left: -12rem;
+    background: rgb(16 185 129 / 5%);
+  }
+
+  .about-section::after {
+    right: -12rem;
+    bottom: -12rem;
+    background: rgb(251 191 36 / 10%);
+  }
+
+  .about-figure::before {
+    position: absolute;
+    inset: 1rem 1rem 0 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 1.5rem;
+    background: rgb(16 185 129 / 15%);
+    content: "";
+    transform: rotate(-3deg);
+  }
+
+  .about-heading::after {
+    display: block;
+    width: 6rem;
+    height: 0.25rem;
+    margin-top: 1rem;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      color-mix(in oklab, var(--primary) 80%, transparent) 0 50%,
+      color-mix(in oklab, var(--secondary) 80%, transparent) 50% 100%
+    );
+    content: "";
+  }
+
+  .about-picture::after {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    background: linear-gradient(to top, rgb(24 19 17 / 40%), transparent);
+    content: "";
+  }
+</style>
