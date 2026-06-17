@@ -19,14 +19,17 @@ const target = isExternal ? "_blank" : "_self";
 const rel = isExternal ? "noopener noreferrer" : undefined;
 ---
 
-<div class="w-full bg-primary text-white hidden md:block">
-  <div
+<aside
+  class="hidden w-full bg-primary text-white md:block"
+  aria-label="Anuncio"
+>
+  <p
     class="max-w-8xl mx-auto px-4 py-1.5 flex items-center justify-center gap-3 text-sm"
   >
     <!-- Texto -->
-    <p class="font-medium leading-tight tracking-wide">
+    <span class="font-medium leading-tight tracking-wide">
       {data.text}
-    </p>
+    </span>
 
     <!-- Link / Botón -->
     {
@@ -41,5 +44,5 @@ const rel = isExternal ? "noopener noreferrer" : undefined;
         </a>
       )
     }
-  </div>
-</div>
+  </p>
+</aside>

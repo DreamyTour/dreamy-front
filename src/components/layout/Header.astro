@@ -19,7 +19,7 @@ const mobileLogoUrl = localizePath("/", lang);
 <header class="w-full border-solid border-b border-border shadow-sm">
   <TopBar data={data?.topBar} lang={lang} />
   <HeaderTop data={data?.headerTop} lang={lang} />
-  <div class="border-t border-primary/20"></div>
+  <hr class="border-t border-primary/20" aria-hidden="true" />
   <Menu
     menu={data?.menu}
     logoUrl={mobileLogoUrl}

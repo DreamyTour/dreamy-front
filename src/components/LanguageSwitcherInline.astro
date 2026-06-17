@@ -18,6 +18,8 @@ const languageFlags: Record<Lang, string> = {
   es: "/imagenes/flag/es.svg",
   pt: "/imagenes/flag/br.svg",
 };
+
+const menuId = "language-menu-desktop";
 ---
 
 <div class="language-switcher relative" data-language-switcher>
@@ -25,6 +27,7 @@ const languageFlags: Record<Lang, string> = {
     type="button"
     aria-haspopup="menu"
     aria-expanded="false"
+    aria-controls={menuId}
     aria-label="Cambiar idioma"
     class="inline-flex h-9 min-w-[124px] items-center justify-between gap-2 rounded-md border border-border bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
     data-language-toggle
@@ -60,6 +63,7 @@ const languageFlags: Record<Lang, string> = {
   </button>
 
   <div
+    id={menuId}
     role="menu"
     class="absolute right-0 z-50 mt-2 hidden min-w-[170px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
     data-language-menu

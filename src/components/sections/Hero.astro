@@ -64,9 +64,9 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 
 <section
   aria-labelledby="home-hero-title"
-  class="hero-section relative w-full min-h-[60vh] md:min-h-[80vh] flex items-end overflow-hidden"
+  class="hero-section relative isolate flex min-h-[60vh] w-full items-end overflow-hidden md:min-h-[80vh]"
 >
-  {/* ──── Video de fondo ──── */}
+  {/* Background media */}
   {
     videoUrl !== "/og-default.jpg" ? (
       <>
@@ -91,6 +91,7 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
           playsinline
           preload="metadata"
           poster={backgroundImageMobile.src}
+          aria-hidden="true"
         >
           <source src={videoUrl} type="video/mp4" media="(min-width: 768px)" />
         </video>
@@ -110,22 +111,14 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
     )
   }
 
-  {/* ──── Overlay oscuro + gradiente inferior ──── */}
-  <div class="absolute inset-0 bg-black/40" aria-hidden="true"></div>
-  <div
-    class="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent"
-    aria-hidden="true"
-  >
-  </div>
-
-  {/* ──── Contenido ──── */}
-  <div
-    class="relative z-10 w-full max-w-8xl mx-auto px-6 pb-16 md:pb-20 lg:pb-24"
+  {/* Content */}
+  <header
+    class="relative z-10 mx-auto w-full max-w-8xl px-6 pb-16 md:pb-20 lg:pb-24"
   >
     {/* Badge */}
     {
       data.badgeText && (
-        <div class="hero-badge inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 rounded-full px-4 py-1.5 mb-6">
+        <p class="hero-badge mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-1.5 backdrop-blur-md">
           {badgeIconUrl !== "/og-default.jpg" && (
             <img
               src={badgeIconUrl}
@@ -140,20 +133,20 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
           <span class="text-xs font-semibold tracking-widest uppercase text-white">
             {data.badgeText}
           </span>
-        </div>
+        </p>
       )
     }
 
     <h1
       id="home-hero-title"
-      class="hero-title font-bold text-white leading-[1.05] tracking-tight mb-5 max-w-5xl"
+      class="hero-title mb-5 max-w-5xl font-bold leading-[1.05] tracking-tight text-white"
     >
       {data.titulo}
     </h1>
 
     {
       data.contenido && (
-        <p class="hero-subtitle text-white/80 max-w-lg mb-8 leading-relaxed">
+        <p class="hero-subtitle mb-8 max-w-lg leading-relaxed text-white/80">
           {data.contenido}
         </p>
       )
@@ -161,22 +154,44 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 
     {
       data.button && data.button.length > 0 && (
-        <div class="flex flex-wrap gap-3">
-          {data.button.map((btn) => (
-            <Button
-              label={btn.label}
-              href={getButtonUrl(btn.url, btn.label)}
-              type={btn.type}
-              isExternal={btn.isExternal}
-            />
-          ))}
-        </div>
+        <nav class="hero-actions" aria-label="Acciones destacadas">
+          <ul class="flex flex-wrap gap-3">
+            {data.button.map((btn) => (
+              <li>
+                <Button
+                  label={btn.label}
+                  href={getButtonUrl(btn.url, btn.label)}
+                  type={btn.type}
+                  isExternal={btn.isExternal}
+                />
+              </li>
+            ))}
+          </ul>
+        </nav>
       )
     }
-  </div>
+  </header>
 </section>
 
 <style>
+  .hero-section::before,
+  .hero-section::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+  }
+
+  .hero-section::before {
+    z-index: 1;
+    background: rgb(0 0 0 / 40%);
+  }
+
+  .hero-section::after {
+    z-index: 2;
+    background: linear-gradient(to top, rgb(0 0 0 / 70%), transparent);
+  }
+
   .hero-title {
     font-size: clamp(2.5rem, 6vw, 4.5rem);
   }
@@ -184,11 +199,11 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
     font-size: clamp(0.95rem, 1.5vw, 1.15rem);
   }
 
-  /* Animaciones de entrada */
+  /* Entry animations */
   .hero-badge,
   .hero-title,
   .hero-subtitle,
-  .hero-btn {
+  .hero-actions {
     animation: hero-fade-up 0.8s ease-out both;
   }
   .hero-title {
@@ -197,7 +212,7 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
   .hero-subtitle {
     animation-delay: 0.3s;
   }
-  .hero-btn {
+  .hero-actions {
     animation-delay: 0.45s;
   }
 

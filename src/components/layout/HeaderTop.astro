@@ -33,72 +33,79 @@ const getLinkProps = (
 };
 ---
 
-<div class="hidden xl:block w-full bg-background text-foreground">
+<section class="hidden w-full bg-background text-foreground xl:block">
   <!-- Bloque superior: links a la izquierda, logo a la derecha -->
   <div
-    class="flex max-w-8xl items-center justify-between gap-8 mx-auto px-4 py-3"
+    class="mx-auto flex max-w-8xl items-center justify-between gap-8 px-4 py-3"
   >
     <!-- Logo -->
-    <div class="group">
-      <a
-        href={logoUrl}
-        target={data.logo?.isExternal ? "_blank" : "_self"}
-        rel={data.logo?.isExternal ? "noopener noreferrer" : undefined}
-      >
-        <img
-          src="/logo-dreamytours.svg"
-          alt="Logo Dreamy Tours"
-          class="h-20 w-auto group-hover:scale-[1.03] duration-300 transition-transform"
-          width="220"
-          height="80"
-          fetchpriority="high"
-        />
-      </a>
-    </div>
+    <a
+      href={logoUrl}
+      target={data.logo?.isExternal ? "_blank" : "_self"}
+      rel={data.logo?.isExternal ? "noopener noreferrer" : undefined}
+      class="group block shrink-0"
+      aria-label="Dreamy Tours - inicio"
+    >
+      <img
+        src="/logo-dreamytours.svg"
+        alt=""
+        class="h-20 w-auto transition-transform duration-300 group-hover:scale-[1.03]"
+        width="220"
+        height="80"
+        fetchpriority="high"
+      />
+    </a>
     <div class="flex min-w-0 flex-1 flex-col items-end gap-2">
       <!-- Links a la izquierda -->
       <nav
-        class="hidden xl:flex max-w-full flex-wrap items-center justify-end gap-y-1 rounded-full border border-border/60 bg-muted/20 px-2 py-1"
+        class="hidden max-w-full rounded-full border border-border/60 bg-muted/20 px-2 py-1 xl:block"
+        aria-label="Enlaces secundarios"
       >
-        {
-          data.headerLink.map((link, index) => {
-            const { target, rel } = getLinkProps(link);
-            return (
-              <a
-                href={rewriteUrl(link.url, lang)}
-                target={target}
-                rel={rel}
-                class={`px-3 py-1 text-[13px] font-semibold leading-5 text-foreground/70 transition-colors duration-200 hover:text-primary ${
-                  index === 0 ? "" : "border-l border-border/70"
-                }`}
-              >
-                {link.label}
-              </a>
-            );
-          })
-        }
+        <ul class="flex max-w-full flex-wrap items-center justify-end gap-y-1">
+          {
+            data.headerLink.map((link, index) => {
+              const { target, rel } = getLinkProps(link);
+              return (
+                <li class={index === 0 ? "" : "border-l border-border/70"}>
+                  <a
+                    href={rewriteUrl(link.url, lang)}
+                    target={target}
+                    rel={rel}
+                    class="block px-3 py-1 text-[13px] font-semibold leading-5 text-foreground/70 transition-colors duration-200 hover:text-primary"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
       </nav>
       <div class="flex flex-wrap items-center justify-end gap-2">
-        <div class="hidden xl:flex flex-wrap justify-end gap-2">
-          {
-            data.button.map((btn) => (
-              <a
-                href={rewriteUrl(btn.url, lang)}
-                target={btn.isExternal ? "_blank" : "_self"}
-                rel={btn.isExternal ? "noopener noreferrer" : undefined}
-                class={`inline-flex items-center rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 ${
-                  btn.type === "PRIMARY"
-                    ? "border-secondary bg-secondary text-white hover:bg-secondary/90"
-                    : "border-border bg-muted/60 text-foreground/75 hover:border-primary/25 hover:text-primary"
-                }`}
-              >
-                {btn.label}
-              </a>
-            ))
-          }
-        </div>
+        <nav class="hidden xl:block" aria-label="Acciones rápidas">
+          <ul class="flex flex-wrap justify-end gap-2">
+            {
+              data.button.map((btn) => (
+                <li>
+                  <a
+                    href={rewriteUrl(btn.url, lang)}
+                    target={btn.isExternal ? "_blank" : "_self"}
+                    rel={btn.isExternal ? "noopener noreferrer" : undefined}
+                    class={`inline-flex items-center rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 ${
+                      btn.type === "PRIMARY"
+                        ? "border-secondary bg-secondary text-white hover:bg-secondary/90"
+                        : "border-border bg-muted/60 text-foreground/75 hover:border-primary/25 hover:text-primary"
+                    }`}
+                  >
+                    {btn.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
         <LanguageSwitcherInline currentLang={lang} />
       </div>
     </div>
   </div>
-</div>
+</section>
