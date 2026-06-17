@@ -22,6 +22,7 @@ interface Props {
   defaultLimit?: number;
   href: string;
   highlighted?: boolean;
+  surface?: "white";
   ctaLabelKey?: "section.verMas" | "section.verMasPaquetes";
 }
 
@@ -33,6 +34,7 @@ const {
   defaultLimit = 3,
   href,
   highlighted = false,
+  surface,
   ctaLabelKey = "section.verMas",
 } = Astro.props;
 
@@ -67,6 +69,7 @@ const availabilityText = {
   aria-labelledby={titleId}
   class:list={[
     "content-deferred content-deferred--tall w-full py-16",
+    surface === "white" && "bg-white",
     highlighted && "bg-primary/5",
   ]}
 >
@@ -102,21 +105,21 @@ const availabilityText = {
           ></span>
         </h2>
 
-        <div
+        <span
           class="mb-6 mt-4 flex items-center justify-start gap-3"
           aria-hidden="true"
         >
-          <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary">
-          </div>
-          <div class="relative h-1.5 w-12 rounded-full bg-secondary">
-            <div
+          <span class="h-px w-16 bg-gradient-to-r from-transparent to-secondary"
+          ></span>
+          <span class="relative h-1.5 w-12 rounded-full bg-secondary">
+            <span
               class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
             >
-            </div>
-          </div>
-          <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary">
-          </div>
-        </div>
+            </span>
+          </span>
+          <span class="h-px w-16 bg-gradient-to-l from-transparent to-secondary"
+          ></span>
+        </span>
 
         <p class="text-base leading-relaxed text-gray-600">
           {
@@ -132,8 +135,8 @@ const availabilityText = {
             aria-labelledby={availabilityTitleId}
             class="flex w-full shrink-0 flex-col justify-center rounded-2xl border-l-[6px] border-secondary bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] lg:w-[380px]"
           >
-            <div class="mb-5 flex items-center gap-4">
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-white shadow-md">
+            <header class="mb-5 flex items-center gap-4">
+              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-white shadow-md">
                 <svg
                   class="h-6 w-6"
                   fill="none"
@@ -148,8 +151,8 @@ const availabilityText = {
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-              </div>
-              <div>
+              </span>
+              <hgroup>
                 <h3
                   id={availabilityTitleId}
                   class="text-[1.05rem] font-bold text-gray-900"
@@ -159,14 +162,14 @@ const availabilityText = {
                 <p class="text-[0.85rem] text-gray-500">
                   {availabilityText.subtitle}
                 </p>
-              </div>
-            </div>
+              </hgroup>
+            </header>
             <a
               href={rewriteUrl(href, lang)}
               aria-label={t("aria.verMasSeccion")}
               class="flex w-full items-center justify-between rounded-xl border border-secondary bg-secondary/10 px-5 py-3.5 font-semibold text-secondary shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-secondary hover:text-white hover:shadow-lg"
             >
-              <div class="flex items-center gap-2">
+              <span class="flex items-center gap-2">
                 <svg
                   class="h-5 w-5"
                   fill="none"
@@ -182,7 +185,7 @@ const availabilityText = {
                   />
                 </svg>
                 <span>{t(ctaLabelKey)}</span>
-              </div>
+              </span>
               <svg
                 class="h-5 w-5"
                 fill="none"
