@@ -207,17 +207,18 @@ const getSourceReviews = (source: ReviewSource) =>
 						>
 							<span
 								class={`review-brand-logo review-brand-logo--${source}`}
+								role="img"
 								aria-label={sourceLabels[source].name}
 							>
 								{source === "google" ? (
 									<>
-										<span class="g-blue">G</span>
-										<span class="g-red">o</span>
-										<span class="g-yellow">o</span>
-										<span class="g-blue">g</span>
-										<span class="g-green">l</span>
-										<span class="g-red">e</span>
-										<span class="review-google-word">Reviews</span>
+										<span class="g-blue" aria-hidden="true">G</span>
+										<span class="g-red" aria-hidden="true">o</span>
+										<span class="g-yellow" aria-hidden="true">o</span>
+										<span class="g-blue" aria-hidden="true">g</span>
+										<span class="g-green" aria-hidden="true">l</span>
+										<span class="g-red" aria-hidden="true">e</span>
+										<span class="review-google-word" aria-hidden="true">Reviews</span>
 									</>
 								) : (
 									<img
@@ -237,10 +238,12 @@ const getSourceReviews = (source: ReviewSource) =>
 								<span class="review-score-descriptor">{reviewLabels.of}</span>
 								<span
 									class={`review-stars review-stars--${source}`}
+									role="img"
 									aria-label={`${sources.find((item) => item.source === source)?.rating || 5} / 5`}
 								>
 									{Array.from({ length: 5 }).map((_, index) => (
 										<span
+											aria-hidden="true"
 											class:list={{
 												"is-filled":
 													index <
@@ -266,10 +269,11 @@ const getSourceReviews = (source: ReviewSource) =>
 								<article class={`review-card ${sourceLabels[source].cardClass}`}>
 									<span
 										class={`review-platform-badge review-platform-badge--${source}`}
+										role="img"
 										aria-label={sourceLabels[source].name}
 									>
 										{source === "google" ? (
-											<span class="g-blue">G</span>
+											<span class="g-blue" aria-hidden="true">G</span>
 										) : (
 											<img
 												class="review-platform-badge-img"
@@ -294,10 +298,12 @@ const getSourceReviews = (source: ReviewSource) =>
 									</p>
 									<span
 										class={`review-stars review-stars--${source}`}
+										role="img"
 										aria-label={`${review.rating} / 5`}
 									>
 										{Array.from({ length: 5 }).map((_, index) => (
 											<span
+												aria-hidden="true"
 												class:list={{ "is-filled": index < Math.round(review.rating) }}
 											/>
 										))}
@@ -435,10 +441,11 @@ const getSourceReviews = (source: ReviewSource) =>
 	const makeLogo = (source: ReviewSource) => {
 		const logo = document.createElement("span");
 		logo.className = `review-brand-logo review-brand-logo--${source}`;
+		logo.setAttribute("role", "img");
 		logo.setAttribute("aria-label", brand[source].name);
 
 		if (source === "google") {
-			logo.innerHTML = `<span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span><span class="review-google-word">Reviews</span>`;
+			logo.innerHTML = `<span class="g-blue" aria-hidden="true">G</span><span class="g-red" aria-hidden="true">o</span><span class="g-yellow" aria-hidden="true">o</span><span class="g-blue" aria-hidden="true">g</span><span class="g-green" aria-hidden="true">l</span><span class="g-red" aria-hidden="true">e</span><span class="review-google-word" aria-hidden="true">Reviews</span>`;
 			return logo;
 		}
 
@@ -453,13 +460,14 @@ const getSourceReviews = (source: ReviewSource) =>
 	const makePlatformBadge = (source: ReviewSource) => {
 		const badge = document.createElement("span");
 		badge.className = `review-platform-badge review-platform-badge--${source}`;
+		badge.setAttribute("role", "img");
 		badge.setAttribute("aria-label", brand[source].name);
 		if (source === "google") {
-			badge.innerHTML = `<span class="g-blue">G</span>`;
+			badge.innerHTML = `<span class="g-blue" aria-hidden="true">G</span>`;
 		} else {
 			badge.innerHTML = tripadvisorLogoUrl
 				? `<img class="review-platform-badge-img" src="${tripadvisorLogoUrl}" alt="" loading="lazy" decoding="async" />`
-				: `<span>Tripadvisor</span>`;
+				: `<span aria-hidden="true">Tripadvisor</span>`;
 		}
 		return badge;
 	};
@@ -467,11 +475,13 @@ const getSourceReviews = (source: ReviewSource) =>
 	const createStars = (rating = 5, source: ReviewSource) => {
 		const stars = document.createElement("span");
 		stars.className = `review-stars review-stars--${source}`;
+		stars.setAttribute("role", "img");
 		stars.setAttribute("aria-label", `${rating} / 5`);
 
 		for (let index = 0; index < 5; index += 1) {
 			const item = document.createElement("span");
 			item.className = index < Math.round(rating) ? "is-filled" : "";
+			item.setAttribute("aria-hidden", "true");
 			stars.append(item);
 		}
 
