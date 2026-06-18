@@ -64,7 +64,7 @@ const seoProps = buildSEOProps({
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <section class="blog-page-shell" aria-labelledby="blog-index-title">
+  <section class="blog-page-shell relative isolate overflow-hidden" aria-labelledby="blog-index-title">
     <div class="blog-index-page w-full py-16 md:py-24">
       <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <header class="mx-auto mb-12 max-w-4xl text-center md:mb-16">
@@ -129,13 +129,17 @@ const seoProps = buildSEOProps({
 </Layout>
 
 <style>
-  .blog-page-shell {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
-      color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
-      color-mix(in oklab, var(--blog-surface) 72%, white) 100%
-    );
+  .blog-page-shell::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/fondo.svg");
+    background-position: top center;
+    background-repeat: repeat;
+    background-size: 520px 520px;
+    content: "";
+    opacity: 0.035;
+    pointer-events: none;
   }
 
   .blog-index-page {

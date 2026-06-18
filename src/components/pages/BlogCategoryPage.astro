@@ -66,7 +66,7 @@ const seoProps =
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <section class="blog-page-shell" aria-labelledby="blog-category-title">
+  <section class="blog-page-shell relative isolate overflow-hidden" aria-labelledby="blog-category-title">
     {
       slugMap && Object.keys(slugMap).length > 0 && (
         <script
@@ -175,13 +175,17 @@ const seoProps =
 </Layout>
 
 <style>
-  .blog-page-shell {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--blog-surface) 88%, white) 0%,
-      color-mix(in oklab, var(--blog-surface) 78%, white) 48%,
-      color-mix(in oklab, var(--blog-surface) 72%, white) 100%
-    );
+  .blog-page-shell::before{
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url("/fondo.svg");
+    background-position: top center;
+    background-repeat: repeat;
+    background-size: 520px 520px;
+    content: "";
+    opacity: 0.035;
+    pointer-events: none;
   }
 
   .blog-category-page {
