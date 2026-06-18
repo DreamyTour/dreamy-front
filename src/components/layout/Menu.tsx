@@ -320,20 +320,18 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 															<NavigationMenuLink asChild variant="dropdown">
 																<a
 																	href={rewriteUrl(subItem.url, lang)}
-																	className="py-3 pl-5 text-[15px] hover:bg-[#fbfaf6]"
+																	className="py-3 pl-5 text-[15px] hover:bg-primary/[0.04]"
 																>
-																	<ChevronRight
-																		size={14}
-																		strokeWidth={2.2}
-																		className="pointer-events-none absolute left-0 top-1/2 -translate-x-1.5 -translate-y-1/2 opacity-0 text-secondary transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus:translate-x-0 group-focus:opacity-100"
+																	{/* Línea izquierda fija */}
+																	<span
 																		aria-hidden="true"
-																		focusable="false"
+																		className="pointer-events-none absolute left-0 top-1/2 h-[60%] w-[3px] -translate-y-1/2 bg-primary"
 																	/>
 																	<span className="min-w-0 whitespace-normal leading-snug">
 																		{subItem.label}
 																	</span>
 																	{subItem.badge ? (
-																		<span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm border border-secondary/20 bg-secondary px-2 py-0.5 text-[10px] font-semibold leading-none text-secondary-foreground">
+																		<span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm bg-secondary px-3 py-1.5 text-[10px] font-normal leading-none text-white uppercase">
 																			{subItem.badge}
 																		</span>
 																	) : null}
