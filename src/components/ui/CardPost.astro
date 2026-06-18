@@ -92,7 +92,7 @@ const imageHeight = isFeatured
     href={rewriteUrl(`/blog/${blog.slug}`, lang)}
     aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
     class:list={[
-      "relative flex h-full flex-col overflow-hidden rounded-[3px] border border-[color-mix(in_oklab,var(--primary)_9%,var(--border))] bg-white text-foreground shadow-[0_18px_44px_var(--blog-card-shadow)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-secondary/32 hover:shadow-[0_24px_60px_var(--blog-card-shadow-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
+      "relative flex h-full flex-col overflow-hidden rounded-sm border border-[color-mix(in_oklab,var(--primary)_9%,var(--border))] bg-white text-foreground shadow-[0_18px_44px_var(--blog-card-shadow)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-secondary/32 hover:shadow-[0_24px_60px_var(--blog-card-shadow-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
       isFeatured && "lg:flex-row",
       cardHeight,
     ]}
@@ -140,7 +140,7 @@ const imageHeight = isFeatured
       >
         {
           category && (
-            <span class="line-clamp-1 inline-flex max-w-full items-center rounded-[3px] border border-white/35 bg-black/20 px-3.5 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_10px_30px_color-mix(in_oklab,var(--blog-image-shade)_36%,transparent)] backdrop-blur-md transition-colors duration-300 group-hover:border-secondary/60 group-hover:bg-secondary/40">
+            <span class="line-clamp-1 inline-flex max-w-full items-center rounded-xs bg-secondary px-3.5 py-1.5 text-[0.6rem] uppercase tracking-[0.16em] text-white shadow-[0_10px_30px_color-mix(in_oklab,var(--blog-image-shade)_36%,transparent)]">
               {category}
             </span>
           )
