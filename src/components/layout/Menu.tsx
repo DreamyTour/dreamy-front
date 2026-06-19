@@ -432,14 +432,14 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 													className="left-[var(--mega-menu-left)] right-auto mt-2 w-[var(--mega-menu-width)] max-w-[calc(100%-2rem)] rounded-none border-slate-200/90 bg-white shadow-[0_34px_90px_-54px_rgba(8,23,17,0.72)]"
 													style={megaMenuStyle}
 												>
-													<div className="border-b border-slate-200 bg-white px-6 pb-4 pt-6">
-														<p className="text-[12px] font-bold uppercase leading-none tracking-[0.24em] text-black">
+													<div className="bg-white px-6 pt-6 pb-3">
+														<p className="inline-block border-b-2 border-primary pb-0.5 text-[12px] font-bold uppercase leading-none tracking-[0.24em] text-black">
 															{menuItem.link.label}
 														</p>
 													</div>
 
 													<ul
-														className="grid w-full grid-flow-col gap-x-4 gap-y-2 px-5 py-5"
+														className="grid w-full grid-flow-col gap-x-4 gap-y-2 px-4 py-4"
 														style={
 															{
 																gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
@@ -452,7 +452,7 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 																<NavigationMenuLink asChild variant="dropdown">
 																	<a
 																		href={rewriteUrl(subItem.url, lang)}
-																		className="overflow-hidden min-h-[50px] rounded-sm px-4 py-3 text-[15px] font-medium text-[#0b1511] before:pointer-events-none before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-secondary before:opacity-0 before:transition-opacity before:duration-200 hover:bg-primary/[0.07] hover:text-primary hover:shadow-[0_18px_38px_-30px_rgba(8,23,17,0.62)] group-hover:before:opacity-100"
+																		className="h-full overflow-hidden min-h-[50px] rounded-sm px-4 py-3 text-[15px] font-medium text-[#0b1511] before:pointer-events-none before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-secondary before:opacity-0 before:transition-opacity before:duration-200 hover:bg-primary/[0.07] hover:text-primary hover:shadow-[0_18px_38px_-30px_rgba(8,23,17,0.62)] group-hover:before:opacity-100 border-b border-dashed border-slate-200 hover:border-primary"
 																	>
 																		<span className="min-w-0 flex-1 whitespace-normal break-words leading-snug text-wrap-pretty [overflow-wrap:anywhere]">
 																			{subItem.label}
