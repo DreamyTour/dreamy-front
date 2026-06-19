@@ -11,7 +11,7 @@ interface Props {
 const { data, lang } = Astro.props;
 if (!data) return;
 
-const imagenUrl = getImageUrl(data.imagen, "large");
+const imagenUrl = getImageUrl(data.imagen, "small");
 const imageSrcSet = getImageSrcSet(data.imagen, ["small", "medium", "large"]);
 const imageAlt = getImageAlt(data.imagen, data.titulo);
 const contentParagraphs = data.content
