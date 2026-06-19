@@ -266,10 +266,14 @@ const features = {
       imagenUrl !== "/og-default.jpg" && (
         <figure class="about-figure relative z-10 mx-auto w-full max-w-xl pt-4 pr-4 lg:mr-0 lg:ml-auto">
           <picture class="about-picture relative z-10 block overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl">
+            <source
+              media="(min-width: 768px)"
+              srcset={imageSrcSet || undefined}
+              sizes="(max-width: 1023px) calc(100vw - 3rem), 50vw"
+            />
             <img
               src={imagenUrl}
-              srcset={imageSrcSet || undefined}
-              sizes="(max-width: 1023px) 100vw, 50vw"
+              sizes="(max-width: 1023px) calc(100vw - 3rem), 50vw"
               alt={imageAlt}
               class="aspect-[4/3] w-full object-cover object-center"
               loading="lazy"
