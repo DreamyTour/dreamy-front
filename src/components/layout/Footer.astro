@@ -26,12 +26,15 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
   isWhatsAppLink(label, url) ? whatsappUrl : url;
 ---
 
-<footer class="relative overflow-hidden bg-[#081711] pt-8 pb-10 text-white">
+<footer
+  class="dreamy-footer relative overflow-hidden bg-[#081711] pt-8 pb-10 text-white"
+>
   <div class="pointer-events-none absolute inset-0 z-0">
     <div
       class="absolute inset-0 bg-[linear-gradient(180deg,_#0b1d15_0%,_#081711_58%,_#050907_100%)]"
     >
     </div>
+    <div class="dreamy-footer-pattern absolute inset-0"></div>
     <div
       class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
     >
@@ -243,3 +246,56 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
     </div>
   </div>
 </footer>
+
+<style>
+  .dreamy-footer {
+    isolation: isolate;
+  }
+
+  .dreamy-footer-pattern {
+    background-image: url("/fondo.svg");
+    background-position: center top;
+    background-repeat: repeat;
+    background-size: clamp(26rem, 38vw, 38rem) clamp(26rem, 38vw, 38rem);
+    filter: invert(1) sepia(0.2) saturate(0.45) contrast(1.08);
+    opacity: 0.08;
+    mix-blend-mode: soft-light;
+  }
+
+  .dreamy-footer-pattern::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(
+        circle at 82% 8%,
+        color-mix(in oklab, var(--accent-warm) 18%, transparent),
+        transparent 32%
+      ),
+      radial-gradient(
+        circle at 18% 88%,
+        color-mix(in oklab, var(--primary) 16%, transparent),
+        transparent 34%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, black 8%, transparent),
+        transparent 36%,
+        color-mix(in oklab, black 36%, transparent)
+      );
+  }
+
+  @media (max-width: 767px) {
+    .dreamy-footer-pattern {
+      background-position: center top;
+      background-size: 24rem 24rem;
+      opacity: 0.07;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .dreamy-footer-pattern {
+      display: none;
+    }
+  }
+</style>

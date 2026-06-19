@@ -4,23 +4,23 @@
   "axes": {
     "clarity": {
       "score": 4,
-      "notes": "La seccion mantiene cuatro indicadores directos, con el lienzo completo oscuro y sin numeracion decorativa."
+      "notes": "About comunica agencia local premium con texto, fotografia, beneficios y prueba social en una composicion clara."
     },
     "hierarchy": {
       "score": 4,
-      "notes": "Los numeros siguen siendo protagonistas, pero con una escala mas contenida y elegante."
+      "notes": "El titulo y la imagen lideran; los beneficios quedan como soporte sin competir con el bloque principal."
     },
     "typography": {
       "score": 4,
-      "notes": "Numerales tabulares, peso alto y etiquetas compactas conservan lectura premium sin verse sobredimensionadas."
+      "notes": "Escala editorial mas amplia, tracking medido y copy con linea de lectura comoda para una agencia de viajes."
     },
     "motion": {
       "score": 4,
-      "notes": "Se conserva el conteo progresivo, la entrada escalonada y el fallback para reduced motion."
+      "notes": "Hover sobrio en beneficios y sin efectos llamativos; la seccion prioriza confianza y refinamiento."
     },
     "brand": {
       "score": 4,
-      "notes": "La superficie completa usa un oscuro premium construido con primary y secondary, textura fondo.svg a nivel de seccion y dorado como acento medido."
+      "notes": "Sin degradados: usa primary, secondary, marfil de marca, textura fondo.svg y filetes solidos para un acabado premium."
     }
   }
 }
