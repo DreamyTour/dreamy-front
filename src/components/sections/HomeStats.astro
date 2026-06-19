@@ -3,232 +3,401 @@ import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 
 interface Props {
-	lang: Lang;
+  lang: Lang;
 }
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const stats = [
-	{
-		value: 15,
-		suffix: "",
-		label: t("homeStats.experience"),
-	},
-	{
-		value: 200,
-		suffix: "+",
-		label: t("homeStats.collaborators"),
-	},
-	{
-		value: 6000,
-		suffix: "+",
-		label: t("homeStats.adventures"),
-	},
-	{
-		value: 70000,
-		suffix: "+",
-		label: t("homeStats.clients"),
-	},
+  {
+    value: 15,
+    suffix: "",
+    label: t("homeStats.experience"),
+  },
+  {
+    value: 200,
+    suffix: "+",
+    label: t("homeStats.collaborators"),
+  },
+  {
+    value: 6000,
+    suffix: "+",
+    label: t("homeStats.adventures"),
+  },
+  {
+    value: 70000,
+    suffix: "+",
+    label: t("homeStats.clients"),
+  },
 ];
 
 const formatValue = (value: number, suffix: string) =>
-	`${new Intl.NumberFormat("en-US").format(value)}${suffix}`;
+  `${new Intl.NumberFormat("en-US").format(value)}${suffix}`;
 ---
 
 <section
-	class="home-stats relative isolate overflow-hidden bg-muted py-12 sm:py-14 lg:py-16"
-	aria-label={t("homeStats.ariaLabel")}
-	data-home-stats
+  class="home-stats relative isolate overflow-hidden px-4 py-10 sm:px-6 sm:py-12 lg:py-16"
+  aria-label={t("homeStats.ariaLabel")}
+  data-home-stats
 >
-	<div
-		class="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/25 to-transparent"
-		aria-hidden="true"
-	>
-	</div>
-	<div
-		class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-secondary/25 to-transparent"
-		aria-hidden="true"
-	>
-	</div>
-
-	<ul class="mx-auto grid max-w-8xl grid-cols-1 gap-y-10 px-6 text-center sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
-		{
-			stats.map((stat, index) => (
-				<li
-					class="home-stat-item relative flex flex-col items-center justify-start px-4"
-					style={`--stat-delay: ${index * 90}ms`}
-					aria-label={`${formatValue(stat.value, stat.suffix)} ${stat.label}`}
-				>
-					<span
-						class="home-stat-number text-4xl font-extrabold leading-none tracking-tight text-secondary sm:text-5xl"
-						data-stat-number
-						data-target={stat.value}
-						data-suffix={stat.suffix}
-						aria-hidden="true"
-					>
-						{formatValue(stat.value, stat.suffix)}
-					</span>
-					<span class="mt-4 max-w-[18rem] text-sm font-extrabold uppercase leading-7 text-foreground sm:text-base">
-						{stat.label}
-					</span>
-				</li>
-			))
-		}
-	</ul>
+  <div class="home-stats-shell mx-auto max-w-8xl">
+    <ul
+      class="home-stats-grid grid grid-cols-1 gap-3 text-center sm:grid-cols-2 lg:grid-cols-4"
+    >
+      {
+        stats.map((stat, index) => (
+          <li
+            class="home-stat-item relative flex min-h-40 flex-col items-center justify-center overflow-hidden px-6 py-8 sm:min-h-44 lg:min-h-48"
+            style={`--stat-delay: ${index * 90}ms`}
+            aria-label={`${formatValue(stat.value, stat.suffix)} ${stat.label}`}
+          >
+            <span
+              class="home-stat-number text-3xl font-black leading-none tracking-tight sm:text-4xl lg:text-5xl"
+              data-stat-number
+              data-target={stat.value}
+              data-suffix={stat.suffix}
+              aria-hidden="true"
+            >
+              {formatValue(stat.value, stat.suffix)}
+            </span>
+            <span class="home-stat-label mt-5 max-w-[17rem] text-xs font-extrabold uppercase leading-6 tracking-[0.18em] sm:text-sm">
+              {stat.label}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </section>
 
 <script>
-	const numberFormatter = new Intl.NumberFormat("en-US");
-	let homeStatsObserver: IntersectionObserver | undefined;
+  const numberFormatter = new Intl.NumberFormat("en-US");
+  let homeStatsObserver: IntersectionObserver | undefined;
 
-	const setFinalValues = (root: HTMLElement) => {
-		root.querySelectorAll<HTMLElement>("[data-stat-number]").forEach((node) => {
-			const target = Number(node.dataset.target || "0");
-			const suffix = node.dataset.suffix || "";
-			node.textContent = `${numberFormatter.format(target)}${suffix}`;
-		});
-		root.classList.add("is-visible");
-	};
+  const setFinalValues = (root: HTMLElement) => {
+    root.querySelectorAll<HTMLElement>("[data-stat-number]").forEach((node) => {
+      const target = Number(node.dataset.target || "0");
+      const suffix = node.dataset.suffix || "";
+      node.textContent = `${numberFormatter.format(target)}${suffix}`;
+    });
+    root.classList.add("is-visible");
+  };
 
-	const animateRoot = (root: HTMLElement) => {
-		root.classList.add("is-visible");
+  const animateRoot = (root: HTMLElement) => {
+    root.classList.add("is-visible");
 
-		root.querySelectorAll<HTMLElement>("[data-stat-number]").forEach((node) => {
-			const target = Number(node.dataset.target || "0");
-			const suffix = node.dataset.suffix || "";
-			const duration = 1200;
-			const startTime = performance.now();
+    root.querySelectorAll<HTMLElement>("[data-stat-number]").forEach((node) => {
+      const target = Number(node.dataset.target || "0");
+      const suffix = node.dataset.suffix || "";
+      const duration = 1200;
+      const startTime = performance.now();
 
-			const tick = (now: number) => {
-				const progress = Math.min((now - startTime) / duration, 1);
-				const eased = 1 - (1 - progress) ** 3;
-				const value = Math.round(target * eased);
-				node.textContent = `${numberFormatter.format(value)}${suffix}`;
+      const tick = (now: number) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - (1 - progress) ** 3;
+        const value = Math.round(target * eased);
+        node.textContent = `${numberFormatter.format(value)}${suffix}`;
 
-				if (progress < 1) {
-					requestAnimationFrame(tick);
-				}
-			};
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        }
+      };
 
-			node.textContent = suffix ? `0${suffix}` : "0";
-			requestAnimationFrame(tick);
-		});
-	};
+      node.textContent = suffix ? `0${suffix}` : "0";
+      requestAnimationFrame(tick);
+    });
+  };
 
-	const initHomeStats = () => {
-		const roots = document.querySelectorAll<HTMLElement>("[data-home-stats]");
-		const reduceMotion = window.matchMedia(
-			"(prefers-reduced-motion: reduce)",
-		).matches;
+  const initHomeStats = () => {
+    const roots = document.querySelectorAll<HTMLElement>("[data-home-stats]");
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
-		homeStatsObserver?.disconnect();
+    homeStatsObserver?.disconnect();
 
-		if (reduceMotion || !("IntersectionObserver" in window)) {
-			roots.forEach(setFinalValues);
-			return;
-		}
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      roots.forEach(setFinalValues);
+      return;
+    }
 
-		homeStatsObserver = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (!entry.isIntersecting) return;
-					const root = entry.target as HTMLElement;
-					animateRoot(root);
-					homeStatsObserver?.unobserve(root);
-				});
-			},
-			{ threshold: 0.35 },
-		);
+    homeStatsObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const root = entry.target as HTMLElement;
+          animateRoot(root);
+          homeStatsObserver?.unobserve(root);
+        });
+      },
+      { threshold: 0.35 },
+    );
 
-		roots.forEach((root) => homeStatsObserver?.observe(root));
-	};
+    roots.forEach((root) => homeStatsObserver?.observe(root));
+  };
 
-	document.addEventListener("astro:page-load", initHomeStats);
-	initHomeStats();
+  document.addEventListener("astro:page-load", initHomeStats);
+  initHomeStats();
 </script>
 
 <style>
-	.home-stats {
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in oklab, var(--muted) 72%, white 28%),
-				var(--muted)
-			);
-	}
+  .home-stats {
+    --stats-ink: color-mix(in oklab, var(--primary) 58%, black 42%);
+    --stats-ink-deep: color-mix(in oklab, var(--primary) 38%, black 62%);
+    --stats-wine: color-mix(in oklab, var(--secondary) 44%, black 56%);
+    --stats-gold: color-mix(in oklab, var(--accent-warm) 86%, white 14%);
+    --stats-line: color-mix(in oklab, var(--accent-warm) 20%, transparent);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--stats-ink) 78%, black 22%),
+      var(--stats-ink-deep) 48%,
+      color-mix(in oklab, var(--stats-wine) 62%, black 38%)
+    );
+    container: home-stats / inline-size;
+  }
 
-	.home-stat-item {
-		opacity: 0;
-		transform: translateY(18px);
-	}
+  .home-stats::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: url("/fondo.svg");
+    background-repeat: repeat;
+    background-size: clamp(24rem, 44vw, 42rem) clamp(24rem, 44vw, 42rem);
+    filter: invert(1) saturate(0.5) contrast(1.08);
+    opacity: 0.02;
+    pointer-events: none;
+  }
 
-	.home-stat-item:not(:last-child)::after {
-		content: "";
-		position: absolute;
-		inset-block: 0.25rem;
-		inset-inline-end: 0;
-		width: 1px;
-		background: linear-gradient(
-			to bottom,
-			transparent,
-			color-mix(in oklab, var(--border) 80%, var(--primary) 20%),
-			transparent
-		);
-		opacity: 0;
-	}
+  .home-stats::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(
+        circle at 18% 8%,
+        color-mix(in oklab, var(--accent-warm) 14%, transparent),
+        transparent 31%
+      ),
+      radial-gradient(
+        circle at 84% 88%,
+        color-mix(in oklab, var(--secondary) 18%, transparent),
+        transparent 34%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, black 18%, transparent),
+        transparent 28%,
+        color-mix(in oklab, black 28%, transparent)
+      );
+    pointer-events: none;
+  }
 
-	.home-stats.is-visible .home-stat-item {
-		animation: stat-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-		animation-delay: var(--stat-delay);
-	}
+  .home-stats-shell {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, white 13%, transparent);
+    border-radius: clamp(1.25rem, 2vw, 2rem);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, white 9%, transparent),
+      color-mix(in oklab, black 8%, transparent) 46%,
+      color-mix(in oklab, var(--secondary) 10%, transparent)
+    );
+    box-shadow:
+      0 30px 84px -50px color-mix(in oklab, black 92%, transparent),
+      inset 0 1px 0 color-mix(in oklab, white 24%, transparent),
+      inset 0 -1px 0 color-mix(in oklab, black 24%, transparent);
+  }
 
-	.home-stats.is-visible .home-stat-item::after {
-		animation: stat-rule 700ms ease-out both;
-		animation-delay: calc(var(--stat-delay) + 180ms);
-	}
+  .home-stats-shell::before {
+    content: "";
+    position: absolute;
+    inset-inline: 1.25rem;
+    inset-block-start: 0;
+    block-size: 1px;
+    z-index: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--accent-warm) 42%, var(--primary) 58%),
+      transparent
+    );
+    opacity: 0.48;
+    pointer-events: none;
+  }
 
-	.home-stat-number {
-		text-shadow: 0 12px 30px color-mix(in oklab, var(--secondary) 18%, transparent);
-	}
+  .home-stats-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(
+        circle at 18% 0%,
+        color-mix(in oklab, var(--accent-warm) 18%, transparent),
+        transparent 32%
+      ),
+      radial-gradient(
+        circle at 78% 105%,
+        color-mix(in oklab, var(--secondary) 20%, transparent),
+        transparent 34%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklab, white 9%, transparent),
+        transparent 46%,
+        color-mix(in oklab, black 16%, transparent)
+      );
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
+    pointer-events: none;
+  }
 
-	@keyframes stat-rise {
-		from {
-			opacity: 0;
-			transform: translateY(18px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
+  .home-stats-grid {
+    position: relative;
+    z-index: 1;
+  }
 
-	@keyframes stat-rule {
-		from {
-			opacity: 0;
-			transform: scaleY(0.2);
-		}
-		to {
-			opacity: 1;
-			transform: scaleY(1);
-		}
-	}
+  .home-stat-item {
+    background: color-mix(in oklab, white 8%, transparent);
+    box-shadow:
+      inset 1px 0 0 color-mix(in oklab, white 10%, transparent),
+      inset 0 1px 0 color-mix(in oklab, white 8%, transparent);
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      background 240ms ease,
+      box-shadow 240ms ease,
+      transform 240ms ease;
+  }
 
-	@media (max-width: 1023px) {
-		.home-stat-item:not(:last-child)::after {
-			display: none;
-		}
-	}
+  .home-stat-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 0%,
+      color-mix(in oklab, var(--stats-gold) 18%, transparent),
+      transparent 58%
+    );
+    opacity: 0.62;
+    transition: opacity 240ms ease;
+  }
 
-	@media (prefers-reduced-motion: reduce) {
-		.home-stat-item {
-			opacity: 1;
-			transform: none;
-		}
+  .home-stat-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    inset-block: 1.25rem;
+    inset-inline-end: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--stats-line),
+      transparent
+    );
+    opacity: 0;
+  }
 
-		.home-stats.is-visible .home-stat-item,
-		.home-stats.is-visible .home-stat-item::after {
-			animation: none;
-		}
-	}
+  .home-stat-item:hover {
+    background: color-mix(in oklab, white 13%, transparent);
+    box-shadow: 0 20px 46px -34px
+      color-mix(in oklab, var(--accent-warm) 55%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .home-stat-item:hover::before {
+    opacity: 1;
+  }
+
+  .home-stats.is-visible .home-stat-item {
+    animation: stat-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: var(--stat-delay);
+  }
+
+  .home-stats.is-visible .home-stat-item::after {
+    animation: stat-rule 700ms ease-out both;
+    animation-delay: calc(var(--stat-delay) + 180ms);
+  }
+
+  .home-stat-number {
+    position: relative;
+    z-index: 1;
+    color: var(--stats-gold);
+    font-size: clamp(2.2rem, 3.25cqi, 3.25rem);
+    font-variant-numeric: tabular-nums;
+    text-shadow:
+      0 1px 0 color-mix(in oklab, white 26%, transparent),
+      0 16px 34px color-mix(in oklab, var(--accent-warm) 22%, transparent);
+  }
+
+  .home-stat-label {
+    position: relative;
+    z-index: 1;
+    color: color-mix(in oklab, white 86%, var(--accent-warm));
+    text-wrap: balance;
+  }
+
+  @keyframes stat-rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes stat-rule {
+    from {
+      opacity: 0;
+      transform: scaleY(0.2);
+    }
+    to {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .home-stat-item:not(:last-child)::after {
+      display: none;
+    }
+  }
+
+  @container home-stats (max-width: 520px) {
+    .home-stats-shell {
+      border-radius: 1.1rem;
+    }
+
+    .home-stat-item {
+      min-block-size: 8.75rem;
+      padding-block: 1.75rem;
+    }
+
+    .home-stat-number {
+      font-size: clamp(2.05rem, 12cqi, 2.85rem);
+    }
+
+    .home-stat-label {
+      letter-spacing: 0.12em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-stat-item {
+      opacity: 1;
+      transform: none;
+    }
+
+    .home-stats.is-visible .home-stat-item,
+    .home-stats.is-visible .home-stat-item::after {
+      animation: none;
+    }
+  }
 </style>
