@@ -216,6 +216,15 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
     animation-delay: 0.45s;
   }
 
+  @media (max-width: 767px) {
+    .hero-badge,
+    .hero-title,
+    .hero-subtitle,
+    .hero-actions {
+      animation: none;
+    }
+  }
+
   @keyframes hero-fade-up {
     from {
       opacity: 0;

@@ -114,10 +114,11 @@ const formatValue = (value: number, suffix: string) =>
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    const compactViewport = window.matchMedia("(max-width: 767px)").matches;
 
     homeStatsObserver?.disconnect();
 
-    if (reduceMotion || !("IntersectionObserver" in window)) {
+    if (reduceMotion || compactViewport || !("IntersectionObserver" in window)) {
       roots.forEach(setFinalValues);
       return;
     }
@@ -390,6 +391,18 @@ const formatValue = (value: number, suffix: string) =>
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .home-stat-item {
+      opacity: 1;
+      transform: none;
+    }
+
+    .home-stats.is-visible .home-stat-item,
+    .home-stats.is-visible .home-stat-item::after {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 767px) {
     .home-stat-item {
       opacity: 1;
       transform: none;
