@@ -10,17 +10,41 @@ import {
 interface Props {
   tours: Tour[];
   lang: Lang;
+  labelledBy?: string;
 }
 
-const { tours, lang } = Astro.props;
+const { tours, lang, labelledBy } = Astro.props;
 const shouldLoop = tours.length > 3;
+const sliderId = `slider-${Math.random().toString(36).slice(2, 11)}`;
+const sliderLabels = {
+  en: {
+    section: "Featured tours",
+    previous: "Show previous tours",
+    next: "Show next tours",
+  },
+  es: {
+    section: "Tours destacados",
+    previous: "Ver tours anteriores",
+    next: "Ver siguientes tours",
+  },
+  pt: {
+    section: "Tours em destaque",
+    previous: "Ver tours anteriores",
+    next: "Ver próximos tours",
+  },
+}[lang];
 ---
 
-<section class="relative" data-tours-slider aria-label="Tours destacados">
+<section
+  class="relative"
+  data-tours-slider
+  aria-labelledby={labelledBy}
+  aria-label={labelledBy ? undefined : sliderLabels.section}
+>
   <div class="overflow-hidden">
     <ul
       class="flex list-none gap-6 overflow-x-auto px-0 py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
-      id={`slider-${Math.random().toString(36).slice(2, 11)}`}
+      id={sliderId}
       data-slider-track
       data-original-count={tours.length}
       data-is-looped={shouldLoop ? "true" : "false"}
@@ -37,14 +61,16 @@ const shouldLoop = tours.length > 3;
 
   <button
     class="slider-prev absolute -left-3 top-[calc((100vw-3rem)*0.75+1rem)] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:-left-7 md:top-1/2 md:h-14 md:w-14"
-    aria-label="Ver tours anteriores"
+    aria-label={sliderLabels.previous}
+    aria-controls={sliderId}
   >
     <ArrowLeftIcon className="w-6 h-6 text-current" aria-hidden="true" />
   </button>
 
   <button
     class="slider-next absolute -right-3 top-[calc((100vw-3rem)*0.75+1rem)] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:-right-7 md:top-1/2 md:h-14 md:w-14"
-    aria-label="Ver siguientes tours"
+    aria-label={sliderLabels.next}
+    aria-controls={sliderId}
   >
     <ArrowRightIcon className="w-6 h-6 text-current" aria-hidden="true" />
   </button>

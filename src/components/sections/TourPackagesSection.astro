@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/i18n";
 import { fetchToursByCategory } from "@/lib/strapiQueries";
 import { rewriteUrl } from "@/lib/utils";
 import type { Category } from "@/types/home";
+import CalendarIcon from "@/assets/svg/tour-packages/calendar.svg";
 
 type TourSectionData = {
   id: number;
@@ -49,24 +50,32 @@ const tours = await fetchToursByCategory({
 });
 
 const hasTours = tours.length > 0;
-const availabilityTitleId = `${titleId.replace(/-title$/, "")}-availability-title`;
-const badgeText =
-  {
-    en: "Adventure Awaits",
-    es: "La Aventura te Espera",
-    pt: "A Aventura te Espera",
-  }[lang] || "Adventure Awaits";
-
+const descriptionId = `${titleId.replace(/-title$/, "")}-description`;
+const ctaTitleId = `${titleId.replace(/-title$/, "")}-cta-title`;
+const ctaLabel = t(ctaLabelKey);
 const availabilityText = {
-  en: { title: "Check Availability", subtitle: "Book your adventure" },
-  es: { title: "Consultar Disponibilidad", subtitle: "Reserva tu aventura" },
-  pt: { title: "Verificar Disponibilidade", subtitle: "Reserve sua aventura" },
-}[lang] || { title: "Check Availability", subtitle: "Book your adventure" };
+  en: {
+    title: "Check Availability",
+    subtitle: "Book your adventure",
+  },
+  es: {
+    title: "Consultar Disponibilidad",
+    subtitle: "Reserva tu aventura",
+  },
+  pt: {
+    title: "Verificar Disponibilidade",
+    subtitle: "Reserve sua aventura",
+  },
+}[lang] || {
+  title: "Check Availability",
+  subtitle: "Book your adventure",
+};
 ---
 
 <section
   id={sectionId}
   aria-labelledby={titleId}
+  aria-describedby={data.description ? descriptionId : undefined}
   class:list={[
     "content-deferred content-deferred--tall w-full py-16",
     surface === "white" && "bg-white",
@@ -74,141 +83,48 @@ const availabilityText = {
   ]}
 >
   <div class="mx-auto max-w-8xl px-6">
-    <div
-      class="mb-14 flex flex-col items-start justify-between gap-8 md:mb-20 lg:flex-row lg:gap-12"
-    >
-      <header class="max-w-3xl flex-1 text-left">
-        <p
-          class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
-        >
-          <svg
-            class="h-4 w-4"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd"></path>
-          </svg>
-          {badgeText}
-        </p>
-
-        <h2
-          id={titleId}
-          class="relative mb-2 inline-block text-3xl font-bold text-gray-900 md:text-4xl"
-        >
-          <span class="relative z-10">{data.titulo}</span>
-          <span
-            class="absolute bottom-0 left-0 -z-0 h-3 w-24 rounded-full bg-secondary/30 blur-sm"
-          ></span>
-        </h2>
-
+    <header class="mb-12 max-w-4xl text-left md:mb-16">
+      <h2
+        id={titleId}
+        class="relative mb-2 inline-block max-w-3xl text-4xl font-bold leading-tight tracking-tight text-gray-950 md:text-5xl"
+      >
+        <span class="relative z-10">{data.titulo}</span>
         <span
-          class="mb-6 mt-4 flex items-center justify-start gap-3"
-          aria-hidden="true"
-        >
-          <span class="h-px w-16 bg-gradient-to-r from-transparent to-secondary"
-          ></span>
-          <span class="relative h-1.5 w-12 rounded-full bg-secondary">
-            <span
-              class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-            >
-            </span>
-          </span>
-          <span class="h-px w-16 bg-gradient-to-l from-transparent to-secondary"
-          ></span>
-        </span>
+          class="absolute bottom-1 left-0 -z-0 h-3 w-24 rounded-full bg-secondary/30 blur-sm"
+          aria-hidden="true"></span>
+      </h2>
 
-        <p class="text-base leading-relaxed text-gray-600">
-          {
-            data.description ||
-              "The ancestral trails of the Andes are waiting for you to live a transforming experience. Each route is a unique adventure, designed for different levels of experience and physical condition. Our guides will accompany you every step of the way, sharing stories, knowledge and guaranteeing a safe and memorable experience."
-          }
-        </p>
-      </header>
+      <span
+        class="mb-6 mt-4 flex items-center justify-start gap-3"
+        aria-hidden="true"
+      >
+        <span class="h-px w-16 bg-gradient-to-r from-transparent to-secondary"
+        ></span>
+        <span class="relative h-1.5 w-12 rounded-full bg-secondary">
+          <span
+            class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
+          >
+          </span>
+        </span>
+        <span class="h-px w-16 bg-gradient-to-l from-transparent to-secondary"
+        ></span>
+      </span>
 
       {
-        data.category?.slug && (
-          <aside
-            aria-labelledby={availabilityTitleId}
-            class="flex w-full shrink-0 flex-col justify-center rounded-2xl border-l-[6px] border-secondary bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.08)] lg:w-[380px]"
+        data.description && (
+          <p
+            id={descriptionId}
+            class="max-w-3xl text-base leading-relaxed text-gray-600"
           >
-            <header class="mb-5 flex items-center gap-4">
-              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-white shadow-md">
-                <svg
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </span>
-              <hgroup>
-                <h3
-                  id={availabilityTitleId}
-                  class="text-[1.05rem] font-bold text-gray-900"
-                >
-                  {availabilityText.title}
-                </h3>
-                <p class="text-[0.85rem] text-gray-500">
-                  {availabilityText.subtitle}
-                </p>
-              </hgroup>
-            </header>
-            <a
-              href={rewriteUrl(href, lang)}
-              aria-label={t("aria.verMasSeccion")}
-              class="flex w-full items-center justify-between rounded-xl border border-secondary bg-secondary/10 px-5 py-3.5 font-semibold text-secondary shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-transparent hover:bg-secondary hover:text-white hover:shadow-lg"
-            >
-              <span class="flex items-center gap-2">
-                <svg
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <span>{t(ctaLabelKey)}</span>
-              </span>
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </a>
-          </aside>
+            {data.description}
+          </p>
         )
       }
-    </div>
+    </header>
 
     {
       hasTours ? (
-        <ToursSlider tours={tours} lang={lang} />
+        <ToursSlider tours={tours} lang={lang} labelledBy={titleId} />
       ) : (
         <div class="rounded-2xl border border-dashed border-secondary/30 bg-white/60 px-6 py-12 text-center">
           <svg
@@ -231,5 +147,48 @@ const availabilityText = {
         </div>
       )
     }
+
+    <aside
+      aria-labelledby={ctaTitleId}
+      class="mt-10 rounded-2xl border border-secondary/25 bg-white px-6 py-6 shadow-[0_18px_42px_-34px_rgb(0,0,0,0.45)] ring-1 ring-secondary/5 md:mt-12 md:px-10"
+    >
+      <div
+        class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
+      >
+        <div class="flex items-start gap-5">
+          <span
+            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-secondary/10 bg-secondary/10 text-secondary"
+            aria-hidden="true"
+          >
+            <CalendarIcon class="h-6 w-6" aria-hidden="true" />
+          </span>
+          <div>
+            <h3
+              id={ctaTitleId}
+              class="text-xl font-bold leading-tight text-gray-900 md:text-2xl"
+            >
+              {availabilityText.title}
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-gray-500">
+              {availabilityText.subtitle}
+            </p>
+          </div>
+        </div>
+
+        <a
+          href={rewriteUrl(href, lang)}
+          aria-label={`${ctaLabel}: ${data.titulo}`}
+          class="group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-xl border border-secondary bg-secondary px-6 py-3 text-sm font-bold text-white shadow-[0_16px_34px_-20px_color-mix(in_oklab,var(--secondary)_86%,black)] transition duration-200 hover:-translate-y-0.5 hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary md:w-auto md:min-w-40"
+        >
+          <span>{ctaLabel}</span>
+          <span
+            class="text-base leading-none transition-transform duration-200 group-hover:translate-x-1"
+            aria-hidden="true"
+          >
+            &rarr;
+          </span>
+        </a>
+      </div>
+    </aside>
   </div>
 </section>
