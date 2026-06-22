@@ -2,6 +2,12 @@
 import type { About } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
 import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import type { SvgComponent } from "astro/types";
+import AwardIcon from "@/assets/svg/about/award.svg";
+import LeafIcon from "@/assets/svg/about/leaf.svg";
+import ShieldIcon from "@/assets/svg/about/shield.svg";
+import StarIcon from "@/assets/svg/about/star.svg";
+import UserIcon from "@/assets/svg/about/user.svg";
 
 interface Props {
   data?: About;
@@ -20,13 +26,37 @@ const contentParagraphs = data.content
   .filter(Boolean);
 const emphasisPattern = /(DREAMY TOURS|Peru and Bolivia|responsible tourism)/;
 
-const eyebrowByLang: Record<Lang, string> = {
-  en: "100% Local Tour",
-  es: "Tour 100% Local",
-  pt: "Tour 100% Local",
+const featureIcons = {
+  award: AwardIcon,
+  user: UserIcon,
+  shield: ShieldIcon,
+  leaf: LeafIcon,
+} satisfies Record<string, SvgComponent>;
+
+const travelerStatByLang: Record<Lang, { count: string; label: string }> = {
+  en: {
+    count: "+500",
+    label: "Happy travelers",
+  },
+  es: {
+    count: "+500",
+    label: "Viajeros felices",
+  },
+  pt: {
+    count: "+500",
+    label: "Viajantes felizes",
+  },
 };
 
-const features = {
+type FeatureIcon = keyof typeof featureIcons;
+type Feature = {
+  title: string;
+  desc: string;
+  icon: FeatureIcon;
+  color: "green" | "yellow";
+};
+
+const features: Record<Lang, Feature[]> = {
   en: [
     {
       title: "Excellence Service",
@@ -116,27 +146,10 @@ const features = {
     class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 lg:grid-cols-2 lg:gap-24 lg:px-8"
   >
     {/* Lado de texto */}
-    <article class="relative z-10 w-full max-w-2xl">
-      <p
-        class="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
-      >
-        <svg
-          class="h-3.5 w-3.5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-            clip-rule="evenodd"></path>
-        </svg>
-        <span class="uppercase tracking-wider">{eyebrowByLang[lang]}</span>
-      </p>
-
+    <div class="relative z-10 w-full max-w-2xl">
       <h2
         id="about-title"
-        class="about-heading text-4xl font-bold tracking-tight text-[#181311] sm:text-5xl"
+        class="font-bold tracking-tight text-[#181311] text-5xl"
       >
         {data.titulo}
       </h2>
@@ -168,103 +181,32 @@ const features = {
       {/* Features en grid 2x2 */}
       <ul class="mt-10 grid list-none gap-6 p-0 sm:grid-cols-2">
         {
-          features[lang].map((act) => (
-            <li class="flex items-start gap-4">
-              <span
-                class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border bg-white shadow-sm ${act.color === "green" ? "border-primary/15 text-primary" : "border-secondary/15 text-secondary"}`}
-                aria-hidden="true"
-              >
-                {act.icon === "award" && (
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="8" r="5" />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M8.5 12.5 7 22l5-3 5 3-1.5-9.5"
-                    />
-                  </svg>
-                )}
-                {act.icon === "user" && (
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16 19a4 4 0 0 0-8 0"
-                    />
-                    <circle cx="12" cy="8" r="3.5" />
-                  </svg>
-                )}
-                {act.icon === "shield" && (
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 3 19 6v5c0 4.5-2.9 8.3-7 10-4.1-1.7-7-5.5-7-10V6l7-3z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="m9.5 12 1.8 1.8 3.7-4"
-                    />
-                  </svg>
-                )}
-                {act.icon === "leaf" && (
-                  <svg
-                    class="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 19c2.5-5 6-8.5 10.5-10.5"
-                    />
-                  </svg>
-                )}
-              </span>
-              <hgroup class="pt-0.5">
-                <h3 class="text-sm font-bold text-[#181311]">{act.title}</h3>
-                <p class="mt-1 text-xs text-[#181311]/70">{act.desc}</p>
-              </hgroup>
-            </li>
-          ))
+          features[lang].map((act) => {
+            const Icon = featureIcons[act.icon];
+
+            return (
+              <li class="flex items-start gap-4">
+                <span
+                  class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border bg-white shadow-sm ${act.color === "green" ? "border-primary/15 text-primary" : "border-secondary/15 text-secondary"}`}
+                  aria-hidden="true"
+                >
+                  <Icon class="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div class="pt-0.5">
+                  <h3 class="text-sm font-bold text-[#181311]">{act.title}</h3>
+                  <p class="mt-1 text-xs text-[#181311]/70">{act.desc}</p>
+                </div>
+              </li>
+            );
+          })
         }
       </ul>
-    </article>
+    </div>
 
     {/* Lado de imagen */}
     {
       imagenUrl !== "/og-default.jpg" && (
-        <figure class="about-figure relative z-10 mx-auto w-full max-w-xl pt-4 pr-4 lg:mr-0 lg:ml-auto">
+        <div class="about-figure relative z-10 mx-auto w-full max-w-xl pt-4 pr-4 lg:mr-0 lg:ml-auto">
           <picture class="about-picture relative z-10 block overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl">
             <source
               media="(min-width: 768px)"
@@ -282,54 +224,32 @@ const features = {
           </picture>
 
           {/* Widget flotante +500 Happy Travelers */}
-          <figcaption class="absolute -bottom-6 -left-6 z-20 flex items-center gap-4 rounded-xl bg-white p-4 pr-6 shadow-2xl ring-1 ring-black/5">
+          <div class="absolute -bottom-6 -left-6 z-20 flex items-center gap-4 rounded-xl bg-white p-4 pr-6 shadow-xl ring-1 ring-black/5">
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
-              <svg
-                class="h-6 w-6"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
+              <StarIcon class="h-6 w-6" aria-hidden="true" />
             </span>
-            <span class="flex flex-col">
+            <p class="flex flex-col">
               <span class="text-sm font-bold leading-tight text-[#181311]">
-                +500
+                {travelerStatByLang[lang].count}
               </span>
               <span class="text-xs font-medium text-[#181311]/60">
-                Happy Travelers
+                {travelerStatByLang[lang].label}
               </span>
-            </span>
-          </figcaption>
-        </figure>
+            </p>
+          </div>
+        </div>
       )
     }
   </div>
 </section>
 
 <style>
-  .about-section::before,
-  .about-section::after {
-    position: absolute;
-    width: 24rem;
-    height: 24rem;
-    border-radius: 9999px;
-    pointer-events: none;
-    content: "";
-    filter: blur(64px);
+  .about-picture {
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  .about-section::before {
-    top: -12rem;
-    left: -12rem;
-    background: rgb(16 185 129 / 5%);
-  }
-
-  .about-section::after {
-    right: -12rem;
-    bottom: -12rem;
-    background: rgb(251 191 36 / 10%);
+  .about-picture:hover {
+    transform: rotate(1.5deg) scale(1.01);
   }
 
   .about-figure::before {
@@ -343,26 +263,13 @@ const features = {
     transform: rotate(-3deg);
   }
 
-  .about-heading::after {
-    display: block;
-    width: 6rem;
-    height: 0.25rem;
-    margin-top: 1rem;
-    border-radius: 9999px;
-    background: linear-gradient(
-      to right,
-      color-mix(in oklab, var(--primary) 80%, transparent) 0 50%,
-      color-mix(in oklab, var(--secondary) 80%, transparent) 50% 100%
-    );
-    content: "";
-  }
+  @media (prefers-reduced-motion: reduce) {
+    .about-picture {
+      transition: none;
+    }
 
-  .about-picture::after {
-    position: absolute;
-    inset: 0;
-    z-index: 10;
-    pointer-events: none;
-    background: linear-gradient(to top, rgb(24 19 17 / 40%), transparent);
-    content: "";
+    .about-picture:hover {
+      transform: none;
+    }
   }
 </style>
