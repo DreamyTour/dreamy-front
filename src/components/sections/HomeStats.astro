@@ -37,23 +37,23 @@ const formatValue = (value: number, suffix: string) =>
 ---
 
 <section
-  class="home-stats relative isolate overflow-hidden px-4 py-10 sm:px-6 sm:py-12 lg:py-16"
+  class="home-stats relative z-20 -mt-[3.25rem] px-4 pb-10 sm:-mt-14 sm:px-6 sm:pb-12 lg:-mt-16 lg:pb-16"
   aria-label={t("homeStats.ariaLabel")}
   data-home-stats
 >
   <div class="home-stats-shell mx-auto max-w-8xl">
     <ul
-      class="home-stats-grid grid gap-3 text-center grid-cols-2 lg:grid-cols-4"
+      class="home-stats-grid grid gap-2.5 text-center grid-cols-2 lg:grid-cols-4"
     >
       {
         stats.map((stat, index) => (
           <li
-            class="home-stat-item relative flex min-h-40 flex-col items-center justify-center overflow-hidden px-6 py-8 sm:min-h-44 lg:min-h-48"
+            class="home-stat-item relative flex min-h-26 flex-col items-center justify-center overflow-hidden px-4 py-4 sm:min-h-28 lg:min-h-32"
             style={`--stat-delay: ${index * 90}ms`}
             aria-label={`${formatValue(stat.value, stat.suffix)} ${stat.label}`}
           >
             <span
-              class="home-stat-number text-3xl font-black leading-none tracking-tight lg:text-5xl"
+              class="home-stat-number text-xl font-black leading-none tracking-tight lg:text-3xl"
               data-stat-number
               data-target={stat.value}
               data-suffix={stat.suffix}
@@ -61,7 +61,7 @@ const formatValue = (value: number, suffix: string) =>
             >
               {formatValue(stat.value, stat.suffix)}
             </span>
-            <span class="home-stat-label mt-5 max-w-[17rem] text-xs font-extrabold uppercase leading-6 tracking-[0.18em] sm:text-sm">
+            <span class="home-stat-label mt-2.5 max-w-[12rem] text-[0.62rem] font-extrabold uppercase leading-4 tracking-[0.12em] sm:text-[0.7rem]">
               {stat.label}
             </span>
           </li>
@@ -118,7 +118,11 @@ const formatValue = (value: number, suffix: string) =>
 
     homeStatsObserver?.disconnect();
 
-    if (reduceMotion || compactViewport || !("IntersectionObserver" in window)) {
+    if (
+      reduceMotion ||
+      compactViewport ||
+      !("IntersectionObserver" in window)
+    ) {
       roots.forEach(setFinalValues);
       return;
     }
@@ -144,118 +148,14 @@ const formatValue = (value: number, suffix: string) =>
 
 <style>
   .home-stats {
-    --stats-ink: color-mix(in oklab, var(--primary) 58%, black 42%);
-    --stats-ink-deep: color-mix(in oklab, var(--primary) 38%, black 62%);
-    --stats-wine: color-mix(in oklab, var(--secondary) 44%, black 56%);
-    --stats-gold: color-mix(in oklab, var(--accent-warm) 86%, white 14%);
-    --stats-line: color-mix(in oklab, var(--accent-warm) 20%, transparent);
-    background: linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--stats-ink) 78%, black 22%),
-      var(--stats-ink-deep) 48%,
-      color-mix(in oklab, var(--stats-wine) 62%, black 38%)
-    );
+    --stats-line: color-mix(in oklab, var(--secondary) 18%, transparent);
     container: home-stats / inline-size;
-  }
-
-  .home-stats::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background-image: url("/fondo.svg");
-    background-repeat: repeat;
-    background-size: clamp(24rem, 44vw, 42rem) clamp(24rem, 44vw, 42rem);
-    filter: invert(1) saturate(0.5) contrast(1.08);
-    opacity: 0.02;
-    pointer-events: none;
-  }
-
-  .home-stats::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background:
-      radial-gradient(
-        circle at 18% 8%,
-        color-mix(in oklab, var(--accent-warm) 14%, transparent),
-        transparent 31%
-      ),
-      radial-gradient(
-        circle at 84% 88%,
-        color-mix(in oklab, var(--secondary) 18%, transparent),
-        transparent 34%
-      ),
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, black 18%, transparent),
-        transparent 28%,
-        color-mix(in oklab, black 28%, transparent)
-      );
-    pointer-events: none;
   }
 
   .home-stats-shell {
     position: relative;
     z-index: 1;
-    overflow: hidden;
-    border: 1px solid color-mix(in oklab, white 13%, transparent);
-    border-radius: clamp(1.25rem, 2vw, 2rem);
-    background: linear-gradient(
-      135deg,
-      color-mix(in oklab, white 9%, transparent),
-      color-mix(in oklab, black 8%, transparent) 46%,
-      color-mix(in oklab, var(--secondary) 10%, transparent)
-    );
-    box-shadow:
-      0 30px 84px -50px color-mix(in oklab, black 92%, transparent),
-      inset 0 1px 0 color-mix(in oklab, white 24%, transparent),
-      inset 0 -1px 0 color-mix(in oklab, black 24%, transparent);
-  }
-
-  .home-stats-shell::before {
-    content: "";
-    position: absolute;
-    inset-inline: 1.25rem;
-    inset-block-start: 0;
-    block-size: 1px;
-    z-index: 0;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      color-mix(in oklab, var(--accent-warm) 42%, var(--primary) 58%),
-      transparent
-    );
-    opacity: 0.48;
-    pointer-events: none;
-  }
-
-  .home-stats-shell::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    background:
-      radial-gradient(
-        circle at 18% 0%,
-        color-mix(in oklab, var(--accent-warm) 18%, transparent),
-        transparent 32%
-      ),
-      radial-gradient(
-        circle at 78% 105%,
-        color-mix(in oklab, var(--secondary) 20%, transparent),
-        transparent 34%
-      ),
-      linear-gradient(
-        180deg,
-        color-mix(in oklab, white 9%, transparent),
-        transparent 46%,
-        color-mix(in oklab, black 16%, transparent)
-      );
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
-    pointer-events: none;
+    overflow: visible;
   }
 
   .home-stats-grid {
@@ -264,10 +164,12 @@ const formatValue = (value: number, suffix: string) =>
   }
 
   .home-stat-item {
-    background: color-mix(in oklab, white 8%, transparent);
+    border: 1px solid color-mix(in oklab, var(--secondary) 14%, white);
+    border-radius: 0.875rem;
+    background: color-mix(in oklab, white 96%, var(--background) 4%);
     box-shadow:
-      inset 1px 0 0 color-mix(in oklab, white 10%, transparent),
-      inset 0 1px 0 color-mix(in oklab, white 8%, transparent);
+      0 18px 40px -30px color-mix(in oklab, black 72%, transparent),
+      0 1px 0 color-mix(in oklab, white 88%, transparent) inset;
     opacity: 0;
     transform: translateY(18px);
     transition:
@@ -282,10 +184,10 @@ const formatValue = (value: number, suffix: string) =>
     inset: 0;
     background: radial-gradient(
       circle at 50% 0%,
-      color-mix(in oklab, var(--stats-gold) 18%, transparent),
+      color-mix(in oklab, var(--secondary) 12%, transparent),
       transparent 58%
     );
-    opacity: 0.62;
+    opacity: 0.72;
     transition: opacity 240ms ease;
   }
 
@@ -305,9 +207,9 @@ const formatValue = (value: number, suffix: string) =>
   }
 
   .home-stat-item:hover {
-    background: color-mix(in oklab, white 13%, transparent);
-    box-shadow: 0 20px 46px -34px
-      color-mix(in oklab, var(--accent-warm) 55%, transparent);
+    background: white;
+    box-shadow: 0 28px 58px -34px
+      color-mix(in oklab, var(--secondary) 48%, black);
     transform: translateY(-2px);
   }
 
@@ -328,18 +230,15 @@ const formatValue = (value: number, suffix: string) =>
   .home-stat-number {
     position: relative;
     z-index: 1;
-    color: var(--stats-gold);
-    font-size: clamp(2.2rem, 3.25cqi, 3.25rem);
+    color: color-mix(in oklab, var(--primary) 72%, black 28%);
+    font-size: clamp(1.55rem, 2.35cqi, 2.35rem);
     font-variant-numeric: tabular-nums;
-    text-shadow:
-      0 1px 0 color-mix(in oklab, white 26%, transparent),
-      0 16px 34px color-mix(in oklab, var(--accent-warm) 22%, transparent);
   }
 
   .home-stat-label {
     position: relative;
     z-index: 1;
-    color: color-mix(in oklab, white 86%, var(--accent-warm));
+    color: color-mix(in oklab, var(--foreground) 76%, var(--secondary));
     text-wrap: balance;
   }
 
@@ -377,16 +276,16 @@ const formatValue = (value: number, suffix: string) =>
     }
 
     .home-stat-item {
-      min-block-size: 8.75rem;
-      padding-block: 1.75rem;
+      min-block-size: 6.5rem;
+      padding-block: 1rem;
     }
 
     .home-stat-number {
-      font-size: clamp(2.05rem, 12cqi, 2.85rem);
+      font-size: clamp(1.45rem, 8.5cqi, 2rem);
     }
 
     .home-stat-label {
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
     }
   }
 
