@@ -2,6 +2,7 @@
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import TripAdvisorLogo from "@/assets/certification/certificado-tripadvisor.svg?url";
+import LocationPinIcon from "@/assets/svg/reviews/location-pin.svg";
 
 interface Props {
   lang: Lang;
@@ -12,7 +13,6 @@ const t = useTranslations(lang);
 
 type ReviewSource = "tripadvisor" | "google";
 type Review = {
-  id: string;
   source: ReviewSource;
   author: string;
   title?: string;
@@ -22,8 +22,6 @@ type Review = {
   url?: string;
 };
 type SourceSummary = {
-  source: ReviewSource;
-  name: string;
   rating: number;
   reviewCount: number;
   url: string;
@@ -74,26 +72,21 @@ const tripadvisorUrl =
 const googleUrl =
   "https://www.google.com/maps/place/Dreamy+Tours/@-13.524429,-71.9506049,1057m/data=!3m2!1e3!4b1!4m6!3m5!1s0x916dd587b52c49c5:0xdaa973fe4585e28a!8m2!3d-13.5244342!4d-71.94803!16s%2Fg%2F11fkv9g6rk";
 
-const sources: SourceSummary[] = [
-  {
-    source: "tripadvisor",
-    name: "Tripadvisor",
+const sourceSummaries: Record<ReviewSource, SourceSummary> = {
+  tripadvisor: {
     rating: 4.9,
     reviewCount: 12910,
     url: tripadvisorUrl,
   },
-  {
-    source: "google",
-    name: "Google Reviews",
+  google: {
     rating: 4.9,
     reviewCount: 552,
     url: googleUrl,
   },
-];
+};
 
 const reviews: Review[] = [
   {
-    id: "tripadvisor-static-1",
     source: "tripadvisor",
     author: "Cliente Tripadvisor",
     title: "Estuvo todo excelente",
@@ -103,7 +96,6 @@ const reviews: Review[] = [
     url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294318-d26448780-r1059010011-Inca_Trail_Machu_Picchu_4_Days-Machu_Picchu_Sacred_Valley_Cusco_Region.html",
   },
   {
-    id: "tripadvisor-static-2",
     source: "tripadvisor",
     author: "Cliente Tripadvisor",
     title: "Excelente experiencia visitando Valle Sagrado y Machu Picchu",
@@ -113,7 +105,6 @@ const reviews: Review[] = [
     url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294314-d23904536-r1059015163-2_Day_Guided_Tour_to_Sacred_Valley_and_Machu_Picchu_by_Train-Cusco_Cusco_Regio.html",
   },
   {
-    id: "tripadvisor-static-3",
     source: "tripadvisor",
     author: "Cliente Tripadvisor",
     title: "Experiencia muy gratificante",
@@ -123,7 +114,6 @@ const reviews: Review[] = [
     url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294314-d28270483-r1058317381-5_day_adventure_Trek_Salkantay_to_Machu_Picchu-Cusco_Cusco_Region.html",
   },
   {
-    id: "google-static-1",
     source: "google",
     author: "Victor Jean Pierrr Parimango Alvarez",
     text: "Nuestro viaje familiar a Cusco y Machu Picchu con Dreamy Tours fue increible. La agencia organizo todo perfectamente: traslados puntuales, un guia excelente y recomendaciones geniales.",
@@ -132,7 +122,6 @@ const reviews: Review[] = [
     url: googleUrl,
   },
   {
-    id: "google-static-2",
     source: "google",
     author: "Johanna Nava Hayden",
     text: "Contratamos la agencia desde Argentina, y de principio a fin la experiencia fue excelente. Muy buena atencion, siempre estan en contacto para lo que necesites.",
@@ -141,7 +130,6 @@ const reviews: Review[] = [
     url: googleUrl,
   },
   {
-    id: "google-static-3",
     source: "google",
     author: "Carla Miguez",
     text: "Me gusto mucho el tour, pude disfrutar hermosos paisajes y aprender sobre la forma de vida local. Excelente guia y buen manejo de los horarios.",
@@ -172,25 +160,13 @@ const getSourceReviews = (source: ReviewSource) =>
 <section
   class="reviews-wall bg-white py-14 sm:py-16"
   aria-labelledby="reviews-wall-title"
-  data-lang={lang}
-  data-tripadvisor-logo={TripAdvisorLogo}
 >
   <div class="mx-auto max-w-8xl px-6">
     <header class="mb-12 max-w-3xl">
       <p
         class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
       >
-        <svg
-          class="h-4 w-4"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-            clip-rule="evenodd"></path>
-        </svg>
+        <LocationPinIcon class="h-4 w-4" aria-hidden="true" />
         {t("reviews.kicker")}
       </p>
       <h2
@@ -221,153 +197,135 @@ const getSourceReviews = (source: ReviewSource) =>
         {t("reviews.description")}
       </p>
     </header>
-    <div
-      class="reviews-rows"
-      data-review-rows
-      aria-live="polite"
-      aria-busy="false"
-    >
+    <div class="reviews-rows">
       {
-        sourceOrder.map((source) => (
-          <div class={`review-source-row review-source-row--${source}`}>
-            <a
-              class={`review-source-panel ${sourceLabels[source].panelClass}`}
-              href={sources.find((item) => item.source === source)?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span
-                class={`review-brand-logo review-brand-logo--${source}`}
-                role="img"
-                aria-label={sourceLabels[source].name}
+        sourceOrder.map((source) => {
+          const summary = sourceSummaries[source];
+          const label = sourceLabels[source];
+
+          return (
+            <div class={`review-source-row review-source-row--${source}`}>
+              <a
+                class={`review-source-panel ${label.panelClass}`}
+                href={summary.url}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {source === "google" ? (
-                  <>
-                    <span class="g-blue" aria-hidden="true">
-                      G
-                    </span>
-                    <span class="g-red" aria-hidden="true">
-                      o
-                    </span>
-                    <span class="g-yellow" aria-hidden="true">
-                      o
-                    </span>
-                    <span class="g-blue" aria-hidden="true">
-                      g
-                    </span>
-                    <span class="g-green" aria-hidden="true">
-                      l
-                    </span>
-                    <span class="g-red" aria-hidden="true">
-                      e
-                    </span>
-                    <span class="review-google-word" aria-hidden="true">
-                      Reviews
-                    </span>
-                  </>
-                ) : (
-                  <img
-                    class="tripadvisor-logo-img"
-                    src={TripAdvisorLogo}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
-                )}
-              </span>
-              <span class="review-source-tour">{reviewLabels.brandTour}</span>
-              <span class="review-score-line">
-                <span class="review-score">
-                  {sources
-                    .find((item) => item.source === source)
-                    ?.rating.toFixed(1)}
-                </span>
-                <span class="review-score-descriptor">{reviewLabels.of}</span>
                 <span
-                  class={`review-stars review-stars--${source}`}
+                  class={`review-brand-logo review-brand-logo--${source}`}
                   role="img"
-                  aria-label={`${sources.find((item) => item.source === source)?.rating || 5} / 5`}
+                  aria-label={label.name}
                 >
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <span
-                      aria-hidden="true"
-                      class:list={{
-                        "is-filled":
-                          index <
-                          Math.round(
-                            sources.find((item) => item.source === source)
-                              ?.rating || 5,
-                          ),
-                      }}
-                    />
-                  ))}
-                </span>
-              </span>
-              <span class="review-total">
-                {reviewLabels.basedOn}{" "}
-                {new Intl.NumberFormat(lang).format(
-                  sources.find((item) => item.source === source)?.reviewCount ||
-                    0,
-                )}{" "}
-                {reviewLabels.reviews}
-              </span>
-            </a>
-            <div class="review-row-cards">
-              {getSourceReviews(source).map((review) => (
-                <article
-                  class={`review-card ${sourceLabels[source].cardClass}`}
-                >
-                  <span
-                    class={`review-platform-badge review-platform-badge--${source}`}
-                    role="img"
-                    aria-label={sourceLabels[source].name}
-                  >
-                    {source === "google" ? (
+                  {source === "google" ? (
+                    <>
                       <span class="g-blue" aria-hidden="true">
                         G
                       </span>
-                    ) : (
-                      <img
-                        class="review-platform-badge-img"
-                        src={TripAdvisorLogo}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    )}
-                  </span>
-                  <div class="review-card__header">
-                    <span
-                      class="review-avatar review-avatar--initials"
-                      aria-hidden="true"
-                    >
-                      {review.author.slice(0, 2).toUpperCase()}
-                    </span>
-                    <div class="review-card__author">
-                      <h3 class="review-author">{review.author}</h3>
-                      <p class="review-date">{formatDate(review.date)}</p>
-                    </div>
-                  </div>
-                  <p class="review-title">
-                    {review.title || sourceLabels[source].name}
-                  </p>
+                      <span class="g-red" aria-hidden="true">
+                        o
+                      </span>
+                      <span class="g-yellow" aria-hidden="true">
+                        o
+                      </span>
+                      <span class="g-blue" aria-hidden="true">
+                        g
+                      </span>
+                      <span class="g-green" aria-hidden="true">
+                        l
+                      </span>
+                      <span class="g-red" aria-hidden="true">
+                        e
+                      </span>
+                      <span class="review-google-word" aria-hidden="true">
+                        Reviews
+                      </span>
+                    </>
+                  ) : (
+                    <img
+                      class="tripadvisor-logo-img"
+                      src={TripAdvisorLogo}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                </span>
+                <span class="review-source-tour">{reviewLabels.brandTour}</span>
+                <span class="review-score-line">
+                  <span class="review-score">{summary.rating.toFixed(1)}</span>
+                  <span class="review-score-descriptor">{reviewLabels.of}</span>
                   <span
                     class={`review-stars review-stars--${source}`}
                     role="img"
-                    aria-label={`${review.rating} / 5`}
+                    aria-label={`${summary.rating} / 5`}
                   >
                     {Array.from({ length: 5 }).map((_, index) => (
                       <span
                         aria-hidden="true"
                         class:list={{
-                          "is-filled": index < Math.round(review.rating),
+                          "is-filled": index < Math.round(summary.rating),
                         }}
                       />
                     ))}
                   </span>
-                  <p class="review-text">{review.text}</p>
-                  {review.url && (
-                    <>
+                </span>
+                <span class="review-total">
+                  {reviewLabels.basedOn}{" "}
+                  {new Intl.NumberFormat(lang).format(summary.reviewCount)}{" "}
+                  {reviewLabels.reviews}
+                </span>
+              </a>
+              <div class="review-row-cards">
+                {getSourceReviews(source).map((review) => (
+                  <article class={`review-card ${label.cardClass}`}>
+                    <span
+                      class={`review-platform-badge review-platform-badge--${source}`}
+                      role="img"
+                      aria-label={label.name}
+                    >
+                      {source === "google" ? (
+                        <span class="g-blue" aria-hidden="true">
+                          G
+                        </span>
+                      ) : (
+                        <img
+                          class="review-platform-badge-img"
+                          src={TripAdvisorLogo}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
+                    </span>
+                    <div class="review-card__header">
+                      <span
+                        class="review-avatar review-avatar--initials"
+                        aria-hidden="true"
+                      >
+                        {review.author.slice(0, 2).toUpperCase()}
+                      </span>
+                      <div class="review-card__author">
+                        <h3 class="review-author">{review.author}</h3>
+                        <p class="review-date">{formatDate(review.date)}</p>
+                      </div>
+                    </div>
+                    <p class="review-title">{review.title || label.name}</p>
+                    <span
+                      class={`review-stars review-stars--${source}`}
+                      role="img"
+                      aria-label={`${review.rating} / 5`}
+                    >
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <span
+                          aria-hidden="true"
+                          class:list={{
+                            "is-filled": index < Math.round(review.rating),
+                          }}
+                        />
+                      ))}
+                    </span>
+                    <p class="review-text">{review.text}</p>
+                    {review.url && (
                       <a
                         class="review-link"
                         href={review.url}
@@ -376,345 +334,17 @@ const getSourceReviews = (source: ReviewSource) =>
                       >
                         {reviewLabels.full}
                       </a>
-                      <span class="review-card-arrow" aria-hidden="true" />
-                    </>
-                  )}
-                </article>
-              ))}
+                    )}
+                  </article>
+                ))}
+              </div>
             </div>
-          </div>
-        ))
+          );
+        })
       }
     </div>
   </div>
 </section>
-
-<script>
-  type ReviewSource = "tripadvisor" | "google";
-  type Review = {
-    id: string;
-    source: ReviewSource;
-    author: string;
-    title?: string;
-    text: string;
-    rating: number;
-    date?: string;
-    url?: string;
-    avatar?: string;
-  };
-  type SourceSummary = {
-    source: ReviewSource;
-    name: string;
-    rating?: number;
-    reviewCount?: number;
-    url?: string;
-    configured: boolean;
-    error?: string;
-  };
-  type ReviewsPayload = {
-    sources: SourceSummary[];
-    reviews: Review[];
-    updatedAt: string;
-  };
-
-  const copy = {
-    es: {
-      brandTour: "Dreamy Tours",
-      basedOn: "Basado en",
-      reviews: "opiniones",
-      of: "De 5 estrellas",
-      full: "Ver la opinión completa",
-      empty: "Reseñas dinámicas no disponibles.",
-      config: "Conecta la API para mostrar las últimas reseñas.",
-    },
-    en: {
-      brandTour: "Dreamy Tours",
-      basedOn: "Based on",
-      reviews: "reviews",
-      of: "Out of 5 stars",
-      full: "Read full review",
-      empty: "Dynamic reviews are not available.",
-      config: "Connect the API to show the latest reviews.",
-    },
-    pt: {
-      brandTour: "Dreamy Tours",
-      basedOn: "Baseado em",
-      reviews: "avaliações",
-      of: "De 5 estrelas",
-      full: "Ver avaliação completa",
-      empty: "Avaliações dinâmicas não disponíveis.",
-      config: "Conecte a API para mostrar as últimas avaliações.",
-    },
-  };
-
-  const sourceOrder: ReviewSource[] = ["tripadvisor", "google"];
-  const tripadvisorLogoUrl =
-    document.querySelector<HTMLElement>("[data-reviews-wall]")?.dataset
-      .tripadvisorLogo || "";
-
-  const brand = {
-    tripadvisor: {
-      name: "Tripadvisor",
-      compact: "TA",
-      panelClass: "review-source-panel--tripadvisor",
-      cardClass: "review-card--tripadvisor",
-    },
-    google: {
-      name: "Google Reviews",
-      compact: "G",
-      panelClass: "review-source-panel--google",
-      cardClass: "review-card--google",
-    },
-  } as const;
-
-  const fallbackSources = (): SourceSummary[] => [
-    {
-      source: "tripadvisor",
-      name: "Tripadvisor",
-      configured: false,
-      url: "https://www.tripadvisor.com.pe/Attraction_Review-g294314-d17325827-Reviews-Dreamy_Tours-Cusco_Cusco_Region.html",
-    },
-    {
-      source: "google",
-      name: "Google Reviews",
-      configured: false,
-      url: "https://www.google.com/maps/place/Dreamy+Tours/@-13.524429,-71.9506049,1057m/data=!3m2!1e3!4b1!4m6!3m5!1s0x916dd587b52c49c5:0xdaa973fe4585e28a!8m2!3d-13.5244342!4d-71.94803!16s%2Fg%2F11fkv9g6rk",
-    },
-  ];
-
-  const formatDate = (date: string | undefined, lang: string) => {
-    if (!date) return "";
-    const parsed = new Date(date);
-    if (Number.isNaN(parsed.getTime())) return "";
-    return new Intl.DateTimeFormat(lang, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(parsed);
-  };
-
-  const makeLogo = (source: ReviewSource) => {
-    const logo = document.createElement("span");
-    logo.className = `review-brand-logo review-brand-logo--${source}`;
-    logo.setAttribute("role", "img");
-    logo.setAttribute("aria-label", brand[source].name);
-
-    if (source === "google") {
-      logo.innerHTML = `<span class="g-blue" aria-hidden="true">G</span><span class="g-red" aria-hidden="true">o</span><span class="g-yellow" aria-hidden="true">o</span><span class="g-blue" aria-hidden="true">g</span><span class="g-green" aria-hidden="true">l</span><span class="g-red" aria-hidden="true">e</span><span class="review-google-word" aria-hidden="true">Reviews</span>`;
-      return logo;
-    }
-
-    if (tripadvisorLogoUrl) {
-      logo.innerHTML = `<img class="tripadvisor-logo-img" src="${tripadvisorLogoUrl}" alt="" loading="lazy" decoding="async" />`;
-    } else {
-      logo.textContent = "Tripadvisor";
-    }
-    return logo;
-  };
-
-  const makePlatformBadge = (source: ReviewSource) => {
-    const badge = document.createElement("span");
-    badge.className = `review-platform-badge review-platform-badge--${source}`;
-    badge.setAttribute("role", "img");
-    badge.setAttribute("aria-label", brand[source].name);
-    if (source === "google") {
-      badge.innerHTML = `<span class="g-blue" aria-hidden="true">G</span>`;
-    } else {
-      badge.innerHTML = tripadvisorLogoUrl
-        ? `<img class="review-platform-badge-img" src="${tripadvisorLogoUrl}" alt="" loading="lazy" decoding="async" />`
-        : `<span aria-hidden="true">Tripadvisor</span>`;
-    }
-    return badge;
-  };
-
-  const createStars = (rating = 5, source: ReviewSource) => {
-    const stars = document.createElement("span");
-    stars.className = `review-stars review-stars--${source}`;
-    stars.setAttribute("role", "img");
-    stars.setAttribute("aria-label", `${rating} / 5`);
-
-    for (let index = 0; index < 5; index += 1) {
-      const item = document.createElement("span");
-      item.className = index < Math.round(rating) ? "is-filled" : "";
-      item.setAttribute("aria-hidden", "true");
-      stars.append(item);
-    }
-
-    return stars;
-  };
-
-  const makeAvatar = (review: Review) => {
-    if (review.avatar) {
-      const img = document.createElement("img");
-      img.className = "review-avatar";
-      img.src = review.avatar;
-      img.alt = "";
-      img.loading = "lazy";
-      img.decoding = "async";
-      return img;
-    }
-
-    const avatar = document.createElement("span");
-    avatar.className = "review-avatar review-avatar--initials";
-    avatar.textContent = review.author.slice(0, 2).toUpperCase();
-    avatar.setAttribute("aria-hidden", "true");
-    return avatar;
-  };
-
-  const renderPanel = (summary: SourceSummary, lang: string) => {
-    const labels = copy[lang as keyof typeof copy] || copy.es;
-    const panel = document.createElement(summary.url ? "a" : "aside");
-    panel.className = `review-source-panel ${brand[summary.source].panelClass}`;
-
-    if (panel instanceof HTMLAnchorElement && summary.url) {
-      panel.href = summary.url;
-      panel.target = "_blank";
-      panel.rel = "noopener noreferrer";
-    }
-
-    panel.append(makeLogo(summary.source));
-
-    const tour = document.createElement("span");
-    tour.className = "review-source-tour";
-    tour.textContent = labels.brandTour;
-    panel.append(tour);
-
-    const scoreLine = document.createElement("span");
-    scoreLine.className = "review-score-line";
-
-    const score = document.createElement("span");
-    score.className = "review-score";
-    score.textContent = summary.rating ? summary.rating.toFixed(1) : "--";
-    scoreLine.append(score);
-
-    const descriptor = document.createElement("span");
-    descriptor.className = "review-score-descriptor";
-    descriptor.textContent = labels.of;
-    scoreLine.append(
-      descriptor,
-      createStars(summary.rating || 5, summary.source),
-    );
-    panel.append(scoreLine);
-
-    const total = document.createElement("span");
-    total.className = "review-total";
-    total.textContent = summary.reviewCount
-      ? `${labels.basedOn} ${new Intl.NumberFormat(lang).format(summary.reviewCount)} ${labels.reviews}`
-      : labels.config;
-    panel.append(total);
-
-    return panel;
-  };
-
-  const renderCard = (review: Review, lang: string) => {
-    const labels = copy[lang as keyof typeof copy] || copy.es;
-    const article = document.createElement("article");
-    article.className = `review-card ${brand[review.source].cardClass}`;
-
-    const header = document.createElement("div");
-    header.className = "review-card__header";
-    header.append(makeAvatar(review));
-
-    const authorWrap = document.createElement("div");
-    authorWrap.className = "review-card__author";
-
-    const author = document.createElement("h3");
-    author.className = "review-author";
-    author.textContent = review.author;
-
-    const date = document.createElement("p");
-    date.className = "review-date";
-    date.textContent = formatDate(review.date, lang);
-    authorWrap.append(author, date);
-    header.append(authorWrap);
-
-    const title = document.createElement("p");
-    title.className = "review-title";
-    title.textContent = review.title || brand[review.source].name;
-
-    const text = document.createElement("p");
-    text.className = "review-text";
-    text.textContent = review.text;
-
-    article.append(makePlatformBadge(review.source), header, title);
-    article.append(createStars(review.rating, review.source), text);
-
-    if (review.url) {
-      const link = document.createElement("a");
-      link.className = "review-link";
-      link.href = review.url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = labels.full;
-      article.append(link);
-
-      const arrow = document.createElement("span");
-      arrow.className = "review-card-arrow";
-      arrow.setAttribute("aria-hidden", "true");
-      article.append(arrow);
-    }
-
-    return article;
-  };
-
-  const renderEmptyCard = (source: ReviewSource, lang: string) => {
-    const labels = copy[lang as keyof typeof copy] || copy.es;
-    const card = document.createElement("article");
-    card.className = `review-card review-card--empty ${brand[source].cardClass}`;
-    card.append(makePlatformBadge(source));
-
-    const title = document.createElement("p");
-    title.className = "review-title";
-    title.textContent = labels.empty;
-
-    const text = document.createElement("p");
-    text.className = "review-text";
-    text.textContent = labels.config;
-    card.append(title, text);
-    return card;
-  };
-
-  const renderRows = (
-    root: HTMLElement,
-    sources: SourceSummary[],
-    reviews: Review[],
-    lang: string,
-  ) => {
-    const rows = root.querySelector<HTMLElement>("[data-review-rows]");
-    if (!rows) return;
-
-    const fragments = sourceOrder.map((source) => {
-      const summary =
-        sources.find((item) => item.source === source) ||
-        fallbackSources().find((item) => item.source === source);
-      const sourceReviews = reviews
-        .filter((review) => review.source === source)
-        .slice(0, 3);
-      const row = document.createElement("div");
-      row.className = `review-source-row review-source-row--${source}`;
-
-      if (summary) row.append(renderPanel(summary, lang));
-
-      const cards = document.createElement("div");
-      cards.className = "review-row-cards";
-
-      if (sourceReviews.length) {
-        cards.append(
-          ...sourceReviews.map((review) => renderCard(review, lang)),
-        );
-      } else {
-        cards.append(renderEmptyCard(source, lang));
-      }
-
-      row.append(cards);
-      return row;
-    });
-
-    rows.replaceChildren(...fragments);
-    rows.setAttribute("aria-busy", "false");
-    root.classList.add("is-loaded");
-  };
-</script>
 
 <style is:global>
   .reviews-wall {
@@ -857,73 +487,6 @@ const getSourceReviews = (source: ReviewSource) =>
     height: auto;
   }
 
-  .tripadvisor-mark {
-    position: relative;
-    display: inline-flex;
-    width: 2.6rem;
-    height: 2.6rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    background: #20d6a2;
-    box-shadow: inset 0 -0.35rem 0 rgba(0, 0, 0, 0.06);
-  }
-
-  .tripadvisor-mark::before,
-  .tripadvisor-mark::after {
-    content: "";
-    position: absolute;
-    top: 0.55rem;
-    width: 0.74rem;
-    height: 0.74rem;
-    border: 0.16rem solid #081711;
-    border-radius: 999px;
-    background: white;
-  }
-
-  .tripadvisor-mark::before {
-    left: 0.52rem;
-  }
-
-  .tripadvisor-mark::after {
-    right: 0.52rem;
-  }
-
-  .tripadvisor-mark > span {
-    position: absolute;
-    top: 0.84rem;
-    z-index: 1;
-    width: 0.24rem;
-    height: 0.24rem;
-    border-radius: 999px;
-    background: #081711;
-  }
-
-  .tripadvisor-mark > span:first-child {
-    left: 0.77rem;
-  }
-
-  .tripadvisor-mark > span:last-child {
-    right: 0.77rem;
-  }
-
-  .tripadvisor-mark > span:last-child::after {
-    content: "";
-    position: absolute;
-    top: 0.48rem;
-    right: 0.25rem;
-    width: 0.52rem;
-    height: 0.36rem;
-    border-inline: 0.16rem solid transparent;
-    border-top: 0.24rem solid #081711;
-  }
-
-  .tripadvisor-word {
-    color: #111827;
-    font-size: clamp(1.9rem, 3vw, 2.65rem);
-    line-height: 1;
-  }
-
   .review-brand-logo--google {
     gap: 0;
     font-size: clamp(1.95rem, 3vw, 2.75rem);
@@ -991,7 +554,6 @@ const getSourceReviews = (source: ReviewSource) =>
     color: color-mix(in oklab, var(--foreground) 62%, white);
   }
 
-  .review-total::first-letter,
   .review-link {
     color: var(--secondary);
   }
@@ -1062,12 +624,6 @@ const getSourceReviews = (source: ReviewSource) =>
 
   .review-card:nth-child(3) {
     animation-delay: 140ms;
-  }
-
-  .review-card--loading {
-    opacity: 1;
-    transform: none;
-    animation: none;
   }
 
   .review-card__header {
@@ -1218,25 +774,6 @@ const getSourceReviews = (source: ReviewSource) =>
     transform: translateX(-0.1rem);
   }
 
-  .review-card-arrow {
-    position: absolute;
-    top: 50%;
-    right: 1.1rem;
-    width: 0.95rem;
-    height: 0.95rem;
-    border-top: 2px solid color-mix(in oklab, var(--secondary) 45%, white);
-    border-right: 2px solid color-mix(in oklab, var(--secondary) 45%, white);
-    transform: translateY(-50%) rotate(45deg);
-    transition:
-      border-color 160ms ease,
-      transform 160ms ease;
-  }
-
-  .review-card:hover .review-card-arrow {
-    border-color: var(--secondary);
-    transform: translate(0.16rem, -50%) rotate(45deg);
-  }
-
   .review-platform-badge {
     position: absolute;
     top: 0.62rem;
@@ -1279,88 +816,6 @@ const getSourceReviews = (source: ReviewSource) =>
       0 8px 16px rgba(15, 23, 42, 0.08);
   }
 
-  .review-card--empty {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .review-card--empty .review-text {
-    min-height: auto;
-  }
-
-  .review-logo-skeleton,
-  .review-meta-skeleton,
-  .review-score-skeleton,
-  .review-skeleton-avatar,
-  .review-skeleton-lines span,
-  .review-skeleton-title,
-  .review-skeleton-copy {
-    background: linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--muted) 88%, white),
-      color-mix(in oklab, var(--border) 70%, white),
-      color-mix(in oklab, var(--muted) 88%, white)
-    );
-    background-size: 220% 100%;
-    animation: review-shimmer 1200ms ease-in-out infinite;
-  }
-
-  .review-logo-skeleton {
-    width: 72%;
-    height: 3.2rem;
-  }
-
-  .review-meta-skeleton {
-    margin-top: 1.7rem;
-    width: 62%;
-    height: 1rem;
-  }
-
-  .review-score-skeleton {
-    margin-top: 1rem;
-    width: 84%;
-    height: 2.8rem;
-  }
-
-  .review-skeleton-avatar {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 999px;
-  }
-
-  .review-skeleton-lines {
-    display: block;
-    width: 58%;
-  }
-
-  .review-skeleton-lines span {
-    display: block;
-    height: 0.78rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .review-skeleton-lines span:last-child {
-    width: 70%;
-    margin-bottom: 0;
-  }
-
-  .review-skeleton-title,
-  .review-skeleton-copy {
-    display: block;
-    height: 0.9rem;
-    margin-top: 1.35rem;
-  }
-
-  .review-skeleton-copy {
-    height: 4.8rem;
-  }
-
-  .review-skeleton-copy--small {
-    width: 64%;
-    height: 0.9rem;
-  }
-
   @keyframes review-rise {
     from {
       opacity: 0;
@@ -1369,12 +824,6 @@ const getSourceReviews = (source: ReviewSource) =>
     to {
       opacity: 1;
       transform: translateY(0);
-    }
-  }
-
-  @keyframes review-shimmer {
-    to {
-      background-position: -220% 0;
     }
   }
 
@@ -1423,14 +872,7 @@ const getSourceReviews = (source: ReviewSource) =>
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .review-card,
-    .review-logo-skeleton,
-    .review-meta-skeleton,
-    .review-score-skeleton,
-    .review-skeleton-avatar,
-    .review-skeleton-lines span,
-    .review-skeleton-title,
-    .review-skeleton-copy {
+    .review-card {
       animation: none;
       opacity: 1;
       transform: none;
