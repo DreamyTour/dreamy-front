@@ -168,7 +168,7 @@ const formatValue = (value: number, suffix: string) =>
     border-radius: 0.875rem;
     background: color-mix(in oklab, white 96%, var(--background) 4%);
     box-shadow:
-      0 18px 40px -30px color-mix(in oklab, black 72%, transparent),
+      0 18px 40px -30px color-mix(in oklab, black 20%, transparent),
       0 1px 0 color-mix(in oklab, white 88%, transparent) inset;
     opacity: 0;
     transform: translateY(18px);
@@ -187,7 +187,7 @@ const formatValue = (value: number, suffix: string) =>
       color-mix(in oklab, var(--secondary) 12%, transparent),
       transparent 58%
     );
-    opacity: 0.72;
+    opacity: 0.20;
     transition: opacity 240ms ease;
   }
 
@@ -209,8 +209,8 @@ const formatValue = (value: number, suffix: string) =>
   .home-stat-item:hover {
     background: white;
     box-shadow: 0 28px 58px -34px
-      color-mix(in oklab, var(--secondary) 48%, black);
-    transform: translateY(-2px);
+      color-mix(in oklab, var(--secondary) 30%, var(--primary) 20%);
+    transform: translateY(-1px);
   }
 
   .home-stat-item:hover::before {
