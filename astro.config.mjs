@@ -1,7 +1,6 @@
 // @ts-check
 
 import cloudflare from "@astrojs/cloudflare";
-import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
@@ -14,13 +13,6 @@ export default defineConfig({
 	site: "https://dreamy.tours",
 
 	adapter: cloudflare(),
-
-	markdown: {
-		processor: unified({
-			gfm: true,
-			smartypants: true,
-		}),
-	},
 
 	fonts: [
 		{
