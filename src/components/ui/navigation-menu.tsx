@@ -75,7 +75,7 @@ const navigationMenuItemStyle = "static";
 /* -------------------------------------------------------------------------- */
 
 const navigationMenuTriggerStyle = cva(
-	"group relative inline-flex h-full min-h-[60px] items-center justify-center gap-2 whitespace-nowrap bg-transparent px-4 text-[15px] font-semibold text-[#16241d] transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white data-[state=open]:bg-[#f4f5f5] data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-5",
+	"group relative uppercase inline-flex h-full min-h-[60px] items-center justify-center gap-2 whitespace-nowrap bg-transparent px-4 text-[14px] font-normal text-[#16241d] transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white data-[state=open]:bg-[#f4f5f5] data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-5",
 );
 
 function NavigationMenuTrigger({
@@ -91,7 +91,7 @@ function NavigationMenuTrigger({
 		>
 			{children}
 			<ChevronDownIcon
-				className="ml-1 size-3 text-[#16241d]/55 transition-transform duration-200 group-hover:text-primary/80 group-data-[state=open]:rotate-180 group-data-[state=open]:text-primary/80"
+				className="ml-1 size-3 text-current opacity-60 transition-all duration-200 group-hover:opacity-85 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-85"
 				aria-hidden="true"
 			/>
 		</NavigationMenuPrimitive.Trigger>
@@ -154,7 +154,7 @@ const navigationMenuLinkStyle = cva(
 		variants: {
 			variant: {
 				default:
-					"relative inline-flex h-full min-h-[60px] items-center gap-2 whitespace-nowrap px-4 text-[15px] font-semibold after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white xl:px-5",
+					"relative inline-flex h-full min-h-[60px] items-center gap-2 whitespace-nowrap px-4 text-[14px] font-normal uppercase after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white xl:px-5",
 				dropdown:
 					"group relative flex min-w-0 items-center justify-start gap-2 rounded-none px-0 py-0 text-sm font-medium text-[#24362d]/72 transition-colors duration-200 hover:text-[#081711] focus:text-[#081711]",
 			},

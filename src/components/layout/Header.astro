@@ -16,7 +16,7 @@ const { data, lang } = Astro.props;
 const mobileLogoUrl = localizePath("/", lang);
 ---
 
-<header class="w-full border-solid border-b border-border shadow-sm">
+<header class="w-full shadow-sm">
   <TopBar data={data?.topBar} lang={lang} />
   <HeaderTop data={data?.headerTop} lang={lang} />
   <hr class="border-t border-primary/20" aria-hidden="true" />

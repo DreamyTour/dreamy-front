@@ -72,6 +72,8 @@ const languageFlags: Record<Lang, string> = {
 
 const MEGA_MENU_COLUMN_WIDTH = 340;
 const MEGA_MENU_EDGE_PADDING = 16;
+const desktopTopLevelItemClass =
+	"text-white/88 hover:bg-white/10 hover:text-white focus-visible:ring-offset-[#081711] data-[state=open]:bg-white/10 data-[state=open]:text-white [&_svg]:text-white/62 [&:hover_svg]:text-white/86 [&[data-state=open]_svg]:text-white/86";
 
 type MegaMenuLayout = {
 	left: number;
@@ -379,8 +381,20 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 			{/* =======================
           DESKTOP (xl+)
           ======================= */}
-			<div className="hidden border-y border-border/70 bg-white shadow-[0_14px_34px_-30px_rgba(15,23,42,0.38)] xl:block">
-				<div ref={desktopMenuRef} className="mx-auto w-full max-w-8xl px-4">
+			<div className="relative z-40 isolate hidden border-y border-white/10 bg-[#081711] text-white shadow-[0_16px_38px_-30px_rgba(8,23,17,0.72)] xl:block">
+				<div
+					className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+					aria-hidden="true"
+				>
+					<div className="absolute inset-0 bg-[linear-gradient(180deg,_#0b1d15_0%,_#081711_58%,_#050907_100%)]" />
+					<div className="absolute inset-0 bg-[url('/fondo.svg')] bg-repeat opacity-15 [background-position:center_top] [background-size:clamp(26rem,38vw,38rem)_clamp(26rem,38vw,38rem)] [filter:invert(1)_sepia(0.2)_saturate(0.45)_contrast(1.08)] [mix-blend-mode:soft-light]" />
+					<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.08),_transparent_38%)]" />
+					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+				</div>
+				<div
+					ref={desktopMenuRef}
+					className="relative z-10 mx-auto w-full max-w-8xl px-4"
+				>
 					<NavigationMenu
 						className="mx-auto w-full max-w-none px-0"
 						aria-label="Menú principal"
@@ -413,6 +427,7 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 											<>
 												<NavigationMenuTrigger
 													data-mega-menu-anchor={index}
+													className={desktopTopLevelItemClass}
 													onClick={() => {
 														if (menuItem.link?.url) {
 															window.location.href = rewriteUrl(
@@ -477,7 +492,10 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 												</NavigationMenuContent>
 											</>
 										) : (
-											<NavigationMenuLink asChild>
+											<NavigationMenuLink
+												asChild
+												className={desktopTopLevelItemClass}
+											>
 												<a href={rewriteUrl(menuItem.link.url, lang)}>
 													<MenuLabelWithBadge
 														label={menuItem.link.label}
