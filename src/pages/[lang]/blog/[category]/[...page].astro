@@ -1,6 +1,5 @@
 ---
 import BlogCategoryPage from "@/components/pages/BlogCategoryPage.astro";
-import { DEFAULT_LANG, isValidLang } from "@/lib/i18n";
 import {
   getBlogCategoryPaths,
   type BlogCategoryProps,
@@ -12,7 +11,6 @@ export async function getStaticPaths({ paginate }: { paginate: Paginate }) {
 }
 
 const props = Astro.props as BlogCategoryProps;
-const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
 ---
 
 <BlogCategoryPage
@@ -24,5 +22,5 @@ const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
   slugMap={props.slugMap}
   categoryPostCounts={props.categoryPostCounts}
   totalPostCount={props.totalPostCount}
-  lang={lang}
+  lang={props.lang}
 />

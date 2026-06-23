@@ -27,6 +27,7 @@ export type Paginate = (
 
 export type BlogListProps = {
   page: PaginatedBlogPage;
+  lang: Lang;
   allCategories: CategoryBlog[];
   socialLogos: Logo[];
   categoryPostCounts: Record<string, number>;
@@ -48,6 +49,7 @@ export type BlogPostProps = {
 
 export type BlogCategoryProps = {
   page: PaginatedBlogPage;
+  lang: Lang;
   allCategories: CategoryBlog[];
   currentCategory: CategoryBlog;
   categorySlug: string;
@@ -167,6 +169,7 @@ export async function getBlogIndexPaths({
         params: localized ? { lang } : undefined,
         pageSize: 9,
         props: {
+          lang,
           allCategories,
           socialLogos: getSocialLogos(globalData),
           categoryPostCounts: getCategoryPostCounts(blogsList),
@@ -283,6 +286,7 @@ export async function getBlogCategoryPaths({
         ),
       );
       const sharedProps = {
+        lang,
         allCategories,
         currentCategory: category,
         categorySlug,
