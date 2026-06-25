@@ -43,7 +43,12 @@ const seoProps = {
 };
 ---
 
-<Layout seo={seoProps} lang={lang} lcpImageUrl={backgroundImageMobile.src}>
+<Layout
+  seo={seoProps}
+  lang={lang}
+  lcpImageUrl={backgroundImageMobile.src}
+  enableClientRouter={false}
+>
   <Hero data={homeData?.hero} lang={lang} />
   <HomeStats lang={lang} />
   <About data={homeData?.about} lang={lang} />
