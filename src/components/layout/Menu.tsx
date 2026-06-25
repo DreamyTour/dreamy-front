@@ -35,6 +35,7 @@ import type { Link, MenuItem, Menu as MenuType } from "@/types/global";
 
 interface MainMenuProps {
 	menu: MenuType;
+	quickActions?: Link[];
 	logoUrl: string;
 	lang: Lang;
 }
@@ -229,7 +230,12 @@ function MobileLanguageSwitcher({ currentLang }: { currentLang: Lang }) {
 	);
 }
 
-export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
+export default function MainMenu({
+	menu,
+	quickActions = [],
+	logoUrl,
+	lang,
+}: MainMenuProps) {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [desktopMegaMenuLayouts, setDesktopMegaMenuLayouts] = useState<
 		Record<string, MegaMenuLayout>
@@ -609,6 +615,29 @@ export default function MainMenu({ menu, logoUrl, lang }: MainMenuProps) {
 							);
 						})}
 					</ul>
+					{quickActions.length > 0 ? (
+						<ul className="mt-3 grid gap-2 border-t border-border/70 px-0.5 pb-1 pt-3">
+							{quickActions.map((action) => (
+								<li key={action.id}>
+									<a
+										href={rewriteUrl(action.url, lang)}
+										target={action.isExternal ? "_blank" : "_self"}
+										rel={action.isExternal ? "noopener noreferrer" : undefined}
+										className={`inline-flex min-h-12 w-full min-w-0 items-center justify-center rounded-xl border px-4 py-3 text-center text-sm font-bold leading-snug transition-colors duration-200 ${
+											action.type === "PRIMARY"
+												? "border-secondary bg-secondary text-white shadow-[0_16px_34px_-24px_color-mix(in_oklab,var(--secondary)_80%,transparent)] hover:bg-secondary/90"
+												: "border-primary/20 bg-primary/6 text-primary hover:border-primary/35 hover:bg-primary/10"
+										}`}
+										onClick={() => setMobileOpen(false)}
+									>
+										<span className="min-w-0 break-words text-wrap-pretty [overflow-wrap:anywhere]">
+											{action.label}
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					) : null}
 				</nav>
 			</section>
 		</>

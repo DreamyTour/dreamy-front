@@ -1,5 +1,5 @@
 ---
-import type { Global } from "@/types/global";
+import type { Global, Link } from "@/types/global";
 
 import TopBar from "@/components/layout/TopBar.astro";
 import HeaderTop from "@/components/layout/HeaderTop.astro";
@@ -14,6 +14,30 @@ interface Props {
 
 const { data, lang } = Astro.props;
 const mobileLogoUrl = localizePath("/", lang);
+const isBlogLink = (link: Link) =>
+  link.url?.includes("/blog") || link.label?.toLowerCase().includes("blog");
+const isContactLink = (link: Link) => {
+  const content = `${link.label ?? ""} ${link.url ?? ""}`.toLowerCase();
+  return (
+    content.includes("contact") ||
+    content.includes("contacto") ||
+    content.includes("contato")
+  );
+};
+const blogLink = data?.headerTop?.headerLink?.find(isBlogLink) ?? {
+  id: -1,
+  label: "Blog",
+  url: "/blog",
+  isButton: true,
+  isExternal: false,
+  type: "SECONDARY",
+};
+const mobileQuickActions = [
+  blogLink,
+  ...(data?.headerTop?.button ?? []).filter(
+    (link) => !isContactLink(link) && !isBlogLink(link),
+  ),
+];
 ---
 
 <header class="w-full shadow-sm">
@@ -22,6 +46,7 @@ const mobileLogoUrl = localizePath("/", lang);
   <hr class="border-t border-primary/20" aria-hidden="true" />
   <Menu
     menu={data?.menu}
+    quickActions={mobileQuickActions}
     logoUrl={mobileLogoUrl}
     lang={lang}
     client:idle
