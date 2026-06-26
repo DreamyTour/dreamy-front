@@ -24,6 +24,7 @@ const copy = {
       "Adéntrate en un territorio donde la geografía cambia cada cien kilómetros, donde puedes pasar de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interactivo del Perú",
     mapSubtitle: "Haz clic en cualquier punto para explorar ese destino.",
+    mapPointLabel: (name: string) => `Ver ${name} en el mapa`,
   },
   en: {
     title: "A Journey through",
@@ -34,6 +35,7 @@ const copy = {
       "Step into a territory where geography shifts every hundred kilometers, from towering glaciers to lush rainforests.",
     mapTitle: "Interactive Peru Map",
     mapSubtitle: "Click any point to explore that destination.",
+    mapPointLabel: (name: string) => `View ${name} on the map`,
   },
   pt: {
     title: "Uma Viagem através da",
@@ -44,6 +46,7 @@ const copy = {
       "Adentre um território onde a geografia muda a cada cem quilômetros, de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interativo do Peru",
     mapSubtitle: "Clique em qualquer ponto para explorar o destino.",
+    mapPointLabel: (name: string) => `Ver ${name} no mapa`,
   },
 } as const;
 
@@ -341,9 +344,9 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                       <li>
                         <a
                           href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
-                          class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
+                          class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50 inline-flex items-center justify-center min-h-[44px] min-w-[44px]"
                           style={`left: ${point.x}; top: ${point.y};`}
-                          aria-label={pointTitle}
+                          aria-label={t.mapPointLabel(pointTitle)}
                           data-point-id={point.id}
                         >
                           <span class="point-halo absolute -inset-2 rounded-full bg-primary/18 opacity-0 transition-all duration-300 ease-out" />
