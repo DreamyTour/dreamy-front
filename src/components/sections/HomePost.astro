@@ -4,7 +4,7 @@ import type { Blog } from "@/types/blog";
 import type { Lang } from "@/lib/i18n";
 import type { sectionCardPost } from "@/types/home";
 import { useTranslations } from "@/i18n/ui";
-import CardPost from "@/components/ui/CardPost.astro";
+import CardPostHome from "@/components/ui/CardPostHome.astro";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -18,7 +18,6 @@ const t = useTranslations(lang);
 
 if (!data || !data.titulo) return;
 
-// Fetch posts más recientes
 const posts = await fetchApi<Blog[]>({
   endpoint: "posts",
   wrappedByKey: "data",
@@ -40,58 +39,53 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
       class="content-deferred content-deferred--tall w-full bg-primary/5 py-16"
     >
       <div class="max-w-8xl mx-auto px-6">
-        {/* Header */}
-        <header class="mb-12 md:mb-16 max-w-4xl mx-auto text-center">
+        <header class="mb-12 max-w-4xl mx-auto text-center md:mb-16">
           {data.titulo && (
             <h2
               id="home-posts-title"
-              class="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-foreground mb-6 relative inline-block"
+              class="relative mb-6 inline-block text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl"
             >
               <span class="relative z-10">{data.titulo}</span>
             </h2>
           )}
           <div
-            class="flex items-center justify-center gap-3 mt-4"
+            class="mt-4 flex items-center justify-center gap-3"
             aria-hidden="true"
           >
             <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary" />
-            <div class="w-12 h-1.5 bg-secondary rounded-full relative">
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-background rounded-full" />
+            <div class="relative h-1.5 w-12 rounded-full bg-secondary">
+              <div class="absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
             </div>
             <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary" />
           </div>
           {data.description && (
-            <p class="mt-6 text-muted-foreground max-w-2xl mx-auto">
+            <p class="mx-auto mt-6 max-w-2xl text-muted-foreground">
               {data.description}
             </p>
           )}
         </header>
 
-        {/* ── Editorial grid ──────────────────────────────────────────
-            Mobile  : stacked column
-            Tablet  : 2-col uniform grid
-            Desktop : [  FEATURED (tall left)  ] [ Card 2 (top-right) ]
-                      [ Card 3 ] [ Card 4 ] [ Card 5 ]
-        ────────────────────────────────────────────────────────────── */}
-        <ul class="posts-mosaic list-none p-0 m-0">
+        <ul class="posts-mosaic m-0 list-none p-0">
           {postsList.slice(0, 1).map((blog: Blog) => (
             <li class="posts-mosaic__featured">
-              <CardPost blog={blog} lang={lang} isFeatured={true} showDescription={true} />
+              <CardPostHome
+                blog={blog}
+                lang={lang}
+              />
             </li>
           ))}
           {postsList.slice(1, 2).map((blog: Blog) => (
             <li class="posts-mosaic__secondary">
-              <CardPost blog={blog} lang={lang} showDescription={true} />
+              <CardPostHome blog={blog} lang={lang} variant="tall" />
             </li>
           ))}
           {postsList.slice(2, 5).map((blog: Blog) => (
             <li class="posts-mosaic__bottom">
-              <CardPost blog={blog} lang={lang} />
+              <CardPostHome blog={blog} lang={lang} />
             </li>
           ))}
         </ul>
 
-        {/* Botón ver más */}
         <div class="mt-12 flex justify-center">
           <a
             href={rewriteUrl("/blog", lang)}
@@ -119,14 +113,12 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
 }
 
 <style>
-  /* ── Posts mosaic layout ─────────────────────────────────────── */
   .posts-mosaic {
     display: grid;
-    gap: 1.25rem;
     grid-template-columns: 1fr;
+    gap: 0.35rem;
   }
 
-  /* Every cell is a flex column so h-full propagates into CardPost */
   .posts-mosaic__featured,
   .posts-mosaic__secondary,
   .posts-mosaic__bottom {
@@ -134,15 +126,6 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
     flex-direction: column;
   }
 
-  /* Pierce CardPost scope: article must fill the li cell */
-  .posts-mosaic__featured :global(article),
-  .posts-mosaic__secondary :global(article),
-  .posts-mosaic__bottom :global(article) {
-    flex: 1;
-    height: 100%;
-  }
-
-  /* Tablet: 2-col grid — featured spans 2 cols, rest 1 each */
   @media (min-width: 768px) {
     .posts-mosaic {
       grid-template-columns: repeat(2, 1fr);
@@ -157,51 +140,38 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
     }
   }
 
-  /* Desktop: editorial mosaic
-     Row 1: [featured tall — col 1-2] [secondary — col 3]
-     Row 2: [card] [card] [card]
-  */
   @media (min-width: 1024px) {
     .posts-mosaic {
-      grid-template-columns: repeat(3, 1fr);
-      /* Row 1 height is driven by content; both cells stretch to match */
-      grid-template-rows: auto auto;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(250px, 1fr));
       align-items: stretch;
     }
 
-    /* Featured: spans 2 columns, row 1 */
     .posts-mosaic__featured {
       grid-column: 1 / 3;
       grid-row: 1;
     }
 
-    /* Secondary: right column, row 1 — same row height as featured */
     .posts-mosaic__secondary {
-      grid-column: 3;
-      grid-row: 1;
+      grid-column: 3 / 5;
+      grid-row: 1 / 3;
     }
 
-    /* Override CardPost's fixed lg:h-[360px] so the grid row controls height.
-       Specificity of this selector (0-2-1) beats Tailwind class (0-1-0). */
-    .posts-mosaic__featured :global(article > a),
-    .posts-mosaic__secondary :global(article > a) {
-      height: 100%;
-      min-height: 0;
-    }
-
-    /* Bottom 3: each takes 1 col in row 2, equal height */
     .posts-mosaic__bottom {
       grid-row: 2;
     }
 
-    .posts-mosaic__bottom:nth-child(3) { grid-column: 1; }
-    .posts-mosaic__bottom:nth-child(4) { grid-column: 2; }
-    .posts-mosaic__bottom:nth-child(5) { grid-column: 3; }
-
-    /* Pierce CardPost scope for bottom cards — enforce equal height */
-    .posts-mosaic__bottom :global(article > a) {
-      height: 100%;
+    .posts-mosaic__bottom:nth-child(3) {
+      grid-column: 1;
     }
+
+    .posts-mosaic__bottom:nth-child(4) {
+      grid-column: 2;
+    }
+
+    .posts-mosaic__bottom:nth-child(5) {
+      display: none;
+    }
+
   }
 </style>
-

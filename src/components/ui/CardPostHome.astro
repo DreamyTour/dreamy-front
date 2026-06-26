@@ -1,0 +1,217 @@
+---
+import type { Blog } from "@/types/blog";
+import type { Lang } from "@/lib/i18n";
+import { useTranslations } from "@/i18n/ui";
+import { getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
+
+interface Props {
+  blog: Blog;
+  lang: Lang;
+  variant?: "standard" | "tall";
+}
+
+const { blog, lang, variant = "standard" } = Astro.props;
+
+if (!blog) return null;
+
+const t = useTranslations(lang);
+const mainImage = getImageUrl(blog.portadaImage, "medium");
+const category = blog.category_blogs?.[0]?.nombre || null;
+const hasImage = mainImage && mainImage !== "/og-default.jpg";
+---
+
+<article class:list={["home-post-card", `home-post-card--${variant}`]}>
+  <a
+    class="home-post-card__link"
+    href={rewriteUrl(`/blog/${blog.slug}`, lang)}
+    aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
+  >
+    <div
+      class:list={["home-post-card__media", !hasImage && "home-post-card__media--fallback"]}
+      style={hasImage ? `background-image: url("${mainImage}")` : undefined}
+      aria-hidden="true"
+    >
+      {
+        !hasImage && (
+          <div class="home-post-card__fallback">No image</div>
+        )
+      }
+    </div>
+
+    <span class="home-post-card__shade" aria-hidden="true"></span>
+
+    {
+      category && (
+        <span class="home-post-card__category">
+          {category}
+        </span>
+      )
+    }
+
+    <div class="home-post-card__content">
+      <h3 class="home-post-card__title">{blog.titulo}</h3>
+      <span class="home-post-card__button">
+        {t("blog.leerMas")}
+      </span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .home-post-card,
+  .home-post-card__link {
+    height: 100%;
+  }
+
+  .home-post-card__link {
+    position: relative;
+    display: flex;
+    min-height: 320px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: #111;
+    color: white;
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  .home-post-card--tall .home-post-card__link {
+    min-height: 420px;
+  }
+
+  .home-post-card__media,
+  .home-post-card__shade {
+    position: absolute;
+    inset: 0;
+  }
+
+  .home-post-card__media {
+    z-index: 0;
+    background-position: center;
+    background-size: cover;
+    scale: 1.005;
+    transform-origin: center;
+    transition:
+      scale 600ms ease,
+      filter 600ms ease;
+  }
+
+  .home-post-card__link:hover .home-post-card__media,
+  .home-post-card__link:focus-visible .home-post-card__media {
+    scale: 1.025;
+    filter: saturate(1.04);
+  }
+
+  .home-post-card__media--fallback {
+    scale: 1;
+  }
+
+  .home-post-card__fallback {
+    display: grid;
+    height: 100%;
+    place-items: center;
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--primary) 18%, #fff),
+      color-mix(in oklab, var(--secondary) 18%, #fff)
+    );
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .home-post-card__shade {
+    z-index: 1;
+    background:
+      linear-gradient(
+        180deg,
+        rgb(0 0 0 / 0.08) 0%,
+        rgb(0 0 0 / 0.22) 42%,
+        rgb(0 0 0 / 0.82) 100%
+      ),
+      linear-gradient(90deg, rgb(0 0 0 / 0.35), transparent 48%);
+  }
+
+  .home-post-card__category {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    z-index: 2;
+    max-width: calc(100% - 2rem);
+    overflow: hidden;
+    background: var(--secondary);
+    padding: 0.42rem 0.8rem;
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .home-post-card__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.1rem;
+    padding: 4.5rem 1.25rem 2rem;
+    text-align: center;
+  }
+
+  .home-post-card__title {
+    max-width: 34rem;
+    color: white;
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.16;
+    text-shadow: 0 2px 18px rgb(0 0 0 / 0.35);
+  }
+
+  @media (min-width: 768px) {
+    .home-post-card__title {
+      font-size: 1.24rem;
+    }
+  }
+
+  .home-post-card__button {
+    border: 1px solid rgb(255 255 255 / 0.86);
+    border-radius: 0.35rem;
+    background: rgb(0 0 0 / 0.16);
+    padding: 0.68rem 1rem;
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    backdrop-filter: blur(2px);
+    transition: background 240ms ease;
+  }
+
+  .home-post-card__link:hover .home-post-card__button,
+  .home-post-card__link:focus-visible .home-post-card__button {
+    background: rgb(255 255 255 / 0.16);
+  }
+
+  .home-post-card__link:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--secondary) 70%, white);
+    outline-offset: 3px;
+  }
+
+  @media (min-width: 1024px) {
+    .home-post-card--standard .home-post-card__link {
+      min-height: 250px;
+    }
+
+    .home-post-card--tall .home-post-card__content {
+      padding-bottom: 4rem;
+    }
+  }
+</style>
