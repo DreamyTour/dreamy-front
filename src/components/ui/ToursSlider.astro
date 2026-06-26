@@ -87,7 +87,7 @@ const sliderLabels = {
 </style>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
+  const initAllSliders = () => {
     const sliderRoots = document.querySelectorAll("[data-tours-slider]");
 
     const initializeSlider = (root: Element) => {
@@ -223,5 +223,15 @@ const sliderLabels = {
     );
 
     sliderRoots.forEach((root) => observer.observe(root));
-  });
+  };
+
+  // Works with ClientRouter (astro:page-load) AND without it (DOMContentLoaded)
+  document.addEventListener("astro:page-load", initAllSliders);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAllSliders, { once: true });
+  } else {
+    // DOM already ready (script runs after parse on pages without ClientRouter)
+    initAllSliders();
+  }
 </script>

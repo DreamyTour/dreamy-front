@@ -344,7 +344,7 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                       <li>
                         <a
                           href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
-                          class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50 inline-flex items-center justify-center min-h-[44px] min-w-[44px]"
+                          class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
                           style={`left: ${point.x}; top: ${point.y};`}
                           aria-label={t.mapPointLabel(pointTitle)}
                           data-point-id={point.id}
@@ -486,6 +486,17 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
 
   .guide-card.is-active h4 {
     color: var(--secondary);
+  }
+
+  /* WCAG 2.5.5 – minimum 44×44px touch target.
+     The visible dot is 16px; we use a transparent hit-area that fills
+     the required size while keeping the visual unchanged. */
+  .map-point {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .map-point.is-active {
