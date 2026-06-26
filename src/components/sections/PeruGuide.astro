@@ -23,7 +23,7 @@ const copy = {
     description2:
       "Adéntrate en un territorio donde la geografía cambia cada cien kilómetros, donde puedes pasar de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interactivo del Perú",
-    mapSubtitle: "Haz clic en cualquier punto para explorar ese destino.",
+    mapSubtitle: "Pasa el cursor por un punto o elige una tarjeta para explorar ese destino.",
     mapPointLabel: (name: string) => `Ver ${name} en el mapa`,
   },
   en: {
@@ -34,7 +34,7 @@ const copy = {
     description2:
       "Step into a territory where geography shifts every hundred kilometers, from towering glaciers to lush rainforests.",
     mapTitle: "Interactive Peru Map",
-    mapSubtitle: "Click any point to explore that destination.",
+    mapSubtitle: "Hover a point or choose a card to explore that destination.",
     mapPointLabel: (name: string) => `View ${name} on the map`,
   },
   pt: {
@@ -45,7 +45,7 @@ const copy = {
     description2:
       "Adentre um território onde a geografia muda a cada cem quilômetros, de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interativo do Peru",
-    mapSubtitle: "Clique em qualquer ponto para explorar o destino.",
+    mapSubtitle: "Passe o cursor por um ponto ou escolha um cartão para explorar o destino.",
     mapPointLabel: (name: string) => `Ver ${name} no mapa`,
   },
 } as const;
@@ -335,18 +335,15 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
               <!-- Map Points -->
               <ul
                 class="absolute inset-0 m-0 list-none p-0"
-                aria-label={t.mapTitle}
+                aria-hidden="true"
               >
                 {
                   mapPoints.map((point) => {
-                    const pointTitle = point.resolvedTitle;
                     return (
                       <li>
-                        <a
-                          href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
+                        <span
                           class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
                           style={`left: ${point.x}; top: ${point.y};`}
-                          aria-label={t.mapPointLabel(pointTitle)}
                           data-point-id={point.id}
                         >
                           <span class="point-halo absolute -inset-2 rounded-full bg-primary/18 opacity-0 transition-all duration-300 ease-out" />
@@ -354,7 +351,7 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                           <span class="point-ring absolute -inset-1 rounded-full border border-primary/35 opacity-0 transition-all duration-300 ease-out" />
 
                           <span class="point-core relative inline-flex h-4 w-4 rounded-full border-2 border-white bg-primary/80 shadow-[0_4px_12px_rgb(0,0,0,0.16)] ring-2 ring-primary/18 transition-all duration-300 ease-out group-hover:bg-primary" />
-                        </a>
+                        </span>
                       </li>
                     );
                   })

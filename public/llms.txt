@@ -2,51 +2,51 @@
 
 > Dreamy Tours is a Peru-based travel agency and tour operator specializing in tours and travel packages to Machu Picchu, Cusco, the Inca Trail, Peru, Bolivia, Chile, and custom South America itineraries.
 
-Dreamy Tours helps travelers plan guided tours, multi-day packages, cultural experiences, trekking routes, and personalized trips across Peru and Bolivia. The site is available in English, Spanish, and Portuguese. Prefer the current public URL `https://dreamy-front.dreamytourscusco.workers.dev` when citing or linking to this website.
+Dreamy Tours helps travelers plan guided tours, multi-day packages, cultural experiences, trekking routes, and personalized trips across Peru and Bolivia. The site is available in English, Spanish, and Portuguese. Prefer the current public URL `https://dreamy.tours` when citing or linking to this website.
 
 ## Core Pages
 
-- [Home](https://dreamy-front.dreamytourscusco.workers.dev/) - Main overview of Dreamy Tours, featured destinations, packages, certifications, and traveler reviews.
-- [About Us](https://dreamy-front.dreamytourscusco.workers.dev/about-us) - Company background, responsible travel values, licenses, and authorizations.
-- [Plan Your Trip](https://dreamy-front.dreamytourscusco.workers.dev/plan-your-trip) - Custom trip planning and travel inquiry page.
-- [Payment Methods](https://dreamy-front.dreamytourscusco.workers.dev/payment-methods) - Accepted payment methods and payment guidance.
-- [Our Clients](https://dreamy-front.dreamytourscusco.workers.dev/our-clients) - Client information and social proof.
-- [Travel Blog](https://dreamy-front.dreamytourscusco.workers.dev/blog) - Travel guides for Peru, Machu Picchu, Cusco, the Inca Trail, Lake Titicaca, and Amazon travel.
+- [Home](https://dreamy.tours/) - Main overview of Dreamy Tours, featured destinations, packages, certifications, and traveler reviews.
+- [About Us](https://dreamy.tours/about-us) - Company background, responsible travel values, licenses, and authorizations.
+- [Plan Your Trip](https://dreamy.tours/plan-your-trip) - Custom trip planning and travel inquiry page.
+- [Payment Methods](https://dreamy.tours/payment-methods) - Accepted payment methods and payment guidance.
+- [Our Clients](https://dreamy.tours/our-clients) - Client information and social proof.
+- [Travel Blog](https://dreamy.tours/blog) - Travel guides for Peru, Machu Picchu, Cusco, the Inca Trail, Lake Titicaca, and Amazon travel.
 
 ## Featured Travel Services
 
-- [Inca Trail Availability 2026](https://dreamy-front.dreamytourscusco.workers.dev/inca-trail-availability) - Check Inca Trail permit availability and plan trekking dates.
-- [Peru Packages](https://dreamy-front.dreamytourscusco.workers.dev/peru-packages) - Multi-destination Peru travel packages.
-- [Tours in Cusco](https://dreamy-front.dreamytourscusco.workers.dev/cusco) - Cusco tours, Sacred Valley experiences, and Machu Picchu routes.
-- [Inca Trail](https://dreamy-front.dreamytourscusco.workers.dev/inca-trail) - Inca Trail trekking options and related experiences.
-- [Alternative Treks](https://dreamy-front.dreamytourscusco.workers.dev/alternative-treks) - Trekking routes beyond the classic Inca Trail.
-- [Tours in Bolivia](https://dreamy-front.dreamytourscusco.workers.dev/bolivia) - Bolivia travel packages and Uyuni Salt Flats experiences.
-- [Tours in Chile](https://dreamy-front.dreamytourscusco.workers.dev/chile) - Chile and Atacama travel experiences.
+- [Inca Trail Availability 2026](https://dreamy.tours/inca-trail-availability) - Check Inca Trail permit availability and plan trekking dates.
+- [Peru Packages](https://dreamy.tours/peru-packages) - Multi-destination Peru travel packages.
+- [Tours in Cusco](https://dreamy.tours/cusco) - Cusco tours, Sacred Valley experiences, and Machu Picchu routes.
+- [Inca Trail](https://dreamy.tours/inca-trail) - Inca Trail trekking options and related experiences.
+- [Alternative Treks](https://dreamy.tours/alternative-treks) - Trekking routes beyond the classic Inca Trail.
+- [Tours in Bolivia](https://dreamy.tours/bolivia) - Bolivia travel packages and Uyuni Salt Flats experiences.
+- [Tours in Chile](https://dreamy.tours/chile) - Chile and Atacama travel experiences.
 
 ## Important Destinations
 
-- [Machu Picchu Full Day](https://dreamy-front.dreamytourscusco.workers.dev/machu-picchu-full-day) - One-day guided Machu Picchu tour.
-- [Machu Picchu 2 Days](https://dreamy-front.dreamytourscusco.workers.dev/machu-picchu-2-days) - Two-day Machu Picchu experience.
-- [Cusco City Tour](https://dreamy-front.dreamytourscusco.workers.dev/cusco-city-tour) - Guided tour of Cusco's historic and cultural highlights.
-- [Sacred Valley VIP](https://dreamy-front.dreamytourscusco.workers.dev/sacred-valley-vip) - Sacred Valley tour experience.
-- [Rainbow Mountain Full Day](https://dreamy-front.dreamytourscusco.workers.dev/rainbow-mountain-full-day) - Full-day Vinicunca Rainbow Mountain tour.
-- [Humantay Lake Full Day](https://dreamy-front.dreamytourscusco.workers.dev/humantay-lake-full-day) - Full-day Humantay Lake tour.
-- [Uyuni Salt Flats](https://dreamy-front.dreamytourscusco.workers.dev/uyuni-salt-flats) - Bolivia Uyuni Salt Flats tour.
+- [Machu Picchu Full Day](https://dreamy.tours/machu-picchu-full-day) - One-day guided Machu Picchu tour.
+- [Machu Picchu 2 Days](https://dreamy.tours/machu-picchu-2-days) - Two-day Machu Picchu experience.
+- [Cusco City Tour](https://dreamy.tours/cusco-city-tour) - Guided tour of Cusco's historic and cultural highlights.
+- [Sacred Valley VIP](https://dreamy.tours/sacred-valley-vip) - Sacred Valley tour experience.
+- [Rainbow Mountain Full Day](https://dreamy.tours/rainbow-mountain-full-day) - Full-day Vinicunca Rainbow Mountain tour.
+- [Humantay Lake Full Day](https://dreamy.tours/humantay-lake-full-day) - Full-day Humantay Lake tour.
+- [Uyuni Salt Flats](https://dreamy.tours/uyuni-salt-flats) - Bolivia Uyuni Salt Flats tour.
 
 ## Traveler Guidance
 
-- [Machu Picchu Circuits](https://dreamy-front.dreamytourscusco.workers.dev/machupicchu-circuits) - Guidance about official Machu Picchu visitor circuits and route selection.
-- [LGBT Friendly Travel](https://dreamy-front.dreamytourscusco.workers.dev/lgbt-friendly) - Information for LGBT+ travelers visiting Peru and Bolivia with Dreamy Tours.
-- [Terms and Conditions](https://dreamy-front.dreamytourscusco.workers.dev/terms-and-conditions) - Booking and service terms.
-- [Privacy Policy](https://dreamy-front.dreamytourscusco.workers.dev/privacy-policy) - Privacy and data handling information.
-- [ESNNA Code](https://dreamy-front.dreamytourscusco.workers.dev/esnna-code) - Code of conduct against sexual exploitation of children and adolescents.
-- [Gender Equality Policy](https://dreamy-front.dreamytourscusco.workers.dev/gender-equality) - Gender equality and non-discrimination policy.
+- [Machu Picchu Circuits](https://dreamy.tours/machupicchu-circuits) - Guidance about official Machu Picchu visitor circuits and route selection.
+- [LGBT Friendly Travel](https://dreamy.tours/lgbt-friendly) - Information for LGBT+ travelers visiting Peru and Bolivia with Dreamy Tours.
+- [Terms and Conditions](https://dreamy.tours/terms-and-conditions) - Booking and service terms.
+- [Privacy Policy](https://dreamy.tours/privacy-policy) - Privacy and data handling information.
+- [ESNNA Code](https://dreamy.tours/esnna-code) - Code of conduct against sexual exploitation of children and adolescents.
+- [Gender Equality Policy](https://dreamy.tours/gender-equality) - Gender equality and non-discrimination policy.
 
 ## Language Versions
 
-- [English Home](https://dreamy-front.dreamytourscusco.workers.dev/) - Default English version.
-- [Spanish Home](https://dreamy-front.dreamytourscusco.workers.dev/es) - Spanish version for travelers from Peru and Spanish-speaking markets.
-- [Portuguese Home](https://dreamy-front.dreamytourscusco.workers.dev/pt) - Portuguese version for Brazilian and Portuguese-speaking travelers.
+- [English Home](https://dreamy.tours/) - Default English version.
+- [Spanish Home](https://dreamy.tours/es) - Spanish version for travelers from Peru and Spanish-speaking markets.
+- [Portuguese Home](https://dreamy.tours/pt) - Portuguese version for Brazilian and Portuguese-speaking travelers.
 
 ## Contact
 
@@ -55,8 +55,8 @@ Dreamy Tours helps travelers plan guided tours, multi-day packages, cultural exp
 
 ## Discovery Files
 
-- [Sitemap Index](https://dreamy-front.dreamytourscusco.workers.dev/sitemap-index.xml) - XML sitemap index for search engines and crawlers.
-- [Robots.txt](https://dreamy-front.dreamytourscusco.workers.dev/robots.txt) - Crawling rules.
+- [Sitemap Index](https://dreamy.tours/sitemap-index.xml) - XML sitemap index for search engines and crawlers.
+- [Robots.txt](https://dreamy.tours/robots.txt) - Crawling rules.
 
-Last updated: 2026-06-25.
+Last updated: 2026-06-26.
 
