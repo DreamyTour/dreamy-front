@@ -2,7 +2,6 @@
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import TripAdvisorLogo from "@/assets/certification/certificado-tripadvisor.svg?url";
-import LocationPinIcon from "@/assets/svg/reviews/location-pin.svg";
 
 interface Props {
   lang: Lang;
@@ -163,20 +162,11 @@ const getSourceReviews = (source: ReviewSource) =>
 >
   <div class="mx-auto max-w-8xl px-6">
     <header class="mb-12 max-w-3xl">
-      <p
-        class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
-      >
-        <LocationPinIcon class="h-4 w-4" aria-hidden="true" />
-        {t("reviews.kicker")}
-      </p>
       <h2
         id="reviews-wall-title"
         class="relative mb-2 inline-block text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl"
       >
         <span class="relative z-10">{t("reviews.title")}</span>
-        <span
-          class="absolute bottom-0 left-0 -z-0 h-3 w-24 rounded-full bg-secondary/30 blur-sm"
-        ></span>
       </h2>
       <div
         class="mb-6 mt-4 flex items-center justify-start gap-3"

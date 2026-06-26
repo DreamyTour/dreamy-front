@@ -1,5 +1,6 @@
 ---
 import type { Lang } from "@/lib/i18n";
+import type { Page } from "@/types/page";
 
 interface Props {
   lang: Lang;
@@ -8,12 +9,13 @@ interface Props {
 const { lang } = Astro.props;
 import mapSvg from "@/assets/svg/mapa-peru.svg?raw";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
+import fetchApi from "@/lib/strapi";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 // ====== i18n: Textos de la sección ======
 const copy = {
   es: {
-    badge: "Guías de Viaje",
     title: "Un Viaje a través de la",
     titleHighlight: "Diversidad Infinita",
     description:
@@ -22,10 +24,8 @@ const copy = {
       "Adéntrate en un territorio donde la geografía cambia cada cien kilómetros, donde puedes pasar de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interactivo del Perú",
     mapSubtitle: "Haz clic en cualquier punto para explorar ese destino.",
-    cta: "Ver tours",
   },
   en: {
-    badge: "Travel Guides",
     title: "A Journey through",
     titleHighlight: "Infinite Diversity",
     description:
@@ -34,10 +34,8 @@ const copy = {
       "Step into a territory where geography shifts every hundred kilometers, from towering glaciers to lush rainforests.",
     mapTitle: "Interactive Peru Map",
     mapSubtitle: "Click any point to explore that destination.",
-    cta: "View tours",
   },
   pt: {
-    badge: "Guias de Viagem",
     title: "Uma Viagem através da",
     titleHighlight: "Diversidade Infinita",
     description:
@@ -46,112 +44,76 @@ const copy = {
       "Adentre um território onde a geografia muda a cada cem quilômetros, de glaciares imponentes a selvas exuberantes.",
     mapTitle: "Mapa Interativo do Peru",
     mapSubtitle: "Clique em qualquer ponto para explorar o destino.",
-    cta: "Ver passeios",
   },
 } as const;
 
 const t = copy[lang as keyof typeof copy] ?? copy.es;
 
-// ====== Puntos del mapa con slug para linkear a las pages ======
-const mapPoints = [
-  {
-    id: "lima",
-    slug: "lima",
-    title: { es: "Costa Central", en: "Central Coast", pt: "Costa Central" },
-    subtitle: {
-      es: "Lima & Paracas",
-      en: "Lima & Paracas",
-      pt: "Lima & Paracas",
-    },
-    description: {
-      es: "La capital gastronómica y las maravillas del Pacífico.",
-      en: "The gastronomic capital and the wonders of the Pacific.",
-      pt: "A capital gastronômica e as maravilhas do Pacífico.",
-    },
-    x: "45%",
-    y: "65%",
+const destinationSlugs = [
+  "lima",
+  "cusco",
+  "iquitos",
+  "arequipa",
+  "puno",
+  "ica",
+  "puerto-maldonado",
+] as const;
+
+const pageSlugFilters = Object.fromEntries(
+  destinationSlugs.map((slug, index) => [`filters[slug][$in][${index}]`, slug]),
+);
+
+const destinationPages = await fetchApi<Page[]>({
+  endpoint: "pages",
+  wrappedByKey: "data",
+  locale: lang,
+  query: {
+    ...pageSlugFilters,
+    populate: "*",
+    "pagination[pageSize]": destinationSlugs.length,
   },
+});
+
+const destinationPagesBySlug = new Map(
+  (Array.isArray(destinationPages) ? destinationPages : []).map((page) => [
+    page.slug,
+    page,
+  ]),
+);
+
+// ====== Posiciones de los puntos del mapa ======
+const mapPointConfig = [
+  { id: "lima", slug: "lima", x: "45%", y: "65%" },
+  { id: "cusco", slug: "cusco", x: "59%", y: "70%" },
+  { id: "iquitos", slug: "iquitos", x: "55%", y: "25%" },
+  { id: "arequipa", slug: "arequipa", x: "55%", y: "80%" },
+  { id: "puno", slug: "puno", x: "68%", y: "75%" },
+  { id: "ica", slug: "ica", x: "47%", y: "72%" },
   {
-    id: "cusco",
-    slug: "cusco",
-    title: {
-      es: "Tierras Altas Andinas",
-      en: "Andean Highlands",
-      pt: "Terras Altas Andinas",
-    },
-    subtitle: {
-      es: "Cusco & Valle Sagrado",
-      en: "Cusco & Sacred Valley",
-      pt: "Cusco & Vale Sagrado",
-    },
-    description: {
-      es: "El corazón del imperio Inca y maravillas de la ingeniería milenaria.",
-      en: "The heart of the Inca empire and wonders of millennial engineering.",
-      pt: "O coração do império Inca e maravilhas da engenharia milenar.",
-    },
-    x: "59%",
-    y: "70%",
-  },
-  {
-    id: "iquitos",
-    slug: "iquitos",
-    title: {
-      es: "Cuenca Amazónica",
-      en: "Amazon Basin",
-      pt: "Bacia Amazônica",
-    },
-    subtitle: {
-      es: "Selva de Iquitos",
-      en: "Iquitos Jungle",
-      pt: "Selva de Iquitos",
-    },
-    description: {
-      es: "Un ecosistema vibrante, hogar del río más caudaloso del mundo.",
-      en: "A vibrant ecosystem, home to the world's mightiest river.",
-      pt: "Um ecossistema vibrante, lar do rio mais caudaloso do mundo.",
-    },
-    x: "55%",
-    y: "25%",
-  },
-  {
-    id: "arequipa",
-    slug: "arequipa",
-    title: { es: "Ruta Volcánica", en: "Volcanic Route", pt: "Rota Vulcânica" },
-    subtitle: {
-      es: "Arequipa & Colca",
-      en: "Arequipa & Colca",
-      pt: "Arequipa & Colca",
-    },
-    description: {
-      es: "La Ciudad Blanca custodiada por imponentes volcanes y cañones profundos.",
-      en: "The White City guarded by majestic volcanoes and deep canyons.",
-      pt: "A Cidade Branca guardada por vulcões majestosos e cânions profundos.",
-    },
-    x: "55%",
-    y: "80%",
-  },
-  {
-    id: "puno",
-    slug: "puno",
-    title: {
-      es: "Altiplano Místico",
-      en: "Mystic Altiplano",
-      pt: "Altiplano Místico",
-    },
-    subtitle: {
-      es: "Puno & Lago Titicaca",
-      en: "Puno & Lake Titicaca",
-      pt: "Puno & Lago Titicaca",
-    },
-    description: {
-      es: "El lago navegable más alto del mundo y cuna de civilizaciones.",
-      en: "The world's highest navigable lake and cradle of civilizations.",
-      pt: "O lago navegável mais alto do mundo e berço de civilizações.",
-    },
+    id: "puerto-maldonado",
+    slug: "puerto-maldonado",
     x: "68%",
-    y: "75%",
+    y: "67%",
   },
 ];
+
+const mapPoints = mapPointConfig
+  .map((point) => {
+    const page = destinationPagesBySlug.get(point.slug);
+    if (!page?.titulo) return null;
+
+    const image = page.seo?.metaImage;
+
+    return {
+      ...point,
+      page,
+      resolvedTitle: page.titulo,
+      resolvedSlug: page.slug || point.slug,
+      imageUrl: image ? getImageUrl(image, "small") : backgroundImageMobile.src,
+      imageAlt: image ? getImageAlt(image, page.titulo) : "",
+    };
+  })
+  .filter((point) => point !== null);
 
 const leftColumnPoints = mapPoints.slice(0, Math.ceil(mapPoints.length / 2));
 const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
@@ -163,29 +125,13 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
 >
   <div class="max-w-8xl mx-auto px-6">
     <header class="mb-10 max-w-3xl text-left md:mb-12">
-      <p
-        class="mb-4 flex w-fit items-center gap-2 rounded-full bg-secondary/15 px-3 py-1 text-sm font-semibold text-secondary"
-      >
-        <svg
-          class="h-4 w-4"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-            clip-rule="evenodd"></path>
-        </svg>
-        {t.badge}
-      </p>
-
       <h2
         id="peru-guide-mobile-title"
         class="relative inline-block mb-2 text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl"
       >
         <span class="relative z-10">
           {t.title}
+          {" "}
           <span class="text-secondary">{t.titleHighlight}</span>
         </span>
         <span
@@ -217,32 +163,25 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
     <ul class="grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-2">
       {
         mapPoints.map((point, index) => {
-          const pointTitle =
-            point.title[lang as keyof typeof point.title] ?? point.title.es;
-          const pointSubtitle =
-            point.subtitle[lang as keyof typeof point.subtitle] ??
-            point.subtitle.es;
-          const pointDescription =
-            point.description[lang as keyof typeof point.description] ??
-            point.description.es;
+          const pointTitle = point.resolvedTitle;
           const isFeatured = index === 0;
 
           return (
             <li class:list={[isFeatured && "md:col-span-2"]}>
               <a
-                href={rewriteUrl(`/${point.slug}`, lang)}
+                href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
                 class:list={[
                   "group relative overflow-hidden rounded-xl border border-white/80 bg-white shadow-[0_10px_35px_rgb(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/25",
-                  isFeatured ? "block min-h-[260px]" : "flex min-h-[124px] p-2",
+                  isFeatured ? "block min-h-[210px]" : "flex min-h-[104px] p-2",
                 ]}
-                aria-label={`${pointTitle} - ${pointSubtitle}`}
+                aria-label={pointTitle}
               >
                 {isFeatured ? (
                   <article>
                     <img
-                      src={backgroundImageMobile.src}
-                      alt=""
-                      aria-hidden="true"
+                      src={point.imageUrl}
+                      alt={point.imageAlt}
+                      aria-hidden={point.imageAlt ? undefined : "true"}
                       class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                       width="640"
                       height="420"
@@ -253,42 +192,19 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                       class="absolute inset-0 bg-gradient-to-t from-black/78 via-black/30 to-black/5"
                       aria-hidden="true"
                     />
-                    <span class="relative z-10 flex h-full min-h-[260px] flex-col justify-end p-5">
-                      <span class="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">
-                        {pointSubtitle}
-                      </span>
-                      <h3 class="mt-2 text-2xl font-bold leading-tight text-white">
+                    <span class="relative z-10 flex h-full min-h-[210px] flex-col justify-end p-5">
+                      <h3 class="text-2xl font-bold leading-tight text-white">
                         {pointTitle}
                       </h3>
-                      <p class="mt-2 line-clamp-2 text-sm leading-6 text-white/82">
-                        {pointDescription}
-                      </p>
-                      <span class="mt-4 flex items-center gap-2 text-sm font-semibold text-white">
-                        <span>{t.cta}</span>
-                        <svg
-                          class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </span>
                     </span>
                   </article>
                 ) : (
                   <>
-                    <span class="relative w-[96px] shrink-0 overflow-hidden rounded-lg">
+                    <span class="relative w-[88px] shrink-0 overflow-hidden rounded-lg">
                       <img
-                        src={backgroundImageMobile.src}
-                        alt=""
-                        aria-hidden="true"
+                        src={point.imageUrl}
+                        alt={point.imageAlt}
+                        aria-hidden={point.imageAlt ? undefined : "true"}
                         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                         width="96"
                         height="124"
@@ -298,33 +214,9 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                     </span>
 
                     <article class="flex min-w-0 flex-1 flex-col justify-center px-3 py-2 sm:px-4">
-                      <p class="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-secondary">
-                        {pointSubtitle}
-                      </p>
-                      <h3 class="mt-1 line-clamp-2 text-[1rem] font-bold leading-tight text-gray-950 transition-colors duration-300 group-hover:text-secondary">
+                      <h3 class="line-clamp-2 text-[1rem] font-bold leading-tight text-gray-950 transition-colors duration-300 group-hover:text-secondary">
                         {pointTitle}
                       </h3>
-                      <p class="mt-1.5 line-clamp-2 text-xs leading-5 text-gray-500">
-                        {pointDescription}
-                      </p>
-
-                      <span class="mt-2 flex items-center gap-1.5 text-[0.78rem] font-semibold text-secondary">
-                        <span>{t.cta}</span>
-                        <svg
-                          class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </span>
                     </article>
                   </>
                 )}
@@ -353,20 +245,12 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
       <!-- Text Content (Left) -->
       <article class="lg:col-span-5 space-y-8">
-        <p
-          class="flex items-center justify-center w-fit space-x-2 bg-secondary/10 px-4 py-2 rounded-full mb-2"
-        >
-          <span
-            class="flex h-2 w-2 rounded-full bg-secondary"
-            aria-hidden="true"></span>
-          <span class="text-secondary text-sm font-semibold">{t.badge}</span>
-        </p>
-
         <h2
           id="peru-guide-desktop-title"
           class="text-4xl md:text-5xl font-bold text-foreground leading-tight"
         >
           {t.title}
+          {" "}
           <span
             class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary"
             >{t.titleHighlight}</span
@@ -406,36 +290,27 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
             <ul class="col-span-3 m-0 list-none space-y-3 p-0">
               {
                 leftColumnPoints.map((point) => {
-                  const pointTitle =
-                    point.title[lang as keyof typeof point.title] ??
-                    point.title.es;
-                  const pointSubtitle =
-                    point.subtitle[lang as keyof typeof point.subtitle] ??
-                    point.subtitle.es;
-
+                  const pointTitle = point.resolvedTitle;
                   return (
                     <li>
                       <a
-                        href={rewriteUrl(`/${point.slug}`, lang)}
-                        class="guide-card group block rounded-xl border border-border/80 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
-                        aria-label={`${pointTitle} — ${pointSubtitle}`}
+                        href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
+                        class="guide-card group block rounded-xl border border-border/80 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
+                        aria-label={pointTitle}
                         data-point-trigger={point.id}
                       >
-                        <article class="flex flex-col w-full">
-                          <h4 class="font-medium text-foreground text-[0.8rem] leading-tight">
-                            {pointTitle}
-                          </h4>
+                        <article class="flex w-full flex-col gap-2">
                           <img
-                            src={backgroundImageMobile.src}
-                            alt=""
-                            aria-hidden="true"
-                            class="mt-2 mb-2 h-14 w-full rounded-lg object-cover"
+                            src={point.imageUrl}
+                            alt={point.imageAlt}
+                            aria-hidden={point.imageAlt ? undefined : "true"}
+                            class="h-16 w-full rounded-lg object-cover"
                             loading="lazy"
                             decoding="async"
                           />
-                          <span class="text-[0.68rem] font-semibold text-secondary block">
-                            {pointSubtitle}
-                          </span>
+                          <h4 class="line-clamp-2 text-[0.8rem] font-semibold leading-tight text-foreground transition-colors duration-300 group-hover:text-secondary">
+                            {pointTitle}
+                          </h4>
                         </article>
                       </a>
                     </li>
@@ -461,26 +336,21 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
               >
                 {
                   mapPoints.map((point) => {
-                    const pointTitle =
-                      point.title[lang as keyof typeof point.title] ??
-                      point.title.es;
-                    const pointSubtitle =
-                      point.subtitle[lang as keyof typeof point.subtitle] ??
-                      point.subtitle.es;
-
+                    const pointTitle = point.resolvedTitle;
                     return (
                       <li>
                         <a
-                          href={rewriteUrl(`/${point.slug}`, lang)}
+                          href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
                           class="map-point group absolute transform -translate-x-1/2 -translate-y-1/2 focus:outline-none z-10 transition-transform duration-300 hover:z-50"
                           style={`left: ${point.x}; top: ${point.y};`}
-                          aria-label={`${pointTitle} — ${pointSubtitle}`}
+                          aria-label={pointTitle}
                           data-point-id={point.id}
                         >
-                          <span class="pulse-ring pulse-ring--outer absolute -inset-1.5 rounded-full bg-secondary/25 animate-ping opacity-0 transition-[opacity,background-color] duration-200" />
-                          <span class="pulse-ring pulse-ring--inner absolute -inset-1 rounded-full bg-secondary/30 animate-pulse opacity-0 transition-[opacity,background-color] duration-200" />
+                          <span class="point-halo absolute -inset-2 rounded-full bg-primary/18 opacity-0 transition-all duration-300 ease-out" />
+                          <span class="point-halo point-halo--delay absolute -inset-2 rounded-full bg-primary/16 opacity-0 transition-all duration-300 ease-out" />
+                          <span class="point-ring absolute -inset-1 rounded-full border border-primary/35 opacity-0 transition-all duration-300 ease-out" />
 
-                          <span class="point-core relative inline-flex rounded-full h-4 w-4 bg-secondary border-2 border-white shadow-md ring-4 ring-transparent transition-all group-hover:bg-primary" />
+                          <span class="point-core relative inline-flex h-4 w-4 rounded-full border-2 border-white bg-primary/80 shadow-[0_4px_12px_rgb(0,0,0,0.16)] ring-2 ring-primary/18 transition-all duration-300 ease-out group-hover:bg-primary" />
                         </a>
                       </li>
                     );
@@ -492,36 +362,27 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
             <ul class="col-span-3 m-0 list-none space-y-3 p-0">
               {
                 rightColumnPoints.map((point) => {
-                  const pointTitle =
-                    point.title[lang as keyof typeof point.title] ??
-                    point.title.es;
-                  const pointSubtitle =
-                    point.subtitle[lang as keyof typeof point.subtitle] ??
-                    point.subtitle.es;
-
+                  const pointTitle = point.resolvedTitle;
                   return (
                     <li>
                       <a
-                        href={rewriteUrl(`/${point.slug}`, lang)}
-                        class="guide-card group block rounded-xl border border-border/80 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
-                        aria-label={`${pointTitle} — ${pointSubtitle}`}
+                        href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
+                        class="guide-card group block rounded-xl border border-border/80 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
+                        aria-label={pointTitle}
                         data-point-trigger={point.id}
                       >
-                        <article class="flex flex-col w-full">
-                          <h4 class="font-medium text-foreground text-[0.8rem] leading-tight">
-                            {pointTitle}
-                          </h4>
+                        <article class="flex w-full flex-col gap-2">
                           <img
-                            src={backgroundImageMobile.src}
-                            alt=""
-                            aria-hidden="true"
-                            class="mt-2 mb-2 h-14 w-full rounded-lg object-cover"
+                            src={point.imageUrl}
+                            alt={point.imageAlt}
+                            aria-hidden={point.imageAlt ? undefined : "true"}
+                            class="h-16 w-full rounded-lg object-cover"
                             loading="lazy"
                             decoding="async"
                           />
-                          <span class="text-[0.68rem] font-semibold text-secondary block">
-                            {pointSubtitle}
-                          </span>
+                          <h4 class="line-clamp-2 text-[0.8rem] font-semibold leading-tight text-foreground transition-colors duration-300 group-hover:text-secondary">
+                            {pointTitle}
+                          </h4>
                         </article>
                       </a>
                     </li>
@@ -537,15 +398,27 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
 </section>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
+  const initPeruGuideMapHover = () => {
     const section = document.querySelector<HTMLElement>("[data-peru-guide]");
     if (!section || section.dataset.initialized === "true") return;
 
     section.dataset.initialized = "true";
 
-    const cards = section.querySelectorAll("[data-point-trigger]");
-    const points = section.querySelectorAll("[data-point-id]");
+    const cards = section.querySelectorAll<HTMLElement>("[data-point-trigger]");
+    const points = section.querySelectorAll<HTMLElement>("[data-point-id]");
+    const cardsById = new Map<string, HTMLElement>();
+    const pointsById = new Map<string, HTMLElement>();
     let activeId: string | null = null;
+
+    cards.forEach((card) => {
+      const id = card.dataset.pointTrigger;
+      if (id) cardsById.set(id, card);
+    });
+
+    points.forEach((point) => {
+      const id = point.dataset.pointId;
+      if (id) pointsById.set(id, point);
+    });
 
     const clearActive = () => {
       cards.forEach((card) => card.classList.remove("is-active"));
@@ -555,8 +428,8 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
     const setActive = (id: string) => {
       activeId = id;
       clearActive();
-      const card = section.querySelector(`[data-point-trigger="${id}"]`);
-      const point = section.querySelector(`[data-point-id="${id}"]`);
+      const card = cardsById.get(id);
+      const point = pointsById.get(id);
       card?.classList.add("is-active");
       point?.classList.add("is-active");
     };
@@ -568,25 +441,35 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
     };
 
     cards.forEach((card) => {
-      const id = card.getAttribute("data-point-trigger");
+      const id = card.dataset.pointTrigger;
       if (!id) return;
 
-      card.addEventListener("mouseenter", () => setActive(id));
+      card.addEventListener("pointerenter", () => setActive(id));
       card.addEventListener("focusin", () => setActive(id));
-      card.addEventListener("mouseleave", () => clearActiveIfCurrent(id));
+      card.addEventListener("pointerleave", () => clearActiveIfCurrent(id));
       card.addEventListener("focusout", () => clearActiveIfCurrent(id));
     });
 
     points.forEach((point) => {
-      const id = point.getAttribute("data-point-id");
+      const id = point.dataset.pointId;
       if (!id) return;
 
-      point.addEventListener("mouseenter", () => setActive(id));
+      point.addEventListener("pointerenter", () => setActive(id));
       point.addEventListener("focusin", () => setActive(id));
-      point.addEventListener("mouseleave", () => clearActiveIfCurrent(id));
+      point.addEventListener("pointerleave", () => clearActiveIfCurrent(id));
       point.addEventListener("focusout", () => clearActiveIfCurrent(id));
     });
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPeruGuideMapHover, {
+      once: true,
+    });
+  } else {
+    initPeruGuideMapHover();
+  }
+
+  document.addEventListener("astro:page-load", initPeruGuideMapHover);
 </script>
 
 <style>
@@ -598,26 +481,69 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
       0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
-  .map-point.is-active .pulse-ring,
-  .map-point:hover .pulse-ring,
-  .map-point:focus-visible .pulse-ring {
-    opacity: 1;
+  .guide-card.is-active h4 {
+    color: var(--secondary);
   }
 
-  .map-point.is-active .pulse-ring,
-  .map-point:hover .pulse-ring,
-  .map-point:focus-visible .pulse-ring,
+  .map-point.is-active {
+    z-index: 50;
+  }
+
+  .map-point.is-active .point-halo,
+  .map-point:hover .point-halo,
+  .map-point:focus-visible .point-halo {
+    opacity: 1;
+    transform: scale(1.15);
+    animation: peru-guide-point-pulse 0.95s ease-out infinite;
+  }
+
+  .map-point.is-active .point-halo--delay,
+  .map-point:hover .point-halo--delay,
+  .map-point:focus-visible .point-halo--delay {
+    animation-delay: 0.38s;
+  }
+
+  .map-point.is-active .point-ring,
+  .map-point:hover .point-ring,
+  .map-point:focus-visible .point-ring {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+
   .map-point.is-active .point-core,
   .map-point:hover .point-core,
   .map-point:focus-visible .point-core {
     background: var(--primary);
+    transform: scale(1.18);
+    box-shadow:
+      0 7px 18px rgb(0 0 0 / 0.18),
+      0 0 0 0.28rem color-mix(in oklab, var(--primary) 18%, transparent);
   }
 
-  .map-point.is-active .point-core,
-  .map-point:hover .point-core,
-  .map-point:focus-visible .point-core {
-    transform: scale(1.12);
-    box-shadow: 0 0 0 0.14rem
-      color-mix(in oklab, var(--primary) 20%, transparent);
+  @keyframes peru-guide-point-pulse {
+    0% {
+      opacity: 0.75;
+      transform: scale(0.85);
+    }
+
+    70% {
+      opacity: 0.22;
+      transform: scale(1.55);
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(1.75);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .map-point.is-active .point-halo,
+    .map-point:hover .point-halo,
+    .map-point:focus-visible .point-halo {
+      animation: none;
+      opacity: 0.7;
+      transform: scale(1.25);
+    }
   }
 </style>
