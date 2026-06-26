@@ -32,52 +32,56 @@ const toneStyles: Record<
   }
 > = {
   c1: {
-    border: "border-t-[#007a3d]",
-    badge: "bg-[#007a3d]",
-    text: "text-[#007a3d]",
-    soft: "bg-[#e8f7ef] text-[#007a3d]",
-    header: "bg-gradient-to-br from-[#007a3d] to-[#004b29]",
-    button: "bg-[#007a3d]",
-    dialog: "bg-[#007a3d]",
-    title: "text-[#007a3d]",
+    border: "border-t-primary",
+    badge: "bg-primary",
+    text: "text-primary",
+    soft: "bg-primary/10 text-primary",
+    header:
+      "bg-[linear-gradient(135deg,var(--primary),color-mix(in_oklab,var(--primary)_72%,black))]",
+    button: "bg-primary",
+    dialog: "bg-primary",
+    title: "text-primary",
   },
   c2: {
-    border: "border-t-[#1463a5]",
-    badge: "bg-[#1463a5]",
-    text: "text-[#1463a5]",
-    soft: "bg-[#e7f1fb] text-[#1463a5]",
-    header: "bg-gradient-to-br from-[#1463a5] to-[#083b6d]",
-    button: "bg-[#1463a5]",
-    dialog: "bg-[#1463a5]",
-    title: "text-[#1463a5]",
+    border: "border-t-[#244237]",
+    badge: "bg-[#244237]",
+    text: "text-[#244237]",
+    soft: "bg-[color-mix(in_oklab,var(--primary)_8%,white)] text-[#244237]",
+    header: "bg-[linear-gradient(135deg,#244237,#1f2d29)]",
+    button: "bg-[#244237]",
+    dialog: "bg-[#244237]",
+    title: "text-[#244237]",
   },
   c3: {
-    border: "border-t-[#7a3db8]",
-    badge: "bg-[#7a3db8]",
-    text: "text-[#7a3db8]",
-    soft: "bg-[#f0e8fb] text-[#7a3db8]",
-    header: "bg-gradient-to-br from-[#7a3db8] to-[#4b247b]",
-    button: "bg-[#7a3db8]",
-    dialog: "bg-[#7a3db8]",
-    title: "text-[#7a3db8]",
+    border: "border-t-secondary",
+    badge: "bg-secondary",
+    text: "text-secondary",
+    soft: "bg-secondary/10 text-secondary",
+    header:
+      "bg-[linear-gradient(135deg,var(--secondary),color-mix(in_oklab,var(--secondary)_68%,#1f2d29))]",
+    button: "bg-secondary",
+    dialog: "bg-secondary",
+    title: "text-secondary",
   },
   gold: {
-    border: "border-t-[#b06a00]",
-    badge: "bg-[#b06a00]",
-    text: "text-[#7a4a00]",
-    soft: "bg-[#fff4d9] text-[#7a4a00]",
-    header: "bg-gradient-to-br from-[#b06a00] to-[#7a4a00]",
-    button: "bg-[#b06a00]",
-    dialog: "bg-[#b06a00]",
-    title: "text-[#7a4a00]",
+    border: "border-t-accent-warm",
+    badge: "bg-accent-warm text-accent-warm-foreground",
+    text: "text-accent-warm-foreground",
+    soft:
+      "bg-[color-mix(in_oklab,var(--accent-warm)_28%,white)] text-accent-warm-foreground",
+    header:
+      "bg-[linear-gradient(135deg,var(--accent-warm),color-mix(in_oklab,var(--accent-warm)_72%,var(--primary)))] text-accent-warm-foreground",
+    button: "bg-[#244237]",
+    dialog: "bg-[#244237]",
+    title: "text-accent-warm-foreground",
   },
 };
 
 const focusClass =
-  "focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#f2b84b]";
+  "focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-ring";
 const pillButtonClass = `${focusClass} inline-flex cursor-pointer justify-center rounded-full border-0 px-4 py-3 text-sm font-extrabold leading-none text-white no-underline transition hover:-translate-y-0.5 hover:brightness-105`;
 const cardClass =
-  "overflow-hidden rounded-lg border border-[rgba(16,32,25,0.12)] bg-white shadow-[0_24px_60px_-42px_rgba(16,32,25,0.45)]";
+  "overflow-hidden rounded-lg border border-border bg-white shadow-[0_24px_60px_-42px_color-mix(in_oklab,var(--foreground)_45%,transparent)]";
 
 const dialogs = [
   ...circuits.map((circuit) => ({
@@ -101,33 +105,35 @@ const dialogs = [
 ---
 
 <section
-  class="mpc mt-8 text-[#102019]"
+  class="mpc mt-8 text-foreground"
   data-mpc-circuits
   aria-labelledby="mpc-heading"
 >
   <div
-    class="flex items-start gap-4 rounded-lg border border-l-4 border-[rgba(176,106,0,0.22)] border-l-[#b06a00] bg-gradient-to-br from-[#fff8e8] to-white p-5 shadow-[0_20px_45px_-34px_rgba(16,32,25,0.45)] max-sm:flex-col max-sm:items-stretch"
+    class="flex items-start gap-4 rounded-lg border border-l-4 border-accent-warm/35 border-l-accent-warm bg-[linear-gradient(135deg,color-mix(in_oklab,var(--accent-warm)_18%,white),white)] p-5 shadow-[0_20px_45px_-34px_color-mix(in_oklab,var(--foreground)_45%,transparent)] max-sm:flex-col max-sm:items-stretch"
   >
     <span
-      class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[#b06a00] font-extrabold text-white"
+      class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full bg-accent-warm font-extrabold text-accent-warm-foreground"
       aria-hidden="true">!</span
     >
-    <p class="m-0 text-[0.96rem] leading-7 text-[#654510]">{ui.decree}</p>
+    <p class="m-0 text-[0.96rem] leading-7 text-accent-warm-foreground">
+      {ui.decree}
+    </p>
   </div>
 
   <section class="py-12 text-center" aria-labelledby="mpc-heading">
     <p
-      class="m-0 text-xs font-extrabold tracking-[0.18em] text-[#007a3d] uppercase"
+      class="m-0 text-xs font-extrabold tracking-[0.18em] text-primary uppercase"
     >
       {ui.mapsLabel}
     </p>
     <h2
       id="mpc-heading"
-      class="mt-2 mb-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+      class="mt-2 mb-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-foreground"
     >
       {ui.mapsTitle}
     </h2>
-    <p class="mx-auto mt-3 mb-0 leading-7 text-[#5d6a62]">
+    <p class="mx-auto mt-3 mb-0 leading-7 text-muted-foreground">
       {ui.mapsDescription}
     </p>
 
@@ -141,7 +147,7 @@ const dialogs = [
               class={`${cardClass} grid grid-rows-[auto_1fr] border-t-4 ${tone.border}`}
             >
               <button
-                class={`${focusClass} group relative block aspect-[16/10] w-full cursor-pointer overflow-hidden border-0 bg-[#0b1611] p-0 text-white`}
+                class={`${focusClass} group relative block aspect-[16/10] w-full cursor-pointer overflow-hidden border-0 bg-[#1f2d29] p-0 text-white`}
                 type="button"
                 data-mpc-dialog={circuit.dialogId}
                 aria-label={`${ui.viewFullMap}: ${ui.circuit} ${circuit.number} ${circuit.name}`}
@@ -159,7 +165,7 @@ const dialogs = [
                 >
                   {ui.circuit} {circuit.number}
                 </span>
-                <span class="absolute inset-0 flex items-center justify-center bg-[rgba(4,10,7,0.68)] opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span class="absolute inset-0 flex items-center justify-center bg-[color-mix(in_oklab,var(--foreground)_72%,transparent)] opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
                   {ui.viewFullMap}
                 </span>
               </button>
@@ -177,7 +183,7 @@ const dialogs = [
                   aria-label={`${ui.routesAria} ${circuit.number}`}
                 >
                   {circuit.routes.map((route) => (
-                    <li class="rounded-full border border-[rgba(16,32,25,0.12)] bg-[#f4f7f4] px-2.5 py-1.5 text-xs font-bold text-[#5d6a62]">
+                    <li class="rounded-full border border-border bg-muted px-2.5 py-1.5 text-xs font-bold text-muted-foreground">
                       {route}
                     </li>
                   ))}
@@ -198,7 +204,7 @@ const dialogs = [
   </section>
 
   <nav
-    class="sticky top-0 z-[8] mb-10 flex gap-3 overflow-x-auto rounded-b-lg border border-[rgba(16,32,25,0.1)] bg-white/95 p-2 shadow-[0_12px_26px_-20px_rgba(16,32,25,0.5)]"
+    class="sticky top-0 z-[8] mb-10 flex gap-3 overflow-x-auto rounded-b-lg border border-border bg-white/95 p-2 shadow-[0_12px_26px_-20px_color-mix(in_oklab,var(--foreground)_50%,transparent)]"
     aria-label={ui.navLabel}
   >
     {
@@ -272,7 +278,7 @@ const dialogs = [
                             {route.title}
                           </h3>
                           {"seasonal" in route && route.seasonal && (
-                            <span class="mt-2 inline-flex rounded-full border border-[rgba(176,106,0,0.2)] bg-white px-2.5 py-1.5 text-xs font-extrabold text-[#7a4a00]">
+                            <span class="mt-2 inline-flex rounded-full border border-accent-warm/35 bg-white px-2.5 py-1.5 text-xs font-extrabold text-accent-warm-foreground">
                               {route.seasonal}
                             </span>
                           )}
@@ -288,26 +294,26 @@ const dialogs = [
                       </header>
 
                       <div class="p-5">
-                        <p class="m-0 max-w-[82ch] leading-7 text-[#5d6a62]">
+                        <p class="m-0 max-w-[82ch] leading-7 text-muted-foreground">
                           {route.intro}
                         </p>
                         <dl class="mt-5 grid gap-3 md:grid-cols-2">
                           {route.details.map(([label, value]) => (
-                            <div class="rounded-lg border border-[rgba(16,32,25,0.12)] bg-[#f4f7f4] p-4">
-                              <dt class="text-xs font-extrabold tracking-[0.08em] text-[#102019] uppercase">
+                            <div class="rounded-lg border border-border bg-muted p-4">
+                              <dt class="text-xs font-extrabold tracking-[0.08em] text-foreground uppercase">
                                 {label}
                               </dt>
-                              <dd class="mt-1.5 mb-0 leading-6 text-[#5d6a62]">
+                              <dd class="mt-1.5 mb-0 leading-6 text-muted-foreground">
                                 {value}
                               </dd>
                             </div>
                           ))}
                         </dl>
-                        <div class="mt-5 rounded-lg border border-[rgba(16,32,25,0.12)] bg-[#fbfdfb] p-4">
+                        <div class="mt-5 rounded-lg border border-border bg-[color-mix(in_oklab,var(--primary)_4%,white)] p-4">
                           <h4 class="m-0 text-base font-extrabold">
                             {ui.idealTitle}
                           </h4>
-                          <ul class="mt-3 mb-0 list-disc pl-5 leading-7 text-[#5d6a62]">
+                          <ul class="mt-3 mb-0 list-disc pl-5 leading-7 text-muted-foreground">
                             {route.ideal.map(([lead, text]) => (
                               <li>
                                 <strong>{lead}</strong> - {text}
@@ -329,21 +335,21 @@ const dialogs = [
   <section class="mt-12" aria-labelledby="mpc-compare-title">
     <h2
       id="mpc-compare-title"
-      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-foreground"
     >
       {ui.compareTitle}
     </h2>
     <div
-      class="mt-4 overflow-x-auto rounded-lg border border-[rgba(16,32,25,0.12)]"
+      class="mt-4 overflow-x-auto rounded-lg border border-border"
     >
       <table class="w-full min-w-[760px] border-collapse">
-        <caption class="p-4 text-left text-[#5d6a62]">
+        <caption class="p-4 text-left text-muted-foreground">
           {ui.compareCaption}
         </caption>
         <thead>
           <tr>
             <th
-              class="border-t-0 bg-[#0b1611] p-4 text-left text-white"
+              class="border-t-0 bg-[#1f2d29] p-4 text-left text-white"
               scope="col"
             >
               {ui.detailHeader}
@@ -351,7 +357,7 @@ const dialogs = [
             {
               circuits.map((circuit) => (
                 <th
-                  class="border-t-0 bg-[#0b1611] p-4 text-left text-white"
+                  class="border-t-0 bg-[#1f2d29] p-4 text-left text-white"
                   scope="col"
                 >
                   {ui.circuit} {circuit.number}
@@ -366,18 +372,18 @@ const dialogs = [
               ([detail, circuitOne, circuitTwo, circuitThree]) => (
                 <tr>
                   <th
-                    class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left font-extrabold text-[#102019]"
+                    class="border-t border-border p-4 text-left font-extrabold text-foreground"
                     scope="row"
                   >
                     {detail}
                   </th>
-                  <td class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left">
+                  <td class="border-t border-border p-4 text-left">
                     {circuitOne}
                   </td>
-                  <td class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left">
+                  <td class="border-t border-border p-4 text-left">
                     {circuitTwo}
                   </td>
-                  <td class="border-t border-[rgba(16,32,25,0.12)] p-4 text-left">
+                  <td class="border-t border-border p-4 text-left">
                     {circuitThree}
                   </td>
                 </tr>
@@ -392,7 +398,7 @@ const dialogs = [
   <section class="mt-12" aria-labelledby="mpc-booking-title">
     <h2
       id="mpc-booking-title"
-      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-foreground"
     >
       {ui.bookingTitle}
     </h2>
@@ -401,7 +407,9 @@ const dialogs = [
         booking.map((item) => (
           <article class={`${cardClass} p-5`}>
             <h3 class="m-0 text-lg font-extrabold">{item.title}</h3>
-            <p class="mt-2 mb-0 leading-7 text-[#5d6a62]">{item.text}</p>
+            <p class="mt-2 mb-0 leading-7 text-muted-foreground">
+              {item.text}
+            </p>
           </article>
         ))
       }
@@ -409,15 +417,15 @@ const dialogs = [
   </section>
 
   <div
-    class="mt-12 rounded-lg border border-[rgba(0,122,61,0.18)] bg-gradient-to-br from-[#e9f7ef] to-[#fffaf0] p-6"
+    class="mt-12 rounded-lg border border-primary/20 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--primary)_10%,white),color-mix(in_oklab,var(--accent-warm)_18%,white))] p-6"
   >
     <h2
-      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-[#102019]"
+      class="m-0 text-[clamp(1.8rem,4vw,2.75rem)] leading-[1.08] font-extrabold tracking-normal text-foreground"
     >
       {cta.title}
     </h2>
-    <p class="mt-2 mb-0 leading-7 text-[#5d6a62]">{cta.text}</p>
-    <a class={`${pillButtonClass} mt-4 bg-[#007a3d]`} href={ctaHref}>
+    <p class="mt-2 mb-0 leading-7 text-muted-foreground">{cta.text}</p>
+    <a class={`${pillButtonClass} mt-4 bg-primary`} href={ctaHref}>
       {cta.label}
     </a>
   </div>
@@ -429,11 +437,11 @@ const dialogs = [
       return (
         <dialog
           id={dialog.id}
-          class="mpc-dialog fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-full max-w-[min(92vw,1040px)] overflow-clip border-0 bg-transparent p-0 text-[#102019] max-sm:max-h-[calc(100dvh-1rem)] max-sm:max-w-[94vw]"
+          class="mpc-dialog fixed inset-0 m-auto max-h-[calc(100dvh-2rem)] w-full max-w-[min(92vw,1040px)] overflow-clip border-0 bg-transparent p-0 text-foreground max-sm:max-h-[calc(100dvh-1rem)] max-sm:max-w-[94vw]"
           aria-labelledby={`${dialog.id}-title`}
           closedby="any"
         >
-          <div class="grid max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-lg border border-white/15 bg-[#f7faf8] shadow-[0_30px_90px_rgba(0,0,0,0.38)] max-sm:max-h-[calc(100dvh-1rem)]">
+          <div class="grid max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-lg border border-white/15 bg-[color-mix(in_oklab,var(--primary)_4%,white)] shadow-[0_30px_90px_rgba(0,0,0,0.38)] max-sm:max-h-[calc(100dvh-1rem)]">
             <header
               class={`flex items-center justify-between gap-4 p-4 text-white ${tone.dialog}`}
             >
@@ -455,14 +463,14 @@ const dialogs = [
             </header>
             <figure class="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] p-4">
               <img
-                class="block h-full max-h-[min(68dvh,620px)] w-full rounded-md bg-[#e8ede9] object-contain max-sm:max-h-[58dvh]"
+                class="block h-full max-h-[min(68dvh,620px)] w-full rounded-md bg-muted object-contain max-sm:max-h-[58dvh]"
                 src={mapImage}
                 alt={dialog.alt}
                 width="1024"
                 height="724"
                 loading="lazy"
               />
-              <figcaption class="mt-3 text-center text-sm leading-6 text-[#5d6a62]">
+              <figcaption class="mt-3 text-center text-sm leading-6 text-muted-foreground">
                 {dialog.caption}
               </figcaption>
             </figure>
