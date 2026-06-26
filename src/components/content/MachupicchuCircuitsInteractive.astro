@@ -3,6 +3,7 @@ import {
   machupicchuCircuitsContent,
   type MachupicchuCircuitsLang,
 } from "@/data/machupicchuCircuitsContent";
+import { MapPinned } from "lucide-react";
 
 interface Props {
   lang?: MachupicchuCircuitsLang;
@@ -10,13 +11,29 @@ interface Props {
 
 type Tone = "c1" | "c2" | "c3" | "gold";
 
-const mapImage =
-  "https://dreamy.tours/wp-content/uploads/Ruta-1-A-2048x1448.webp";
-
 const selectedLang = Astro.props.lang ?? "es";
 const content =
   machupicchuCircuitsContent[selectedLang] ?? machupicchuCircuitsContent.es;
 const { circuits, routes, ui, compareRows, booking, cta, ctaHref } = content;
+
+const circuitMapImages: Record<string, string> = {
+  circuito1: "/imagenes/circuitos/mapa-del-circuito-uno-machupicchu.webp",
+  circuito2: "/imagenes/circuitos/mapa-circuito-dos-machupicchu.webp",
+  circuito3: "/imagenes/circuitos/mapa-circuito-tres-machupicchu.webp",
+};
+
+const routeMapImages: Record<string, string> = {
+  "ruta-1a": "/imagenes/circuitos/ruta-1-a.webp",
+  "ruta-1b": "/imagenes/circuitos/ruta-1-b.webp",
+  "ruta-1c": "/imagenes/circuitos/ruta-1-c.webp",
+  "ruta-1d": "/imagenes/circuitos/ruta-1-d.webp",
+  "ruta-2a": "/imagenes/circuitos/ruta-2-a.webp",
+  "ruta-2b": "/imagenes/circuitos/ruta-2-b.webp",
+  "ruta-3a": "/imagenes/circuitos/ruta-3-a.webp",
+  "ruta-3b": "/imagenes/circuitos/ruta-3-b.webp",
+  "ruta-3c": "/imagenes/circuitos/ruta-3-c.webp",
+  "ruta-3d": "/imagenes/circuitos/ruta-3-d.webp",
+};
 
 const toneStyles: Record<
   Tone,
@@ -67,8 +84,7 @@ const toneStyles: Record<
     border: "border-t-accent-warm",
     badge: "bg-accent-warm text-accent-warm-foreground",
     text: "text-accent-warm-foreground",
-    soft:
-      "bg-[color-mix(in_oklab,var(--accent-warm)_28%,white)] text-accent-warm-foreground",
+    soft: "bg-[color-mix(in_oklab,var(--accent-warm)_28%,white)] text-accent-warm-foreground",
     header:
       "bg-[linear-gradient(135deg,var(--accent-warm),color-mix(in_oklab,var(--accent-warm)_72%,var(--primary)))] text-accent-warm-foreground",
     button: "bg-[#244237]",
@@ -79,7 +95,7 @@ const toneStyles: Record<
 
 const focusClass =
   "focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-ring";
-const pillButtonClass = `${focusClass} inline-flex cursor-pointer justify-center rounded-full border-0 px-4 py-3 text-sm font-extrabold leading-none text-white no-underline transition hover:-translate-y-0.5 hover:brightness-105`;
+const pillButtonClass = `${focusClass} inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border-0 px-4 py-3 text-sm font-extrabold leading-none text-white no-underline transition hover:-translate-y-0.5 hover:brightness-105`;
 const cardClass =
   "overflow-hidden rounded-lg border border-border bg-white shadow-[0_24px_60px_-42px_color-mix(in_oklab,var(--foreground)_45%,transparent)]";
 
@@ -87,19 +103,21 @@ const dialogs = [
   ...circuits.map((circuit) => ({
     id: circuit.dialogId,
     tone: circuit.tone as Tone,
+    image: circuitMapImages[circuit.id],
     title: `${ui.officialMap} - ${ui.circuit} ${circuit.number} ${circuit.name}`,
     alt: circuit.alt,
     caption: `(c) Dreamy Tours - ${ui.officialMap} - ${ui.circuit} ${circuit.number} ${circuit.name} (${circuit.routes.join(", ")})`,
   })),
   ...routes.map((route) => ({
     id: route.modalId,
-    tone: route.tone as Tone,
+    tone:
+      (circuits.find((circuit) => circuit.id === route.circuitId)?.tone as
+        | Tone
+        | undefined) ?? (route.tone as Tone),
+    image: routeMapImages[route.id],
     title: `${ui.map} - ${route.title}`,
-    alt: `${ui.officialMap} ${route.title}`,
-    caption:
-      route.id === "ruta-1a"
-        ? `(c) Dreamy Tours - ${ui.officialMap} - ${route.title}`
-        : `${ui.replaceImage} - ${route.title}`,
+    alt: `${ui.officialMap} - ${route.title}`,
+    caption: `(c) Dreamy Tours - ${ui.officialMap} - ${route.title}`,
   })),
 ];
 ---
@@ -154,7 +172,7 @@ const dialogs = [
               >
                 <img
                   class="block h-full w-full object-cover transition group-hover:scale-105"
-                  src={mapImage}
+                  src={circuitMapImages[circuit.id]}
                   alt={circuit.alt}
                   width="1024"
                   height="724"
@@ -261,7 +279,7 @@ const dialogs = [
               {routes
                 .filter((route) => route.circuitId === circuit.id)
                 .map((route) => {
-                  const routeTone = toneStyles[route.tone as Tone];
+                  const routeTone = tone;
 
                   return (
                     <article
@@ -289,7 +307,10 @@ const dialogs = [
                           data-mpc-dialog={route.modalId}
                           aria-label={`${ui.viewRouteMap}: ${route.title}`}
                         >
-                          {ui.viewRouteMap}
+                          <span class="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full bg-white/20 ring-1 ring-white/25">
+                            <MapPinned className="h-4 w-4" aria-hidden="true" />
+                          </span>
+                          <span>{ui.viewRouteMap}</span>
                         </button>
                       </header>
 
@@ -339,9 +360,7 @@ const dialogs = [
     >
       {ui.compareTitle}
     </h2>
-    <div
-      class="mt-4 overflow-x-auto rounded-lg border border-border"
-    >
+    <div class="mt-4 overflow-x-auto rounded-lg border border-border">
       <table class="w-full min-w-[760px] border-collapse">
         <caption class="p-4 text-left text-muted-foreground">
           {ui.compareCaption}
@@ -407,9 +426,7 @@ const dialogs = [
         booking.map((item) => (
           <article class={`${cardClass} p-5`}>
             <h3 class="m-0 text-lg font-extrabold">{item.title}</h3>
-            <p class="mt-2 mb-0 leading-7 text-muted-foreground">
-              {item.text}
-            </p>
+            <p class="mt-2 mb-0 leading-7 text-muted-foreground">{item.text}</p>
           </article>
         ))
       }
@@ -464,7 +481,7 @@ const dialogs = [
             <figure class="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] p-4">
               <img
                 class="block h-full max-h-[min(68dvh,620px)] w-full rounded-md bg-muted object-contain max-sm:max-h-[58dvh]"
-                src={mapImage}
+                src={dialog.image}
                 alt={dialog.alt}
                 width="1024"
                 height="724"
