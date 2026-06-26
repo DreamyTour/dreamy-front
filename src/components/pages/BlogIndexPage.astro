@@ -5,6 +5,7 @@ import BlogAside from "@/components/ui/BlogAside.astro";
 import BlogPagination from "@/components/blog/BlogPagination.astro";
 import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
+import { buildBlogIndexSchemas } from "@/lib/pageSchema";
 import type { Blog } from "@/types/blog";
 import type { BlogListProps } from "@/lib/blogRoutes";
 
@@ -52,6 +53,8 @@ const blogSeoByLang: Record<
   },
 };
 const blogSeo = blogSeoByLang[lang];
+const siteUrl = Astro.site?.origin || "https://dreamy.tours";
+const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
 const seoProps = buildSEOProps({
   fallbackTitle:
     page.currentPage > 1
@@ -60,6 +63,14 @@ const seoProps = buildSEOProps({
   fallbackDescription: blogSeo.description,
   type: "website",
   lang,
+  schemas: buildBlogIndexSchemas({
+    canonicalUrl,
+    siteUrl,
+    lang,
+    title: blogSeo.title,
+    description: blogSeo.description,
+    posts: blogsList,
+  }),
 });
 ---
 

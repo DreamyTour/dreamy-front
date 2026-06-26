@@ -6,6 +6,7 @@ import BlogPagination from "@/components/blog/BlogPagination.astro";
 import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
+import { buildBlogCategorySchemas } from "@/lib/pageSchema";
 import { serializeJsonForHtml } from "@/lib/html";
 import type { Blog } from "@/types/blog";
 import type { BlogCategoryProps } from "@/lib/blogRoutes";
@@ -55,6 +56,21 @@ const categorySeoProps = buildSEOProps({
   type: "website",
   lang,
   slugMap,
+  fallbackImage: heroImage || undefined,
+  fallbackImageAlt: currentCategory?.nombre,
+  schemas: buildBlogCategorySchemas({
+    canonicalUrl: `${Astro.site?.origin || "https://dreamy.tours"}${Astro.url.pathname}`,
+    siteUrl: Astro.site?.origin || "https://dreamy.tours",
+    lang,
+    title: currentCategory?.seo?.metaTitle || currentCategory?.nombre || "Blog",
+    description:
+      currentCategory?.seo?.metaDescription ||
+      currentCategory?.descripcion ||
+      "",
+    imageUrl: heroImage || undefined,
+    category: currentCategory,
+    posts: blogsList,
+  }),
 });
 const seoProps =
   page.currentPage > 1

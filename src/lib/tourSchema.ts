@@ -22,6 +22,12 @@ function cleanText(value: unknown): string | undefined {
   return cleanValue || undefined;
 }
 
+function toAbsoluteUrl(url: string | undefined, siteUrl: string): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http")) return url;
+  return `${siteUrl}${url.startsWith("/") ? url : `/${url}`}`;
+}
+
 export function buildTourSchemas({
   tour,
   canonicalUrl,
@@ -32,7 +38,8 @@ export function buildTourSchemas({
 }: BuildTourSchemasOptions): Record<string, unknown>[] {
   const name = cleanText(tour.titulo) || "Dreamy Tours";
   const summary = cleanText(description);
-  const image = imageUrl ? [imageUrl] : undefined;
+  const absoluteImage = toAbsoluteUrl(imageUrl, siteUrl);
+  const image = absoluteImage ? [absoluteImage] : undefined;
   const additionalProperty = tour.badge
     ?.map((badge) => {
       const propertyName = cleanText(badge.titulo);

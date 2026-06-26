@@ -72,11 +72,17 @@ async function loadStrapiPagesByLang() {
     const tours = await fetchAllStrapi<Tour>({
       endpoint: "tours",
       locale: lang,
+      query: {
+        populate: "*",
+      },
     });
 
     const pages = await fetchAllStrapi<Page>({
       endpoint: "pages",
       locale: lang,
+      query: {
+        populate: "*",
+      },
     });
 
     allToursByLang[lang] =

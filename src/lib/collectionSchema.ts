@@ -28,6 +28,12 @@ function normalizeUrl(url: string): string {
   return url.endsWith("/") ? url : `${url}/`;
 }
 
+function toAbsoluteUrl(url: string | undefined, siteUrl: string): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http")) return url;
+  return `${siteUrl}${url.startsWith("/") ? url : `/${url}`}`;
+}
+
 export function buildCollectionSchemas({
   page,
   tours,
@@ -46,6 +52,7 @@ export function buildCollectionSchemas({
       Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
         ? getImageUrl(tour.imagenDestacada[0], "large")
         : undefined;
+    const absoluteImage = toAbsoluteUrl(image, siteUrl);
 
     return {
       "@type": "ListItem",
@@ -56,7 +63,7 @@ export function buildCollectionSchemas({
         "@id": `${tourUrl}#tour`,
         name: cleanText(tour.titulo) || tour.slug,
         url: tourUrl,
-        ...(image ? { image: [image] } : {}),
+        ...(absoluteImage ? { image: [absoluteImage] } : {}),
         provider: {
           "@id": `${siteUrl}/#organization`,
         },

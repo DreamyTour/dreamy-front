@@ -94,17 +94,20 @@ const {
 
 const socialLogos =
   globalData?.footer?.socialLogo || globalData?.socialLogo || [];
+const heroImage = getImageUrl(blog.portadaImage, "large");
+const heroImageAlt = getImageAlt(blog.portadaImage, blog.titulo);
 const seoProps = buildSEOProps({
   seo: blog.seo,
   fallbackTitle: blog.titulo || "Blog",
   fallbackDescription: generateDescription(blog.contenido),
+  fallbackImage: heroImage !== "/og-default.jpg" ? heroImage : undefined,
+  fallbackImageAlt: heroImageAlt,
   type: "article",
   lang,
   publishedTime: blog.publishedAt,
   slugMap,
 });
 const tocHeadings = extractHeadings(blog.contenido);
-const heroImage = getImageUrl(blog.portadaImage, "large");
 const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
   "small",
   "medium",

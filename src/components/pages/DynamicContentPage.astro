@@ -19,6 +19,7 @@ import { serializeJsonForHtml } from "@/lib/html";
 import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 import { buildTourSchemas } from "@/lib/tourSchema";
 import { buildCollectionSchemas } from "@/lib/collectionSchema";
+import { buildFaqPageSchema, buildStaticPageSchemas } from "@/lib/pageSchema";
 
 interface MdxFrontmatter {
   title: string;
@@ -73,6 +74,18 @@ const seoProps =
         type: "website",
         lang,
         slugMap: pageSlugMap,
+        schemas: buildStaticPageSchemas({
+          canonicalUrl,
+          siteUrl,
+          lang,
+          title: mdxFrontmatter.seo?.metaTitle || mdxFrontmatter.title || "Pagina",
+          description:
+            mdxFrontmatter.seo?.metaDescription ||
+            mdxFrontmatter.description ||
+            "",
+          imageUrl: mdxFrontmatter.heroImage,
+          pathname: Astro.url.pathname,
+        }),
       })
     : type === "tour" && tour
       ? (() => {
@@ -111,6 +124,36 @@ const seoProps =
       : type === "page" && page
         ? (() => {
             const pageDescription = generateDescription(page.content);
+            const pageFaqSchema = buildFaqPageSchema({
+              canonicalUrl,
+              questions: page.preguntasAcordeon,
+            });
+            const pageSchemas =
+              toursByCategory.length > 0
+                ? buildCollectionSchemas({
+                    page,
+                    tours: toursByCategory,
+                    canonicalUrl,
+                    siteUrl,
+                    lang,
+                    description: pageDescription,
+                  })
+                : buildStaticPageSchemas({
+                    canonicalUrl,
+                    siteUrl,
+                    lang,
+                    title: page.seo?.metaTitle || page.titulo || "Pagina",
+                    description:
+                      page.seo?.metaDescription || pageDescription || "",
+                    imageUrl: page.seo?.metaImage
+                      ? getImageUrl(page.seo.metaImage, "large")
+                      : undefined,
+                    pathname: Astro.url.pathname,
+                  });
+
+            if (pageFaqSchema) {
+              pageSchemas.push(pageFaqSchema);
+            }
 
             return buildSEOProps({
               seo: page.seo,
@@ -119,17 +162,7 @@ const seoProps =
               type: "website",
               lang,
               slugMap: pageSlugMap,
-              schemas:
-                toursByCategory.length > 0
-                  ? buildCollectionSchemas({
-                      page,
-                      tours: toursByCategory,
-                      canonicalUrl,
-                      siteUrl,
-                      lang,
-                      description: pageDescription,
-                    })
-                  : undefined,
+              schemas: pageSchemas,
             });
           })()
         : undefined;

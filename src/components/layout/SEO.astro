@@ -169,6 +169,24 @@ const organizationSchema = {
   ],
 };
 
+const webPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${canonical}#webpage`,
+  url: canonical,
+  name: title,
+  description,
+  inLanguage: schemaLanguage,
+  isPartOf: {
+    "@id": `${siteUrl}/#website`,
+  },
+  publisher: {
+    "@id": `${siteUrl}/#organization`,
+  },
+  ...(type === "article" ? { mainEntity: { "@id": `${canonical}#article` } } : {}),
+  ...(fullImageUrl ? { image: fullImageUrl } : {}),
+};
+
 // Breadcrumb schema
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -321,6 +339,11 @@ const additionalSchemas = (Array.isArray(schemas) ? schemas : [schemas]).filter(
   is:inline
   type="application/ld+json"
   set:html={serializeJsonForHtml(organizationSchema)}
+/>
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={serializeJsonForHtml(webPageSchema)}
 />
 <script
   is:inline
