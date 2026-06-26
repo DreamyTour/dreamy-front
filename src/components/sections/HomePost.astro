@@ -25,7 +25,7 @@ const posts = await fetchApi<Blog[]>({
   locale: lang,
   query: {
     sort: "publishedAt:desc",
-    "pagination[limit]": data.limit || 6,
+    "pagination[limit]": 5,
     populate: "*",
   },
 });
@@ -41,7 +41,7 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
     >
       <div class="max-w-8xl mx-auto px-6">
         {/* Header */}
-        <header class="mb-14 md:mb-20 max-w-4xl mx-auto text-center">
+        <header class="mb-12 md:mb-16 max-w-4xl mx-auto text-center">
           {data.titulo && (
             <h2
               id="home-posts-title"
@@ -67,10 +67,25 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
           )}
         </header>
 
-        {/* Grid de Posts */}
-        <ul class="grid list-none grid-cols-1 gap-10 p-0 md:grid-cols-2 md:gap-x-8 md:gap-y-16 lg:grid-cols-3">
-          {postsList.map((blog: Blog) => (
-            <li class="min-w-0">
+        {/* ── Editorial grid ──────────────────────────────────────────
+            Mobile  : stacked column
+            Tablet  : 2-col uniform grid
+            Desktop : [  FEATURED (tall left)  ] [ Card 2 (top-right) ]
+                      [ Card 3 ] [ Card 4 ] [ Card 5 ]
+        ────────────────────────────────────────────────────────────── */}
+        <ul class="posts-mosaic list-none p-0 m-0">
+          {postsList.slice(0, 1).map((blog: Blog) => (
+            <li class="posts-mosaic__featured">
+              <CardPost blog={blog} lang={lang} isFeatured={true} showDescription={true} />
+            </li>
+          ))}
+          {postsList.slice(1, 2).map((blog: Blog) => (
+            <li class="posts-mosaic__secondary">
+              <CardPost blog={blog} lang={lang} showDescription={true} />
+            </li>
+          ))}
+          {postsList.slice(2, 5).map((blog: Blog) => (
+            <li class="posts-mosaic__bottom">
               <CardPost blog={blog} lang={lang} />
             </li>
           ))}
@@ -102,3 +117,91 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
     </section>
   )
 }
+
+<style>
+  /* ── Posts mosaic layout ─────────────────────────────────────── */
+  .posts-mosaic {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  /* Every cell is a flex column so h-full propagates into CardPost */
+  .posts-mosaic__featured,
+  .posts-mosaic__secondary,
+  .posts-mosaic__bottom {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Pierce CardPost scope: article must fill the li cell */
+  .posts-mosaic__featured :global(article),
+  .posts-mosaic__secondary :global(article),
+  .posts-mosaic__bottom :global(article) {
+    flex: 1;
+    height: 100%;
+  }
+
+  /* Tablet: 2-col grid — featured spans 2 cols, rest 1 each */
+  @media (min-width: 768px) {
+    .posts-mosaic {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .posts-mosaic__featured {
+      grid-column: 1 / -1;
+    }
+
+    .posts-mosaic__bottom:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* Desktop: editorial mosaic
+     Row 1: [featured tall — col 1-2] [secondary — col 3]
+     Row 2: [card] [card] [card]
+  */
+  @media (min-width: 1024px) {
+    .posts-mosaic {
+      grid-template-columns: repeat(3, 1fr);
+      /* Row 1 height is driven by content; both cells stretch to match */
+      grid-template-rows: auto auto;
+      align-items: stretch;
+    }
+
+    /* Featured: spans 2 columns, row 1 */
+    .posts-mosaic__featured {
+      grid-column: 1 / 3;
+      grid-row: 1;
+    }
+
+    /* Secondary: right column, row 1 — same row height as featured */
+    .posts-mosaic__secondary {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    /* Override CardPost's fixed lg:h-[360px] so the grid row controls height.
+       Specificity of this selector (0-2-1) beats Tailwind class (0-1-0). */
+    .posts-mosaic__featured :global(article > a),
+    .posts-mosaic__secondary :global(article > a) {
+      height: 100%;
+      min-height: 0;
+    }
+
+    /* Bottom 3: each takes 1 col in row 2, equal height */
+    .posts-mosaic__bottom {
+      grid-row: 2;
+    }
+
+    .posts-mosaic__bottom:nth-child(3) { grid-column: 1; }
+    .posts-mosaic__bottom:nth-child(4) { grid-column: 2; }
+    .posts-mosaic__bottom:nth-child(5) { grid-column: 3; }
+
+    /* Pierce CardPost scope for bottom cards — enforce equal height */
+    .posts-mosaic__bottom :global(article > a) {
+      height: 100%;
+    }
+  }
+</style>
+

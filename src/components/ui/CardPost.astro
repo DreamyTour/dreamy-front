@@ -71,7 +71,7 @@ function extractPlainText(value: unknown): string {
 
 const plainContent = extractPlainText(blog.contenido);
 
-const excerptLimit = isFeatured ? 280 : 138;
+const excerptLimit = isFeatured ? 700 : 138;
 const excerpt =
   showDescription && plainContent
     ? plainContent.length > excerptLimit
@@ -207,7 +207,9 @@ const imageHeight = isFeatured
           excerpt && (
             <p class:list={[
               "text-sm leading-6 text-muted-foreground md:text-[0.96rem]",
-              isFeatured ? "line-clamp-4" : "line-clamp-2"
+              isFeatured
+                ? "flex-1 overflow-hidden line-clamp-[12]"
+                : "line-clamp-2"
             ]}>
               {excerpt}
             </p>
