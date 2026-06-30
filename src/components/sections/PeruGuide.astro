@@ -86,19 +86,38 @@ const destinationPagesBySlug = new Map(
 
 // ====== Posiciones de los puntos del mapa ======
 const mapPointConfig = [
-  { id: "lima", slug: "lima", x: "45%", y: "65%" },
+  { id: "lima", slug: "lima", x: "45%", y: "74%" },
   { id: "cusco", slug: "cusco", x: "59%", y: "70%" },
-  { id: "iquitos", slug: "iquitos", x: "55%", y: "25%" },
-  { id: "arequipa", slug: "arequipa", x: "55%", y: "80%" },
-  { id: "puno", slug: "puno", x: "68%", y: "75%" },
-  { id: "ica", slug: "ica", x: "47%", y: "72%" },
+  { id: "iquitos", slug: "iquitos", x: "51%", y: "25%" },
+  { id: "arequipa", slug: "arequipa", x: "62%", y: "85%" },
+  { id: "puno", slug: "puno", x: "79%", y: "80%" },
+  { id: "ica", slug: "ica", x: "53%", y: "82%" },
   {
     id: "puerto-maldonado",
     slug: "puerto-maldonado",
-    x: "68%",
-    y: "67%",
+    x: "71%",
+    y: "64%",
   },
 ];
+
+const destinationIcons: Record<string, string> = {
+  lima:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 20V9l6-4 6 4v11" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20v-6h6v6M9 10h.01M15 10h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  cusco:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18 9.5 7l3.2 6 2.2-3.5L20 18H4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 7 11 18M14.9 9.5 14 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  iquitos:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19c5-1 9-5 10-12 3 2 4 5 4 8 0 3-2 5-5 5H5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 19c4-3 7-6 10-12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  arequipa:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18h16L15 7l-3 5-2-3-6 9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15 7c1.2-.8 2.6-.8 3.8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  puno:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 16c2-2 4-2 6 0s4 2 6 0 3-2 4-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 19c2-1.4 4-1.4 6 0s4 1.4 6 0 2.3-1.2 3-.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 12h8l-2-4h-4l-2 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+  ica:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17c2.5-4 5.5-5.5 9-4.5 2 .6 4.3.5 7-1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6 19c3-2 6-2.2 9-1 1.6.6 3 .6 4.5-.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 8h4l-2 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  "puerto-maldonado":
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 10c-3.5 0-6-1.8-7-5 3.8-.4 6.2 1.1 7 5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 13c3.8-.3 6.1-2.4 7-6-3.9.2-6.2 2.2-7 6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+  default:
+    '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8"/></svg>',
+};
 
 const mapPoints = mapPointConfig
   .map((point) => {
@@ -123,14 +142,14 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
 ---
 
 <section
-  class="w-full overflow-hidden bg-primary/5 py-16 lg:hidden"
+  class="w-full overflow-hidden bg-primary/5 py-12 lg:hidden"
   aria-labelledby="peru-guide-mobile-title"
 >
-  <div class="max-w-8xl mx-auto px-6">
-    <header class="mb-10 max-w-3xl text-left md:mb-12">
+  <div class="max-w-8xl mx-auto px-4">
+    <header class="mb-7 max-w-3xl text-left md:mb-9">
       <h2
         id="peru-guide-mobile-title"
-        class="relative inline-block mb-2 text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl"
+        class="relative inline-block mb-2 text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl md:text-5xl"
       >
         <span class="relative z-10">
           {t.title}
@@ -160,69 +179,74 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
         ></span>
       </span>
 
-      <p class="text-base leading-relaxed text-gray-600">{t.description}</p>
+      <p class="text-sm leading-relaxed text-gray-600 sm:text-base">
+        {t.description}
+      </p>
     </header>
 
-    <ul class="grid list-none grid-cols-1 gap-4 p-0 md:grid-cols-2">
+    <ul class="grid list-none grid-cols-12 gap-[0.35rem] p-0">
       {
         mapPoints.map((point, index) => {
           const pointTitle = point.resolvedTitle;
-          const isFeatured = index === 0;
+          const patternPosition = index % 4;
+          const spanClass =
+            patternPosition === 0 || patternPosition === 3
+              ? "col-span-7"
+              : "col-span-5";
+          const isOddLast =
+            index === mapPoints.length - 1 && mapPoints.length % 2 !== 0;
+          const shouldFillRow = isOddLast;
 
           return (
-            <li class:list={[isFeatured && "md:col-span-2"]}>
+            <li
+              class:list={[
+                shouldFillRow ? "col-span-12" : spanClass,
+              ]}
+            >
               <a
                 href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
                 class:list={[
-                  "group relative overflow-hidden rounded-xl border border-white/80 bg-white shadow-[0_10px_35px_rgb(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/25",
-                  isFeatured ? "block min-h-[210px]" : "flex min-h-[104px] p-2",
+                  "mobile-bento-card group relative block overflow-hidden rounded-[5px] border border-white/80 bg-white shadow-[0_8px_22px_rgb(15,23,42,0.10)] ring-1 ring-black/[0.03] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgb(15,23,42,0.14)]",
+                  "h-[150px] sm:h-[172px]",
                 ]}
                 aria-label={pointTitle}
               >
-                {isFeatured ? (
-                  <article>
-                    <img
-                      src={point.imageUrl}
-                      alt={point.imageAlt}
-                      aria-hidden={point.imageAlt ? undefined : "true"}
-                      class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      width="640"
-                      height="420"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span
-                      class="absolute inset-0 bg-gradient-to-t from-black/78 via-black/30 to-black/5"
-                      aria-hidden="true"
-                    />
-                    <span class="relative z-10 flex h-full min-h-[210px] flex-col justify-end p-5">
-                      <h3 class="text-2xl font-bold leading-tight text-white">
-                        {pointTitle}
-                      </h3>
-                    </span>
-                  </article>
-                ) : (
-                  <>
-                    <span class="relative w-[88px] shrink-0 overflow-hidden rounded-lg">
-                      <img
-                        src={point.imageUrl}
-                        alt={point.imageAlt}
-                        aria-hidden={point.imageAlt ? undefined : "true"}
-                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        width="96"
-                        height="124"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </span>
-
-                    <article class="flex min-w-0 flex-1 flex-col justify-center px-3 py-2 sm:px-4">
-                      <h3 class="line-clamp-2 text-[1rem] font-bold leading-tight text-gray-950 transition-colors duration-300 group-hover:text-secondary">
-                        {pointTitle}
-                      </h3>
-                    </article>
-                  </>
-                )}
+                <img
+                  src={point.imageUrl}
+                  alt={point.imageAlt}
+                  aria-hidden={point.imageAlt ? undefined : "true"}
+                  class="bento-card-image absolute inset-0 h-full w-full object-cover transition-[filter] duration-300"
+                  width={shouldFillRow ? "640" : "320"}
+                  height="360"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span
+                  class:list={[
+                    "absolute inset-0 bg-gradient-to-t from-black/68 via-black/14 to-transparent",
+                  ]}
+                  aria-hidden="true"
+                />
+                <article
+                  class:list={[
+                    "relative z-10 flex h-full flex-col items-center justify-center text-center",
+                    shouldFillRow ? "p-4" : "p-2.5",
+                  ]}
+                >
+                  <span
+                    class="mobile-bento-icon grid size-10 place-items-center text-white/92 transition-transform duration-300 sm:size-11"
+                    aria-hidden="true"
+                    set:html={destinationIcons[point.id] ?? destinationIcons.default}
+                  />
+                  <h3
+                    class:list={[
+                      "mt-2.5 line-clamp-2 font-semibold leading-tight text-white drop-shadow-[0_1px_8px_rgb(0,0,0,0.55)]",
+                      shouldFillRow ? "text-lg" : "text-[0.78rem] sm:text-[0.95rem]",
+                    ]}
+                  >
+                    {pointTitle}
+                  </h3>
+                </article>
               </a>
             </li>
           );
@@ -298,20 +322,29 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                     <li>
                       <a
                         href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
-                        class="guide-card group block rounded-xl border border-border/80 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
+                        class="guide-card mobile-bento-card desktop-guide-card group relative block h-[104px] overflow-hidden rounded-[5px] border border-white/80 bg-white shadow-[0_8px_22px_rgb(15,23,42,0.10)] ring-1 ring-black/[0.03] transition-shadow duration-300 hover:shadow-[0_12px_28px_rgb(15,23,42,0.14)] focus:outline-none"
                         aria-label={pointTitle}
                         data-point-trigger={point.id}
                       >
-                        <article class="flex w-full flex-col gap-2">
-                          <img
-                            src={point.imageUrl}
-                            alt={point.imageAlt}
-                            aria-hidden={point.imageAlt ? undefined : "true"}
-                            class="h-16 w-full rounded-lg object-cover"
-                            loading="lazy"
-                            decoding="async"
+                        <img
+                          src={point.imageUrl}
+                          alt={point.imageAlt}
+                          aria-hidden={point.imageAlt ? undefined : "true"}
+                          class="bento-card-image absolute inset-0 h-full w-full object-cover transition-[filter] duration-300"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <span
+                          class="desktop-card-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-black/18 to-transparent"
+                          aria-hidden="true"
+                        />
+                        <article class="desktop-card-content relative z-10 flex h-full flex-col items-center justify-center p-2 text-center text-white">
+                          <span
+                            class="mobile-bento-icon grid size-9 place-items-center text-white/92 transition-transform duration-300"
+                            aria-hidden="true"
+                            set:html={destinationIcons[point.id] ?? destinationIcons.default}
                           />
-                          <h4 class="line-clamp-2 text-[0.8rem] font-semibold leading-tight text-foreground transition-colors duration-300 group-hover:text-secondary">
+                          <h4 class="mt-2 line-clamp-2 text-[0.76rem] font-semibold leading-tight drop-shadow-[0_1px_8px_rgb(0,0,0,0.55)]">
                             {pointTitle}
                           </h4>
                         </article>
@@ -327,7 +360,7 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
             >
               <!-- Map SVG -->
               <div
-                class="absolute inset-0 flex items-center justify-center p-8 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30"
+                class="absolute inset-0 flex items-center justify-center p-2 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30"
                 aria-hidden="true"
                 set:html={mapSvg}
               />
@@ -367,20 +400,29 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                     <li>
                       <a
                         href={rewriteUrl(`/${point.resolvedSlug}`, lang)}
-                        class="guide-card group block rounded-xl border border-border/80 bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-lg focus:outline-none"
+                        class="guide-card mobile-bento-card desktop-guide-card group relative block h-[104px] overflow-hidden rounded-[5px] border border-white/80 bg-white shadow-[0_8px_22px_rgb(15,23,42,0.10)] ring-1 ring-black/[0.03] transition-shadow duration-300 hover:shadow-[0_12px_28px_rgb(15,23,42,0.14)] focus:outline-none"
                         aria-label={pointTitle}
                         data-point-trigger={point.id}
                       >
-                        <article class="flex w-full flex-col gap-2">
-                          <img
-                            src={point.imageUrl}
-                            alt={point.imageAlt}
-                            aria-hidden={point.imageAlt ? undefined : "true"}
-                            class="h-16 w-full rounded-lg object-cover"
-                            loading="lazy"
-                            decoding="async"
+                        <img
+                          src={point.imageUrl}
+                          alt={point.imageAlt}
+                          aria-hidden={point.imageAlt ? undefined : "true"}
+                          class="bento-card-image absolute inset-0 h-full w-full object-cover transition-[filter] duration-300"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <span
+                          class="desktop-card-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-black/18 to-transparent"
+                          aria-hidden="true"
+                        />
+                        <article class="desktop-card-content relative z-10 flex h-full flex-col items-center justify-center p-2 text-center text-white">
+                          <span
+                            class="mobile-bento-icon grid size-9 place-items-center text-white/92 transition-transform duration-300"
+                            aria-hidden="true"
+                            set:html={destinationIcons[point.id] ?? destinationIcons.default}
                           />
-                          <h4 class="line-clamp-2 text-[0.8rem] font-semibold leading-tight text-foreground transition-colors duration-300 group-hover:text-secondary">
+                          <h4 class="mt-2 line-clamp-2 text-[0.76rem] font-semibold leading-tight drop-shadow-[0_1px_8px_rgb(0,0,0,0.55)]">
                             {pointTitle}
                           </h4>
                         </article>
@@ -485,15 +527,110 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
     color: var(--secondary);
   }
 
-  /* WCAG 2.5.5 – minimum 44×44px touch target.
-     The visible dot is 16px; we use a transparent hit-area that fills
-     the required size while keeping the visual unchanged. */
+  .guide-card.mobile-bento-card.is-active h4 {
+    color: white;
+  }
+
+  .guide-card.desktop-guide-card.is-active {
+    transform: none;
+  }
+
+  .desktop-guide-card .desktop-card-overlay {
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+
+  .desktop-guide-card .desktop-card-content {
+    opacity: 0;
+    transform: translateY(0.35rem);
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease;
+  }
+
+  .desktop-guide-card:hover .desktop-card-overlay,
+  .desktop-guide-card:focus-visible .desktop-card-overlay,
+  .desktop-guide-card.is-active .desktop-card-overlay,
+  .desktop-guide-card:hover .desktop-card-content,
+  .desktop-guide-card:focus-visible .desktop-card-content,
+  .desktop-guide-card.is-active .desktop-card-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mobile-bento-card:hover .bento-card-image,
+  .mobile-bento-card:focus-visible .bento-card-image,
+  .mobile-bento-card.is-active .bento-card-image {
+    filter: saturate(0.98) brightness(0.9);
+  }
+
+  .mobile-bento-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    border: 1px solid rgb(255 255 255 / 0.28);
+    border-radius: 5px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16);
+    pointer-events: none;
+  }
+
+  .mobile-bento-icon {
+    position: relative;
+    z-index: 0;
+    line-height: 0;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--primary) 46%, white 28%);
+    background:
+      linear-gradient(
+        145deg,
+        color-mix(in oklab, var(--primary) 88%, white 10%),
+        color-mix(in oklab, var(--primary) 82%, black 12%)
+      );
+    box-shadow:
+      0 10px 22px color-mix(in oklab, var(--primary) 32%, transparent),
+      0 0 0 5px color-mix(in oklab, var(--primary) 12%, transparent),
+      inset 0 1px 0 rgb(255 255 255 / 0.22);
+    transform: translateY(0);
+  }
+
+  .mobile-bento-icon::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    z-index: -1;
+    border-radius: inherit;
+    border: 1px solid color-mix(in oklab, var(--primary) 18%, transparent);
+    opacity: 0.8;
+  }
+
+  .mobile-bento-icon svg {
+    display: block;
+    width: 1.14rem;
+    height: 1.14rem;
+  }
+
+  .mobile-bento-card:hover .mobile-bento-icon {
+    box-shadow:
+      0 12px 26px color-mix(in oklab, var(--primary) 38%, transparent),
+      0 0 0 6px color-mix(in oklab, var(--primary) 14%, transparent),
+      inset 0 1px 0 rgb(255 255 255 / 0.28);
+    transform: translateY(-1px);
+  }
+
   .map-point {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  @media (pointer: coarse) {
+    .map-point {
+      min-width: 40px;
+      min-height: 40px;
+    }
   }
 
   .map-point.is-active {
