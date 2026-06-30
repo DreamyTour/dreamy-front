@@ -239,10 +239,7 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
                     set:html={destinationIcons[point.id] ?? destinationIcons.default}
                   />
                   <h3
-                    class:list={[
-                      "mt-2.5 line-clamp-2 font-semibold leading-tight text-white drop-shadow-[0_1px_8px_rgb(0,0,0,0.55)]",
-                      shouldFillRow ? "text-lg" : "text-[0.78rem] sm:text-[0.95rem]",
-                    ]}
+                    class="mt-2.5 line-clamp-2 text-[0.78rem] font-semibold leading-tight text-white drop-shadow-[0_1px_8px_rgb(0,0,0,0.55)] sm:text-[0.95rem]"
                   >
                     {pointTitle}
                   </h3>
