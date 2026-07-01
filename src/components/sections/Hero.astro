@@ -2,7 +2,7 @@
 import Button from "@/components/ui/button.astro";
 import type { Hero } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
-import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { getImageUrl } from "@/lib/helpers";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 import { rewriteUrl } from "@/lib/utils";
 
@@ -15,7 +15,6 @@ const { data, lang } = Astro.props;
 if (!data) return;
 
 const videoUrl = getImageUrl(data.backgroundVideo);
-const badgeIconUrl = getImageUrl(data.badgeIcon);
 
 function getButtonUrl(btnUrl: string, btnLabel: string) {
   const urlLower = (btnUrl || "").toLowerCase();
@@ -82,19 +81,18 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
           fetchpriority="high"
         />
         <video
-          class="absolute inset-0 hidden h-full w-full object-cover md:block"
+          class="hero-video absolute inset-0 hidden h-full w-full object-cover md:block"
           width={backgroundImageMobile.width}
           height={backgroundImageMobile.height}
           autoplay
           muted
           loop
           playsinline
-          preload="metadata"
+          preload="none"
           poster={backgroundImageMobile.src}
+          data-src={videoUrl}
           aria-hidden="true"
-        >
-          <source src={videoUrl} type="video/mp4" media="(min-width: 768px)" />
-        </video>
+        />
       </>
     ) : (
       <img
@@ -151,6 +149,53 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
     }
   </header>
 </section>
+
+<script>
+  const loadHeroVideo = () => {
+    const video = document.querySelector(".hero-video");
+    if (!(video instanceof HTMLVideoElement) || video.dataset.loaded === "true") {
+      return;
+    }
+
+    const sourceUrl = video.dataset.src;
+    const shouldLoadVideo = window.matchMedia("(min-width: 768px)").matches;
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    const saveData = connection?.saveData === true;
+
+    if (!sourceUrl || !shouldLoadVideo || saveData) {
+      return;
+    }
+
+    const source = document.createElement("source");
+    source.src = sourceUrl;
+    source.type = "video/mp4";
+    video.append(source);
+    video.dataset.loaded = "true";
+    video.load();
+    video.play().catch(() => {});
+  };
+
+  const scheduleHeroVideo = () => {
+    const requestIdleCallback =
+      "requestIdleCallback" in window
+        ? (window.requestIdleCallback as (
+            callback: IdleRequestCallback,
+            options?: IdleRequestOptions,
+          ) => number)
+        : undefined;
+
+    if (requestIdleCallback) {
+      requestIdleCallback(loadHeroVideo, { timeout: 1600 });
+      return;
+    }
+
+    window.setTimeout(loadHeroVideo, 900);
+  };
+
+  scheduleHeroVideo();
+</script>
 
 <style>
   .hero-section::before,
