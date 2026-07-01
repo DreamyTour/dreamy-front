@@ -1,6 +1,7 @@
 "use client";
 
-import { type ChangeEvent, useState } from "react";
+import { CalendarDays } from "lucide-react";
+import { type ChangeEvent, useRef, useState } from "react";
 import { countries } from "@/data/countries";
 
 interface CountryOption {
@@ -121,6 +122,11 @@ export default function PlaneaTuViaje({
 	lang?: "es" | "en" | "pt";
 }) {
 	const t = i18n[lang] || i18n.es;
+	const dateInputRef = useRef<HTMLInputElement>(null);
+	const today = new Date();
+	const todayDateValue = `${today.getFullYear()}-${String(
+		today.getMonth() + 1,
+	).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
 	// Cargar lista de países según idioma (idealmente traduciríamos country name pero usamos nameES por ahora)
 	const paises: CountryOption[] = [
@@ -167,6 +173,18 @@ export default function PlaneaTuViaje({
 	) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
+	};
+
+	const openDatePicker = () => {
+		const dateInput = dateInputRef.current;
+
+		if (!dateInput) return;
+
+		try {
+			dateInput.showPicker();
+		} catch {
+			dateInput.focus();
+		}
 	};
 
 	const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -425,15 +443,28 @@ export default function PlaneaTuViaje({
 						>
 							{t.date}
 						</label>
-						<input
-							id="fechaViaje"
-							type="date"
-							name="fechaViaje"
-							value={formData.fechaViaje}
-							onChange={handleChange}
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
-						/>
+						<div className="relative">
+							<input
+								ref={dateInputRef}
+								id="fechaViaje"
+								type="date"
+								name="fechaViaje"
+								value={formData.fechaViaje}
+								onChange={handleChange}
+								onClick={openDatePicker}
+								min={todayDateValue}
+								style={inputStyle}
+								className="w-full cursor-pointer rounded-sm border border-border px-4 py-3 pr-12 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+							/>
+							<button
+								type="button"
+								onClick={openDatePicker}
+								aria-label={t.date}
+								className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-sm text-primary transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+							>
+								<CalendarDays className="h-5 w-5" aria-hidden="true" />
+							</button>
+						</div>
 					</div>
 
 					<div>
