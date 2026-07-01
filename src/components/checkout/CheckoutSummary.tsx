@@ -49,6 +49,10 @@ export default function CheckoutSummary({
 	const [error, setError] = useState<string | null>(null);
 	const errorRef = useRef<HTMLDivElement>(null);
 	const firstPassengerNameRef = useRef<HTMLInputElement>(null);
+	const today = new Date();
+	const todayDateValue = `${today.getFullYear()}-${String(
+		today.getMonth() + 1,
+	).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
 	// states for Passenger Step
 	const [passengers, setPassengers] = useState<Passenger[]>([]);
@@ -167,6 +171,16 @@ export default function CheckoutSummary({
 		const newPax = [...passengers];
 		newPax[index] = { ...newPax[index], [field]: value };
 		setPassengers(newPax);
+	};
+
+	const openDatePicker = (dateInput: HTMLInputElement | null) => {
+		if (!dateInput) return;
+
+		try {
+			dateInput.showPicker();
+		} catch {
+			dateInput.focus();
+		}
 	};
 
 	const validateStep2 = () => {
@@ -573,17 +587,36 @@ export default function CheckoutSummary({
 										</label>
 										<label className="flex flex-col gap-1">
 											<span className={labelClass}>Date of Birth *</span>
-											<input
-												type="date"
-												name={`passenger-${i + 1}-birthdate`}
-												autoComplete="bday"
-												required
-												value={pax.dob}
-												onChange={(e) =>
-													handlePassengerChange(i, "dob", e.target.value)
-												}
-												className={fieldClass}
-											/>
+											<div className="relative">
+												<input
+													id={`passenger-${i + 1}-birthdate`}
+													type="date"
+													name={`passenger-${i + 1}-birthdate`}
+													autoComplete="bday"
+													required
+													value={pax.dob}
+													onChange={(e) =>
+														handlePassengerChange(i, "dob", e.target.value)
+													}
+													onClick={(e) => openDatePicker(e.currentTarget)}
+													max={todayDateValue}
+													className={`${fieldClass} w-full cursor-pointer pr-12`}
+												/>
+												<button
+													type="button"
+													onClick={() =>
+														openDatePicker(
+															document.getElementById(
+																`passenger-${i + 1}-birthdate`,
+															) as HTMLInputElement | null,
+														)
+													}
+													aria-label="Open date of birth calendar"
+													className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-sm text-[#1f6c43] transition-colors hover:bg-[#1f6c43]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6c43]/25"
+												>
+													<Calendar className="h-5 w-5" aria-hidden="true" />
+												</button>
+											</div>
 										</label>
 										<label className="flex flex-col gap-1">
 											<span className={labelClass}>Document Type *</span>

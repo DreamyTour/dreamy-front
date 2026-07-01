@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { countries } from "../../data/countries";
 import { escapeHtml } from "../../lib/html";
 import {
 	getDreamyRecipients,
@@ -71,6 +72,16 @@ function getPaymentAmount({
 	const subtotal = amountToPayLabel === "total" ? totalPrice : totalPrice / 2;
 
 	return subtotal + subtotal * PAYPAL_FEE_RATE;
+}
+
+function getCountryName(countryCode?: string) {
+	const normalizedCode = countryCode?.trim().toUpperCase();
+	const country = countries.find(
+		(country) =>
+			country.iso2 === normalizedCode || country.iso3 === normalizedCode,
+	);
+
+	return country?.nameES || countryCode || "";
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -163,59 +174,116 @@ export const POST: APIRoute = async ({ request }) => {
 			phoneCode: escapeHtml(contactInfo.phoneCode),
 			phone: escapeHtml(contactInfo.phone),
 		};
+		const emailTitle = `${safeCart.tourName} - Dreamy Tours`;
+		const tableLabelStyle =
+			"padding: 8px; border: 1px solid #e5e7eb; background-color: #f9fafb; font-weight: bold;";
+		const tableValueStyle = "padding: 8px; border: 1px solid #e5e7eb;";
+		const passengerTables = passengers
+			.map((p: CheckoutPassenger, i: number) => {
+				const passenger = {
+					name: escapeHtml(p.name),
+					lastname: escapeHtml(p.lastname),
+					gender: escapeHtml(p.gender),
+					dob: escapeHtml(p.dob),
+					country: escapeHtml(getCountryName(p.country)),
+					documentType: escapeHtml(p.documentType),
+					documentNumber: escapeHtml(p.documentNumber),
+				};
+
+				return `
+          <h3 style="color: #374151; margin: 20px 0 8px;">PASAJERO ${i + 1}</h3>
+          <table style="width: 100%; border-collapse: collapse; margin: 0 0 15px;">
+            <tr>
+              <td style="${tableLabelStyle}">Nombre Completo:</td>
+              <td style="${tableValueStyle}">${passenger.name} ${passenger.lastname}</td>
+            </tr>
+            <tr>
+              <td style="${tableLabelStyle}">Genero:</td>
+              <td style="${tableValueStyle}">${passenger.gender}</td>
+            </tr>
+            <tr>
+              <td style="${tableLabelStyle}">Fecha de Nacimiento:</td>
+              <td style="${tableValueStyle}">${passenger.dob}</td>
+            </tr>
+            <tr>
+              <td style="${tableLabelStyle}">Pais Emisor:</td>
+              <td style="${tableValueStyle}">${passenger.country}</td>
+            </tr>
+            <tr>
+              <td style="${tableLabelStyle}">${passenger.documentType}:</td>
+              <td style="${tableValueStyle}">${passenger.documentNumber}</td>
+            </tr>
+          </table>
+        `;
+			})
+			.join("");
 
 		if (resend && contactInfo.email) {
 			const { data: emailData, error: resendError } = await resend.emails.send({
 				from: getDreamySender(),
 				to: getDreamyRecipients(),
-				subject: `Reserva Confirmada: ${cart.tourName}`,
+				subject: `Reserva: ${cart.tourName} - Dreamy Tours`,
 				replyTo: contactInfo.email,
 				html: `
-             <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-               <h2>Detalles de la Reserva</h2>
-               <p><strong>Tour:</strong> ${safeCart.tourName}</p>
-               <p><strong>Fecha de Viaje:</strong> ${safeCart.date}</p>
-               <p><strong>Cantidad de Pasajeros:</strong> ${safeCart.passengers}</p>
+          <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; color: #333; line-height: 1.6;">
+            <h1 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">
+              ${emailTitle}
+            </h1>
 
-               <h3>Detalles de Pago</h3>
-               <p><strong>Monto Pagado a traves de PayPal:</strong> US$${safeCart.amountPaid}
-                 <em>(${safeCart.amountToPayLabel})</em>
-               </p>
-               <p><strong>Precio Total Original:</strong> US$${safeCart.totalPrice}</p>
+            <h2 style="color: #374151; margin-top: 20px;">DETALLES DE LA RESERVA</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <tr>
+                <td style="${tableLabelStyle}">Tour:</td>
+                <td style="${tableValueStyle}">${safeCart.tourName}</td>
+              </tr>
+              <tr>
+                <td style="${tableLabelStyle}">Fecha de Viaje:</td>
+                <td style="${tableValueStyle}">${safeCart.date}</td>
+              </tr>
+              <tr>
+                <td style="${tableLabelStyle}">Cantidad de Pasajeros:</td>
+                <td style="${tableValueStyle}">${safeCart.passengers}</td>
+              </tr>
+            </table>
 
-               <h3>Datos de Contacto Principales</h3>
-               <ul style="list-style: none; padding: 0;">
-                  <li><strong>Nombre Completo:</strong> ${safeContact.firstname} ${safeContact.lastname}</li>
-                  <li><strong>Correo Electronico:</strong> ${safeContact.email}</li>
-                  <li><strong>Telefono / WhatsApp:</strong> ${safeContact.phoneCode} ${safeContact.phone}</li>
-               </ul>
+            <h2 style="color: #374151; margin-top: 20px;">DETALLES DE PAGO</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <tr>
+                <td style="${tableLabelStyle}">Monto Pagado por PayPal:</td>
+                <td style="${tableValueStyle}">US$${safeCart.amountPaid} <em>(${safeCart.amountToPayLabel})</em></td>
+              </tr>
+              <tr>
+                <td style="${tableLabelStyle}">Precio Total Original:</td>
+                <td style="${tableValueStyle}">US$${safeCart.totalPrice}</td>
+              </tr>
+            </table>
 
-               <h3>Informacion de los Pasajeros (Travelers)</h3>
-               <ul>
-                 ${passengers
-										.map((p: CheckoutPassenger, i: number) => {
-											const passenger = {
-												name: escapeHtml(p.name),
-												lastname: escapeHtml(p.lastname),
-												gender: escapeHtml(p.gender),
-												dob: escapeHtml(p.dob),
-												country: escapeHtml(p.country),
-												documentType: escapeHtml(p.documentType),
-												documentNumber: escapeHtml(p.documentNumber),
-											};
+            <h2 style="color: #374151; margin-top: 20px;">DATOS DE CONTACTO</h2>
+            <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+              <tr>
+                <td style="${tableLabelStyle}">Nombre Completo:</td>
+                <td style="${tableValueStyle}">${safeContact.firstname} ${safeContact.lastname}</td>
+              </tr>
+              <tr>
+                <td style="${tableLabelStyle}">Correo Electronico:</td>
+                <td style="${tableValueStyle}">${safeContact.email}</td>
+              </tr>
+              <tr>
+                <td style="${tableLabelStyle}">Telefono / WhatsApp:</td>
+                <td style="${tableValueStyle}">${safeContact.phoneCode} ${safeContact.phone}</td>
+              </tr>
+            </table>
 
-											return `<li style="margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 6px;">
-                      <strong style="color: #6d28d9;">Pasajero ${i + 1}:</strong> ${passenger.name} ${passenger.lastname}<br/>
-                      <strong>Genero:</strong> ${passenger.gender} |
-                      <strong>Fecha de Nacimiento:</strong> ${passenger.dob} |
-                      <strong>Pais Emisor:</strong> ${passenger.country}<br/>
-                      <strong>${passenger.documentType}:</strong> ${passenger.documentNumber}
-                   </li>`;
-										})
-										.join("")}
-               </ul>
-             </div>
-           `,
+            <h2 style="color: #374151; margin-top: 20px;">DATOS DE PASAJEROS</h2>
+            ${passengerTables}
+
+            <div style="margin-top: 20px; padding: 15px; background-color: #eff6ff; border-radius: 8px;">
+              <p style="margin: 0; color: #6b7280; font-size: 12px;">
+                Este mensaje fue enviado desde el checkout de Dreamy Tours
+              </p>
+            </div>
+          </div>
+        `,
 			});
 
 			if (resendError) {
