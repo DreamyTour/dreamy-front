@@ -136,11 +136,14 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         class="block text-sm font-semibold text-gray-700 mb-1.5"
       >
         País
+        <span class="text-red-500" aria-hidden="true">*</span>
+        <span class="sr-only">(requerido)</span>
       </label>
       <select
         id="contact-country"
         name="pais"
         autocomplete="country-name"
+        required
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
       >
         <option value="">Selecciona tu país</option>

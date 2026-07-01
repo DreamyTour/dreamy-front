@@ -60,12 +60,16 @@ Crea o actualiza el archivo `.env` en la raiz del proyecto.
 ```env
 VITE_STRAPI_URL=
 RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+RESEND_TO_EMAIL=
 ```
 
 Variables usadas:
 
 - `VITE_STRAPI_URL`: URL base del CMS Strapi. Es obligatoria para cargar home, tours, blog, menus, footer y datos globales.
 - `RESEND_API_KEY`: API key opcional para enviar correos reales desde los formularios. Si no existe, algunos endpoints funcionan en modo simulacion.
+- `RESEND_FROM_EMAIL`: remitente verificado en Resend. Por defecto usa `Dreamy Tours <info@dreamy.tours>`.
+- `RESEND_TO_EMAIL`: destinatario(s) de formularios separados por coma. Por defecto usa `info@dreamy.tours`.
 
 No subas valores privados de produccion al repositorio.
 

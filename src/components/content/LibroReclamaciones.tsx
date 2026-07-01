@@ -21,6 +21,7 @@ export default function LibroReclamaciones() {
 	const [formData, setFormData] = useState({
 		nombres: "",
 		pais: "",
+		ciudad: "",
 		documento: "",
 		email: "",
 		telefono: "",
@@ -69,6 +70,7 @@ export default function LibroReclamaciones() {
 				setFormData({
 					nombres: "",
 					pais: "",
+					ciudad: "",
 					documento: "",
 					email: "",
 					telefono: "",
@@ -186,6 +188,29 @@ export default function LibroReclamaciones() {
 								</option>
 							))}
 						</select>
+					</div>
+
+					<div>
+						<label
+							htmlFor="lr-ciudad"
+							className="block text-sm font-medium mb-2"
+							style={{ color: colors.foreground }}
+						>
+							Ciudad <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="lr-ciudad"
+							type="text"
+							name="ciudad"
+							value={formData.ciudad}
+							onChange={handleChange}
+							autoComplete="address-level2"
+							enterKeyHint="next"
+							required
+							style={inputStyle}
+							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							placeholder="Ingrese su ciudad"
+						/>
 					</div>
 
 					<div>

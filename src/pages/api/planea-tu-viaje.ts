@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { escapeHtml } from "../../lib/html";
+import { isResendConfigured, sendDreamyEmail } from "../../lib/resend";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -52,9 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
-		const apiKey = import.meta.env.RESEND_API_KEY;
-
-		if (!apiKey) {
+		if (!isResendConfigured()) {
 			console.log("Email simulation: RESEND_API_KEY is not configured", {
 				form: "planea-tu-viaje",
 				hasPhone: Boolean(telefono),
@@ -73,8 +72,6 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
-		const { Resend } = await import("resend");
-		const resend = new Resend(apiKey);
 		const safe = {
 			nombres: escapeHtml(nombres),
 			pais: escapeHtml(pais),
@@ -172,9 +169,7 @@ export const POST: APIRoute = async ({ request }) => {
       </div>
     `;
 
-		const { data, error } = await resend.emails.send({
-			from: "Dreamy Tours <onboarding@resend.dev>",
-			to: ["info@dreamy.tours"],
+		const { data, error } = await sendDreamyEmail({
 			replyTo: emailValue,
 			subject: tourName
 				? `Solicitud de tour: ${String(tourName)} - ${String(nombres)}`

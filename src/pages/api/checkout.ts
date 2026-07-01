@@ -1,5 +1,10 @@
 import type { APIRoute } from "astro";
 import { escapeHtml } from "../../lib/html";
+import {
+	getDreamyRecipients,
+	getDreamySender,
+	getResendClient,
+} from "../../lib/resend";
 
 export const prerender = false;
 
@@ -69,18 +74,7 @@ function getPaymentAmount({
 }
 
 export const POST: APIRoute = async ({ request }) => {
-	let resend = null;
-	const resendApiKey =
-		import.meta.env.RESEND_API_KEY || process.env.RESEND_API_KEY;
-
-	if (resendApiKey) {
-		try {
-			const { Resend } = await import("resend");
-			resend = new Resend(resendApiKey);
-		} catch (e) {
-			console.error("Failed to load Resend:", e);
-		}
-	}
+	const resend = getResendClient();
 
 	try {
 		const contentType = request.headers.get("content-type") || "";
@@ -172,8 +166,8 @@ export const POST: APIRoute = async ({ request }) => {
 
 		if (resend && contactInfo.email) {
 			const { data: emailData, error: resendError } = await resend.emails.send({
-				from: "Reservas Dreamy Tours <info@dreamy.tours>",
-				to: ["info@dreamy.tours"],
+				from: getDreamySender(),
+				to: getDreamyRecipients(),
 				subject: `Reserva Confirmada: ${cart.tourName}`,
 				replyTo: contactInfo.email,
 				html: `
