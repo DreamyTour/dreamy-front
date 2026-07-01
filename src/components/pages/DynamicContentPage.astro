@@ -297,7 +297,7 @@ const MdxContent = mdxComponent?.default;
                 <BookingFormFallback slot="fallback" />
               </BookingFormIsland>
             ) : (
-              <ContactForm tourName={tour.titulo} />
+              <ContactForm tourName={tour.titulo} lang={lang} />
             )}
           </TourTabs>
         </section>

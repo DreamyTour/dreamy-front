@@ -3,18 +3,100 @@ import { countriesWithPhoneCode } from "@/data/countries";
 
 interface Props {
   tourName?: string;
+  lang?: "es" | "en" | "pt";
 }
 
-const { tourName } = Astro.props;
+const { tourName, lang = "es" } = Astro.props;
+
+const contactCopy = {
+  es: {
+    title: "Reserva tu aventura",
+    whatsapp: "WhatsApp Directo",
+    divider: "o por correo",
+    name: "Tu nombre",
+    namePlaceholder: "Ingresa tu nombre completo",
+    email: "Correo electrónico",
+    emailPlaceholder: "tu@email.com",
+    country: "País",
+    countryPlaceholder: "Selecciona tu país",
+    otherCountry: "Otro",
+    whatsappLabel: "WhatsApp",
+    message: "Mensaje",
+    messagePlaceholder:
+      "¿En qué fechas te gustaría reservar? ¿Cuántas personas?",
+    required: "(requerido)",
+    submit: "Enviar solicitud",
+    submitting: "Enviando...",
+    success: "Formulario enviado correctamente. Te contactaremos pronto.",
+    error:
+      "No se pudo enviar el formulario. Inténtalo nuevamente o escríbenos por WhatsApp.",
+    genericError: "No se pudo enviar el formulario.",
+  },
+  en: {
+    title: "Book your adventure",
+    whatsapp: "Direct WhatsApp",
+    divider: "or by email",
+    name: "Your name",
+    namePlaceholder: "Enter your full name",
+    email: "Email address",
+    emailPlaceholder: "you@email.com",
+    country: "Country",
+    countryPlaceholder: "Select your country",
+    otherCountry: "Other",
+    whatsappLabel: "WhatsApp",
+    message: "Message",
+    messagePlaceholder:
+      "Which dates would you like to book? How many people?",
+    required: "(required)",
+    submit: "Send request",
+    submitting: "Sending...",
+    success: "Form sent successfully. We will contact you soon.",
+    error:
+      "The form could not be sent. Please try again or message us on WhatsApp.",
+    genericError: "The form could not be sent.",
+  },
+  pt: {
+    title: "Reserve sua aventura",
+    whatsapp: "WhatsApp direto",
+    divider: "ou por e-mail",
+    name: "Seu nome",
+    namePlaceholder: "Digite seu nome completo",
+    email: "E-mail",
+    emailPlaceholder: "voce@email.com",
+    country: "País",
+    countryPlaceholder: "Selecione seu país",
+    otherCountry: "Outro",
+    whatsappLabel: "WhatsApp",
+    message: "Mensagem",
+    messagePlaceholder:
+      "Em quais datas gostaria de reservar? Quantas pessoas?",
+    required: "(obrigatório)",
+    submit: "Enviar solicitação",
+    submitting: "Enviando...",
+    success: "Formulario enviado corretamente. Entraremos em contato em breve.",
+    error:
+      "Não foi possível enviar o formulário. Tente novamente ou escreva pelo WhatsApp.",
+    genericError: "Não foi possível enviar o formulário.",
+  },
+} as const;
+
+const copy = contactCopy[lang] ?? contactCopy.es;
 
 // Prepare countries sorted by name, filter out empty phone codes
 const countries = [...countriesWithPhoneCode].sort((a, b) =>
-  a.nameES.localeCompare(b.nameES),
+  (lang === "en" ? a.nameEN : a.nameES).localeCompare(
+    lang === "en" ? b.nameEN : b.nameES,
+  ),
 );
 ---
 
 <section
   data-contact-form-root
+  data-submit-label={copy.submit}
+  data-submitting-label={copy.submitting}
+  data-success-message={copy.success}
+  data-error-message={copy.error}
+  data-generic-error-message={copy.genericError}
   aria-labelledby="contact-form-title"
   class="bg-white rounded-sm p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 flex flex-col relative overflow-hidden"
 >
@@ -27,7 +109,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
     <span
       id="contact-form-title"
       class="text-secondary font-bold tracking-wider uppercase text-xs inline-block mb-1"
-      >Reserva tu aventura</span
+      >{copy.title}</span
     >
     {
       tourName && (
@@ -61,13 +143,13 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
       ></path>
     </svg>
-    <span class="relative z-10 text-[15px]">WhatsApp Directo</span>
+    <span class="relative z-10 text-[15px]">{copy.whatsapp}</span>
   </a>
 
   <div class="flex items-center gap-4 mb-6">
     <div class="h-px bg-gray-200 flex-1"></div>
     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
-      >o por correo</span
+      >{copy.divider}</span
     >
     <div class="h-px bg-gray-200 flex-1"></div>
   </div>
@@ -93,8 +175,8 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         for="contact-name"
         class="block text-sm font-semibold text-gray-700 mb-1.5"
       >
-        Tu nombre <span class="text-red-500" aria-hidden="true">*</span>
-        <span class="sr-only">(requerido)</span>
+        {copy.name} <span class="text-red-500" aria-hidden="true">*</span>
+        <span class="sr-only">{copy.required}</span>
       </label>
       <input
         type="text"
@@ -104,7 +186,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         autocomplete="name"
         enterkeyhint="next"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-sm"
-        placeholder="Ingresa tu nombre completo"
+        placeholder={copy.namePlaceholder}
       />
     </div>
 
@@ -113,9 +195,8 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         for="contact-email"
         class="block text-sm font-semibold text-gray-700 mb-1.5"
       >
-        Correo electrónico <span class="text-red-500" aria-hidden="true">*</span
-        >
-        <span class="sr-only">(requerido)</span>
+        {copy.email} <span class="text-red-500" aria-hidden="true">*</span>
+        <span class="sr-only">{copy.required}</span>
       </label>
       <input
         type="email"
@@ -126,7 +207,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         inputmode="email"
         enterkeyhint="next"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 text-sm"
-        placeholder="tu@email.com"
+        placeholder={copy.emailPlaceholder}
       />
     </div>
 
@@ -136,9 +217,9 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         for="contact-country"
         class="block text-sm font-semibold text-gray-700 mb-1.5"
       >
-        País
+        {copy.country}
         <span class="text-red-500" aria-hidden="true">*</span>
-        <span class="sr-only">(requerido)</span>
+        <span class="sr-only">{copy.required}</span>
       </label>
       <select
         id="contact-country"
@@ -147,15 +228,18 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         required
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
       >
-        <option value="">Selecciona tu país</option>
+        <option value="">{copy.countryPlaceholder}</option>
         {
           countries.map((c) => (
-            <option value={c.nameES} data-code={c.phoneCode}>
-              {c.nameES}
+            <option
+              value={lang === "en" ? c.nameEN : c.nameES}
+              data-code={c.phoneCode}
+            >
+              {lang === "en" ? c.nameEN : c.nameES}
             </option>
           ))
         }
-        <option value="Otro" data-code="">Otro</option>
+        <option value={copy.otherCountry} data-code="">{copy.otherCountry}</option>
       </select>
     </div>
 
@@ -165,7 +249,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         for="contact-whatsapp"
         class="block text-sm font-semibold text-gray-700 mb-1.5"
       >
-        WhatsApp
+        {copy.whatsappLabel}
       </label>
       <div class="flex">
         <span
@@ -192,8 +276,8 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         for="contact-message"
         class="block text-sm font-semibold text-gray-700 mb-1.5"
       >
-        Mensaje <span class="text-red-500" aria-hidden="true">*</span>
-        <span class="sr-only">(requerido)</span>
+        {copy.message} <span class="text-red-500" aria-hidden="true">*</span>
+        <span class="sr-only">{copy.required}</span>
       </label>
       <textarea
         id="contact-message"
@@ -202,7 +286,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         required
         enterkeyhint="send"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 resize-none text-sm"
-        placeholder="¿En qué fechas te gustaría reservar? ¿Cuántas personas?"
+        placeholder={copy.messagePlaceholder}
       ></textarea>
     </div>
 
@@ -211,7 +295,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       data-contact-submit
       class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-sm font-bold transition-all duration-200 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] mt-2 group"
     >
-      <span data-contact-submit-label>Enviar solicitud</span>
+      <span data-contact-submit-label>{copy.submit}</span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
@@ -276,6 +360,16 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         const statusMessage = root.querySelector<HTMLElement>(
           "[data-contact-status]",
         );
+        const submitText = root.dataset.submitLabel || "Send request";
+        const submittingText = root.dataset.submittingLabel || "Sending...";
+        const successText =
+          root.dataset.successMessage ||
+          "Form sent successfully. We will contact you soon.";
+        const errorText =
+          root.dataset.errorMessage ||
+          "The form could not be sent. Please try again or message us on WhatsApp.";
+        const genericErrorText =
+          root.dataset.genericErrorMessage || "The form could not be sent.";
 
         if (!countrySelect || !phoneCodeSpan) return;
         const phoneCodeDisplay = phoneCodeSpan;
@@ -350,8 +444,8 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
 
           if (submitLabel) {
             submitLabel.textContent = isSubmitting
-              ? "Enviando..."
-              : "Enviar solicitud";
+              ? submittingText
+              : submitText;
           }
         }
 
@@ -376,23 +470,15 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
             const result = await response.json().catch(() => ({}));
 
             if (!response.ok || !result.success) {
-              throw new Error(
-                result.error || "No se pudo enviar el formulario.",
-              );
+              throw new Error(result.error || genericErrorText);
             }
 
             form.reset();
             updatePhoneCode();
-            setStatus(
-              "success",
-              "Formulario enviado correctamente. Te contactaremos pronto.",
-            );
+            setStatus("success", successText);
           } catch (error) {
             console.error("Error al enviar formulario de tour:", error);
-            setStatus(
-              "error",
-              "No se pudo enviar el formulario. Inténtalo nuevamente o escríbenos por WhatsApp.",
-            );
+            setStatus("error", errorText);
           } finally {
             setSubmitting(false);
           }
@@ -434,12 +520,23 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
     const statusMessage = form.querySelector<HTMLElement>(
       "[data-contact-status]",
     );
+    const root = form.closest<HTMLElement>("[data-contact-form-root]");
+    const submitText = root?.dataset.submitLabel || "Send request";
+    const submittingText = root?.dataset.submittingLabel || "Sending...";
+    const successText =
+      root?.dataset.successMessage ||
+      "Form sent successfully. We will contact you soon.";
+    const errorText =
+      root?.dataset.errorMessage ||
+      "The form could not be sent. Please try again or message us on WhatsApp.";
+    const genericErrorText =
+      root?.dataset.genericErrorMessage || "The form could not be sent.";
 
     if (submitButton) {
       submitButton.disabled = true;
       submitButton.classList.add("cursor-not-allowed", "opacity-75");
     }
-    if (submitLabel) submitLabel.textContent = "Enviando...";
+    if (submitLabel) submitLabel.textContent = submittingText;
     statusMessage?.classList.add("hidden");
 
     try {
@@ -453,14 +550,13 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error || "No se pudo enviar el formulario.");
+        throw new Error(result.error || genericErrorText);
       }
 
       form.reset();
 
       if (statusMessage) {
-        statusMessage.textContent =
-          "Formulario enviado correctamente. Te contactaremos pronto.";
+        statusMessage.textContent = successText;
         statusMessage.classList.remove(
           "hidden",
           "border-red-200",
@@ -479,8 +575,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       console.error("Error al enviar formulario de tour:", error);
 
       if (statusMessage) {
-        statusMessage.textContent =
-          "No se pudo enviar el formulario. Intentalo nuevamente o escribenos por WhatsApp.";
+        statusMessage.textContent = errorText;
         statusMessage.classList.remove(
           "hidden",
           "border-green-200",
@@ -500,7 +595,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         submitButton.disabled = false;
         submitButton.classList.remove("cursor-not-allowed", "opacity-75");
       }
-      if (submitLabel) submitLabel.textContent = "Enviar solicitud";
+      if (submitLabel) submitLabel.textContent = submitText;
     }
   });
 

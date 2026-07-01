@@ -18,6 +18,51 @@ interface BookingFormProps {
 	initialTickets?: TicketsByDate;
 }
 
+const bookingFormCopy = {
+	es: {
+		title: "Reserva",
+		selectDate: "Seleccione la fecha",
+		passengers: "Pasajeros",
+		selectDateFirst: "Primero seleccione una fecha",
+		pax: "Pax",
+		peopleForDeparture: "Personas para esta salida",
+		decreasePassengers: "Reducir cantidad de pasajeros",
+		increasePassengers: "Aumentar cantidad de pasajeros",
+		pricePerPerson: "Precio por persona",
+		totalPrice: "Precio total",
+		bookNow: "Reservar ahora",
+		alertDate: "Por favor seleccione una fecha antes de reservar.",
+	},
+	en: {
+		title: "Booking",
+		selectDate: "Select date",
+		passengers: "Passengers",
+		selectDateFirst: "Select a date first",
+		pax: "Pax",
+		peopleForDeparture: "People for this departure",
+		decreasePassengers: "Decrease passenger count",
+		increasePassengers: "Increase passenger count",
+		pricePerPerson: "Price per person",
+		totalPrice: "Total price",
+		bookNow: "Book now",
+		alertDate: "Please select a date before booking.",
+	},
+	pt: {
+		title: "Reserva",
+		selectDate: "Selecione a data",
+		passengers: "Passageiros",
+		selectDateFirst: "Primeiro selecione uma data",
+		pax: "Pax",
+		peopleForDeparture: "Pessoas para esta saida",
+		decreasePassengers: "Reduzir quantidade de passageiros",
+		increasePassengers: "Aumentar quantidade de passageiros",
+		pricePerPerson: "Preco por pessoa",
+		totalPrice: "Preco total",
+		bookNow: "Reservar agora",
+		alertDate: "Selecione uma data antes de reservar.",
+	},
+} as const;
+
 export default function BookingForm({
 	tourId,
 	tourName,
@@ -30,6 +75,7 @@ export default function BookingForm({
 	selectionDurationDays = 1,
 	initialTickets,
 }: BookingFormProps) {
+	const copy = bookingFormCopy[lang] ?? bookingFormCopy.en;
 	const [date, setDate] = useState<string>("");
 	const [selectedAvailability, setSelectedAvailability] = useState<
 		number | null
@@ -63,7 +109,7 @@ export default function BookingForm({
 
 	const handleBookNow = () => {
 		if (!date) {
-			alert("Por favor seleccione una fecha antes de reservar.");
+			alert(copy.alertDate);
 			return;
 		}
 
@@ -99,7 +145,7 @@ export default function BookingForm({
 					id="booking-form-title"
 					className="text-2xl font-extrabold tracking-tight text-white"
 				>
-					Reserva
+					{copy.title}
 				</h2>
 				<p className="mt-1 text-sm font-semibold leading-6 text-[#f0dbc8]">
 					{tourName}
@@ -113,7 +159,7 @@ export default function BookingForm({
 							1
 						</span>
 						<span className="text-sm font-extrabold uppercase tracking-wide text-[#244237]">
-							Seleccione la fecha
+							{copy.selectDate}
 						</span>
 					</div>
 
@@ -143,10 +189,10 @@ export default function BookingForm({
 							2
 						</span>
 						<span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-extrabold uppercase tracking-wide text-[#244237]">
-							Pasajeros
+							{copy.passengers}
 							{!date && (
 								<span className="text-xs font-bold normal-case tracking-normal text-secondary">
-									Primero seleccione una fecha
+									{copy.selectDateFirst}
 								</span>
 							)}
 						</span>
@@ -155,10 +201,10 @@ export default function BookingForm({
 					<div className="mt-4 flex items-center justify-between gap-4">
 						<div>
 							<span className="block text-lg font-extrabold text-[#1f2d29]">
-								Pax
+								{copy.pax}
 							</span>
 							<span className="text-sm font-semibold text-[#5f5349]">
-								Personas para esta salida
+								{copy.peopleForDeparture}
 							</span>
 						</div>
 						<div className="flex items-center overflow-hidden rounded-full border border-[#e6d4c1] bg-white shadow-sm">
@@ -166,7 +212,7 @@ export default function BookingForm({
 								type="button"
 								onClick={handleMinus}
 								disabled={passengers <= 1 || !date}
-								aria-label="Reducir cantidad de pasajeros"
+								aria-label={copy.decreasePassengers}
 								className="flex h-11 w-11 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 							>
 								<Minus size={20} aria-hidden="true" />
@@ -178,7 +224,7 @@ export default function BookingForm({
 								type="button"
 								onClick={handlePlus}
 								disabled={!date}
-								aria-label="Aumentar cantidad de pasajeros"
+								aria-label={copy.increasePassengers}
 								className="flex h-11 w-11 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 							>
 								<Plus size={20} aria-hidden="true" />
@@ -191,7 +237,7 @@ export default function BookingForm({
 			<footer className="border-t border-[#eadfd3] bg-white p-5 md:p-6">
 				<div className="mb-3 flex items-center justify-between rounded-sm border border-[#e8e2da] bg-[#faf8f5] px-3 py-2">
 					<span className="text-sm font-semibold text-[#5f5349]">
-						Precio por Persona
+						{copy.pricePerPerson}
 					</span>
 					<span className="text-sm font-extrabold text-[#1f2d29]">
 						US${(basePrice || 620).toFixed(2)}
@@ -199,7 +245,7 @@ export default function BookingForm({
 				</div>
 				<div className="mb-3 flex items-center justify-between gap-4">
 					<span className="text-sm font-extrabold uppercase tracking-wide text-[#244237]">
-						Precio Total
+						{copy.totalPrice}
 					</span>
 					<span className="text-2xl font-extrabold tracking-tight text-[#1f2d29]">
 						US${(totalPrice || 620).toFixed(2)}
@@ -211,7 +257,7 @@ export default function BookingForm({
 					disabled={!date}
 					className="w-full rounded-sm bg-[#1f6c43] py-4 text-lg font-extrabold text-white shadow-[0_18px_40px_-26px_rgba(31,108,67,0.9)] transition-all hover:-translate-y-0.5 hover:bg-[#185637] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6c43] focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
 				>
-					Book Now
+					{copy.bookNow}
 				</button>
 			</footer>
 		</section>

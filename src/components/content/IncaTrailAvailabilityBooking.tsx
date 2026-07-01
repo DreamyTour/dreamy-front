@@ -39,6 +39,8 @@ const copyByLang = {
 		route: "Ruta",
 		days: "dias",
 		alertDate: "Por favor seleccione una fecha antes de reservar.",
+		decreasePassengers: "Reducir cantidad de pasajeros",
+		increasePassengers: "Aumentar cantidad de pasajeros",
 	},
 	en: {
 		stepPeople: "Number of people",
@@ -48,6 +50,8 @@ const copyByLang = {
 		route: "Route",
 		days: "days",
 		alertDate: "Please select a date before booking.",
+		decreasePassengers: "Decrease passenger count",
+		increasePassengers: "Increase passenger count",
 	},
 	pt: {
 		stepPeople: "Quantidade de pessoas",
@@ -57,6 +61,8 @@ const copyByLang = {
 		route: "Rota",
 		days: "dias",
 		alertDate: "Selecione uma data antes de reservar.",
+		decreasePassengers: "Reduzir quantidade de passageiros",
+		increasePassengers: "Aumentar quantidade de passageiros",
 	},
 } as const;
 
@@ -224,7 +230,7 @@ export default function IncaTrailAvailabilityBooking({
 									type="button"
 									onClick={handleMinus}
 									disabled={passengers <= 1 || !date}
-									aria-label="Reducir cantidad de pasajeros"
+									aria-label={copy.decreasePassengers}
 									className="flex h-10 w-10 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 								>
 									<Minus size={18} aria-hidden="true" />
@@ -239,7 +245,7 @@ export default function IncaTrailAvailabilityBooking({
 										!date ||
 										(maxPassengers !== null && passengers >= maxPassengers)
 									}
-									aria-label="Aumentar cantidad de pasajeros"
+									aria-label={copy.increasePassengers}
 									className="flex h-10 w-10 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 								>
 									<Plus size={18} aria-hidden="true" />

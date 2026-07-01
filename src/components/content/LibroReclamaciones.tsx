@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useMemo, useState } from "react";
 import { countries } from "@/data/countries";
 
 // Colores del theme (definidos en global.css)
@@ -13,11 +13,126 @@ const colors = {
 	foreground: "oklch(0.16 0.06 150)",
 };
 
-const sortedCountries = [...countries].sort((a, b) =>
-	a.nameES.localeCompare(b.nameES),
-);
+const complaintCopy = {
+	es: {
+		consumerTitle: "IDENTIFICACI\u00d3N DEL CONSUMIDOR RECLAMANTE",
+		fullName: "Nombres",
+		fullNamePlaceholder: "Ingrese sus nombres completos",
+		country: "Pa\u00eds",
+		countryPlaceholder: "Selecciona tu pa\u00eds",
+		city: "Ciudad",
+		cityPlaceholder: "Ingrese su ciudad",
+		document: "Nro. Documento (DNI / Pasaporte)",
+		documentPlaceholder: "Ingrese su n\u00famero de documento",
+		email: "Email",
+		phone: "Tel\u00e9fono",
+		isMinor: "\u00bfEres menor de edad?",
+		no: "No",
+		yes: "S\u00ed",
+		guardian: "Datos del padre, madre o apoderado",
+		guardianPlaceholder: "Nombre completo del padre, madre o apoderado",
+		claimTitle: "MANIFIESTO DEL CONSUMIDOR RECLAMANTE",
+		type: "Tipo",
+		claim: "Reclamo",
+		complaint: "Queja",
+		detail: "Detalle de la reclamaci\u00f3n o queja",
+		detailPlaceholder: "Describa detalladamente su reclamo o queja...",
+		success:
+			"Su reclamaci\u00f3n ha sido enviada correctamente. Nos pondremos en contacto en un plazo m\u00e1ximo de 30 d\u00edas h\u00e1biles.",
+		error:
+			"Hubo un error al enviar su reclamaci\u00f3n. Por favor intente nuevamente o cont\u00e1ctenos directamente.",
+		sendError: "Error en el env\u00edo",
+		submitting: "Enviando...",
+		sent: "Enviado exitosamente",
+		sendFailed: "Error al enviar",
+		submit: "Enviar",
+	},
+	en: {
+		consumerTitle: "CLAIMANT CONSUMER IDENTIFICATION",
+		fullName: "Full name",
+		fullNamePlaceholder: "Enter your full name",
+		country: "Country",
+		countryPlaceholder: "Select your country",
+		city: "City",
+		cityPlaceholder: "Enter your city",
+		document: "Document No. (ID / Passport)",
+		documentPlaceholder: "Enter your document number",
+		email: "Email",
+		phone: "Phone",
+		isMinor: "Are you underage?",
+		no: "No",
+		yes: "Yes",
+		guardian: "Parent or guardian details",
+		guardianPlaceholder: "Full name of parent or guardian",
+		claimTitle: "CLAIMANT CONSUMER STATEMENT",
+		type: "Type",
+		claim: "Claim",
+		complaint: "Complaint",
+		detail: "Claim or complaint details",
+		detailPlaceholder: "Describe your claim or complaint in detail...",
+		success:
+			"Your complaint has been submitted successfully. We will contact you within a maximum of 30 business days.",
+		error:
+			"There was an error submitting your complaint. Please try again or contact us directly.",
+		sendError: "Submission error",
+		submitting: "Sending...",
+		sent: "Sent successfully",
+		sendFailed: "Error sending",
+		submit: "Submit",
+	},
+	pt: {
+		consumerTitle: "IDENTIFICA\u00c7\u00c3O DO CONSUMIDOR RECLAMANTE",
+		fullName: "Nome completo",
+		fullNamePlaceholder: "Digite seu nome completo",
+		country: "Pa\u00eds",
+		countryPlaceholder: "Selecione seu pa\u00eds",
+		city: "Cidade",
+		cityPlaceholder: "Digite sua cidade",
+		document: "Nro. Documento (ID / Passaporte)",
+		documentPlaceholder: "Digite o n\u00famero do seu documento",
+		email: "E-mail",
+		phone: "Telefone",
+		isMinor: "Voc\u00ea \u00e9 menor de idade?",
+		no: "N\u00e3o",
+		yes: "Sim",
+		guardian: "Dados do pai, m\u00e3e ou respons\u00e1vel",
+		guardianPlaceholder: "Nome completo do pai, m\u00e3e ou respons\u00e1vel",
+		claimTitle: "MANIFESTO DO CONSUMIDOR RECLAMANTE",
+		type: "Tipo",
+		claim: "Reclama\u00e7\u00e3o",
+		complaint: "Queixa",
+		detail: "Detalhe da reclama\u00e7\u00e3o ou queixa",
+		detailPlaceholder:
+			"Descreva detalhadamente sua reclama\u00e7\u00e3o ou queixa...",
+		success:
+			"Sua reclama\u00e7\u00e3o foi enviada corretamente. Entraremos em contato em um prazo m\u00e1ximo de 30 dias \u00fateis.",
+		error:
+			"Houve um erro ao enviar sua reclama\u00e7\u00e3o. Tente novamente ou entre em contato diretamente.",
+		sendError: "Erro no envio",
+		submitting: "Enviando...",
+		sent: "Enviado com sucesso",
+		sendFailed: "Erro ao enviar",
+		submit: "Enviar",
+	},
+} as const;
 
-export default function LibroReclamaciones() {
+interface LibroReclamacionesProps {
+	lang?: "es" | "en" | "pt";
+}
+
+export default function LibroReclamaciones({
+	lang = "es",
+}: LibroReclamacionesProps) {
+	const copy = complaintCopy[lang] ?? complaintCopy.es;
+	const sortedCountries = useMemo(
+		() =>
+			[...countries].sort((a, b) =>
+				(lang === "en" ? a.nameEN : a.nameES).localeCompare(
+					lang === "en" ? b.nameEN : b.nameES,
+				),
+			),
+		[lang],
+	);
 	const [formData, setFormData] = useState({
 		nombres: "",
 		pais: "",
@@ -79,18 +194,14 @@ export default function LibroReclamaciones() {
 					tipo: "reclamo",
 					detalle: "",
 				});
-				setStatusMessage(
-					"Su reclamación ha sido enviada correctamente. Nos pondremos en contacto en un plazo máximo de 30 días hábiles.",
-				);
+				setStatusMessage(copy.success);
 			} else {
-				throw new Error(result.error || "Error en el envío");
+				throw new Error(result.error || copy.sendError);
 			}
 		} catch (error) {
 			console.error("Error:", error);
 			setSubmitStatus("error");
-			setStatusMessage(
-				"Hubo un error al enviar su reclamación. Por favor intente nuevamente o contáctenos directamente.",
-			);
+			setStatusMessage(copy.error);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -127,13 +238,13 @@ export default function LibroReclamaciones() {
 			onSubmit={handleSubmit}
 			className="space-y-6"
 		>
-			{/* IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE */}
+			{/* Consumer identification */}
 			<div>
 				<h2
 					className="text-lg font-semibold mb-4"
 					style={{ color: colors.foreground }}
 				>
-					IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE
+					{copy.consumerTitle}
 				</h2>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -143,7 +254,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Nombres <span className="text-red-500">*</span>
+							{copy.fullName} <span className="text-red-500">*</span>
 						</label>
 						<input
 							id="lr-nombres"
@@ -156,7 +267,7 @@ export default function LibroReclamaciones() {
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
-							placeholder="Ingrese sus nombres completos"
+							placeholder={copy.fullNamePlaceholder}
 						/>
 					</div>
 
@@ -166,7 +277,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							País <span className="text-red-500">*</span>
+							{copy.country} <span className="text-red-500">*</span>
 						</label>
 						<select
 							id="lr-pais"
@@ -178,13 +289,13 @@ export default function LibroReclamaciones() {
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all bg-white"
 						>
-							<option value="">Selecciona tu país</option>
+							<option value="">{copy.countryPlaceholder}</option>
 							{sortedCountries.map((country) => (
 								<option
 									key={`lr-country-${country.iso2}`}
-									value={country.nameES}
+									value={lang === "en" ? country.nameEN : country.nameES}
 								>
-									{country.nameES}
+									{lang === "en" ? country.nameEN : country.nameES}
 								</option>
 							))}
 						</select>
@@ -196,7 +307,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Ciudad <span className="text-red-500">*</span>
+							{copy.city} <span className="text-red-500">*</span>
 						</label>
 						<input
 							id="lr-ciudad"
@@ -209,7 +320,7 @@ export default function LibroReclamaciones() {
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
-							placeholder="Ingrese su ciudad"
+							placeholder={copy.cityPlaceholder}
 						/>
 					</div>
 
@@ -219,8 +330,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							N° Documento (DNI / Pasaporte){" "}
-							<span className="text-red-500">*</span>
+							{copy.document} <span className="text-red-500">*</span>
 						</label>
 						<input
 							id="lr-documento"
@@ -233,7 +343,7 @@ export default function LibroReclamaciones() {
 							required
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
-							placeholder="Ingrese su número de documento"
+							placeholder={copy.documentPlaceholder}
 						/>
 					</div>
 
@@ -243,7 +353,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Email <span className="text-red-500">*</span>
+							{copy.email} <span className="text-red-500">*</span>
 						</label>
 						<input
 							id="lr-email"
@@ -267,7 +377,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Teléfono <span className="text-red-500">*</span>
+							{copy.phone} <span className="text-red-500">*</span>
 						</label>
 						<input
 							id="lr-telefono"
@@ -291,7 +401,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							¿Eres Menor de edad? <span className="text-red-500">*</span>
+							{copy.isMinor} <span className="text-red-500">*</span>
 						</label>
 						<div className="flex gap-4 mt-2">
 							<label className="inline-flex items-center cursor-pointer">
@@ -305,7 +415,7 @@ export default function LibroReclamaciones() {
 									style={{ accentColor: colors.primary }}
 								/>
 								<span className="ml-2" style={{ color: colors.foreground }}>
-									No
+									{copy.no}
 								</span>
 							</label>
 							<label className="inline-flex items-center cursor-pointer">
@@ -319,7 +429,7 @@ export default function LibroReclamaciones() {
 									style={{ accentColor: colors.primary }}
 								/>
 								<span className="ml-2" style={{ color: colors.foreground }}>
-									Sí
+									{copy.yes}
 								</span>
 							</label>
 						</div>
@@ -333,8 +443,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Datos del Padre, Madre o Apoderado{" "}
-							<span className="text-red-500">*</span>
+							{copy.guardian} <span className="text-red-500">*</span>
 						</label>
 						<input
 							id="lr-datos-apoderado"
@@ -346,19 +455,19 @@ export default function LibroReclamaciones() {
 							enterKeyHint="next"
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
-							placeholder="Nombre completo del padre, madre o apoderado"
+							placeholder={copy.guardianPlaceholder}
 						/>
 					</div>
 				</div>
 			</div>
 
-			{/* MANIFIESTO DEL CONSUMIDOR RECLAMANTE */}
+			{/* Claim statement */}
 			<div>
 				<h2
 					className="text-lg font-semibold mb-4 pt-4 border-t"
 					style={{ color: colors.foreground, borderColor: colors.border }}
 				>
-					MANIFIESTO DEL CONSUMIDOR RECLAMANTE
+					{copy.claimTitle}
 				</h2>
 
 				<div className="space-y-6">
@@ -368,7 +477,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Tipo <span className="text-red-500">*</span>
+							{copy.type} <span className="text-red-500">*</span>
 						</label>
 						<div className="flex gap-6 mt-2">
 							<label
@@ -397,7 +506,7 @@ export default function LibroReclamaciones() {
 									className="ml-2 font-medium"
 									style={{ color: colors.foreground }}
 								>
-									Reclamo
+									{copy.claim}
 								</span>
 							</label>
 							<label
@@ -424,7 +533,7 @@ export default function LibroReclamaciones() {
 									className="ml-2 font-medium"
 									style={{ color: colors.foreground }}
 								>
-									Queja
+									{copy.complaint}
 								</span>
 							</label>
 						</div>
@@ -436,8 +545,7 @@ export default function LibroReclamaciones() {
 							className="block text-sm font-medium mb-2"
 							style={{ color: colors.foreground }}
 						>
-							Detalle de la Reclamación o Queja{" "}
-							<span className="text-red-500">*</span>
+							{copy.detail} <span className="text-red-500">*</span>
 						</label>
 						<textarea
 							id="lr-detalle"
@@ -449,7 +557,7 @@ export default function LibroReclamaciones() {
 							rows={6}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
-							placeholder="Describa detalladamente su reclamo o queja..."
+							placeholder={copy.detailPlaceholder}
 						></textarea>
 					</div>
 				</div>
@@ -465,7 +573,11 @@ export default function LibroReclamaciones() {
 							: "border-green-200 bg-green-50 text-green-700"
 					}`}
 				>
-					{statusMessage}
+					{submitStatus === "success"
+						? copy.success
+						: submitStatus === "error"
+							? copy.error
+							: statusMessage}
 				</p>
 			)}
 
@@ -477,12 +589,12 @@ export default function LibroReclamaciones() {
 					className={`w-full font-bold py-4 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-75 disabled:cursor-not-allowed`}
 				>
 					{isSubmitting
-						? "⏳ Enviando..."
+						? copy.submitting
 						: submitStatus === "success"
-							? "✅ Enviado exitosamente"
+							? copy.sent
 							: submitStatus === "error"
-								? "❌ Error al enviar"
-								: "Enviar"}
+								? copy.sendFailed
+								: copy.submit}
 				</button>
 			</div>
 		</form>

@@ -819,6 +819,13 @@ textarea:focus-visible,
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--ring) 45%, transparent);
 }
 
+:where(input, select, textarea):focus,
+:where(input, select, textarea):focus-visible {
+  border-color: var(--primary) !important;
+  box-shadow: none !important;
+  outline: 0;
+}
+
 :target {
   scroll-margin-top: 80px;
 }

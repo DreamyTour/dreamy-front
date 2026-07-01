@@ -38,9 +38,223 @@ interface CheckoutSummaryProps {
 	initialLang?: "en" | "es" | "pt";
 }
 
+const checkoutCopy = {
+	es: {
+		loading: "Cargando...",
+		emptyTitle: "Tu carrito esta vacio",
+		emptyText: "Explora nuestros tours y comienza tu aventura",
+		exploreTours: "Explorar tours",
+		title: "Completa tu reserva",
+		stepItinerary: "Itinerario",
+		stepPassengers: "Pasajeros",
+		stepPayment: "Pago",
+		bookingSummary: "Resumen de reserva",
+		travelDates: "Fechas de viaje",
+		travelers: "Viajeros",
+		person: "persona",
+		people: "personas",
+		perPerson: "Por persona",
+		totalTourPrice: "Precio total del tour",
+		continue: "Continuar",
+		travelerInfo: "Informacion de viajeros",
+		travelerHelp: "Completa los datos de todos los viajeros",
+		passportNotice:
+			"Tus datos y numero de pasaporte deben coincidir exactamente con tu documento.",
+		traveler: "Viajero",
+		firstName: "Nombres",
+		lastName: "Apellidos",
+		gender: "Genero",
+		male: "Masculino",
+		female: "Femenino",
+		dateOfBirth: "Fecha de nacimiento",
+		openBirthCalendar: "Abrir calendario de fecha de nacimiento",
+		documentType: "Tipo de documento",
+		passport: "Pasaporte",
+		idCard: "Documento de identidad",
+		documentNumber: "Numero de documento",
+		issuingCountry: "Pais emisor",
+		contactDetails: "Datos de contacto",
+		emailAddress: "Correo electronico",
+		countryCode: "Codigo de pais",
+		phone: "Telefono",
+		termsPrefix: "He leido y acepto los",
+		terms: "Terminos y condiciones",
+		termsMiddle: "y las",
+		bookingPolicies: "Politicas de reserva",
+		backToItinerary: "Volver al itinerario",
+		continueToPayment: "Continuar al pago",
+		changesNotice: "Puedes solicitar cambios escribiendo a",
+		paypalNotice: "PayPal cobra una comision del 8% por procesamiento seguro.",
+		paymentMethod: "Metodo de pago",
+		securePayment: "Pago seguro - aplica comision de 8%",
+		paymentAmount: "Monto de pago",
+		popular: "POPULAR",
+		payNow: "Pagar ahora",
+		secureBooking: "Asegura tu reserva",
+		payFull: "Pagar total",
+		completePayment: "Completa tu pago",
+		paypalFee: "Comision PayPal (8%)",
+		totalToPayToday: "Total a pagar hoy",
+		backToPassengers: "Volver a pasajeros",
+		processing: "Procesando...",
+		pay: "Pagar",
+		summary: "Resumen",
+		selectedPayment: "Pago seleccionado",
+		payToday: "Pagar hoy",
+		selectGender: {
+			Male: "Masculino",
+			Female: "Femenino",
+		},
+		validationTerms: "Acepta los terminos y condiciones para continuar",
+		validationContact: "Completa todos los datos de contacto",
+		validationTraveler: "Completa toda la informacion del viajero",
+	},
+	en: {
+		loading: "Loading...",
+		emptyTitle: "Your cart is empty",
+		emptyText: "Explore our tours and start your adventure",
+		exploreTours: "Explore tours",
+		title: "Complete your booking",
+		stepItinerary: "Itinerary",
+		stepPassengers: "Passengers",
+		stepPayment: "Payment",
+		bookingSummary: "Booking summary",
+		travelDates: "Travel dates",
+		travelers: "Travelers",
+		person: "person",
+		people: "people",
+		perPerson: "Per person",
+		totalTourPrice: "Total tour price",
+		continue: "Continue",
+		travelerInfo: "Traveler information",
+		travelerHelp: "Please fill in the details for all travelers",
+		passportNotice:
+			"Your details and passport number must match exactly as they appear in your passport.",
+		traveler: "Traveler",
+		firstName: "First name",
+		lastName: "Last name",
+		gender: "Gender",
+		male: "Male",
+		female: "Female",
+		dateOfBirth: "Date of birth",
+		openBirthCalendar: "Open date of birth calendar",
+		documentType: "Document type",
+		passport: "Passport",
+		idCard: "ID card",
+		documentNumber: "Document number",
+		issuingCountry: "Issuing country",
+		contactDetails: "Contact details",
+		emailAddress: "Email address",
+		countryCode: "Country code",
+		phone: "Phone",
+		termsPrefix: "I have read and accept the",
+		terms: "Terms and Conditions",
+		termsMiddle: "and",
+		bookingPolicies: "Booking Policies",
+		backToItinerary: "Back to itinerary",
+		continueToPayment: "Continue to payment",
+		changesNotice: "You can request changes by writing to",
+		paypalNotice: "PayPal charges an 8% fee for secure payment processing.",
+		paymentMethod: "Payment method",
+		securePayment: "Secure payment - 8% fee applies",
+		paymentAmount: "Payment amount",
+		popular: "POPULAR",
+		payNow: "Pay now",
+		secureBooking: "Secure your booking",
+		payFull: "Pay full",
+		completePayment: "Complete your payment",
+		paypalFee: "PayPal fee (8%)",
+		totalToPayToday: "Total to pay today",
+		backToPassengers: "Back to passengers",
+		processing: "Processing...",
+		pay: "Pay",
+		summary: "Summary",
+		selectedPayment: "Selected payment",
+		payToday: "Pay today",
+		selectGender: {
+			Male: "Male",
+			Female: "Female",
+		},
+		validationTerms: "Please accept the terms and conditions to continue",
+		validationContact: "Please fill in all contact details",
+		validationTraveler: "Please complete all information for traveler",
+	},
+	pt: {
+		loading: "Carregando...",
+		emptyTitle: "Seu carrinho esta vazio",
+		emptyText: "Explore nossos tours e comece sua aventura",
+		exploreTours: "Explorar tours",
+		title: "Complete sua reserva",
+		stepItinerary: "Itinerario",
+		stepPassengers: "Passageiros",
+		stepPayment: "Pagamento",
+		bookingSummary: "Resumo da reserva",
+		travelDates: "Datas da viagem",
+		travelers: "Viajantes",
+		person: "pessoa",
+		people: "pessoas",
+		perPerson: "Por pessoa",
+		totalTourPrice: "Preco total do tour",
+		continue: "Continuar",
+		travelerInfo: "Informacoes dos viajantes",
+		travelerHelp: "Preencha os dados de todos os viajantes",
+		passportNotice:
+			"Seus dados e numero do passaporte devem coincidir exatamente com o documento.",
+		traveler: "Viajante",
+		firstName: "Nome",
+		lastName: "Sobrenome",
+		gender: "Genero",
+		male: "Masculino",
+		female: "Feminino",
+		dateOfBirth: "Data de nascimento",
+		openBirthCalendar: "Abrir calendario de data de nascimento",
+		documentType: "Tipo de documento",
+		passport: "Passaporte",
+		idCard: "Documento de identidade",
+		documentNumber: "Numero do documento",
+		issuingCountry: "Pais emissor",
+		contactDetails: "Dados de contato",
+		emailAddress: "E-mail",
+		countryCode: "Codigo do pais",
+		phone: "Telefone",
+		termsPrefix: "Li e aceito os",
+		terms: "Termos e condicoes",
+		termsMiddle: "e as",
+		bookingPolicies: "Politicas de reserva",
+		backToItinerary: "Voltar ao itinerario",
+		continueToPayment: "Continuar para pagamento",
+		changesNotice: "Voce pode solicitar alteracoes escrevendo para",
+		paypalNotice: "O PayPal cobra uma taxa de 8% pelo processamento seguro.",
+		paymentMethod: "Metodo de pagamento",
+		securePayment: "Pagamento seguro - taxa de 8% aplicada",
+		paymentAmount: "Valor do pagamento",
+		popular: "POPULAR",
+		payNow: "Pagar agora",
+		secureBooking: "Garanta sua reserva",
+		payFull: "Pagar total",
+		completePayment: "Complete seu pagamento",
+		paypalFee: "Taxa PayPal (8%)",
+		totalToPayToday: "Total a pagar hoje",
+		backToPassengers: "Voltar aos passageiros",
+		processing: "Processando...",
+		pay: "Pagar",
+		summary: "Resumo",
+		selectedPayment: "Pagamento selecionado",
+		payToday: "Pagar hoje",
+		selectGender: {
+			Male: "Masculino",
+			Female: "Feminino",
+		},
+		validationTerms: "Aceite os termos e condicoes para continuar",
+		validationContact: "Preencha todos os dados de contato",
+		validationTraveler: "Complete todas as informacoes do viajante",
+	},
+} as const;
+
 export default function CheckoutSummary({
 	initialLang = "en",
 }: CheckoutSummaryProps) {
+	const copy = checkoutCopy[initialLang] ?? checkoutCopy.en;
 	const [cart, setCart] = useState<BookingCart | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [emptyCartHref, setEmptyCartHref] = useState("/");
@@ -135,7 +349,7 @@ export default function CheckoutSummary({
 		return (
 			<div className="w-full max-w-5xl mx-auto p-4 md:p-8 text-center min-h-[50vh] flex flex-col justify-center items-center">
 				<div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-				<p className="text-gray-500 mt-4">Loading...</p>
+				<p className="text-gray-500 mt-4">{copy.loading}</p>
 			</div>
 		);
 	}
@@ -148,16 +362,14 @@ export default function CheckoutSummary({
 					<Users className="w-10 h-10 text-primary" />
 				</div>
 				<h2 className="text-2xl font-bold text-gray-800 mb-3">
-					Tu carrito está vacío
+					{copy.emptyTitle}
 				</h2>
-				<p className="text-gray-500 mb-6">
-					Explora nuestros tours y comienza tu aventura
-				</p>
+				<p className="text-gray-500 mb-6">{copy.emptyText}</p>
 				<a
 					href={emptyCartHref}
 					className="px-8 py-3.5 bg-primary text-white font-semibold rounded-sm shadow-lg shadow-primary/25 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]"
 				>
-					Explorar Tours
+					{copy.exploreTours}
 				</a>
 			</div>
 		);
@@ -186,7 +398,7 @@ export default function CheckoutSummary({
 	const validateStep2 = () => {
 		setError(null);
 		if (!acceptedTerms) {
-			setError("Please accept the terms and conditions to continue");
+			setError(copy.validationTerms);
 			return false;
 		}
 		if (
@@ -195,13 +407,13 @@ export default function CheckoutSummary({
 			!contact.email ||
 			!contact.phone
 		) {
-			setError("Please fill in all contact details");
+			setError(copy.validationContact);
 			return false;
 		}
 		for (let i = 0; i < passengers.length; i++) {
 			const p = passengers[i];
 			if (!p.name || !p.lastname || !p.dob || !p.documentNumber) {
-				setError(`Please complete all information for traveler ${i + 1}`);
+				setError(`${copy.validationTraveler} ${i + 1}`);
 				return false;
 			}
 		}
@@ -296,13 +508,6 @@ export default function CheckoutSummary({
 	const fieldClass =
 		"min-h-12 rounded-sm border border-[#d8cec2] bg-white px-4 py-3 text-base text-[#1f2d29] outline-none transition focus:border-[#1f6c43] focus:ring-2 focus:ring-[#1f6c43]/15";
 	const labelClass = "text-xs font-bold uppercase tracking-wide text-[#5f5349]";
-	const checkoutTitle =
-		initialLang === "es"
-			? "Completa tu reserva"
-			: initialLang === "pt"
-				? "Complete sua reserva"
-				: "Complete your booking";
-
 	return (
 		<div className="w-full px-4 py-6 md:px-8 md:py-10">
 			<div className="mx-auto mb-6 max-w-8xl">
@@ -310,7 +515,7 @@ export default function CheckoutSummary({
 					Checkout
 				</p>
 				<h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#1f2d29] md:text-4xl">
-					{checkoutTitle}
+					{copy.title}
 				</h1>
 			</div>
 			{/* MAIN CONTAINER */}
@@ -337,7 +542,7 @@ export default function CheckoutSummary({
 							<span
 								className={`text-sm font-semibold ${step >= 1 ? "text-white" : "text-white/45"}`}
 							>
-								Itinerary
+								{copy.stepItinerary}
 							</span>
 						</button>
 
@@ -364,7 +569,7 @@ export default function CheckoutSummary({
 							<span
 								className={`text-sm font-semibold ${step >= 2 ? "text-white" : "text-white/45"}`}
 							>
-								Passengers
+								{copy.stepPassengers}
 							</span>
 						</button>
 
@@ -385,7 +590,7 @@ export default function CheckoutSummary({
 							<span
 								className={`text-sm font-semibold ${step >= 3 ? "text-white" : "text-white/45"}`}
 							>
-								Payment
+								{copy.stepPayment}
 							</span>
 						</div>
 					</div>
@@ -397,7 +602,7 @@ export default function CheckoutSummary({
 						<div className="mb-8 flex items-start justify-between">
 							<div>
 								<h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-secondary">
-									Booking Summary
+									{copy.bookingSummary}
 								</h2>
 								<h3 className="text-2xl font-extrabold leading-tight text-[#1f2d29] md:text-3xl">
 									{tourName}
@@ -415,7 +620,7 @@ export default function CheckoutSummary({
 									</div>
 									<div>
 										<p className="text-xs font-bold uppercase tracking-wide text-[#6f6258]">
-											Travel Dates
+											{copy.travelDates}
 										</p>
 										<p className="font-semibold text-[#1f2d29]">
 											{travelDateStr}
@@ -430,10 +635,10 @@ export default function CheckoutSummary({
 									</div>
 									<div>
 										<p className="text-xs font-bold uppercase tracking-wide text-[#6f6258]">
-											Travelers
+											{copy.travelers}
 										</p>
 										<p className="font-semibold text-[#1f2d29]">
-											{paxCount} {paxCount === 1 ? "Person" : "People"}
+											{paxCount} {paxCount === 1 ? copy.person : copy.people}
 										</p>
 									</div>
 								</div>
@@ -445,7 +650,7 @@ export default function CheckoutSummary({
 									</div>
 									<div>
 										<p className="text-xs font-bold uppercase tracking-wide text-[#6f6258]">
-											Per Person
+											{copy.perPerson}
 										</p>
 										<p className="font-semibold text-[#1f2d29]">
 											US${pricePerPerson.toFixed(2)}
@@ -460,7 +665,7 @@ export default function CheckoutSummary({
 							<div className="flex items-center gap-3">
 								<div className="h-3 w-3 rounded-full bg-[#1f6c43]"></div>
 								<span className="font-semibold text-[#244237]">
-									Total Tour Price
+									{copy.totalTourPrice}
 								</span>
 							</div>
 							<div className="text-right">
@@ -477,7 +682,7 @@ export default function CheckoutSummary({
 								onClick={() => setStep(2)}
 								className="group flex min-h-12 items-center gap-2 rounded-sm bg-[#1f6c43] px-8 py-4 font-semibold text-white shadow-lg shadow-[#1f6c43]/20 transition-all hover:bg-[#185637] hover:shadow-xl hover:shadow-[#1f6c43]/25 active:scale-[0.98]"
 							>
-								Continue
+								{copy.continue}
 								<ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
 							</button>
 						</div>
@@ -494,10 +699,10 @@ export default function CheckoutSummary({
 							</div>
 							<div>
 								<h2 className="text-xl font-extrabold text-[#1f2d29]">
-									Traveler Information
+									{copy.travelerInfo}
 								</h2>
 								<p className="text-sm font-medium text-[#6f6258]">
-									Please fill in the details for all travelers
+									{copy.travelerHelp}
 								</p>
 							</div>
 						</div>
@@ -506,8 +711,7 @@ export default function CheckoutSummary({
 						<div className="mb-6 flex gap-3 rounded-sm border border-[#f0d3a5] bg-[#fff8ef] p-4">
 							<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#9a2f0d]" />
 							<p className="text-sm font-medium text-[#71300f]">
-								Your data and passport number must match exactly as they appear
-								in your passport.
+								{copy.passportNotice}
 							</p>
 						</div>
 
@@ -536,13 +740,13 @@ export default function CheckoutSummary({
 											{i + 1}
 										</div>
 										<span className="font-bold text-[#1f2d29]">
-											Traveler {i + 1}
+											{copy.traveler} {i + 1}
 										</span>
 									</div>
 
 									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 										<label className="flex flex-col gap-1">
-											<span className={labelClass}>First Name *</span>
+											<span className={labelClass}>{copy.firstName} *</span>
 											<input
 												ref={i === 0 ? firstPassengerNameRef : undefined}
 												type="text"
@@ -557,7 +761,7 @@ export default function CheckoutSummary({
 											/>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className={labelClass}>Last Name *</span>
+											<span className={labelClass}>{copy.lastName} *</span>
 											<input
 												type="text"
 												name={`passenger-${i + 1}-family-name`}
@@ -571,7 +775,7 @@ export default function CheckoutSummary({
 											/>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className={labelClass}>Gender *</span>
+											<span className={labelClass}>{copy.gender} *</span>
 											<select
 												name={`passenger-${i + 1}-gender`}
 												required
@@ -581,12 +785,14 @@ export default function CheckoutSummary({
 												}
 												className={fieldClass}
 											>
-												<option value="Male">Male</option>
-												<option value="Female">Female</option>
+												<option value="Male">{copy.selectGender.Male}</option>
+												<option value="Female">
+													{copy.selectGender.Female}
+												</option>
 											</select>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className={labelClass}>Date of Birth *</span>
+											<span className={labelClass}>{copy.dateOfBirth} *</span>
 											<div className="relative">
 												<input
 													id={`passenger-${i + 1}-birthdate`}
@@ -611,7 +817,7 @@ export default function CheckoutSummary({
 															) as HTMLInputElement | null,
 														)
 													}
-													aria-label="Open date of birth calendar"
+													aria-label={copy.openBirthCalendar}
 													className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-sm text-[#1f6c43] transition-colors hover:bg-[#1f6c43]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6c43]/25"
 												>
 													<Calendar className="h-5 w-5" aria-hidden="true" />
@@ -619,7 +825,7 @@ export default function CheckoutSummary({
 											</div>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className={labelClass}>Document Type *</span>
+											<span className={labelClass}>{copy.documentType} *</span>
 											<select
 												name={`passenger-${i + 1}-document-type`}
 												required
@@ -633,12 +839,14 @@ export default function CheckoutSummary({
 												}
 												className={fieldClass}
 											>
-												<option value="Passport">Passport</option>
-												<option value="ID">ID Card</option>
+												<option value="Passport">{copy.passport}</option>
+												<option value="ID">{copy.idCard}</option>
 											</select>
 										</label>
 										<label className="flex flex-col gap-1">
-											<span className={labelClass}>Document Number *</span>
+											<span className={labelClass}>
+												{copy.documentNumber} *
+											</span>
 											<input
 												type="text"
 												name={`passenger-${i + 1}-document-number`}
@@ -656,7 +864,9 @@ export default function CheckoutSummary({
 											/>
 										</label>
 										<label className="flex flex-col gap-1 md:col-span-2">
-											<span className={labelClass}>Issuing Country *</span>
+											<span className={labelClass}>
+												{copy.issuingCountry} *
+											</span>
 											<select
 												name={`passenger-${i + 1}-issuing-country`}
 												autoComplete="country"
@@ -669,7 +879,7 @@ export default function CheckoutSummary({
 											>
 												{countries.map((c) => (
 													<option key={`country-${c.iso2}`} value={c.iso2}>
-														{lang === "es" ? c.nameES : c.nameEN}
+														{lang === "en" ? c.nameEN : c.nameES}
 													</option>
 												))}
 											</select>
@@ -683,11 +893,11 @@ export default function CheckoutSummary({
 						<div className="mb-8">
 							<h3 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#1f2d29]">
 								<span className="h-2 w-2 rounded-full bg-[#1f6c43]"></span>
-								Contact Details
+								{copy.contactDetails}
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<label className="flex flex-col gap-1">
-									<span className={labelClass}>First Name *</span>
+									<span className={labelClass}>{copy.firstName} *</span>
 									<input
 										type="text"
 										name="contact-given-name"
@@ -702,7 +912,7 @@ export default function CheckoutSummary({
 									/>
 								</label>
 								<label className="flex flex-col gap-1">
-									<span className={labelClass}>Last Name *</span>
+									<span className={labelClass}>{copy.lastName} *</span>
 									<input
 										type="text"
 										name="contact-family-name"
@@ -717,7 +927,7 @@ export default function CheckoutSummary({
 									/>
 								</label>
 								<label className="flex flex-col gap-1">
-									<span className={labelClass}>Email Address *</span>
+									<span className={labelClass}>{copy.emailAddress} *</span>
 									<input
 										type="email"
 										name="contact-email"
@@ -734,7 +944,7 @@ export default function CheckoutSummary({
 								</label>
 								<div className="flex flex-col md:flex-row gap-4">
 									<label className="flex flex-col gap-1 w-full md:w-5/12">
-										<span className={labelClass}>Country Code *</span>
+										<span className={labelClass}>{copy.countryCode} *</span>
 										<select
 											name="contact-phone-code"
 											autoComplete="tel-country-code"
@@ -752,14 +962,14 @@ export default function CheckoutSummary({
 														key={`phone-${c.iso2}`}
 														value={`+${c.phoneCode}`}
 													>
-														{lang === "es" ? c.nameES : c.nameEN} (+
+														{lang === "en" ? c.nameEN : c.nameES} (+
 														{c.phoneCode})
 													</option>
 												))}
 										</select>
 									</label>
 									<label className="flex flex-col gap-1 flex-1">
-										<span className={labelClass}>Phone *</span>
+										<span className={labelClass}>{copy.phone} *</span>
 										<input
 											type="tel"
 											name="contact-phone"
@@ -789,19 +999,19 @@ export default function CheckoutSummary({
 								className="mt-0.5 h-5 w-5 cursor-pointer rounded accent-[#1f6c43]"
 							/>
 							<span className="text-sm font-medium text-[#5f5349]">
-								I have read and accept the{" "}
+								{copy.termsPrefix}{" "}
 								<a
 									href="/terms-and-conditions"
 									className="font-bold text-[#1f6c43] hover:underline"
 								>
-									Terms and Conditions
+									{copy.terms}
 								</a>{" "}
-								and{" "}
+								{copy.termsMiddle}{" "}
 								<a
 									href="/booking-policies"
 									className="font-bold text-[#1f6c43] hover:underline"
 								>
-									Booking Policies
+									{copy.bookingPolicies}
 								</a>
 								.
 							</span>
@@ -815,7 +1025,7 @@ export default function CheckoutSummary({
 								className="flex min-h-12 items-center justify-center gap-2 rounded-sm border border-[#e7d7c8] px-5 font-semibold text-[#5f5349] transition-colors hover:bg-[#fff8ef] hover:text-[#1f2d29] sm:justify-start sm:border-0 sm:px-0"
 							>
 								<ArrowLeft className="w-4 h-4" />
-								Back to Itinerary
+								{copy.backToItinerary}
 							</button>
 							<button
 								type="button"
@@ -824,7 +1034,7 @@ export default function CheckoutSummary({
 								}}
 								className="flex min-h-12 items-center justify-center gap-2 rounded-sm bg-[#1f6c43] px-8 py-4 font-semibold text-white shadow-lg shadow-[#1f6c43]/20 transition-all hover:bg-[#185637] hover:shadow-xl hover:shadow-[#1f6c43]/25 active:scale-[0.98]"
 							>
-								Continue to Payment
+								{copy.continueToPayment}
 								<ArrowRight className="w-5 h-5" />
 							</button>
 						</div>
@@ -843,19 +1053,19 @@ export default function CheckoutSummary({
 								</div>
 								<div className="space-y-1 text-sm font-medium text-[#244237]">
 									<p>
-										You can make changes by writing to{" "}
+										{copy.changesNotice}{" "}
 										<strong className="text-[#1f6c43]">
 											info@dreamy.tours
 										</strong>
 									</p>
-									<p>PayPal charges an 8% fee for secure payment processing.</p>
+									<p>{copy.paypalNotice}</p>
 								</div>
 							</div>
 
 							{/* Payment Method */}
 							<h3 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#1f2d29]">
 								<span className="h-2 w-2 rounded-full bg-[#1f6c43]"></span>
-								Payment Method
+								{copy.paymentMethod}
 							</h3>
 							<div className="mb-8">
 								<div className="flex cursor-pointer items-center justify-between rounded-sm border-2 border-[#1f6c43] bg-[#edf8f1] p-5 shadow-lg shadow-[#1f6c43]/10 transition-all">
@@ -868,7 +1078,7 @@ export default function CheckoutSummary({
 										<div>
 											<span className="font-bold text-[#1f2d29]">PayPal</span>
 											<p className="text-xs text-gray-500">
-												Secure payment • 8% fee applies
+												{copy.securePayment}
 											</p>
 										</div>
 									</div>
@@ -881,7 +1091,7 @@ export default function CheckoutSummary({
 							{/* Payment Amount - The stars of the show */}
 							<h3 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#1f2d29]">
 								<span className="h-2 w-2 rounded-full bg-[#1f6c43]"></span>
-								Payment Amount
+								{copy.paymentAmount}
 							</h3>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
 								{/* Minimum Payment */}
@@ -897,16 +1107,16 @@ export default function CheckoutSummary({
 								>
 									{paymentOption === "minimum" && (
 										<div className="absolute -top-2.5 left-4 rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-bold text-secondary-foreground">
-											POPULAR
+											{copy.popular}
 										</div>
 									)}
 									<div className="flex justify-between items-start mb-4">
 										<div>
 											<span className="text-sm font-bold text-[#1f2d29]">
-												Pay Now
+												{copy.payNow}
 											</span>
 											<p className="mt-0.5 text-[11px] font-medium text-[#5f5349]">
-												Secure your booking
+												{copy.secureBooking}
 											</p>
 										</div>
 										<div
@@ -934,7 +1144,7 @@ export default function CheckoutSummary({
 									</div>
 									<div className="flex justify-between items-center pt-3 border-t border-gray-100">
 										<span className="text-[11px] font-medium text-[#6f6258]">
-											PayPal Fee (8%)
+											{copy.paypalFee}
 										</span>
 										<span className="text-xs font-bold text-[#1f2d29]">
 											+US${((totalPrice / 2) * 0.08).toFixed(2)}
@@ -956,10 +1166,10 @@ export default function CheckoutSummary({
 									<div className="flex justify-between items-start mb-4">
 										<div>
 											<span className="text-sm font-bold text-[#1f2d29]">
-												Pay Full
+												{copy.payFull}
 											</span>
 											<p className="mt-0.5 text-[11px] font-medium text-[#5f5349]">
-												Complete your payment
+												{copy.completePayment}
 											</p>
 										</div>
 										<div
@@ -987,7 +1197,7 @@ export default function CheckoutSummary({
 									</div>
 									<div className="flex justify-between items-center pt-3 border-t border-gray-100">
 										<span className="text-[11px] font-medium text-[#6f6258]">
-											PayPal Fee (8%)
+											{copy.paypalFee}
 										</span>
 										<span className="text-xs font-bold text-[#1f2d29]">
 											+US${(totalPrice * 0.08).toFixed(2)}
@@ -1001,7 +1211,7 @@ export default function CheckoutSummary({
 								<div className="flex items-center gap-2">
 									<Lock className="w-4 h-4 text-white/70" />
 									<span className="text-sm font-medium text-white/70">
-										Total to pay today
+										{copy.totalToPayToday}
 									</span>
 								</div>
 								<div className="text-right">
@@ -1019,7 +1229,7 @@ export default function CheckoutSummary({
 									className="flex min-h-12 items-center justify-center gap-2 rounded-sm border border-[#e7d7c8] px-5 font-semibold text-[#5f5349] transition-colors hover:bg-[#fff8ef] hover:text-[#1f2d29] sm:justify-start sm:border-0 sm:px-0"
 								>
 									<ArrowLeft className="w-4 h-4" />
-									Back to Passengers
+									{copy.backToPassengers}
 								</button>
 								<button
 									type="button"
@@ -1030,12 +1240,12 @@ export default function CheckoutSummary({
 									{isSubmitting ? (
 										<>
 											<div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-											Processing...
+											{copy.processing}
 										</>
 									) : (
 										<>
 											<Lock className="w-5 h-5" />
-											Pay US${(payAmount + paymentFee).toFixed(2)}
+											{copy.pay} US${(payAmount + paymentFee).toFixed(2)}
 										</>
 									)}
 								</button>
@@ -1045,7 +1255,7 @@ export default function CheckoutSummary({
 						{/* RIGHT SIDEBAR - Order Summary */}
 						<div className="w-full border-t border-[#eadfd3] bg-[#fffdf9] p-6 lg:border-l lg:border-t-0">
 							<h4 className="mb-5 text-sm font-bold uppercase tracking-widest text-secondary">
-								Summary
+								{copy.summary}
 							</h4>
 
 							<div className="mb-5 space-y-2">
@@ -1062,14 +1272,16 @@ export default function CheckoutSummary({
 							<div className="space-y-3">
 								<div className="flex items-center justify-between text-base">
 									<span className="font-medium text-[#6f6258]">
-										Selected payment
+										{copy.selectedPayment}
 									</span>
 									<span className="font-bold text-[#1f2d29]">
 										US${payAmount.toFixed(2)}
 									</span>
 								</div>
 								<div className="flex items-center justify-between text-base">
-									<span className="font-medium text-[#6f6258]">PayPal fee</span>
+									<span className="font-medium text-[#6f6258]">
+										{copy.paypalFee}
+									</span>
 									<span className="font-bold text-[#1f2d29]">
 										US${paymentFee.toFixed(2)}
 									</span>
@@ -1077,7 +1289,7 @@ export default function CheckoutSummary({
 								<div className="my-4 h-px bg-[#eadfd3]"></div>
 								<div className="flex items-center justify-between rounded-sm bg-[#edf8f1] px-3 py-3">
 									<span className="text-lg font-bold text-[#1f6c43]">
-										Pay today
+										{copy.payToday}
 									</span>
 									<span className="text-xl font-extrabold text-[#1f6c43]">
 										US${(payAmount + paymentFee).toFixed(2)}
