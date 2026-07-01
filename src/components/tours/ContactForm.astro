@@ -77,6 +77,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
     method="POST"
     class="space-y-4"
     id="contact-tour-form"
+    data-contact-tour-form
   >
     {tourName && <input type="hidden" name="tourName" value={tourName} />}
     <input
@@ -207,9 +208,10 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
 
     <button
       type="submit"
+      data-contact-submit
       class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-sm font-bold transition-all duration-200 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] mt-2 group"
     >
-      <span>Enviar solicitud</span>
+      <span data-contact-submit-label>Enviar solicitud</span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
@@ -226,6 +228,13 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
       </svg>
     </button>
+
+    <p
+      class="hidden rounded-sm border px-4 py-3 text-sm font-semibold"
+      data-contact-status
+      aria-live="polite"
+    >
+    </p>
   </form>
 </section>
 
@@ -257,6 +266,16 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         );
         const whatsappInput =
           root.querySelector<HTMLInputElement>("#contact-whatsapp");
+        const form = root.querySelector<HTMLFormElement>("#contact-tour-form");
+        const submitButton = root.querySelector<HTMLButtonElement>(
+          "[data-contact-submit]",
+        );
+        const submitLabel = root.querySelector<HTMLElement>(
+          "[data-contact-submit-label]",
+        );
+        const statusMessage = root.querySelector<HTMLElement>(
+          "[data-contact-status]",
+        );
 
         if (!countrySelect || !phoneCodeSpan) return;
         const phoneCodeDisplay = phoneCodeSpan;
@@ -294,16 +313,196 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           updateWhatsAppLink();
         }
 
+        function setStatus(type: "success" | "error", message: string) {
+          if (!statusMessage) return;
+
+          statusMessage.textContent = message;
+          statusMessage.classList.remove(
+            "hidden",
+            "border-green-200",
+            "bg-green-50",
+            "text-green-700",
+            "border-red-200",
+            "bg-red-50",
+            "text-red-700",
+          );
+          statusMessage.classList.add(
+            ...(type === "success"
+              ? ["border-green-200", "bg-green-50", "text-green-700"]
+              : ["border-red-200", "bg-red-50", "text-red-700"]),
+          );
+          statusMessage.setAttribute(
+            "role",
+            type === "success" ? "status" : "alert",
+          );
+          statusMessage.setAttribute(
+            "aria-live",
+            type === "success" ? "polite" : "assertive",
+          );
+        }
+
+        function setSubmitting(isSubmitting: boolean) {
+          if (submitButton) {
+            submitButton.disabled = isSubmitting;
+            submitButton.classList.toggle("cursor-not-allowed", isSubmitting);
+            submitButton.classList.toggle("opacity-75", isSubmitting);
+          }
+
+          if (submitLabel) {
+            submitLabel.textContent = isSubmitting
+              ? "Enviando..."
+              : "Enviar solicitud";
+          }
+        }
+
+        async function handleSubmit(event: SubmitEvent) {
+          if (!form) return;
+
+          event.preventDefault();
+
+          if (!form.reportValidity()) return;
+
+          setSubmitting(true);
+          statusMessage?.classList.add("hidden");
+
+          try {
+            const response = await fetch(form.action, {
+              method: form.method || "POST",
+              body: new FormData(form),
+              headers: {
+                Accept: "application/json",
+              },
+            });
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok || !result.success) {
+              throw new Error(
+                result.error || "No se pudo enviar el formulario.",
+              );
+            }
+
+            form.reset();
+            updatePhoneCode();
+            setStatus(
+              "success",
+              "Formulario enviado correctamente. Te contactaremos pronto.",
+            );
+          } catch (error) {
+            console.error("Error al enviar formulario de tour:", error);
+            setStatus(
+              "error",
+              "No se pudo enviar el formulario. Inténtalo nuevamente o escríbenos por WhatsApp.",
+            );
+          } finally {
+            setSubmitting(false);
+          }
+        }
+
         countrySelect.addEventListener("change", updatePhoneCode, {
           signal: controller.signal,
         });
         whatsappInput?.addEventListener("input", updateWhatsAppLink, {
           signal: controller.signal,
         });
+        form?.addEventListener("submit", handleSubmit, {
+          signal: controller.signal,
+        });
 
         updatePhoneCode();
       });
   }
+
+  document.addEventListener("submit", async (event) => {
+    if (event.defaultPrevented) return;
+
+    const form = (event.target as HTMLElement | null)?.closest<HTMLFormElement>(
+      "[data-contact-tour-form]",
+    );
+
+    if (!form) return;
+
+    event.preventDefault();
+
+    if (!form.reportValidity()) return;
+
+    const submitButton = form.querySelector<HTMLButtonElement>(
+      "[data-contact-submit]",
+    );
+    const submitLabel = form.querySelector<HTMLElement>(
+      "[data-contact-submit-label]",
+    );
+    const statusMessage = form.querySelector<HTMLElement>(
+      "[data-contact-status]",
+    );
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.classList.add("cursor-not-allowed", "opacity-75");
+    }
+    if (submitLabel) submitLabel.textContent = "Enviando...";
+    statusMessage?.classList.add("hidden");
+
+    try {
+      const response = await fetch(form.action, {
+        method: form.method || "POST",
+        body: new FormData(form),
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "No se pudo enviar el formulario.");
+      }
+
+      form.reset();
+
+      if (statusMessage) {
+        statusMessage.textContent =
+          "Formulario enviado correctamente. Te contactaremos pronto.";
+        statusMessage.classList.remove(
+          "hidden",
+          "border-red-200",
+          "bg-red-50",
+          "text-red-700",
+        );
+        statusMessage.classList.add(
+          "border-green-200",
+          "bg-green-50",
+          "text-green-700",
+        );
+        statusMessage.setAttribute("role", "status");
+        statusMessage.setAttribute("aria-live", "polite");
+      }
+    } catch (error) {
+      console.error("Error al enviar formulario de tour:", error);
+
+      if (statusMessage) {
+        statusMessage.textContent =
+          "No se pudo enviar el formulario. Intentalo nuevamente o escribenos por WhatsApp.";
+        statusMessage.classList.remove(
+          "hidden",
+          "border-green-200",
+          "bg-green-50",
+          "text-green-700",
+        );
+        statusMessage.classList.add(
+          "border-red-200",
+          "bg-red-50",
+          "text-red-700",
+        );
+        statusMessage.setAttribute("role", "alert");
+        statusMessage.setAttribute("aria-live", "assertive");
+      }
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.classList.remove("cursor-not-allowed", "opacity-75");
+      }
+      if (submitLabel) submitLabel.textContent = "Enviar solicitud";
+    }
+  });
 
   windowWithContactForm.__dreamyContactFormPageLoadController?.abort();
   windowWithContactForm.__dreamyContactFormPageLoadController =

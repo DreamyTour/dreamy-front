@@ -24,8 +24,91 @@ async function readRequestData(request: Request) {
 	return data;
 }
 
+function expectsJson(request: Request) {
+	const accept = request.headers.get("accept") || "";
+	const contentType = request.headers.get("content-type") || "";
+
+	return (
+		accept.includes("application/json") ||
+		contentType.includes("application/json")
+	);
+}
+
+function htmlFormResponse({
+	title,
+	message,
+	backUrl,
+	status = 200,
+}: {
+	title: string;
+	message: string;
+	backUrl: string;
+	status?: number;
+}) {
+	return new Response(
+		`<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeHtml(title)}</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f8faf7;
+        color: #1f2d29;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main {
+        width: min(92vw, 34rem);
+        border: 1px solid #dfe7df;
+        border-radius: 8px;
+        background: white;
+        padding: 2rem;
+        box-shadow: 0 24px 70px rgba(31, 45, 41, 0.12);
+      }
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(1.7rem, 4vw, 2.4rem);
+        line-height: 1.1;
+      }
+      p {
+        margin: 0 0 1.5rem;
+        color: #5f6f67;
+        line-height: 1.6;
+      }
+      a {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        border-radius: 4px;
+        background: #1f6c43;
+        color: white;
+        padding: 0 1rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>${escapeHtml(title)}</h1>
+      <p>${escapeHtml(message)}</p>
+      <a href="${escapeHtml(backUrl)}">Volver al tour</a>
+    </main>
+  </body>
+</html>`,
+		{ status, headers: { "Content-Type": "text/html; charset=utf-8" } },
+	);
+}
+
 export const POST: APIRoute = async ({ request }) => {
 	try {
+		const shouldReturnJson = expectsJson(request);
+		const backUrl = request.headers.get("referer") || "/";
 		const body = await readRequestData(request);
 		const {
 			nombres,
@@ -45,6 +128,15 @@ export const POST: APIRoute = async ({ request }) => {
 		const emailValue = String(email || "").trim();
 
 		if (!nombres || !pais || !emailValue || !emailPattern.test(emailValue)) {
+			if (!shouldReturnJson) {
+				return htmlFormResponse({
+					title: "No se pudo enviar",
+					message: "Completa los campos requeridos e intenta nuevamente.",
+					backUrl,
+					status: 400,
+				});
+			}
+
 			return new Response(
 				JSON.stringify({
 					error: "Todos los campos requeridos deben ser completados",
@@ -60,6 +152,14 @@ export const POST: APIRoute = async ({ request }) => {
 				hasMessage: Boolean(mensaje),
 				destinationsCount: Array.isArray(destinos) ? destinos.length : 0,
 			});
+
+			if (!shouldReturnJson) {
+				return htmlFormResponse({
+					title: "Formulario enviado",
+					message: "Gracias por contactarnos. Te responderemos pronto.",
+					backUrl,
+				});
+			}
 
 			return new Response(
 				JSON.stringify({
@@ -179,10 +279,28 @@ export const POST: APIRoute = async ({ request }) => {
 
 		if (error) {
 			console.error("Error de Resend:", error);
+			if (!shouldReturnJson) {
+				return htmlFormResponse({
+					title: "No se pudo enviar",
+					message:
+						"Hubo un problema al enviar el formulario. Intenta nuevamente o escribenos por WhatsApp.",
+					backUrl,
+					status: 500,
+				});
+			}
+
 			return new Response(
 				JSON.stringify({ error: "Error al enviar el email", details: error }),
 				{ status: 500, headers: { "Content-Type": "application/json" } },
 			);
+		}
+
+		if (!shouldReturnJson) {
+			return htmlFormResponse({
+				title: "Formulario enviado",
+				message: "Gracias por contactarnos. Te responderemos pronto.",
+				backUrl,
+			});
 		}
 
 		return new Response(
