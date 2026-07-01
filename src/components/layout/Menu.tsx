@@ -73,8 +73,12 @@ const languageFlags: Record<Lang, string> = {
 
 const MEGA_MENU_COLUMN_WIDTH = 340;
 const MEGA_MENU_EDGE_PADDING = 16;
+const DESKTOP_NAV_QUERY = "(min-width: 1280px)";
+const DESKTOP_NAV_SCROLL_DELTA = 8;
 const desktopTopLevelItemClass =
 	"text-white/88 hover:bg-white/10 hover:text-white focus-visible:ring-offset-[#081711] data-[state=open]:bg-white/10 data-[state=open]:text-white [&_svg]:text-white/62 [&:hover_svg]:text-white/86 [&[data-state=open]_svg]:text-white/86";
+
+type DesktopNavMode = "static" | "visible" | "hidden";
 
 type MegaMenuLayout = {
 	left: number;
@@ -240,10 +244,15 @@ export default function MainMenu({
 	const [desktopMegaMenuLayouts, setDesktopMegaMenuLayouts] = useState<
 		Record<string, MegaMenuLayout>
 	>({});
+	const [desktopNavMode, setDesktopNavMode] =
+		useState<DesktopNavMode>("static");
+	const desktopNavShellRef = useRef<HTMLDivElement>(null);
 	const desktopMenuRef = useRef<HTMLDivElement>(null);
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const mobileMenuRef = useRef<HTMLElement>(null);
 	const wasMobileOpenRef = useRef(false);
+	const desktopNavModeRef = useRef<DesktopNavMode>("static");
+	const lastScrollYRef = useRef(0);
 
 	const measureDesktopMegaMenus = useCallback(() => {
 		const desktopMenu = desktopMenuRef.current;
@@ -324,6 +333,68 @@ export default function MainMenu({
 		};
 	}, [measureDesktopMegaMenus]);
 
+	useEffect(() => {
+		const mediaQuery = window.matchMedia(DESKTOP_NAV_QUERY);
+		let frameId = 0;
+
+		const setMode = (mode: DesktopNavMode) => {
+			if (desktopNavModeRef.current === mode) return;
+			desktopNavModeRef.current = mode;
+			setDesktopNavMode(mode);
+		};
+
+		const updateNavMode = () => {
+			frameId = 0;
+
+			if (!mediaQuery.matches) {
+				setMode("static");
+				lastScrollYRef.current = window.scrollY;
+				return;
+			}
+
+			const shell = desktopNavShellRef.current;
+			if (!shell) return;
+
+			const currentScrollY = Math.max(0, window.scrollY);
+			const shellTop = shell.offsetTop;
+			const shellHeight = shell.offsetHeight;
+			const pinThreshold = shellTop + shellHeight;
+
+			if (currentScrollY <= shellTop) {
+				setMode("static");
+				lastScrollYRef.current = currentScrollY;
+				return;
+			}
+
+			const delta = currentScrollY - lastScrollYRef.current;
+			if (Math.abs(delta) < DESKTOP_NAV_SCROLL_DELTA) return;
+
+			setMode(
+				delta < 0 || currentScrollY <= pinThreshold ? "visible" : "hidden",
+			);
+			lastScrollYRef.current = currentScrollY;
+		};
+
+		const requestUpdate = () => {
+			if (frameId) return;
+			frameId = window.requestAnimationFrame(updateNavMode);
+		};
+
+		lastScrollYRef.current = window.scrollY;
+		updateNavMode();
+
+		window.addEventListener("scroll", requestUpdate, { passive: true });
+		window.addEventListener("resize", requestUpdate);
+		mediaQuery.addEventListener("change", requestUpdate);
+
+		return () => {
+			if (frameId) window.cancelAnimationFrame(frameId);
+			window.removeEventListener("scroll", requestUpdate);
+			window.removeEventListener("resize", requestUpdate);
+			mediaQuery.removeEventListener("change", requestUpdate);
+		};
+	}, []);
+
 	// Focus trap y gestión del foco al abrir/cerrar menú móvil
 	useEffect(() => {
 		if (mobileOpen) {
@@ -387,134 +458,147 @@ export default function MainMenu({
 			{/* =======================
           DESKTOP (xl+)
           ======================= */}
-			<div className="relative z-40 isolate hidden border-y border-white/10 bg-[#081711] text-white shadow-[0_16px_38px_-30px_rgba(8,23,17,0.72)] xl:block">
+			<div ref={desktopNavShellRef} className="hidden h-[62px] xl:block">
 				<div
-					className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-					aria-hidden="true"
+					className={`z-40 isolate border-y border-white/10 bg-[#081711] text-white shadow-[0_16px_38px_-30px_rgba(8,23,17,0.72)] transition-transform duration-300 ease-out motion-reduce:transition-none ${
+						desktopNavMode === "static"
+							? "relative"
+							: desktopNavMode === "visible"
+								? "fixed inset-x-0 top-0 translate-y-0"
+								: "fixed inset-x-0 top-0 -translate-y-full"
+					}`}
 				>
-					<div className="absolute inset-0 bg-[linear-gradient(180deg,_#0b1d15_0%,_#081711_58%,_#050907_100%)]" />
-					<div className="absolute inset-0 bg-[url('/fondo.svg')] bg-repeat opacity-15 [background-position:center_top] [background-size:clamp(26rem,38vw,38rem)_clamp(26rem,38vw,38rem)] [filter:invert(1)_sepia(0.2)_saturate(0.45)_contrast(1.08)] [mix-blend-mode:soft-light]" />
-					<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.08),_transparent_38%)]" />
-					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-				</div>
-				<div
-					ref={desktopMenuRef}
-					className="relative z-10 mx-auto w-full max-w-8xl px-4"
-				>
-					<NavigationMenu
-						className="mx-auto w-full max-w-none px-0"
-						aria-label="Menú principal"
+					<div
+						className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+						aria-hidden="true"
 					>
-						<NavigationMenuList className="h-[60px] w-full justify-center gap-0">
-							{menu?.menuItems?.map((menuItem: MenuItem, index) => {
-								const hasChildren =
-									Array.isArray(menuItem.item) && menuItem.item.length > 0;
-								const columnCount = hasChildren
-									? getMegaMenuColumnCount(menuItem.item.length)
-									: 1;
-								const rowsPerColumn = hasChildren
-									? Math.ceil(menuItem.item.length / columnCount)
-									: 1;
-								const megaMenuLayout =
-									desktopMegaMenuLayouts[String(menuItem.id)];
-								const megaMenuStyle = hasChildren
-									? ({
-											"--mega-menu-left": `${megaMenuLayout?.left ?? MEGA_MENU_EDGE_PADDING}px`,
-											"--mega-menu-width": `${megaMenuLayout?.width ?? columnCount * MEGA_MENU_COLUMN_WIDTH}px`,
-										} as CSSProperties)
-									: undefined;
+						<div className="absolute inset-0 bg-[linear-gradient(180deg,_#0b1d15_0%,_#081711_58%,_#050907_100%)]" />
+						<div className="absolute inset-0 bg-[url('/fondo.svg')] bg-repeat opacity-15 [background-position:center_top] [background-size:clamp(26rem,38vw,38rem)_clamp(26rem,38vw,38rem)] [filter:invert(1)_sepia(0.2)_saturate(0.45)_contrast(1.08)] [mix-blend-mode:soft-light]" />
+						<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.08),_transparent_38%)]" />
+						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+					</div>
+					<div
+						ref={desktopMenuRef}
+						className="relative z-10 mx-auto w-full max-w-8xl px-4"
+					>
+						<NavigationMenu
+							className="mx-auto w-full max-w-none px-0"
+							aria-label="Menú principal"
+						>
+							<NavigationMenuList className="h-[60px] w-full justify-center gap-0">
+								{menu?.menuItems?.map((menuItem: MenuItem, index) => {
+									const hasChildren =
+										Array.isArray(menuItem.item) && menuItem.item.length > 0;
+									const columnCount = hasChildren
+										? getMegaMenuColumnCount(menuItem.item.length)
+										: 1;
+									const rowsPerColumn = hasChildren
+										? Math.ceil(menuItem.item.length / columnCount)
+										: 1;
+									const megaMenuLayout =
+										desktopMegaMenuLayouts[String(menuItem.id)];
+									const megaMenuStyle = hasChildren
+										? ({
+												"--mega-menu-left": `${megaMenuLayout?.left ?? MEGA_MENU_EDGE_PADDING}px`,
+												"--mega-menu-width": `${megaMenuLayout?.width ?? columnCount * MEGA_MENU_COLUMN_WIDTH}px`,
+											} as CSSProperties)
+										: undefined;
 
-								return (
-									<NavigationMenuItem
-										key={menuItem.id}
-										className="flex h-full justify-center"
-									>
-										{hasChildren ? (
-											<>
-												<NavigationMenuTrigger
-													data-mega-menu-anchor={index}
-													className={desktopTopLevelItemClass}
-													onClick={() => {
-														if (menuItem.link?.url) {
-															window.location.href = rewriteUrl(
-																menuItem.link.url,
-																lang,
-															);
-														}
-													}}
-												>
-													<MenuLabelWithBadge
-														label={menuItem.link.label}
-														badge={menuItem.link.badge}
-													/>
-												</NavigationMenuTrigger>
-
-												<NavigationMenuContent
-													className="left-[var(--mega-menu-left)] right-auto mt-2 w-[var(--mega-menu-width)] max-w-[calc(100%-2rem)] rounded-none border-slate-200/90 bg-white shadow-[0_34px_90px_-54px_rgba(8,23,17,0.72)]"
-													style={megaMenuStyle}
-												>
-													<div className="bg-white px-6 pt-6 pb-3">
-														<p className="inline-block border-b-2 border-primary pb-0.5 text-[12px] font-bold uppercase leading-none tracking-[0.24em] text-black">
-															{menuItem.link.label}
-														</p>
-													</div>
-
-													<ul
-														className="grid w-full grid-flow-col gap-x-4 gap-y-2 px-4 py-4"
-														style={
-															{
-																gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
-																gridTemplateRows: `repeat(${rowsPerColumn}, auto)`,
-															} as CSSProperties
-														}
+									return (
+										<NavigationMenuItem
+											key={menuItem.id}
+											className="flex h-full justify-center"
+										>
+											{hasChildren ? (
+												<>
+													<NavigationMenuTrigger
+														data-mega-menu-anchor={index}
+														className={desktopTopLevelItemClass}
+														onClick={() => {
+															if (menuItem.link?.url) {
+																window.location.href = rewriteUrl(
+																	menuItem.link.url,
+																	lang,
+																);
+															}
+														}}
 													>
-														{menuItem.item.map((subItem: Link) => (
-															<li key={subItem.id} className="min-w-0">
-																<NavigationMenuLink asChild variant="dropdown">
-																	<a
-																		href={rewriteUrl(subItem.url, lang)}
-																		className="h-full overflow-hidden min-h-[50px] rounded-sm px-4 py-3 text-[15px] font-medium text-[#0b1511] before:pointer-events-none before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-secondary before:opacity-0 before:transition-opacity before:duration-200 hover:bg-primary/[0.07] hover:text-primary hover:shadow-[0_18px_38px_-30px_rgba(8,23,17,0.62)] group-hover:before:opacity-100 border-b border-dashed border-slate-200 hover:border-primary"
+														<MenuLabelWithBadge
+															label={menuItem.link.label}
+															badge={menuItem.link.badge}
+														/>
+													</NavigationMenuTrigger>
+
+													<NavigationMenuContent
+														className="left-[var(--mega-menu-left)] right-auto mt-2 w-[var(--mega-menu-width)] max-w-[calc(100%-2rem)] rounded-none border-slate-200/90 bg-white shadow-[0_34px_90px_-54px_rgba(8,23,17,0.72)]"
+														style={megaMenuStyle}
+													>
+														<div className="bg-white px-6 pt-6 pb-3">
+															<p className="inline-block border-b-2 border-primary pb-0.5 text-[12px] font-bold uppercase leading-none tracking-[0.24em] text-black">
+																{menuItem.link.label}
+															</p>
+														</div>
+
+														<ul
+															className="grid w-full grid-flow-col gap-x-4 gap-y-2 px-4 py-4"
+															style={
+																{
+																	gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
+																	gridTemplateRows: `repeat(${rowsPerColumn}, auto)`,
+																} as CSSProperties
+															}
+														>
+															{menuItem.item.map((subItem: Link) => (
+																<li key={subItem.id} className="min-w-0">
+																	<NavigationMenuLink
+																		asChild
+																		variant="dropdown"
 																	>
-																		<span className="min-w-0 flex-1 whitespace-normal break-words leading-snug text-wrap-pretty [overflow-wrap:anywhere]">
-																			{subItem.label}
-																		</span>
-																		<ArrowUpRight
-																			size={16}
-																			strokeWidth={2.2}
-																			aria-hidden="true"
-																			focusable="false"
-																			className="-translate-x-1 ml-auto size-7 shrink-0 translate-y-1 rounded-full border border-secondary/20 bg-white p-1.5 text-secondary opacity-0 shadow-[0_10px_22px_-18px_color-mix(in_oklab,var(--secondary)_72%,transparent)] transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
-																		/>
-																		{subItem.badge ? (
-																			<span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm bg-secondary px-3 py-1.5 text-[10px] font-normal leading-none text-white uppercase">
-																				{subItem.badge}
+																		<a
+																			href={rewriteUrl(subItem.url, lang)}
+																			className="h-full overflow-hidden min-h-[50px] rounded-sm px-4 py-3 text-[15px] font-medium text-[#0b1511] before:pointer-events-none before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-secondary before:opacity-0 before:transition-opacity before:duration-200 hover:bg-primary/[0.07] hover:text-primary hover:shadow-[0_18px_38px_-30px_rgba(8,23,17,0.62)] group-hover:before:opacity-100 border-b border-dashed border-slate-200 hover:border-primary"
+																		>
+																			<span className="min-w-0 flex-1 whitespace-normal break-words leading-snug text-wrap-pretty [overflow-wrap:anywhere]">
+																				{subItem.label}
 																			</span>
-																		) : null}
-																	</a>
-																</NavigationMenuLink>
-															</li>
-														))}
-													</ul>
-												</NavigationMenuContent>
-											</>
-										) : (
-											<NavigationMenuLink
-												asChild
-												className={desktopTopLevelItemClass}
-											>
-												<a href={rewriteUrl(menuItem.link.url, lang)}>
-													<MenuLabelWithBadge
-														label={menuItem.link.label}
-														badge={menuItem.link.badge}
-													/>
-												</a>
-											</NavigationMenuLink>
-										)}
-									</NavigationMenuItem>
-								);
-							})}
-						</NavigationMenuList>
-					</NavigationMenu>
+																			<ArrowUpRight
+																				size={16}
+																				strokeWidth={2.2}
+																				aria-hidden="true"
+																				focusable="false"
+																				className="-translate-x-1 ml-auto size-7 shrink-0 translate-y-1 rounded-full border border-secondary/20 bg-white p-1.5 text-secondary opacity-0 shadow-[0_10px_22px_-18px_color-mix(in_oklab,var(--secondary)_72%,transparent)] transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+																			/>
+																			{subItem.badge ? (
+																				<span className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm bg-secondary px-3 py-1.5 text-[10px] font-normal leading-none text-white uppercase">
+																					{subItem.badge}
+																				</span>
+																			) : null}
+																		</a>
+																	</NavigationMenuLink>
+																</li>
+															))}
+														</ul>
+													</NavigationMenuContent>
+												</>
+											) : (
+												<NavigationMenuLink
+													asChild
+													className={desktopTopLevelItemClass}
+												>
+													<a href={rewriteUrl(menuItem.link.url, lang)}>
+														<MenuLabelWithBadge
+															label={menuItem.link.label}
+															badge={menuItem.link.badge}
+														/>
+													</a>
+												</NavigationMenuLink>
+											)}
+										</NavigationMenuItem>
+									);
+								})}
+							</NavigationMenuList>
+						</NavigationMenu>
+					</div>
 				</div>
 			</div>
 
