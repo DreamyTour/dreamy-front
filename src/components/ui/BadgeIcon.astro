@@ -3,6 +3,7 @@ import {
   DurationIcon,
   DifficultyIcon,
   GroupIcon,
+  ServiceTypeIcon,
   AltitudeIcon,
   GuideIcon,
   TransportIcon,
@@ -41,6 +42,15 @@ else if (
   searchStr.includes("level")
 )
   iconType = "difficulty";
+else if (
+  searchStr.includes("service type") ||
+  searchStr.includes("service tipe") ||
+  searchStr.includes("tipo de servicio") ||
+  searchStr.includes("tipo de servico") ||
+  searchStr.includes("tipo servicio") ||
+  searchStr.includes("tipo servico")
+)
+  iconType = "serviceType";
 else if (
   searchStr.includes("grupo") ||
   searchStr.includes("group") ||
@@ -90,6 +100,9 @@ else if (
 }
 {
   iconType === "group" && <GroupIcon className={className} />
+}
+{
+  iconType === "serviceType" && <ServiceTypeIcon className={className} />
 }
 {
   iconType === "altitude" && <AltitudeIcon className={className} />

@@ -62,6 +62,30 @@ export function GroupIcon(props: React.SVGProps<SVGSVGElement>) {
 	);
 }
 
+export function ServiceTypeIcon(props: React.SVGProps<SVGSVGElement>) {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			aria-hidden="true"
+			focusable="false"
+			{...props}
+		>
+			<path d="M4 7h16" />
+			<path d="M4 17h16" />
+			<path d="M7 4v6" />
+			<path d="M17 14v6" />
+			<circle cx="7" cy="7" r="2" />
+			<circle cx="17" cy="17" r="2" />
+		</svg>
+	);
+}
+
 export function AltitudeIcon(props: React.SVGProps<SVGSVGElement>) {
 	return (
 		<svg
