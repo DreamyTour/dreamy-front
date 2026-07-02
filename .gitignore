@@ -18,6 +18,16 @@ test-results/
 playwright-report/
 
 ############################
+# Local diagnostics / screenshots
+############################
+/tmp*.png
+/home-stats*.png
+/trace-*.json
+/critique.json
+/dev-reviews.log
+/mqlgnqnx-image.png
+
+############################
 # Environment variables 🔐
 ############################
 .env
