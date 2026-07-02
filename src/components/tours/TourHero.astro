@@ -238,10 +238,10 @@ const galleryImagesJson = serializeJsonForHtml(
   {/* TOUR INFO: Title + Description (left) | Badges Card (right) */}
   <div class="w-full items-center animate-fade-in-up mt-8 lg:mt-12">
     <div
-      class={`flex items-center flex-col ${hasBadges ? "lg:flex-row" : ""} gap-8 lg:gap-12`}
+      class={`flex items-center flex-col ${hasBadges ? "xl:flex-row" : ""} gap-8 xl:gap-12`}
     >
       {/* Left Column — Title & Description */}
-      <div class={`${hasBadges ? "lg:flex-1" : "w-full"}`}>
+      <div class={`${hasBadges ? "xl:flex-1" : "w-full"}`}>
         {
           categoryName && (
             <span class="inline-block text-xs font-bold uppercase tracking-[0.2em] text-slate-800 mb-4">
@@ -263,7 +263,7 @@ const galleryImagesJson = serializeJsonForHtml(
       {/* Right Column — Badges Card + CTAs */}
       {
         hasBadges && (
-          <div class="lg:w-[380px] xl:w-[420px] shrink-0">
+          <div class="w-full xl:w-[420px] shrink-0">
             <div class="rounded-lg border border-border bg-background p-1 shadow-sm">
               {/* Badges Grid */}
               <dl class="grid grid-cols-2 overflow-hidden rounded-md divide-x divide-y divide-border bg-muted/50">

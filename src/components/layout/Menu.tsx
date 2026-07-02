@@ -636,15 +636,15 @@ export default function MainMenu({
 								type="button"
 								ref={menuButtonRef}
 								onClick={() => setMobileOpen(!mobileOpen)}
-								className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-primary transition-all duration-200 hover:bg-primary/5 active:scale-90"
+								className="inline-flex h-[42px] w-[42px] items-center justify-center rounded-full border border-primary/25 bg-white text-primary shadow-sm transition-all duration-200 hover:border-primary/45 hover:bg-primary/5 active:scale-90"
 								aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
 								aria-expanded={mobileOpen}
 								aria-controls="mobile-menu"
 							>
 								{mobileOpen ? (
-									<X size={22} aria-hidden="true" focusable="false" />
+									<X size={25} aria-hidden="true" focusable="false" />
 								) : (
-									<Menu size={22} aria-hidden="true" focusable="false" />
+									<Menu size={25} aria-hidden="true" focusable="false" />
 								)}
 							</button>
 						</li>
