@@ -63,13 +63,13 @@ const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
 ---
 
 <section
-  class="mt-12 overflow-hidden rounded-lg border border-border bg-white shadow-[0_12px_34px_rgba(15,23,42,0.06)]"
+  class="blog-contact-cta relative isolate mt-12 overflow-hidden rounded-lg border border-primary/20 bg-[color-mix(in_oklab,var(--primary)_7%,white)] shadow-[0_20px_56px_-42px_color-mix(in_oklab,var(--primary)_58%,black)]"
   aria-labelledby="blog-contact-title"
 >
-  <div class="grid gap-0 lg:grid-cols-[1fr_auto]">
+  <div class="relative z-10 grid gap-0 lg:grid-cols-[1fr_auto]">
     <div class="p-6 sm:p-8">
       <p
-        class="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-primary"
+        class="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-secondary"
       >
         {t.eyebrow}
       </p>
@@ -85,11 +85,11 @@ const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
     </div>
 
     <div
-      class="flex flex-col justify-center gap-3 border-t border-border bg-muted/20 p-6 sm:flex-row sm:items-center lg:min-w-[280px] lg:flex-col lg:items-stretch lg:border-l lg:border-t-0"
+      class="flex flex-col justify-center gap-3 border-t border-primary/15 bg-white/55 p-6 backdrop-blur-[1px] sm:flex-row sm:items-center lg:min-w-[280px] lg:flex-col lg:items-stretch lg:border-l lg:border-t-0"
     >
       <a
         href={rewriteUrl(planTripPath, lang)}
-        class="inline-flex items-center justify-center rounded-sm bg-primary px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-primary-foreground shadow-sm shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        class="inline-flex items-center justify-center rounded-sm bg-secondary px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-secondary-foreground shadow-sm shadow-secondary/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-secondary/90 hover:shadow-md hover:shadow-secondary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
       >
         {t.primary}
       </a>
@@ -97,7 +97,7 @@ const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
         href={whatsappHref}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center justify-center gap-2 rounded-sm border border-primary/30 bg-white px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-primary transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-sm:mr-16"
+        class="inline-flex items-center justify-center gap-2 rounded-sm border-2 border-primary bg-white px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-primary transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 max-sm:mr-16"
       >
         <WhatsAppIcon className="size-4" />
         {t.secondary}
@@ -105,3 +105,21 @@ const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
     </div>
   </div>
 </section>
+
+<style>
+  .blog-contact-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .blog-contact-cta::before {
+    background-image: url("/fondo.svg");
+    background-position: center top;
+    background-repeat: repeat;
+    background-size: 17rem 17rem;
+    opacity: 0.09;
+  }
+</style>
