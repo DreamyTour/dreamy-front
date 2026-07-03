@@ -187,7 +187,7 @@
 
 .payment-page .payment-options-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -197,16 +197,23 @@
   border: 1px solid var(--primary);
   border-radius: 12px;
   padding: 1.25rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.25rem;
+  align-items: start;
+}
+
+.payment-page .payment-option-card:nth-child(3) {
+  grid-column: 1 / -1;
+  background: color-mix(in oklab, var(--accent) 16%, var(--payment-bg));
 }
 
 .payment-page .option-icon {
   width: 44px;
   height: 44px;
   min-width: 44px;
+  grid-row: 1 / span 2;
   background: var(--accent);
   border-radius: 10px;
   display: flex;
@@ -228,7 +235,6 @@
   color: var(--payment-muted);
   margin: 0;
   line-height: 1.4;
-  display: none;
 }
 
 .payment-page .payment-grid {
@@ -646,9 +652,12 @@
     grid-template-columns: 1fr;
   }
 
+  .payment-page .payment-option-card:nth-child(3) {
+    grid-column: auto;
+  }
+
   .payment-page .payment-option-card {
-    flex-direction: row;
-    align-items: center;
+    grid-template-columns: 44px minmax(0, 1fr);
   }
 }
 
