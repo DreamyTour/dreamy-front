@@ -3,6 +3,7 @@ import {
   machupicchuCircuitsContent,
   type MachupicchuCircuitsLang,
 } from "@/data/machupicchuCircuitsContent";
+import { getPlanTripHref } from "@/lib/planTrip";
 import { MapPinned } from "lucide-react";
 
 interface Props {
@@ -14,7 +15,8 @@ type Tone = "c1" | "c2" | "c3" | "gold";
 const selectedLang = Astro.props.lang ?? "es";
 const content =
   machupicchuCircuitsContent[selectedLang] ?? machupicchuCircuitsContent.es;
-const { circuits, routes, ui, compareRows, booking, cta, ctaHref } = content;
+const { circuits, routes, ui, compareRows, booking, cta } = content;
+const ctaHref = getPlanTripHref(selectedLang);
 
 const circuitMapImages: Record<string, string> = {
   circuito1: "/imagenes/circuitos/mapa-del-circuito-uno-machupicchu.webp",
