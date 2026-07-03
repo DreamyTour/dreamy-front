@@ -105,8 +105,15 @@ slugs:
 
 {/* Support Note */}
 
-<div class="mt-8 p-6 rounded-xl bg-muted/20 border border-dashed border-border">
-  <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
+<div class="relative mt-8 rounded-xl border border-dashed border-border bg-muted/20 p-6 transition-colors hover:bg-muted/35">
+  <a
+    class="absolute inset-0 rounded-xl"
+    href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=info@dreamy.tours"
+    target="_blank"
+    rel="nofollow noopener noreferrer"
+    aria-label="Entre em contato com nossa equipe em info@dreamy.tours"
+  ></a>
+  <div class="pointer-events-none relative flex flex-col md:flex-row items-center justify-center gap-4 text-center">
     <div class="flex items-center gap-2 text-muted-foreground">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -125,12 +132,9 @@ slugs:
       <span>Dúvidas?</span>
     </div>
     <span class="text-muted-foreground">Entre em contato com nossa equipe em</span>
-    <a
-      class="inline-flex items-center text-primary-foreground font-semibold text-sm"
-      href="mailto:info@dreamytours.com"
-    >
-      info@dreamytours.com
-    </a>
+    <span class="inline-flex items-center text-primary font-semibold text-sm">
+      info@dreamy.tours
+    </span>
   </div>
 </div>
 

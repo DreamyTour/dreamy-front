@@ -1,5 +1,6 @@
 ---
-type Lang = "es" | "en" | "pt";
+import type { Lang } from "@/lib/i18n";
+import { getPlanTripHref } from "@/lib/planTrip";
 
 interface Props {
   lang?: Lang;
@@ -209,6 +210,7 @@ const content = {
 >;
 
 const page = content[selectedLang] ?? content.en;
+const planTripHref = getPlanTripHref(selectedLang);
 ---
 
 <section class="lgbt-page" aria-labelledby="lgbt-intro-title">
@@ -266,7 +268,7 @@ const page = content[selectedLang] ?? content.en;
     <h2 id="lgbt-cta-title">{page.ctaTitle}</h2>
   </div>
 
-  <a href="mailto:info@dreamytours.com">{page.ctaText}</a>
+  <a href={planTripHref}>{page.ctaText}</a>
 </section>
 
 <style is:inline>
