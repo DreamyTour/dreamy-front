@@ -14,6 +14,10 @@ slugs:
 ---
 
 import Button from "@/components/ui/button.astro";
+import paypalLogoUrl from "@/assets/svg/logos/paypal.svg?url";
+import izipayLogoUrl from "@/assets/svg/logos/izipay.webp";
+import moneygramLogoUrl from "@/assets/svg/logos/moneygram.svg?url";
+import westernUnionLogoUrl from "@/assets/svg/logos/western-union.svg?url";
 
 <div class="payment-page">
 
@@ -103,7 +107,9 @@ A Dreamy Tours opera sob padrões de serviço de alta qualidade, oferecendo os m
 <div class="payment-card">
   <div class="card-header">
     <div class="card-brand">
-      <div class="brand-icon brand-paypal">Pay</div>
+      <div class="brand-icon brand-logo brand-paypal">
+        <img src={paypalLogoUrl} alt="PayPal" loading="lazy" />
+      </div>
       <div>
         <h3 class="brand-name">PayPal</h3>
         <p class="brand-type">Pagamento online seguro</p>
@@ -133,7 +139,9 @@ A Dreamy Tours opera sob padrões de serviço de alta qualidade, oferecendo os m
 <div class="payment-card">
   <div class="card-header">
     <div class="card-brand">
-      <div class="brand-icon brand-izipay">IZI</div>
+      <div class="brand-icon brand-logo brand-izipay">
+        <img src={izipayLogoUrl.src} alt="Izipay" loading="lazy" />
+      </div>
       <div>
         <h3 class="brand-name">Izipay</h3>
         <p class="brand-type">Cartões de crédito e débito</p>
@@ -161,6 +169,8 @@ A Dreamy Tours opera sob padrões de serviço de alta qualidade, oferecendo os m
 </div>
 
 </div>
+
+{/* Temporariamente desativado: as transferências bancárias não serão usadas por enquanto.
 
 ---
 
@@ -276,6 +286,10 @@ A Dreamy Tours opera sob padrões de serviço de alta qualidade, oferecendo os m
 
 ---
 
+*/}
+
+---
+
 ## Envio de Dinheiro
 
 <div class="payment-grid">
@@ -283,7 +297,9 @@ A Dreamy Tours opera sob padrões de serviço de alta qualidade, oferecendo os m
 <div class="payment-card transfer-card">
   <div class="card-header">
     <div class="card-brand">
-      <div class="brand-icon brand-transfer">MG</div>
+      <div class="brand-icon brand-transfer brand-logo brand-moneygram">
+        <img src={moneygramLogoUrl} alt="MoneyGram" loading="lazy" />
+      </div>
       <div>
         <h3 class="brand-name">MoneyGram</h3>
         <p class="brand-type">Transferências rápidas</p>
@@ -306,7 +322,9 @@ A Dreamy Tours opera sob padrões de serviço de alta qualidade, oferecendo os m
 <div class="payment-card transfer-card">
   <div class="card-header">
     <div class="card-brand">
-      <div class="brand-icon brand-transfer">WU</div>
+      <div class="brand-icon brand-transfer brand-logo brand-western-union">
+        <img src={westernUnionLogoUrl} alt="Western Union" loading="lazy" />
+      </div>
       <div>
         <h3 class="brand-name">Western Union</h3>
         <p class="brand-type">Transferências globais</p>

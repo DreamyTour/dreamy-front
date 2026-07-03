@@ -422,15 +422,15 @@
 }
 
 .payment-page .brand-icon.brand-paypal {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font-size: 0.75rem;
+  background: #002991;
+}
+
+.payment-page .brand-icon.brand-paypal img {
+  width: 86%;
 }
 
 .payment-page .brand-icon.brand-izipay {
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-  font-size: 0.625rem;
+  background: #ff4240;
 }
 
 .payment-page .brand-icon.brand-bank {
@@ -442,6 +442,28 @@
 .payment-page .brand-icon.brand-transfer {
   background: var(--secondary);
   color: var(--secondary-foreground);
+}
+
+.payment-page .brand-icon.brand-logo {
+  width: 118px;
+  min-width: 118px;
+  border: 0;
+  padding: 0.65rem 0.8rem;
+}
+
+.payment-page .brand-icon.brand-moneygram {
+  background: #e31837;
+}
+
+.payment-page .brand-icon.brand-western-union {
+  background: #111111;
+}
+
+.payment-page .brand-icon.brand-logo img {
+  display: block;
+  width: 100%;
+  max-height: 36px;
+  object-fit: contain;
 }
 
 .payment-page .brand-name {
