@@ -2,6 +2,7 @@ import * as React from "react";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
 import { normalizeLists } from "@/lib/strapiBlocks";
 import { cn } from "@/lib/utils";
+import type { Lang } from "@/lib/i18n";
 import type {
   Acordeon as AcordeonType,
   StrapiBlock,
@@ -13,6 +14,7 @@ interface Props {
   openFirst?: boolean;
   asList?: boolean;
   variant?: "default" | "timeline";
+  lang?: Lang;
 }
 
 function renderTextNodes(children: StrapiBlockChild[]) {
@@ -105,14 +107,22 @@ function AccordionItem({
   defaultOpen,
   variant = "default",
   index,
+  lang = "es",
 }: {
   item: AcordeonType;
   defaultOpen: boolean;
   variant?: "default" | "timeline";
   index: number;
+  lang?: Lang;
 }) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
   const contentId = React.useId();
+  const dayLabels: Record<Lang, string> = {
+    en: "DAY",
+    es: "DÍA",
+    pt: "DIA",
+  };
+  const dayLabel = dayLabels[lang] ?? dayLabels.es;
 
   if (variant === "timeline") {
     return (
@@ -139,8 +149,13 @@ function AccordionItem({
             className="group flex w-full cursor-pointer items-center justify-between gap-5 text-left"
             onClick={() => setIsOpen((current) => !current)}
           >
-            <span className="text-xl font-extrabold leading-tight tracking-tight text-foreground md:text-2xl">
-              {item.titulo}
+            <span className="min-w-0">
+              <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.18em] text-secondary">
+                {dayLabel} {index + 1}
+              </span>
+              <span className="block text-xl font-extrabold leading-tight tracking-tight text-foreground md:text-2xl">
+                {item.titulo}
+              </span>
             </span>
             <span className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors duration-200 group-hover:text-primary">
               <ChevronIcon
@@ -212,6 +227,7 @@ export default function TourAccordionList({
   openFirst = false,
   asList = false,
   variant = "default",
+  lang,
 }: Props) {
   const content = items.map((item, index) => (
     <AccordionItem
@@ -220,6 +236,7 @@ export default function TourAccordionList({
       defaultOpen={openFirst && index === 0}
       variant={variant}
       index={index}
+      lang={lang}
     />
   ));
 

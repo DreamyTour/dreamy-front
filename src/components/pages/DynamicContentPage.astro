@@ -14,7 +14,12 @@ import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ManualSEO } from "@/lib/seo";
 import { buildSEOProps } from "@/lib/seo";
-import { generateDescription, getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import {
+  generateDescription,
+  getImageAlt,
+  getImageSrcSet,
+  getImageUrl,
+} from "@/lib/helpers";
 import { serializeJsonForHtml } from "@/lib/html";
 import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 import { buildTourSchemas } from "@/lib/tourSchema";
@@ -78,7 +83,8 @@ const seoProps =
           canonicalUrl,
           siteUrl,
           lang,
-          title: mdxFrontmatter.seo?.metaTitle || mdxFrontmatter.title || "Pagina",
+          title:
+            mdxFrontmatter.seo?.metaTitle || mdxFrontmatter.title || "Pagina",
           description:
             mdxFrontmatter.seo?.metaDescription ||
             mdxFrontmatter.description ||
@@ -284,7 +290,7 @@ const MdxContent = mdxComponent?.default;
                 ? "Detalhes do tour"
                 : "Detalles del tour"}
           </h2>
-          <TourTabs tour={tour} client:visible>
+          <TourTabs tour={tour} lang={lang} client:visible>
             {hasIncaTrailBookingCalendar ? (
               <BookingFormIsland
                 server:defer
