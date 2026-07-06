@@ -8,7 +8,6 @@ import {
   getImageUrl,
   extractTextFromBlocks,
 } from "@/lib/helpers";
-import { serializeJsonForHtml } from "@/lib/html";
 
 interface Props {
   tour: Tour;
@@ -19,732 +18,270 @@ interface Props {
 const { tour, lang, badges } = Astro.props;
 if (!tour) return;
 
-// Extract array of image URLs
 const images = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada
-      .map((img) => ({
-        gridUrl: getImageUrl(img, "medium"),
-        gridSrcSet: getImageSrcSet(img, ["small", "medium"]),
-        thumbUrl: getImageUrl(img, "small"),
-        thumbSrcSet: getImageSrcSet(img, ["thumbnail", "small"]),
-        modalUrl: getImageUrl(img, "medium"),
-        modalSrcSet: getImageSrcSet(img, ["small", "medium"]),
-        alt: getImageAlt(img, tour.titulo),
-      }))
-      .filter((img) => img.gridUrl && img.gridUrl !== "/og-default.jpg")
+      .map((img) => {
+        const originalUrl = getImageUrl(img);
+        const largeSrcSet = getImageSrcSet(img, ["large"]);
+        const originalSrcSet = img.width ? `${originalUrl} ${img.width}w` : "";
+        const heroSrcSet = [largeSrcSet, originalSrcSet]
+          .filter(Boolean)
+          .join(", ");
+
+        return {
+          heroUrl: originalUrl,
+          heroSrcSet,
+          alt: getImageAlt(img, tour.titulo),
+        };
+      })
+      .filter((img) => img.heroUrl && img.heroUrl !== "/og-default.jpg")
   : [];
 
 if (images.length === 0) {
   images.push({
-    gridUrl: "/og-default.jpg",
-    gridSrcSet: "",
-    thumbUrl: "/og-default.jpg",
-    thumbSrcSet: "",
-    modalUrl: "/og-default.jpg",
-    modalSrcSet: "",
+    heroUrl: "/og-default.jpg",
+    heroSrcSet: "",
     alt: tour.titulo,
   });
 }
 
-const mainImage = images[0];
-const galleryPreviewImages = [1, 2, 3, 4].map(
-  (index) => images[index] || mainImage,
-);
-const galleryId = `tour-gallery-${tour.id}`;
-const galleryLabels = {
-  en: {
-    open: "View photos",
-    close: "Close gallery",
-    title: "Photos",
-    previous: "Previous photo",
-    next: "Next photo",
-    image: "Photo",
-  },
-  es: {
-    open: "Ver fotos",
-    close: "Cerrar galeria",
-    title: "Fotos",
-    previous: "Foto anterior",
-    next: "Foto siguiente",
-    image: "Foto",
-  },
-  pt: {
-    open: "Ver fotos",
-    close: "Fechar galeria",
-    title: "Fotos",
-    previous: "Foto anterior",
-    next: "Proxima foto",
-    image: "Foto",
-  },
-};
-const galleryLabel = galleryLabels[lang] || galleryLabels.en;
+const heroImage = images[images.length - 1];
+const categoryName = tour.categories?.[0]?.nombre;
+const hasBadges = badges && badges.length > 0;
+const description = extractTextFromBlocks(tour.content);
+
 const ctaLabels = {
   en: {
     book: "Book online",
     whatsapp: "Ask now",
+    contactTitle: "Contact us",
+    contactText:
+      "Tell us your travel date and we will help you plan the next step.",
   },
   es: {
     book: "Reservar online",
     whatsapp: "Consultar ahora",
+    contactTitle: "Contactanos",
+    contactText:
+      "Cuentanos tu fecha de viaje y te ayudamos con el siguiente paso.",
   },
   pt: {
     book: "Reservar online",
     whatsapp: "Consultar agora",
+    contactTitle: "Fale conosco",
+    contactText: "Conte-nos sua data de viagem e ajudamos com o proximo passo.",
   },
 };
 const ctaLabel = ctaLabels[lang] || ctaLabels.en;
-
-const categoryName = tour.categories?.[0]?.nombre;
-const hasBadges = badges && badges.length > 0;
-const galleryImagesJson = serializeJsonForHtml(
-  images.map((img) => ({
-    src: img.modalUrl,
-    srcSet: img.modalSrcSet,
-    alt: img.alt || tour.titulo,
-  })),
-);
 ---
 
+<!--
+  HERO ANTERIOR COMENTADO:
+  La version previa tenia grid de galeria desktop, slider mobile, card lateral
+  de badges/CTAs y modal de fotos. Queda retirada temporalmente mientras se
+  valida el nuevo diseno con una sola imagen destacada.
+-->
 <section
-  class="tour-hero-container w-full pt-4 pb-8 relative"
+  class="tour-hero-container w-full pt-0 pb-8 lg:pb-12"
   aria-labelledby="tour-title"
 >
-  {/* DESKTOP GRID (Hidden on mobile) */}
   <div
-    class="hidden md:grid grid-cols-4 grid-rows-2 gap-3 lg:gap-4 mb-8 lg:mb-12 h-[350px] md:h-[450px] lg:h-[500px]"
+    class="tour-hero-shell relative left-1/2 isolate min-h-[500px] w-screen -translate-x-1/2 overflow-hidden bg-slate-950 text-white shadow-[0_28px_80px_-48px_rgba(2,6,23,0.85)] md:min-h-[560px] lg:min-h-[620px]"
   >
-    {/* Left Large Image - spans 2 columns and 2 rows */}
-    <figure
-      class="col-span-2 row-span-2 rounded-sm overflow-hidden relative group cursor-pointer shadow-sm"
-      data-gallery-open={galleryId}
-      data-gallery-index="0"
-      aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
-    >
-      <img
-        src={mainImage.gridUrl}
-        srcset={mainImage.gridSrcSet || undefined}
-        sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 600px"
-        alt={mainImage.alt}
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-        width="600"
-        height="500"
-        loading="eager"
-        fetchpriority="high"
-        decoding="async"
-      />
-      <div
-        class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500"
-      >
-      </div>
-      <button
-        type="button"
-        class="tour-gallery-open absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-sm bg-white px-4 py-3 text-sm font-bold text-slate-950 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-        data-gallery-open={galleryId}
-        data-gallery-index="0"
-        aria-haspopup="dialog"
-        aria-controls={galleryId}
-        aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          <circle cx="9" cy="9" r="2"></circle>
-          <path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"></path>
-        </svg>
-        {galleryLabel.open} ({images.length})
-      </button>
-    </figure>
-
-    {
-      galleryPreviewImages.map((img, index) => (
-        <button
-          type="button"
-          class="rounded-sm overflow-hidden relative group cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          data-gallery-open={galleryId}
-          data-gallery-index={String(index + 1)}
-          aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
-        >
-          <img
-            src={img.thumbUrl}
-            srcset={img.thumbSrcSet || undefined}
-            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 25vw, 320px"
-            alt={img.alt || `${tour.titulo} ${index + 2}`}
-            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
-        </button>
-      ))
-    }
-  </div>
-
-  {/* MOBILE SLIDER (Hidden on desktop) */}
-  <div class="md:hidden w-[100dvw] relative left-1/2 -translate-x-1/2 mb-6">
+    <img
+      src={heroImage.heroUrl}
+      srcset={heroImage.heroSrcSet || undefined}
+      sizes="100vw"
+      alt={heroImage.alt}
+      class="tour-hero-image absolute inset-0 -z-20 h-full w-full object-cover"
+      width="1440"
+      height="760"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+    />
     <div
-      class="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 pb-4 hide-scrollbar"
+      class="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-slate-950/90 via-slate-950/46 to-transparent"
     >
-      {
-        images.slice(0, 3).map((img, i) => (
-          <figure
-            class="w-[85vw] h-[320px] shrink-0 snap-center rounded-sm overflow-hidden relative shadow-sm cursor-pointer"
-            data-gallery-open={galleryId}
-            data-gallery-index={String(i)}
-            aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
-          >
-            <img
-              src={img.gridUrl}
-              srcset={img.gridSrcSet || undefined}
-              sizes="85vw"
-              alt={
-                img.alt ||
-                (i === 0 ? tour.titulo : `${tour.titulo} - Imagen ${i + 1}`)
-              }
-              class="w-full h-full object-cover"
-              width="320"
-              height="320"
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchpriority={i === 0 ? "high" : "auto"}
-              decoding="async"
-            />
-            {i === 0 && (
-              <button
-                type="button"
-                class="tour-gallery-open absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-sm bg-white px-4 py-3 text-sm font-bold text-slate-950 shadow-lg"
-                data-gallery-open={galleryId}
-                data-gallery-index={String(i)}
-                aria-haspopup="dialog"
-                aria-controls={galleryId}
-                aria-label={`${galleryLabel.open}: ${images.length} ${images.length === 1 ? "foto" : "fotos"}`}
-              >
-                {galleryLabel.open} ({images.length})
-              </button>
-            )}
-          </figure>
-        ))
-      }
     </div>
-  </div>
 
-  {/* TOUR INFO: Title + Description (left) | Badges Card (right) */}
-  <div class="w-full items-center animate-fade-in-up mt-8 lg:mt-12">
     <div
-      class={`flex items-center flex-col ${hasBadges ? "xl:flex-row" : ""} gap-8 xl:gap-12`}
+      class="mx-auto flex min-h-[500px] max-w-8xl flex-col justify-end px-4 pb-6 pt-0 sm:px-6 md:min-h-[560px] md:px-9 md:pb-9 lg:min-h-[620px] lg:px-12 lg:pb-12"
     >
-      {/* Left Column — Title & Description */}
-      <div class={`${hasBadges ? "xl:flex-1" : "w-full"}`}>
+      <div class="w-full max-w-8xl">
         {
           categoryName && (
-            <span class="inline-block text-xs font-bold uppercase tracking-[0.2em] text-slate-800 mb-4">
+            <span class="tour-category-chip mb-4 inline-flex rounded-full px-4 py-2 text-[0.68rem] uppercase tracking-[0.18em] text-secondary-foreground shadow-lg">
               {categoryName}
             </span>
           )
         }
+
         <h1
           id="tour-title"
-          class="mb-5 text-3xl font-extrabold leading-[1.15] tracking-tight text-slate-950 md:mb-6 md:text-4xl lg:text-[42px]"
+          class="max-w-3xl text-3xl font-extrabold leading-[1.08] text-white md:text-5xl lg:text-6xl"
         >
           {tour.titulo}
         </h1>
-        <p class="text-base leading-relaxed text-slate-800 md:text-[1.05rem]">
-          {extractTextFromBlocks(tour.content)}
-        </p>
+
+        {
+          hasBadges && (
+            <dl class="tour-badges mt-6 grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-3 xl:flex xl:flex-nowrap">
+              {badges.map((badge, index) => (
+                <div
+                  class="tour-badge group flex min-h-[54px] min-w-0 items-center gap-2 rounded-sm border border-white/18 bg-white/12 px-2.5 py-2 text-white shadow-[0_18px_42px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/18 xl:min-w-[150px] xl:shrink-0"
+                  style={`animation-delay: ${index * 90}ms;`}
+                >
+                  <div class="tour-badge-icon flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-sm bg-secondary/90 text-secondary-foreground shadow-lg shadow-black/20">
+                    <BadgeIcon
+                      title={badge.titulo}
+                      content={badge.content}
+                      className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div class="min-w-0">
+                    <dt class="text-[0.58rem] uppercase tracking-[0.12em] text-white/68">
+                      {badge.titulo}
+                    </dt>
+                    <dd class="mt-0.5 text-xs font-bold leading-tight text-white">
+                      {badge.content}
+                    </dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          )
+        }
       </div>
-
-      {/* Right Column — Badges Card + CTAs */}
-      {
-        hasBadges && (
-          <div class="w-full xl:w-[420px] shrink-0">
-            <div class="rounded-lg border border-border bg-background p-1 shadow-sm">
-              {/* Badges Grid */}
-              <dl class="grid grid-cols-2 overflow-hidden rounded-md divide-x divide-y divide-border bg-muted/50">
-                {badges.map((badge, index) => {
-                  return (
-                    <div
-                      class="group flex items-center gap-3 bg-white p-4 transition-all duration-300 hover:bg-slate-50"
-                      style={`animation: badge-fade-in 0.5s ease-out ${index * 0.1}s both;`}
-                    >
-                      <div class="tour-badge-icon flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-primary/10 to-secondary/10">
-                        <BadgeIcon
-                          title={badge.titulo}
-                          content={badge.content}
-                          className="h-5 w-5 text-slate-950 transition-colors duration-300"
-                        />
-                      </div>
-                      <div class="flex flex-col min-w-0">
-                        <dt class="text-[0.6rem] font-semibold uppercase tracking-wider text-slate-950 lg:text-[0.65rem]">
-                          {badge.titulo}
-                        </dt>
-                        <dd class="text-sm font-medium leading-tight text-slate-950 transition-colors group-hover:text-slate-950">
-                          {badge.content}
-                        </dd>
-                      </div>
-                    </div>
-                  );
-                })}
-              </dl>
-
-              {/* CTA Buttons */}
-              <div class="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
-                <a
-                  href="#tour-contact-form"
-                  class="hero-cta-book flex items-center justify-center gap-2 bg-secondary text-white py-3 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 hover:bg-secondary/90 hover:shadow-lg hover:shadow-secondary/25 hover:-translate-y-0.5 active:scale-[0.98]"
-                >
-                  {ctaLabel.book}
-                </a>
-                <a
-                  href="https://wa.me/51969787221"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="hero-cta-whatsapp flex items-center justify-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground py-3 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                  {ctaLabel.whatsapp}
-                </a>
-              </div>
-            </div>
-          </div>
-        )
-      }
     </div>
   </div>
 
   <div
-    id={galleryId}
-    class="tour-gallery-modal fixed inset-0 z-[80] hidden items-center justify-center bg-slate-950/90 px-3 py-4 backdrop-blur-sm sm:px-6"
-    role="dialog"
-    aria-modal="true"
-    aria-label={galleryLabel.title}
-    data-gallery-modal
+    class="tour-hero-content mx-auto mt-10 grid max-w-8xl gap-5 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start"
   >
-    <div
-      class="relative flex h-full max-h-[94vh] w-full max-w-[min(75vw,800px)] flex-col max-xl:max-w-[88vw] max-md:max-w-[94vw]"
+    <p
+      class="max-w-4xl text-base leading-relaxed text-slate-800 md:text-[1.05rem]"
     >
-      <button
-        type="button"
-        class="tour-gallery-close absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
-        data-gallery-close
-        aria-label={galleryLabel.close}
+      {description}
+    </p>
+
+    <aside
+      class="tour-contact-card rounded-sm border border-border bg-background p-4 shadow-sm lg:p-5"
+    >
+      <p
+        class="text-xs font-extrabold uppercase tracking-[0.16em] text-primary"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M18 6 6 18"></path>
-          <path d="m6 6 12 12"></path>
-        </svg>
-      </button>
+        {ctaLabel.contactTitle}
+      </p>
+      <p class="mt-2 text-sm leading-relaxed text-slate-700">
+        {ctaLabel.contactText}
+      </p>
 
-      <div class="tour-gallery-stage relative min-h-0 flex-1">
-        <figure
-          class="tour-gallery-slide is-active relative flex h-full min-h-[420px] md:min-h-[620px]"
-          data-gallery-slide
-        >
-          <img
-            src={mainImage.modalUrl}
-            srcset={mainImage.modalSrcSet || undefined}
-            sizes="(max-width: 767px) 94vw, (max-width: 1279px) 88vw, 800px"
-            alt={mainImage.alt}
-            class="mx-auto h-full max-h-[88vh] min-h-[420px] w-full object-contain md:min-h-[560px]"
-            loading="lazy"
-            decoding="async"
-            data-gallery-image
-          />
-          <figcaption
-            class="tour-gallery-caption pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-6 pb-7 pt-20 text-center text-sm italic leading-relaxed text-white/90 sm:px-12 sm:pb-9 sm:text-base"
-            data-gallery-caption
-          >
-            {mainImage.alt}
-          </figcaption>
-        </figure>
-
-        <button
-          type="button"
-          class="tour-gallery-nav tour-gallery-nav-prev absolute left-2 top-1/2 inline-flex h-12 w-10 -translate-y-1/2 items-center justify-center rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:h-14 md:w-11 xl:-left-16 xl:h-16 xl:w-12"
-          data-gallery-prev
-          aria-label={galleryLabel.previous}
+      <div class="mt-4 grid gap-3">
+        <a
+          href="https://wa.me/51969787221"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hero-cta-whatsapp inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98]"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
+            class="h-4 w-4"
+            fill="currentColor"
             viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
             aria-hidden="true"
           >
-            <path d="m15 18-6-6 6-6"></path>
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+            ></path>
           </svg>
-        </button>
-        <button
-          type="button"
-          class="tour-gallery-nav tour-gallery-nav-next absolute right-2 top-1/2 inline-flex h-12 w-10 -translate-y-1/2 items-center justify-center rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:h-14 md:w-11 xl:-right-16 xl:h-16 xl:w-12"
-          data-gallery-next
-          aria-label={galleryLabel.next}
+          {ctaLabel.whatsapp}
+        </a>
+        <a
+          href="#tour-contact-form"
+          class="hero-cta-book inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 active:scale-[0.98]"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
+          {ctaLabel.book}
+        </a>
       </div>
-      <script
-        type="application/json"
-        data-gallery-images
-        set:html={galleryImagesJson}
-      />
-    </div>
+    </aside>
   </div>
 </section>
 
 <style is:inline>
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .tour-hero-container .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .tour-hero-container .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+  .tour-hero-container .tour-hero-image {
+    animation: tour-hero-slow-zoom 26s ease-in-out infinite alternate;
+    transform-origin: center;
   }
 
-  .tour-hero-container .text-slate-800,
-  .tour-hero-container .text-slate-950 {
-    color: #020617;
+  .tour-hero-container .tour-category-chip {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
   }
 
-  .tour-hero-container .bg-white {
-    background-color: #ffffff;
-  }
-
-  .tour-hero-container .hero-cta-book {
-    background-color: var(--secondary);
-    color: var(--white);
-  }
-
-  .tour-hero-container .hero-cta-book:hover {
-    background-color: color-mix(in oklab, var(--secondary) 88%, black);
+  .tour-hero-container .tour-badge {
+    animation: tour-badge-in 0.55s ease-out both;
   }
 
   .tour-hero-container .hero-cta-whatsapp {
-    border-color: var(--primary);
-    color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 18px 36px -28px var(--primary);
   }
 
   .tour-hero-container .hero-cta-whatsapp:hover {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
-  }
-
-  .tour-hero-container .animate-fade-in-up {
-    animation: tour-fade-up 0.7s ease-out both;
-  }
-
-  .tour-hero-container .tour-badge-icon {
-    rotate: 0deg;
-    transform-origin: center;
-    transition: rotate 0.3s ease;
-  }
-
-  .tour-hero-container .group:hover .tour-badge-icon {
-    rotate: -8deg;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .tour-hero-container .tour-badge-icon {
-      transition: none;
-    }
-
-    .tour-hero-container .group:hover .tour-badge-icon {
-      rotate: 0deg;
-    }
-  }
-
-  @keyframes tour-fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes badge-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .tour-hero-container .tour-specs-card {
-    border-left: 3px solid var(--secondary);
-  }
-
-  .tour-hero-container .tour-gallery-slide.is-active {
-    display: flex;
-  }
-
-  .tour-hero-container .tour-gallery-slide.is-active img {
-    animation: gallery-image-in 0.28s ease-out both;
-  }
-
-  .tour-hero-container .tour-gallery-caption {
-    text-wrap: balance;
-  }
-
-  .tour-hero-container .tour-gallery-close {
-    color: rgba(255, 255, 255, 0.92);
-    background: color-mix(in oklab, var(--foreground) 34%, transparent);
-    border: 1px solid rgba(255, 255, 255, 0.26);
-    box-shadow: 0 16px 40px -28px var(--foreground);
-    backdrop-filter: blur(14px);
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease,
-      color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .tour-hero-container .tour-gallery-close:hover {
-    color: var(--secondary-foreground);
-    background: var(--secondary);
-    border-color: var(--secondary);
-    transform: translateY(-1px);
-  }
-
-  .tour-hero-container .tour-gallery-close:active {
-    transform: translateY(0) scale(0.96);
-  }
-
-  .tour-hero-container .tour-gallery-nav {
-    color: rgba(255, 255, 255, 0.9);
-    background: color-mix(in oklab, var(--foreground) 28%, transparent);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 18px 44px -32px var(--foreground);
-    backdrop-filter: blur(14px);
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease,
-      color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .tour-hero-container .tour-gallery-nav:hover {
-    color: var(--primary-foreground);
-    background: var(--primary);
-    border-color: var(--primary);
-  }
-
-  .tour-hero-container .tour-gallery-nav:active {
     background: color-mix(in oklab, var(--primary) 88%, black);
   }
 
-  .tour-hero-container .tour-gallery-nav::before {
-    content: "";
-    position: absolute;
-    inset-block: 10px;
-    width: 2px;
-    background: rgba(255, 255, 255, 0.35);
-    opacity: 1;
-    transition: background-color 0.2s ease;
+  .tour-hero-container .hero-cta-book {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+    box-shadow: 0 18px 36px -28px var(--secondary);
   }
 
-  .tour-hero-container .tour-gallery-nav-prev::before {
-    left: -1px;
+  .tour-hero-container .hero-cta-book:hover {
+    background: color-mix(in oklab, var(--secondary) 88%, black);
   }
 
-  .tour-hero-container .tour-gallery-nav-next::before {
-    right: -1px;
-  }
-
-  .tour-hero-container .tour-gallery-nav:hover::before,
-  .tour-hero-container .tour-gallery-nav:active::before {
-    background: var(--primary-foreground);
-  }
-
-  @media (min-width: 1280px) {
-    .tour-hero-container .tour-gallery-nav::before {
-      inset-block: 12px;
+  @keyframes tour-hero-slow-zoom {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.08);
     }
   }
 
-  @keyframes gallery-image-in {
+  @keyframes tour-badge-in {
     from {
-      opacity: 0.55;
-      transform: scale(0.985);
+      opacity: 0;
+      transform: translateY(14px);
     }
     to {
       opacity: 1;
-      transform: scale(1);
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tour-hero-container .tour-hero-image,
+    .tour-hero-container .tour-badge {
+      animation: none;
+    }
+
+    .tour-hero-container .tour-badge {
+      opacity: 1;
+      transform: none;
     }
   }
 </style>
 
 <script>
-  type GalleryImage = {
-    src: string;
-    srcSet?: string;
-    alt: string;
-  };
-
-  let activeGalleryTrigger: HTMLElement | null = null;
-  const galleryDataCache = new WeakMap<HTMLElement, GalleryImage[]>();
-
-  function getGalleryImages(modal: HTMLElement): GalleryImage[] {
-    const cached = galleryDataCache.get(modal);
-    if (cached) return cached;
-
-    const dataEl = modal.querySelector<HTMLScriptElement>(
-      "[data-gallery-images]",
-    );
-    if (!dataEl?.textContent) return [];
-
-    try {
-      const images = JSON.parse(dataEl.textContent) as GalleryImage[];
-      galleryDataCache.set(modal, images);
-      return images;
-    } catch {
-      return [];
-    }
-  }
-
-  function setGalleryIndex(modal: HTMLElement, nextIndex: number) {
-    const images = getGalleryImages(modal);
-    if (images.length === 0) return;
-
-    const index = (nextIndex + images.length) % images.length;
-    const item = images[index];
-    modal.dataset.galleryIndex = String(index);
-
-    const imageEl = modal.querySelector<HTMLImageElement>(
-      "[data-gallery-image]",
-    );
-    const captionEl = modal.querySelector<HTMLElement>(
-      "[data-gallery-caption]",
-    );
-
-    if (imageEl) {
-      imageEl.src = item.src;
-      if (item.srcSet) {
-        imageEl.srcset = item.srcSet;
-      } else {
-        imageEl.removeAttribute("srcset");
-      }
-      imageEl.alt = item.alt;
-    }
-
-    if (captionEl) captionEl.textContent = item.alt;
-  }
-
-  function moveGallery(modal: HTMLElement, direction: number) {
-    const currentIndex = Number(modal.dataset.galleryIndex || "0");
-    setGalleryIndex(modal, currentIndex + direction);
-  }
-
-  function closeGallery(modal: HTMLElement) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    document.body.style.overflow = "";
-    activeGalleryTrigger?.focus();
-    activeGalleryTrigger = null;
-  }
-
-  function openGallery(
-    modal: HTMLElement,
-    trigger: HTMLElement,
-    initialIndex = 0,
-  ) {
-    activeGalleryTrigger = trigger;
-    setGalleryIndex(modal, initialIndex);
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    document.body.style.overflow = "hidden";
-    const closeButton = modal.querySelector<HTMLElement>(
-      "[data-gallery-close]",
-    );
-    closeButton?.focus();
-  }
-
   document.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
-    const openButton = target.closest<HTMLElement>("[data-gallery-open]");
-    if (openButton) {
-      const modalId = openButton.dataset.galleryOpen;
-      const modal = modalId ? document.getElementById(modalId) : null;
-      const index = Number(openButton.dataset.galleryIndex || "0");
-      if (modal) openGallery(modal, openButton, index);
-      return;
-    }
-
-    const prevButton = target.closest<HTMLElement>("[data-gallery-prev]");
-    if (prevButton) {
-      const modal = prevButton.closest<HTMLElement>("[data-gallery-modal]");
-      if (modal) moveGallery(modal, -1);
-      return;
-    }
-
-    const nextButton = target.closest<HTMLElement>("[data-gallery-next]");
-    if (nextButton) {
-      const modal = nextButton.closest<HTMLElement>("[data-gallery-modal]");
-      if (modal) moveGallery(modal, 1);
-      return;
-    }
-
-    const closeButton = target.closest<HTMLElement>("[data-gallery-close]");
-    if (closeButton) {
-      const modal = closeButton.closest<HTMLElement>("[data-gallery-modal]");
-      if (modal) closeGallery(modal);
-      return;
-    }
-
-    const modalBackdrop = target.closest<HTMLElement>("[data-gallery-modal]");
-    if (modalBackdrop && target === modalBackdrop) {
-      closeGallery(modalBackdrop);
-      return;
-    }
-
     const link = target.closest('a[href="#tour-contact-form"]');
     if (!link) return;
+
     e.preventDefault();
     const isMobile = window.innerWidth < 1024;
     const targetId = isMobile
@@ -753,40 +290,6 @@ const galleryImagesJson = serializeJsonForHtml(
     const scrollTarget = document.getElementById(targetId);
     if (scrollTarget) {
       scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  });
-
-  document.addEventListener("keydown", (e) => {
-    const keyboardTrigger = (e.target as HTMLElement).closest<HTMLElement>(
-      '[data-gallery-open][role="button"]',
-    );
-    if (
-      keyboardTrigger &&
-      !keyboardTrigger.closest("[data-gallery-modal]") &&
-      (e.key === "Enter" || e.key === " ")
-    ) {
-      e.preventDefault();
-      keyboardTrigger.click();
-      return;
-    }
-
-    const openModal = document.querySelector<HTMLElement>(
-      "[data-gallery-modal]:not(.hidden)",
-    );
-    if (!openModal) return;
-
-    if (e.key === "Escape") {
-      closeGallery(openModal);
-      return;
-    }
-
-    if (e.key === "ArrowLeft") {
-      moveGallery(openModal, -1);
-      return;
-    }
-
-    if (e.key === "ArrowRight") {
-      moveGallery(openModal, 1);
     }
   });
 </script>
