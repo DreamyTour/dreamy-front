@@ -128,34 +128,27 @@ export default function TourTabs({ tour, lang, children }: Props) {
 
   // Iconos simples para las pestañas
   const renderIcon = (type: string) => {
+    const iconClass =
+      "size-5 shrink-0 transition-transform duration-300 group-hover:-translate-y-1 md:size-6";
+
     switch (type) {
       case "overview":
-        return (
-          <OverviewIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
-        );
+        return <OverviewIcon className={iconClass} />;
       case "itinerary":
-        return (
-          <ItineraryIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
-        );
+        return <ItineraryIcon className={iconClass} />;
       case "included":
-        return (
-          <IncludedIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
-        );
+        return <IncludedIcon className={iconClass} />;
       case "information":
-        return (
-          <InformationIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
-        );
+        return <InformationIcon className={iconClass} />;
       case "price":
-        return (
-          <PriceIcon className="size-6 mb-2 transition-transform duration-300 group-hover:-translate-y-1" />
-        );
+        return <PriceIcon className={iconClass} />;
       default:
         return null;
     }
   };
 
   const tabTriggerClass =
-    "group relative flex-1 flex flex-col items-center justify-center py-6 md:py-4 text-[0.65rem] md:text-base font-bold uppercase tracking-widest text-[#333] hover:text-black hover:bg-white transition-colors duration-300 !rounded-none data-[state=active]:text-secondary data-[state=active]:!bg-white !bg-transparent whitespace-nowrap outline-none border-none !shadow-none ring-0 focus-visible:ring-0";
+    "tour-tab-trigger group relative flex-1 flex flex-col items-center justify-center gap-2 rounded-sm bg-transparent px-4 pb-5 pt-4 text-[0.65rem] md:text-sm font-bold uppercase tracking-[0.12em] text-[#333] transition-colors duration-300 whitespace-nowrap outline-none border-none !shadow-none ring-0 focus-visible:ring-0";
   const mobileAccordionClass =
     "group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]";
   const mobileSummaryClass =
@@ -167,6 +160,48 @@ export default function TourTabs({ tour, lang, children }: Props) {
 
   return (
     <div className="w-full" ref={tabsRef}>
+      <style>{`
+        .tour-tabs-list .tour-tab-trigger::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          bottom: 0.4rem;
+          width: 0;
+          height: 2px;
+          border-radius: 999px;
+          background: var(--secondary);
+          opacity: 0;
+          transform: translateX(-50%);
+          transition:
+            width 220ms ease,
+            opacity 220ms ease;
+        }
+
+        .tour-tabs-list .tour-tab-trigger:hover {
+          background: var(--background);
+          color: var(--foreground);
+        }
+
+        .tour-tabs-list .tour-tab-trigger:hover::after {
+          width: min(3.5rem, calc(100% - 2rem));
+          opacity: 1;
+        }
+
+        .tour-tabs-list .tour-tab-trigger[data-state="active"] {
+          background: transparent !important;
+          color: var(--secondary) !important;
+        }
+
+        .tour-tabs-list .tour-tab-trigger[data-state="active"]::after {
+          width: min(4rem, calc(100% - 2rem));
+          opacity: 1;
+        }
+
+        .tour-tabs-list .tour-tab-trigger[data-state="active"]:hover {
+          background: transparent !important;
+          color: var(--secondary) !important;
+        }
+      `}</style>
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8">
         {/* Desktop Layout */}
         <div className="hidden lg:contents">
@@ -177,10 +212,10 @@ export default function TourTabs({ tour, lang, children }: Props) {
           >
             {/* Sticky container - Full Bleed */}
             <div
-              className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] border-y border-gray-200/60 lg:col-span-2 ${isStuck ? "shadow-md" : ""}`}
+              className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] lg:col-span-2 ${isStuck ? "shadow-md" : ""}`}
             >
               <div className="w-full">
-                <TabsList className="flex w-full justify-between items-stretch !p-0 !bg-transparent !rounded-none divide-x divide-gray-200/50 !h-auto gap-0 !border-0 outline-none ring-0">
+                <TabsList className="tour-tabs-list flex !h-auto w-full items-stretch justify-between gap-1 rounded-sm bg-muted/70 p-1.5 outline-none ring-0">
                   {hasOverview && tab.overview.titulo && (
                     <TabsTrigger value="overview" className={tabTriggerClass}>
                       {renderIcon("overview")}
