@@ -153,9 +153,9 @@ function AccordionItem({
               <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.18em] text-secondary">
                 {dayLabel} {index + 1}
               </span>
-              <span className="block text-xl font-extrabold leading-tight tracking-tight text-foreground md:text-2xl">
+              <h2 className="block text-xl font-extrabold leading-tight tracking-tight text-foreground">
                 {item.titulo}
-              </span>
+              </h2>
             </span>
             <span className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors duration-200 group-hover:text-primary">
               <ChevronIcon
