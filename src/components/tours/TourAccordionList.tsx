@@ -17,6 +17,13 @@ interface Props {
   lang?: Lang;
 }
 
+const tabHeadingClass =
+  "text-xl font-extrabold leading-tight tracking-tight text-foreground";
+const tabContentHeadingClass =
+  "mb-2 mt-4 text-xl font-extrabold leading-tight tracking-tight text-foreground";
+const tabContentSubheadingClass =
+  "mb-2 mt-3 text-lg font-bold leading-snug text-foreground";
+
 function renderTextNodes(children: StrapiBlockChild[]) {
   return children.map((child) => {
     if (!child.text) return null;
@@ -61,17 +68,19 @@ function AccordionContent({ content }: { content: StrapiBlock[] }) {
 
         if (block.type === "heading") {
           const level = block.level as number | undefined;
-          const className =
-            level === 1
-              ? "text-xl font-bold text-foreground"
-              : level === 2
-                ? "text-lg font-bold text-foreground"
-                : "text-base font-semibold text-foreground";
+          const HeadingTag = level && level >= 4 ? "h4" : "h3";
 
           return (
-            <h2 key={blockKey} className={className}>
+            <HeadingTag
+              key={blockKey}
+              className={
+                level && level >= 4
+                  ? tabContentSubheadingClass
+                  : tabContentHeadingClass
+              }
+            >
               {renderTextNodes(block.children || [])}
-            </h2>
+            </HeadingTag>
           );
         }
 
@@ -142,30 +151,30 @@ function AccordionItem({
         </div>
 
         <div className="min-w-0 border-b border-border/80 px-1 py-7 first:pt-1 md:px-2 md:py-8">
-          <button
-            type="button"
-            aria-expanded={isOpen}
-            aria-controls={contentId}
-            className="group flex w-full cursor-pointer items-center justify-between gap-5 text-left"
-            onClick={() => setIsOpen((current) => !current)}
-          >
-            <span className="min-w-0">
-              <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.18em] text-secondary">
-                {dayLabel} {index + 1}
+          <h3 className={tabHeadingClass}>
+            <button
+              type="button"
+              aria-expanded={isOpen}
+              aria-controls={contentId}
+              className="group flex w-full cursor-pointer items-center justify-between gap-5 text-left"
+              onClick={() => setIsOpen((current) => !current)}
+            >
+              <span className="min-w-0">
+                <span className="mb-2 block text-xs font-extrabold uppercase tracking-[0.18em] text-secondary">
+                  {dayLabel} {index + 1}
+                </span>
+                <span className="block">{item.titulo}</span>
               </span>
-              <h2 className="block text-xl font-extrabold leading-tight tracking-tight text-foreground">
-                {item.titulo}
-              </h2>
-            </span>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors duration-200 group-hover:text-primary">
-              <ChevronIcon
-                className={cn(
-                  "h-4 w-4 transition-transform duration-200",
-                  isOpen && "rotate-180",
-                )}
-              />
-            </span>
-          </button>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors duration-200 group-hover:text-primary">
+                <ChevronIcon
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isOpen && "rotate-180",
+                  )}
+                />
+              </span>
+            </button>
+          </h3>
           <div
             id={contentId}
             className={cn(
@@ -186,25 +195,25 @@ function AccordionItem({
 
   return (
     <div className="overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]">
-      <button
-        type="button"
-        aria-expanded={isOpen}
-        aria-controls={contentId}
-        className="flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-200 hover:bg-primary/[0.03] md:px-6"
-        onClick={() => setIsOpen((current) => !current)}
-      >
-        <span className="text-left text-sm font-semibold text-foreground md:text-base">
-          {item.titulo}
-        </span>
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary">
-          <ChevronIcon
-            className={cn(
-              "h-5 w-5 transition-transform duration-200",
-              isOpen && "rotate-180",
-            )}
-          />
-        </span>
-      </button>
+      <h3 className={tabHeadingClass}>
+        <button
+          type="button"
+          aria-expanded={isOpen}
+          aria-controls={contentId}
+          className="flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-5 text-left transition-colors duration-200 hover:bg-primary/[0.03] md:px-6"
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          <span className="text-left">{item.titulo}</span>
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary">
+            <ChevronIcon
+              className={cn(
+                "h-5 w-5 transition-transform duration-200",
+                isOpen && "rotate-180",
+              )}
+            />
+          </span>
+        </button>
+      </h3>
       <div
         id={contentId}
         className={cn(

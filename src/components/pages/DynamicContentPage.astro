@@ -282,14 +282,16 @@ const MdxContent = mdxComponent?.default;
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 pb-12">
         <TourHero tour={tour} lang={lang} badges={tour.badge} />
 
-        <section class="w-full mt-8" aria-labelledby="tour-details-title">
-          <h2 id="tour-details-title" class="sr-only">
-            {lang === "en"
+        <section
+          class="w-full mt-8"
+          aria-label={
+            lang === "en"
               ? "Tour details"
               : lang === "pt"
                 ? "Detalhes do tour"
-                : "Detalles del tour"}
-          </h2>
+                : "Detalles del tour"
+          }
+        >
           <TourTabs tour={tour} lang={lang} client:visible>
             {hasIncaTrailBookingCalendar ? (
               <BookingFormIsland

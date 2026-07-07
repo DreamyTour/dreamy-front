@@ -4,6 +4,11 @@ import type { StrapiBlock, StrapiBlockChild } from "@/types/tours";
 
 type Variant = "included" | "price" | "overview";
 
+const tabHeadingClass =
+	"mb-2 mt-4 text-xl font-extrabold leading-tight tracking-tight text-foreground";
+const tabSubheadingClass =
+	"mb-2 mt-3 text-lg font-bold leading-snug text-gray-800";
+
 interface Props {
 	content?: StrapiBlock[];
 	variant?: Variant;
@@ -120,19 +125,15 @@ export default function TourRichTextBlocks({
 
 				if (block.type === "heading") {
 					const level = (block as { level?: number }).level;
-					const isLargeHeading = variant !== "overview" && level === 3;
+					const HeadingTag = level && level >= 4 ? "h4" : "h3";
 
 					return (
-						<h2
+						<HeadingTag
 							key={blockKey}
-							className={
-								isLargeHeading
-									? "mb-2 mt-4 text-lg font-bold text-gray-900"
-									: "mb-2 mt-3 text-base font-semibold text-gray-800"
-							}
+							className={level && level >= 4 ? tabSubheadingClass : tabHeadingClass}
 						>
 							{renderTextNodes(block.children || [])}
-						</h2>
+						</HeadingTag>
 					);
 				}
 

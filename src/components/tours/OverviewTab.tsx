@@ -20,9 +20,9 @@ export default function OverviewTab({ timeline }: OverviewTabProps) {
             <div className="mt-2 w-0.5 flex-1 bg-linear-to-b from-primary via-primary/40 to-transparent" />
           </div>
           <div className="timeline-content flex-1 pb-6 md:pb-8">
-            <h2 className="my-2 text-lg font-semibold text-gray-800">
+            <h3 className="my-2 text-xl font-extrabold leading-tight tracking-tight text-foreground">
               {item.titulo}
-            </h2>
+            </h3>
             <TourRichTextBlocks content={item.itemsDay} variant="overview" />
           </div>
         </li>
