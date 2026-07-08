@@ -151,24 +151,24 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
             <dl class="tour-badges mt-6 grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-3 xl:flex xl:flex-nowrap">
               {badges.map((badge, index) => (
                 <div
-                  class="tour-badge group flex min-h-[54px] min-w-0 items-center gap-2 rounded-sm border border-white/18 bg-white/12 px-2.5 py-2 text-white shadow-[0_18px_42px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/18 xl:min-w-[150px] xl:shrink-0"
+                  class="tour-badge group grid min-h-[54px] min-w-0 grid-cols-[2rem_minmax(0,1fr)] items-center gap-x-2 rounded-sm border border-white/18 bg-white/12 px-2.5 py-2 text-white shadow-[0_18px_42px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/18 xl:min-w-[150px] xl:shrink-0"
                   style={`animation-delay: ${index * 90}ms;`}
                 >
-                  <div class="tour-badge-icon flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-sm bg-secondary/90 text-secondary-foreground shadow-lg shadow-black/20">
-                    <BadgeIcon
-                      title={badge.titulo}
-                      content={badge.content}
-                      className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110"
-                    />
-                  </div>
-                  <div class="min-w-0">
-                    <dt class="text-[0.58rem] uppercase tracking-[0.12em] text-white/68">
+                  <dt class="contents">
+                    <span class="tour-badge-icon row-span-2 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-sm bg-secondary/90 text-secondary-foreground shadow-lg shadow-black/20">
+                      <BadgeIcon
+                        title={badge.titulo}
+                        content={badge.content}
+                        className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </span>
+                    <span class="min-w-0 text-[0.58rem] uppercase tracking-[0.12em] text-white/68">
                       {badge.titulo}
-                    </dt>
-                    <dd class="mt-0.5 text-xs font-bold leading-tight text-white">
-                      {badge.content}
-                    </dd>
-                  </div>
+                    </span>
+                  </dt>
+                  <dd class="col-start-2 mt-0.5 text-xs font-medium leading-tight text-white">
+                    {badge.content}
+                  </dd>
                 </div>
               ))}
             </dl>
