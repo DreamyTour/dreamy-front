@@ -63,21 +63,8 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	const defaultActiveTab = visibleTabs[0] ?? "overview";
 	const [activeTab, setActiveTab] = React.useState(defaultActiveTab);
 	const [isStuck, setIsStuck] = React.useState(false);
-	const [isMobileLayout, setIsMobileLayout] = React.useState(false);
 
 	const tabsRef = React.useRef<HTMLDivElement>(null);
-
-	React.useEffect(() => {
-		const mediaQuery = window.matchMedia("(max-width: 1023px)");
-		const updateLayout = () => setIsMobileLayout(mediaQuery.matches);
-
-		updateLayout();
-		mediaQuery.addEventListener("change", updateLayout);
-
-		return () => {
-			mediaQuery.removeEventListener("change", updateLayout);
-		};
-	}, []);
 
 	React.useEffect(() => {
 		if (!visibleTabs.includes(activeTab)) {
@@ -223,15 +210,9 @@ export default function TourTabs({ tour, lang, children }: Props) {
           color: var(--secondary) !important;
         }
       `}</style>
-			<div
-				className={
-					isMobileLayout
-						? ""
-						: "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8"
-				}
-			>
+			<div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8">
 				{/* Desktop Layout */}
-				{!isMobileLayout && (
+				<div className="hidden lg:contents">
 					<Tabs
 						value={activeTab}
 						onValueChange={handleTabChange}
@@ -382,121 +363,117 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							)}
 						</div>
 					</Tabs>
-				)}
+				</div>
 
 				{/* Mobile Layout */}
-				{isMobileLayout && (
-					<div className="space-y-4">
-						{/* Summary */}
-						{hasOverview && tab.overview.titulo && (
-							<details open className={mobileAccordionClass}>
-								<summary className={mobileSummaryClass}>
-									<span className="text-left text-sm font-semibold text-foreground">
-										{tab.overview.titulo}
-									</span>
-									<span className={mobileIconClass}>
-										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-									</span>
-								</summary>
-								<div className={mobileContentClass}>
-									<h2 className={tabPanelTitleClass}>{tab.overview.titulo}</h2>
-									<OverviewTab timeline={tab.overview.timeline} />
-								</div>
-							</details>
-						)}
+				<div className="space-y-4 lg:hidden">
+					{/* Summary */}
+					{hasOverview && tab.overview.titulo && (
+						<details open className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.overview.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<h2 className={tabPanelTitleClass}>{tab.overview.titulo}</h2>
+								<OverviewTab timeline={tab.overview.timeline} />
+							</div>
+						</details>
+					)}
 
-						{/* Itinerary */}
-						{hasItinerary && tab.itinerary.titulo && (
-							<details open={!hasOverview} className={mobileAccordionClass}>
-								<summary className={mobileSummaryClass}>
-									<span className="text-left text-sm font-semibold text-foreground">
-										{tab.itinerary.titulo}
-									</span>
-									<span className={mobileIconClass}>
-										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-									</span>
-								</summary>
-								<div className={mobileContentClass}>
-									<h2 className={tabPanelTitleClass}>{tab.itinerary.titulo}</h2>
-									<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
-								</div>
-							</details>
-						)}
+					{/* Itinerary */}
+					{hasItinerary && tab.itinerary.titulo && (
+						<details open={!hasOverview} className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.itinerary.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<h2 className={tabPanelTitleClass}>{tab.itinerary.titulo}</h2>
+								<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
+							</div>
+						</details>
+					)}
 
-						{/* Included */}
-						{hasIncluded && tab.included.titulo && (
-							<details className={mobileAccordionClass}>
-								<summary className={mobileSummaryClass}>
-									<span className="text-left text-sm font-semibold text-foreground">
-										{tab.included.titulo}
-									</span>
-									<span className={mobileIconClass}>
-										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-									</span>
-								</summary>
-								<div className={mobileContentClass}>
-									<h2 className={tabPanelTitleClass}>{tab.included.titulo}</h2>
-									<IncludedTab contenido={tab.included.contenido} />
-								</div>
-							</details>
-						)}
+					{/* Included */}
+					{hasIncluded && tab.included.titulo && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.included.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<h2 className={tabPanelTitleClass}>{tab.included.titulo}</h2>
+								<IncludedTab contenido={tab.included.contenido} />
+							</div>
+						</details>
+					)}
 
-						{/* Information */}
-						{hasInformation && tab.information.titulo && (
-							<details className={mobileAccordionClass}>
-								<summary className={mobileSummaryClass}>
-									<span className="text-left text-sm font-semibold text-foreground">
-										{tab.information.titulo}
-									</span>
-									<span className={mobileIconClass}>
-										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-									</span>
-								</summary>
-								<div className={mobileContentClass}>
-									<h2 className={tabPanelTitleClass}>
-										{tab.information.titulo}
-									</h2>
-									<InformationTab items={tab.information.acordeon} />
-								</div>
-							</details>
-						)}
+					{/* Information */}
+					{hasInformation && tab.information.titulo && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.information.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<h2 className={tabPanelTitleClass}>{tab.information.titulo}</h2>
+								<InformationTab items={tab.information.acordeon} />
+							</div>
+						</details>
+					)}
 
-						{/* Price */}
-						{hasPrice && tab.price.titulo && (
-							<details className={mobileAccordionClass}>
-								<summary className={mobileSummaryClass}>
-									<span className="text-left text-sm font-semibold text-foreground">
-										{tab.price.titulo}
-									</span>
-									<span className={mobileIconClass}>
-										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-									</span>
-								</summary>
-								<div className={mobileContentClass}>
-									<h2 className={tabPanelTitleClass}>{tab.price.titulo}</h2>
-									<PriceTab contenido={tab.price.contenido} />
-								</div>
-							</details>
-						)}
+					{/* Price */}
+					{hasPrice && tab.price.titulo && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{tab.price.titulo}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<h2 className={tabPanelTitleClass}>{tab.price.titulo}</h2>
+								<PriceTab contenido={tab.price.contenido} />
+							</div>
+						</details>
+					)}
 
-						{hasMaps && (
-							<details className={mobileAccordionClass}>
-								<summary className={mobileSummaryClass}>
-									<span className="text-left text-sm font-semibold text-foreground">
-										{mapsTitle}
-									</span>
-									<span className={mobileIconClass}>
-										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-									</span>
-								</summary>
-								<div className={mobileContentClass}>
-									<h2 className={tabPanelTitleClass}>{mapsTitle}</h2>
-									<MapTab lang={lang} />
-								</div>
-							</details>
-						)}
-					</div>
-				)}
+					{hasMaps && (
+						<details className={mobileAccordionClass}>
+							<summary className={mobileSummaryClass}>
+								<span className="text-left text-sm font-semibold text-foreground">
+									{mapsTitle}
+								</span>
+								<span className={mobileIconClass}>
+									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+								</span>
+							</summary>
+							<div className={mobileContentClass}>
+								<h2 className={tabPanelTitleClass}>{mapsTitle}</h2>
+								<MapTab lang={lang} />
+							</div>
+						</details>
+					)}
+				</div>
 
 				{/* Booking / Contact Form */}
 				{children && (
