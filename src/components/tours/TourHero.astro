@@ -57,6 +57,12 @@ const ctaLabels = {
     contactTitle: "Contact us",
     contactText:
       "Tell us your travel date and we will help you plan the next step.",
+    benefits: [
+      "No hidden fees",
+      "Instant confirmation",
+      "Discover and Join the adventure today",
+      "Local expert guides",
+    ],
   },
   es: {
     book: "Reservar online",
@@ -64,12 +70,24 @@ const ctaLabels = {
     contactTitle: "Contactanos",
     contactText:
       "Cuentanos tu fecha de viaje y te ayudamos con el siguiente paso.",
+    benefits: [
+      "Sin cargos ocultos",
+      "Confirmación instantánea",
+      "Descubre y únete a la aventura hoy",
+      "Guías expertos locales",
+    ],
   },
   pt: {
     book: "Reservar online",
     whatsapp: "Consultar agora",
     contactTitle: "Fale conosco",
     contactText: "Conte-nos sua data de viagem e ajudamos com o proximo passo.",
+    benefits: [
+      "Sem taxas ocultas",
+      "Confirmação instantânea",
+      "Descubra e junte-se à aventura hoje",
+      "Guias especialistas locais",
+    ],
   },
 };
 const ctaLabel = ctaLabels[lang] || ctaLabels.en;
@@ -86,7 +104,7 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
   aria-labelledby="tour-title"
 >
   <div
-    class="tour-hero-shell relative left-1/2 isolate min-h-[500px] w-screen -translate-x-1/2 overflow-hidden bg-slate-950 text-white shadow-[0_28px_80px_-48px_rgba(2,6,23,0.85)] md:min-h-[560px] lg:min-h-[620px]"
+    class="tour-hero-shell relative left-1/2 isolate min-h-[500px] w-screen -translate-x-1/2 overflow-hidden bg-slate-950 text-white shadow-[0_28px_80px_-48px_rgba(2,6,23,0.85)] md:min-h-[560px] lg:min-h-[700px]"
   >
     <img
       src={heroImage.heroUrl}
@@ -106,7 +124,7 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
     </div>
 
     <div
-      class="mx-auto flex min-h-[500px] max-w-8xl flex-col justify-end px-4 pb-6 pt-0 sm:px-6 md:min-h-[560px] md:px-9 md:pb-9 lg:min-h-[620px] lg:px-12 lg:pb-12"
+      class="mx-auto flex min-h-[500px] max-w-8xl flex-col justify-end px-4 pb-6 pt-0 sm:px-6 md:min-h-[560px] md:px-9 md:pb-9 lg:min-h-[620px] lg:px-12 lg:pb-0 lg:pt-12"
     >
       <div class="w-full max-w-8xl">
         {
@@ -157,13 +175,17 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
   </div>
 
   <div
-    class="tour-hero-content mx-auto mt-10 grid max-w-8xl gap-5 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start"
+    class="tour-hero-content mx-auto mt-10 grid max-w-8xl items-stretch gap-5 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_340px]"
   >
-    <p
-      class="max-w-4xl text-base leading-relaxed text-slate-800 md:text-[1.05rem]"
+    <div
+      class="h-full rounded-sm border border-primary/30 bg-background p-4 lg:p-5"
     >
-      {description}
-    </p>
+      <p
+        class="max-w-4xl text-base leading-relaxed text-slate-800 md:text-[1.05rem]"
+      >
+        {description}
+      </p>
+    </div>
 
     <aside
       class="tour-contact-card rounded-sm border border-border bg-background p-4 shadow-sm lg:p-5"
@@ -204,6 +226,28 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
           {ctaLabel.book}
         </a>
       </div>
+
+      <ul class="mt-5 space-y-2 border-t border-border pt-4">
+        {
+          ctaLabel.benefits.map((benefit) => (
+            <li class="flex items-start gap-2 text-xs text-slate-700">
+              <svg
+                class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>{benefit}</span>
+            </li>
+          ))
+        }
+      </ul>
     </aside>
   </div>
 </section>

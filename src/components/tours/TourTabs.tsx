@@ -1,11 +1,12 @@
 import * as React from "react";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
 import {
-  IncludedIcon,
-  InformationIcon,
-  ItineraryIcon,
-  OverviewIcon,
-  PriceIcon,
+	IncludedIcon,
+	InformationIcon,
+	ItineraryIcon,
+	MapIcon,
+	OverviewIcon,
+	PriceIcon,
 } from "@/components/icons/TourIcons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Lang } from "@/lib/i18n";
@@ -13,168 +14,174 @@ import type { Tour } from "@/types/tours";
 import IncludedTab from "./IncludedTab";
 import InformationTab from "./InformationTab";
 import ItineraryTab from "./ItineraryTab";
+import MapTab from "./MapTab";
 import OverviewTab from "./OverviewTab";
 import PriceTab from "./PriceTab";
 
 interface Props {
-  tour: Tour;
-  lang: Lang;
-  children?: React.ReactNode;
+	tour: Tour;
+	lang: Lang;
+	children?: React.ReactNode;
 }
 
 export default function TourTabs({ tour, lang, children }: Props) {
-  const tab = tour?.tab;
+	const tab = tour?.tab;
 
-  const hasOverview = Boolean(
-    tab?.overview?.titulo &&
-    Array.isArray(tab.overview.timeline) &&
-    tab.overview.timeline.length > 0,
-  );
-  const hasItinerary = Boolean(
-    tab?.itinerary?.titulo &&
-    Array.isArray(tab.itinerary.acordeon) &&
-    tab.itinerary.acordeon.length > 0,
-  );
-  const hasIncluded = Boolean(tab?.included?.titulo);
-  const hasInformation = Boolean(
-    tab?.information?.titulo &&
-    Array.isArray(tab.information.acordeon) &&
-    tab.information.acordeon.length > 0,
-  );
-  const hasPrice = Boolean(
-    tab?.price && (tab.price.titulo || tab.price.contenido),
-  );
-  const visibleTabs = React.useMemo(
-    () =>
-      [
-        hasOverview && "overview",
-        hasItinerary && "itinerary",
-        hasIncluded && "included",
-        hasInformation && "information",
-        hasPrice && "price",
-      ].filter(Boolean) as string[],
-    [hasOverview, hasItinerary, hasIncluded, hasInformation, hasPrice],
-  );
-  const defaultActiveTab = visibleTabs[0] ?? "overview";
-  const [activeTab, setActiveTab] = React.useState(defaultActiveTab);
-  const [isStuck, setIsStuck] = React.useState(false);
-  const [isMobileLayout, setIsMobileLayout] = React.useState(false);
+	const hasOverview = Boolean(
+		tab?.overview?.titulo &&
+			Array.isArray(tab.overview.timeline) &&
+			tab.overview.timeline.length > 0,
+	);
+	const hasItinerary = Boolean(
+		tab?.itinerary?.titulo &&
+			Array.isArray(tab.itinerary.acordeon) &&
+			tab.itinerary.acordeon.length > 0,
+	);
+	const hasIncluded = Boolean(tab?.included?.titulo);
+	const hasInformation = Boolean(
+		tab?.information?.titulo &&
+			Array.isArray(tab.information.acordeon) &&
+			tab.information.acordeon.length > 0,
+	);
+	const hasPrice = Boolean(
+		tab?.price && (tab.price.titulo || tab.price.contenido),
+	);
+	const hasMaps = true;
+	const mapsTitle = "Maps";
+	const visibleTabs = React.useMemo(
+		() =>
+			[
+				hasOverview && "overview",
+				hasItinerary && "itinerary",
+				hasIncluded && "included",
+				hasInformation && "information",
+				hasPrice && "price",
+				hasMaps && "maps",
+			].filter(Boolean) as string[],
+		[hasOverview, hasItinerary, hasIncluded, hasInformation, hasPrice],
+	);
+	const defaultActiveTab = visibleTabs[0] ?? "overview";
+	const [activeTab, setActiveTab] = React.useState(defaultActiveTab);
+	const [isStuck, setIsStuck] = React.useState(false);
+	const [isMobileLayout, setIsMobileLayout] = React.useState(false);
 
-  const tabsRef = React.useRef<HTMLDivElement>(null);
+	const tabsRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 1023px)");
-    const updateLayout = () => setIsMobileLayout(mediaQuery.matches);
+	React.useEffect(() => {
+		const mediaQuery = window.matchMedia("(max-width: 1023px)");
+		const updateLayout = () => setIsMobileLayout(mediaQuery.matches);
 
-    updateLayout();
-    mediaQuery.addEventListener("change", updateLayout);
+		updateLayout();
+		mediaQuery.addEventListener("change", updateLayout);
 
-    return () => {
-      mediaQuery.removeEventListener("change", updateLayout);
-    };
-  }, []);
+		return () => {
+			mediaQuery.removeEventListener("change", updateLayout);
+		};
+	}, []);
 
-  React.useEffect(() => {
-    if (!visibleTabs.includes(activeTab)) {
-      setActiveTab(defaultActiveTab);
-    }
-  }, [activeTab, defaultActiveTab, visibleTabs]);
+	React.useEffect(() => {
+		if (!visibleTabs.includes(activeTab)) {
+			setActiveTab(defaultActiveTab);
+		}
+	}, [activeTab, defaultActiveTab, visibleTabs]);
 
-  React.useEffect(() => {
-    let ticking = false;
-    let lastScrollY = window.scrollY;
+	React.useEffect(() => {
+		let ticking = false;
+		let lastScrollY = window.scrollY;
 
-    const handleScroll = () => {
-      if (!ticking && tabsRef.current) {
-        ticking = true;
-        requestAnimationFrame(() => {
-          if (tabsRef.current) {
-            const rect = tabsRef.current.getBoundingClientRect();
-            const currentScrollY = window.scrollY;
+		const handleScroll = () => {
+			if (!ticking && tabsRef.current) {
+				ticking = true;
+				requestAnimationFrame(() => {
+					if (tabsRef.current) {
+						const rect = tabsRef.current.getBoundingClientRect();
+						const currentScrollY = window.scrollY;
 
-            // Solo cambiar si hay una diferencia significativa de scroll
-            const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+						// Solo cambiar si hay una diferencia significativa de scroll
+						const scrollDelta = Math.abs(currentScrollY - lastScrollY);
 
-            // Usar threshold para evitar parpadeo en el límite
-            const shouldBeStuck = rect.top <= -10;
+						// Usar threshold para evitar parpadeo en el límite
+						const shouldBeStuck = rect.top <= -10;
 
-            // Solo actualizar si hay scroll significativo o cambio de estado
-            if (scrollDelta > 1 || isStuck !== shouldBeStuck) {
-              setIsStuck(shouldBeStuck);
-            }
+						// Solo actualizar si hay scroll significativo o cambio de estado
+						if (scrollDelta > 1 || isStuck !== shouldBeStuck) {
+							setIsStuck(shouldBeStuck);
+						}
 
-            lastScrollY = currentScrollY;
-          }
-          ticking = false;
-        });
-      }
-    };
+						lastScrollY = currentScrollY;
+					}
+					ticking = false;
+				});
+			}
+		};
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, [isStuck]);
+		window.addEventListener("scroll", handleScroll, { passive: true });
+		window.addEventListener("resize", handleScroll, { passive: true });
+		handleScroll();
+		return () => {
+			window.removeEventListener("scroll", handleScroll);
+			window.removeEventListener("resize", handleScroll);
+		};
+	}, [isStuck]);
 
-  if (!tab) {
-    return null;
-  }
+	if (!tab) {
+		return null;
+	}
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+	const handleTabChange = (value: string) => {
+		setActiveTab(value);
 
-    // Usar setTimeout para que se ejecute DESPUÉS del render del tab
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (tabsRef.current) {
-          tabsRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      });
-    });
-  };
+		// Usar setTimeout para que se ejecute DESPUÉS del render del tab
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				if (tabsRef.current) {
+					tabsRef.current.scrollIntoView({
+						behavior: "smooth",
+						block: "start",
+					});
+				}
+			});
+		});
+	};
 
-  // Iconos simples para las pestañas
-  const renderIcon = (type: string) => {
-    const iconClass =
-      "size-5 shrink-0 transition-transform duration-300 group-hover:-translate-y-1 md:size-6";
+	// Iconos simples para las pestañas
+	const renderIcon = (type: string) => {
+		const iconClass =
+			"size-5 shrink-0 transition-transform duration-300 group-hover:-translate-y-1 md:size-6";
 
-    switch (type) {
-      case "overview":
-        return <OverviewIcon className={iconClass} />;
-      case "itinerary":
-        return <ItineraryIcon className={iconClass} />;
-      case "included":
-        return <IncludedIcon className={iconClass} />;
-      case "information":
-        return <InformationIcon className={iconClass} />;
-      case "price":
-        return <PriceIcon className={iconClass} />;
-      default:
-        return null;
-    }
-  };
+		switch (type) {
+			case "overview":
+				return <OverviewIcon className={iconClass} />;
+			case "itinerary":
+				return <ItineraryIcon className={iconClass} />;
+			case "included":
+				return <IncludedIcon className={iconClass} />;
+			case "information":
+				return <InformationIcon className={iconClass} />;
+			case "price":
+				return <PriceIcon className={iconClass} />;
+			case "maps":
+				return <MapIcon className={iconClass} />;
+			default:
+				return null;
+		}
+	};
 
-  const tabTriggerClass =
-    "tour-tab-trigger group relative flex-1 flex flex-col items-center justify-center gap-2 rounded-sm bg-transparent px-4 pb-5 pt-4 text-[0.65rem] md:text-sm font-bold uppercase tracking-[0.12em] text-[#333] transition-colors duration-300 whitespace-nowrap outline-none border-none !shadow-none ring-0 focus-visible:ring-0";
-  const mobileAccordionClass =
-    "group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]";
-  const mobileSummaryClass =
-    "flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden";
-  const mobileIconClass =
-    "flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary";
-  const mobileContentClass =
-    "border-t border-primary/10 px-4 py-4 bg-background";
-  const tabPanelTitleClass = "sr-only";
+	const tabTriggerClass =
+		"tour-tab-trigger group relative flex-1 flex flex-col items-center justify-center gap-2 rounded-sm bg-transparent px-4 pb-5 pt-4 text-[0.65rem] md:text-sm font-bold uppercase tracking-[0.12em] text-[#333] transition-colors duration-300 whitespace-nowrap outline-none border-none !shadow-none ring-0 focus-visible:ring-0";
+	const mobileAccordionClass =
+		"group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]";
+	const mobileSummaryClass =
+		"flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden";
+	const mobileIconClass =
+		"flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary";
+	const mobileContentClass =
+		"border-t border-primary/10 px-4 py-4 bg-background";
+	const tabPanelTitleClass = "sr-only";
 
-  return (
-    <div className="w-full" ref={tabsRef}>
-      <style>{`
+	return (
+		<div className="w-full" ref={tabsRef}>
+			<style>{`
         .tour-tabs-list .tour-tab-trigger::after {
           content: "";
           position: absolute;
@@ -216,259 +223,292 @@ export default function TourTabs({ tour, lang, children }: Props) {
           color: var(--secondary) !important;
         }
       `}</style>
-      <div
-        className={
-          isMobileLayout
-            ? ""
-            : "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8"
-        }
-      >
-        {/* Desktop Layout */}
-        {!isMobileLayout && (
-          <Tabs
-            value={activeTab}
-            onValueChange={handleTabChange}
-            className="contents"
-          >
-            {/* Sticky container - Full Bleed */}
-            <div
-              className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] lg:col-span-2 ${isStuck ? "shadow-md" : ""}`}
-            >
-              <div className="w-full">
-                <TabsList className="tour-tabs-list flex !h-auto w-full items-stretch justify-between gap-1 rounded-sm bg-muted/70 p-1.5 outline-none ring-0">
-                  {hasOverview && tab.overview.titulo && (
-                    <TabsTrigger value="overview" className={tabTriggerClass}>
-                      {renderIcon("overview")}
-                      {tab.overview.titulo}
-                    </TabsTrigger>
-                  )}
-                  {hasItinerary && tab.itinerary.titulo && (
-                    <TabsTrigger value="itinerary" className={tabTriggerClass}>
-                      {renderIcon("itinerary")}
-                      {tab.itinerary.titulo}
-                    </TabsTrigger>
-                  )}
-                  {hasIncluded && tab.included.titulo && (
-                    <TabsTrigger value="included" className={tabTriggerClass}>
-                      {renderIcon("included")}
-                      {tab.included.titulo}
-                    </TabsTrigger>
-                  )}
-                  {hasInformation && tab.information.titulo && (
-                    <TabsTrigger
-                      value="information"
-                      className={tabTriggerClass}
-                    >
-                      {renderIcon("information")}
-                      {tab.information.titulo}
-                    </TabsTrigger>
-                  )}
-                  {hasPrice && tab.price.titulo && (
-                    <TabsTrigger value="price" className={tabTriggerClass}>
-                      {renderIcon("price")}
-                      {tab.price.titulo}
-                    </TabsTrigger>
-                  )}
-                </TabsList>
-              </div>
-            </div>
+			<div
+				className={
+					isMobileLayout
+						? ""
+						: "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8"
+				}
+			>
+				{/* Desktop Layout */}
+				{!isMobileLayout && (
+					<Tabs
+						value={activeTab}
+						onValueChange={handleTabChange}
+						className="contents"
+					>
+						{/* Sticky container - Full Bleed */}
+						<div
+							className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] lg:col-span-2 ${isStuck ? "shadow-md" : ""}`}
+						>
+							<div className="w-full">
+								<TabsList className="tour-tabs-list flex !h-auto w-full items-stretch justify-between gap-1 rounded-sm bg-muted/70 p-1.5 outline-none ring-0">
+									{hasOverview && tab.overview.titulo && (
+										<TabsTrigger value="overview" className={tabTriggerClass}>
+											{renderIcon("overview")}
+											{tab.overview.titulo}
+										</TabsTrigger>
+									)}
+									{hasItinerary && tab.itinerary.titulo && (
+										<TabsTrigger value="itinerary" className={tabTriggerClass}>
+											{renderIcon("itinerary")}
+											{tab.itinerary.titulo}
+										</TabsTrigger>
+									)}
+									{hasIncluded && tab.included.titulo && (
+										<TabsTrigger value="included" className={tabTriggerClass}>
+											{renderIcon("included")}
+											{tab.included.titulo}
+										</TabsTrigger>
+									)}
+									{hasInformation && tab.information.titulo && (
+										<TabsTrigger
+											value="information"
+											className={tabTriggerClass}
+										>
+											{renderIcon("information")}
+											{tab.information.titulo}
+										</TabsTrigger>
+									)}
+									{hasPrice && tab.price.titulo && (
+										<TabsTrigger value="price" className={tabTriggerClass}>
+											{renderIcon("price")}
+											{tab.price.titulo}
+										</TabsTrigger>
+									)}
+									{hasMaps && (
+										<TabsTrigger value="maps" className={tabTriggerClass}>
+											{renderIcon("maps")}
+											{mapsTitle}
+										</TabsTrigger>
+									)}
+								</TabsList>
+							</div>
+						</div>
 
-            <div className="mt-8 min-w-0 lg:mt-12">
-              {hasOverview && (
-                <TabsContent
-                  value="overview"
-                  className="outline-none animate-fade-in"
-                >
-                  <section aria-labelledby="tour-overview-title">
-                    <h2 id="tour-overview-title" className={tabPanelTitleClass}>
-                      {tab.overview.titulo}
-                    </h2>
-                    <OverviewTab timeline={tab.overview.timeline} />
-                  </section>
-                </TabsContent>
-              )}
+						<div className="mt-8 min-w-0 lg:mt-12">
+							{hasOverview && (
+								<TabsContent
+									value="overview"
+									className="outline-none animate-fade-in"
+								>
+									<section aria-labelledby="tour-overview-title">
+										<h2 id="tour-overview-title" className={tabPanelTitleClass}>
+											{tab.overview.titulo}
+										</h2>
+										<OverviewTab timeline={tab.overview.timeline} />
+									</section>
+								</TabsContent>
+							)}
 
-              {hasItinerary && (
-                <TabsContent
-                  value="itinerary"
-                  className="outline-none animate-fade-in"
-                >
-                  <section aria-labelledby="tour-itinerary-title">
-                    <h2
-                      id="tour-itinerary-title"
-                      className={tabPanelTitleClass}
-                    >
-                      {tab.itinerary.titulo}
-                    </h2>
-                    <ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
-                  </section>
-                </TabsContent>
-              )}
+							{hasItinerary && (
+								<TabsContent
+									value="itinerary"
+									className="outline-none animate-fade-in"
+								>
+									<section aria-labelledby="tour-itinerary-title">
+										<h2
+											id="tour-itinerary-title"
+											className={tabPanelTitleClass}
+										>
+											{tab.itinerary.titulo}
+										</h2>
+										<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
+									</section>
+								</TabsContent>
+							)}
 
-              {hasInformation && (
-                <TabsContent
-                  value="information"
-                  className="outline-none animate-fade-in"
-                >
-                  <section aria-labelledby="tour-information-title">
-                    <h2
-                      id="tour-information-title"
-                      className={tabPanelTitleClass}
-                    >
-                      {tab.information.titulo}
-                    </h2>
-                    <InformationTab items={tab.information.acordeon} />
-                  </section>
-                </TabsContent>
-              )}
+							{hasInformation && (
+								<TabsContent
+									value="information"
+									className="outline-none animate-fade-in"
+								>
+									<section aria-labelledby="tour-information-title">
+										<h2
+											id="tour-information-title"
+											className={tabPanelTitleClass}
+										>
+											{tab.information.titulo}
+										</h2>
+										<InformationTab items={tab.information.acordeon} />
+									</section>
+								</TabsContent>
+							)}
 
-              {hasIncluded && (
-                <TabsContent
-                  value="included"
-                  className="outline-none animate-fade-in"
-                >
-                  <section aria-labelledby="tour-included-title">
-                    <h2 id="tour-included-title" className={tabPanelTitleClass}>
-                      {tab.included.titulo}
-                    </h2>
-                    <div className="not-prose">
-                      <IncludedTab contenido={tab.included.contenido} />
-                    </div>
-                  </section>
-                </TabsContent>
-              )}
+							{hasIncluded && (
+								<TabsContent
+									value="included"
+									className="outline-none animate-fade-in"
+								>
+									<section aria-labelledby="tour-included-title">
+										<h2 id="tour-included-title" className={tabPanelTitleClass}>
+											{tab.included.titulo}
+										</h2>
+										<div className="not-prose">
+											<IncludedTab contenido={tab.included.contenido} />
+										</div>
+									</section>
+								</TabsContent>
+							)}
 
-              {hasPrice && (
-                <TabsContent
-                  value="price"
-                  className="outline-none animate-fade-in"
-                >
-                  <section aria-labelledby="tour-price-title">
-                    <h2 id="tour-price-title" className={tabPanelTitleClass}>
-                      {tab.price.titulo}
-                    </h2>
-                    <div className="not-prose">
-                      <PriceTab contenido={tab.price.contenido} />
-                    </div>
-                  </section>
-                </TabsContent>
-              )}
-            </div>
-          </Tabs>
-        )}
+							{hasPrice && (
+								<TabsContent
+									value="price"
+									className="outline-none animate-fade-in"
+								>
+									<section aria-labelledby="tour-price-title">
+										<h2 id="tour-price-title" className={tabPanelTitleClass}>
+											{tab.price.titulo}
+										</h2>
+										<div className="not-prose">
+											<PriceTab contenido={tab.price.contenido} />
+										</div>
+									</section>
+								</TabsContent>
+							)}
 
-        {/* Mobile Layout */}
-        {isMobileLayout && (
-          <div className="space-y-4">
-            {/* Summary */}
-            {hasOverview && tab.overview.titulo && (
-              <details open className={mobileAccordionClass}>
-                <summary className={mobileSummaryClass}>
-                  <span className="text-left text-sm font-semibold text-foreground">
-                    {tab.overview.titulo}
-                  </span>
-                  <span className={mobileIconClass}>
-                    <ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-                  </span>
-                </summary>
-                <div className={mobileContentClass}>
-                  <h2 className={tabPanelTitleClass}>{tab.overview.titulo}</h2>
-                  <OverviewTab timeline={tab.overview.timeline} />
-                </div>
-              </details>
-            )}
+							{hasMaps && (
+								<TabsContent
+									value="maps"
+									className="outline-none animate-fade-in"
+								>
+									<section aria-labelledby="tour-maps-title">
+										<h2 id="tour-maps-title" className={tabPanelTitleClass}>
+											{mapsTitle}
+										</h2>
+										<MapTab lang={lang} />
+									</section>
+								</TabsContent>
+							)}
+						</div>
+					</Tabs>
+				)}
 
-            {/* Itinerary */}
-            {hasItinerary && tab.itinerary.titulo && (
-              <details open={!hasOverview} className={mobileAccordionClass}>
-                <summary className={mobileSummaryClass}>
-                  <span className="text-left text-sm font-semibold text-foreground">
-                    {tab.itinerary.titulo}
-                  </span>
-                  <span className={mobileIconClass}>
-                    <ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-                  </span>
-                </summary>
-                <div className={mobileContentClass}>
-                  <h2 className={tabPanelTitleClass}>
-                    {tab.itinerary.titulo}
-                  </h2>
-                  <ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
-                </div>
-              </details>
-            )}
+				{/* Mobile Layout */}
+				{isMobileLayout && (
+					<div className="space-y-4">
+						{/* Summary */}
+						{hasOverview && tab.overview.titulo && (
+							<details open className={mobileAccordionClass}>
+								<summary className={mobileSummaryClass}>
+									<span className="text-left text-sm font-semibold text-foreground">
+										{tab.overview.titulo}
+									</span>
+									<span className={mobileIconClass}>
+										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+									</span>
+								</summary>
+								<div className={mobileContentClass}>
+									<h2 className={tabPanelTitleClass}>{tab.overview.titulo}</h2>
+									<OverviewTab timeline={tab.overview.timeline} />
+								</div>
+							</details>
+						)}
 
-            {/* Included */}
-            {hasIncluded && tab.included.titulo && (
-              <details className={mobileAccordionClass}>
-                <summary className={mobileSummaryClass}>
-                  <span className="text-left text-sm font-semibold text-foreground">
-                    {tab.included.titulo}
-                  </span>
-                  <span className={mobileIconClass}>
-                    <ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-                  </span>
-                </summary>
-                <div className={mobileContentClass}>
-                  <h2 className={tabPanelTitleClass}>
-                    {tab.included.titulo}
-                  </h2>
-                  <IncludedTab contenido={tab.included.contenido} />
-                </div>
-              </details>
-            )}
+						{/* Itinerary */}
+						{hasItinerary && tab.itinerary.titulo && (
+							<details open={!hasOverview} className={mobileAccordionClass}>
+								<summary className={mobileSummaryClass}>
+									<span className="text-left text-sm font-semibold text-foreground">
+										{tab.itinerary.titulo}
+									</span>
+									<span className={mobileIconClass}>
+										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+									</span>
+								</summary>
+								<div className={mobileContentClass}>
+									<h2 className={tabPanelTitleClass}>{tab.itinerary.titulo}</h2>
+									<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
+								</div>
+							</details>
+						)}
 
-            {/* Information */}
-            {hasInformation && tab.information.titulo && (
-              <details className={mobileAccordionClass}>
-                <summary className={mobileSummaryClass}>
-                  <span className="text-left text-sm font-semibold text-foreground">
-                    {tab.information.titulo}
-                  </span>
-                  <span className={mobileIconClass}>
-                    <ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-                  </span>
-                </summary>
-                <div className={mobileContentClass}>
-                  <h2 className={tabPanelTitleClass}>
-                    {tab.information.titulo}
-                  </h2>
-                  <InformationTab items={tab.information.acordeon} />
-                </div>
-              </details>
-            )}
+						{/* Included */}
+						{hasIncluded && tab.included.titulo && (
+							<details className={mobileAccordionClass}>
+								<summary className={mobileSummaryClass}>
+									<span className="text-left text-sm font-semibold text-foreground">
+										{tab.included.titulo}
+									</span>
+									<span className={mobileIconClass}>
+										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+									</span>
+								</summary>
+								<div className={mobileContentClass}>
+									<h2 className={tabPanelTitleClass}>{tab.included.titulo}</h2>
+									<IncludedTab contenido={tab.included.contenido} />
+								</div>
+							</details>
+						)}
 
-            {/* Price */}
-            {hasPrice && tab.price.titulo && (
-              <details className={mobileAccordionClass}>
-                <summary className={mobileSummaryClass}>
-                  <span className="text-left text-sm font-semibold text-foreground">
-                    {tab.price.titulo}
-                  </span>
-                  <span className={mobileIconClass}>
-                    <ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-                  </span>
-                </summary>
-                <div className={mobileContentClass}>
-                  <h2 className={tabPanelTitleClass}>{tab.price.titulo}</h2>
-                  <PriceTab contenido={tab.price.contenido} />
-                </div>
-              </details>
-            )}
-          </div>
-        )}
+						{/* Information */}
+						{hasInformation && tab.information.titulo && (
+							<details className={mobileAccordionClass}>
+								<summary className={mobileSummaryClass}>
+									<span className="text-left text-sm font-semibold text-foreground">
+										{tab.information.titulo}
+									</span>
+									<span className={mobileIconClass}>
+										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+									</span>
+								</summary>
+								<div className={mobileContentClass}>
+									<h2 className={tabPanelTitleClass}>
+										{tab.information.titulo}
+									</h2>
+									<InformationTab items={tab.information.acordeon} />
+								</div>
+							</details>
+						)}
 
-        {/* Booking / Contact Form */}
-        {children && (
-          <aside
-            id="tour-contact-form"
-            aria-label="Reserva y contacto"
-            className="mt-8 min-w-0 scroll-mt-28 lg:mt-12 lg:self-start"
-          >
-            {children}
-          </aside>
-        )}
-      </div>
-    </div>
-  );
+						{/* Price */}
+						{hasPrice && tab.price.titulo && (
+							<details className={mobileAccordionClass}>
+								<summary className={mobileSummaryClass}>
+									<span className="text-left text-sm font-semibold text-foreground">
+										{tab.price.titulo}
+									</span>
+									<span className={mobileIconClass}>
+										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+									</span>
+								</summary>
+								<div className={mobileContentClass}>
+									<h2 className={tabPanelTitleClass}>{tab.price.titulo}</h2>
+									<PriceTab contenido={tab.price.contenido} />
+								</div>
+							</details>
+						)}
+
+						{hasMaps && (
+							<details className={mobileAccordionClass}>
+								<summary className={mobileSummaryClass}>
+									<span className="text-left text-sm font-semibold text-foreground">
+										{mapsTitle}
+									</span>
+									<span className={mobileIconClass}>
+										<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
+									</span>
+								</summary>
+								<div className={mobileContentClass}>
+									<h2 className={tabPanelTitleClass}>{mapsTitle}</h2>
+									<MapTab lang={lang} />
+								</div>
+							</details>
+						)}
+					</div>
+				)}
+
+				{/* Booking / Contact Form */}
+				{children && (
+					<aside
+						id="tour-contact-form"
+						aria-label="Reserva y contacto"
+						className="mt-8 min-w-0 scroll-mt-28 lg:mt-12 lg:self-start"
+					>
+						{children}
+					</aside>
+				)}
+			</div>
+		</div>
+	);
 }
