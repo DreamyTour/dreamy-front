@@ -191,7 +191,7 @@ const getSourceReviews = (source: ReviewSource) =>
       {
         sourceOrder.map((source) => {
           const summary = sourceSummaries[source];
-          const label = sourceLabels[source];/*  */
+          const label = sourceLabels[source]; /*  */
 
           return (
             <div class={`review-source-row review-source-row--${source}`}>
@@ -211,7 +211,7 @@ const getSourceReviews = (source: ReviewSource) =>
                       <span class="g-blue" aria-hidden="true">
                         G
                       </span>
-                      <span class="g-red" aria-hidden="true">
+                      <span class="g-secondary" aria-hidden="true">
                         o
                       </span>
                       <span class="g-yellow" aria-hidden="true">
@@ -223,7 +223,7 @@ const getSourceReviews = (source: ReviewSource) =>
                       <span class="g-green" aria-hidden="true">
                         l
                       </span>
-                      <span class="g-red" aria-hidden="true">
+                      <span class="g-secondary" aria-hidden="true">
                         e
                       </span>
                       <span class="review-google-word" aria-hidden="true">
@@ -441,7 +441,7 @@ const getSourceReviews = (source: ReviewSource) =>
       #4285f4 0%,
       #34a853 48%,
       #fbbc04 72%,
-      #ea4335 100%
+      var(--secondary) 100%
     );
   }
 
@@ -497,8 +497,8 @@ const getSourceReviews = (source: ReviewSource) =>
     color: #4285f4;
   }
 
-  .g-red {
-    color: #ea4335;
+  .g-secondary {
+    color: var(--secondary);
   }
 
   .g-yellow {
@@ -598,7 +598,7 @@ const getSourceReviews = (source: ReviewSource) =>
       #4285f4 0%,
       #34a853 38%,
       #fbbc04 66%,
-      #ea4335 100%
+      var(--secondary) 100%
     );
   }
 

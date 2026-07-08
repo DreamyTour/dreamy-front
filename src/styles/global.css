@@ -438,7 +438,7 @@
 }
 
 .payment-page .brand-icon.brand-izipay {
-  background: #ff4240;
+  background: var(--secondary);
 }
 
 .payment-page .brand-icon.brand-bank {
@@ -460,7 +460,7 @@
 }
 
 .payment-page .brand-icon.brand-moneygram {
-  background: #e31837;
+  background: var(--secondary);
 }
 
 .payment-page .brand-icon.brand-western-union {
@@ -756,13 +756,21 @@ html {
   --accent-foreground: var(--foreground);
   --ring: color-mix(in oklab, var(--primary) 35%, white);
 
-  --destructive: oklch(0.62 0.25 25);
+  --destructive: var(--secondary);
   --blog-surface: oklch(0.985 0.005 80);
   --blog-card-shadow: oklch(0.38 0.06 40 / 0.08);
   --blog-card-shadow-strong: oklch(0.34 0.07 35 / 0.16);
   --blog-image-shade: oklch(0.12 0.04 150);
-  --blog-aside-surface: color-mix(in oklab, var(--card) 96%, var(--blog-surface) 4%);
-  --blog-aside-border: color-mix(in oklab, var(--foreground) 10%, var(--border));
+  --blog-aside-surface: color-mix(
+    in oklab,
+    var(--card) 96%,
+    var(--blog-surface) 4%
+  );
+  --blog-aside-border: color-mix(
+    in oklab,
+    var(--foreground) 10%,
+    var(--border)
+  );
 
   color-scheme: light dark;
   accent-color: var(--primary);
