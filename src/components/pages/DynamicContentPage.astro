@@ -177,15 +177,22 @@ const tourLcpImageUrl =
   type === "tour" &&
   tour &&
   Array.isArray(tour.imagenDestacada) &&
-  tour.imagenDestacada[0]
-    ? getImageUrl(tour.imagenDestacada[0], "medium")
+  tour.imagenDestacada.length > 0
+    ? getImageUrl(
+        tour.imagenDestacada[tour.imagenDestacada.length - 1],
+        "medium",
+      )
     : undefined;
 const tourLcpImageSrcSet =
   type === "tour" &&
   tour &&
   Array.isArray(tour.imagenDestacada) &&
-  tour.imagenDestacada[0]
-    ? getImageSrcSet(tour.imagenDestacada[0], ["small", "medium"])
+  tour.imagenDestacada.length > 0
+    ? getImageSrcSet(tour.imagenDestacada[tour.imagenDestacada.length - 1], [
+        "small",
+        "medium",
+        "large",
+      ])
     : undefined;
 
 const mdxUiCopy = {

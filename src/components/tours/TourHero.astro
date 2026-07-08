@@ -22,9 +22,13 @@ const images = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada
       .map((img) => {
         const originalUrl = getImageUrl(img);
-        const largeSrcSet = getImageSrcSet(img, ["large"]);
+        const responsiveSrcSet = getImageSrcSet(img, [
+          "small",
+          "medium",
+          "large",
+        ]);
         const originalSrcSet = img.width ? `${originalUrl} ${img.width}w` : "";
-        const heroSrcSet = [largeSrcSet, originalSrcSet]
+        const heroSrcSet = [responsiveSrcSet, originalSrcSet]
           .filter(Boolean)
           .join(", ");
 
