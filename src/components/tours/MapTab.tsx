@@ -296,8 +296,8 @@ export default function MapTab({ lang }: { lang: Lang }) {
 							"line-width": [
 								"case",
 								["==", ["get", "id"], activeSegmentId ?? ""],
-								5,
-								3,
+								3.5,
+								2,
 							],
 							"line-opacity": 0.82,
 						}}
