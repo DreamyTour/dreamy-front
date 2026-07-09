@@ -1,5 +1,5 @@
 import { Clock, Route } from "lucide-react";
-import type { ExpressionSpecification, Map as MapLibreMap } from "maplibre-gl";
+import type { Map as MapLibreMap } from "maplibre-gl";
 import * as React from "react";
 import {
 	MapArc,
@@ -37,7 +37,6 @@ interface TourRouteSegment extends MapArcDatum {
 	to: [number, number];
 	fromStop: TourMapStop;
 	toStop: TourMapStop;
-	color: string;
 }
 
 const tourMapStopsSource: TourMapStopSource[] = [
@@ -93,7 +92,7 @@ const tourMapStopsSource: TourMapStopSource[] = [
 	},
 ];
 
-const routeColors = ["#2563eb", "#16a34a", "#f59e0b", "var(--secondary)"];
+const TOUR_ROUTE_COLOR = "#16a34a";
 const TOUR_MAP_CENTER: [number, number] = [-70.76, -15.98];
 
 const dayPrefixes: Record<Lang, string> = {
@@ -139,10 +138,10 @@ function Pin({
 			type="button"
 			aria-label={label}
 			className={cn(
-				"flex items-center justify-center rounded-full text-sm font-extrabold text-white shadow-[0_18px_34px_-20px_rgba(15,23,42,0.85)] ring-4 ring-white/90 transition-all focus:outline-none focus-visible:ring-primary/70",
+				"flex items-center justify-center rounded-full text-sm font-extrabold text-white shadow-[0_18px_34px_-20px_rgba(15,23,42,0.85)] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-green-500/70",
 				active
-					? "h-10 w-10 scale-110 bg-primary"
-					: "h-8 w-8 bg-foreground hover:bg-primary",
+					? "h-10 w-10 scale-110 bg-green-700 ring-4 ring-green-500/35"
+					: "h-8 w-8 bg-black ring-4 ring-white/90 hover:bg-green-700",
 			)}
 		>
 			{number}
@@ -173,20 +172,9 @@ export default function MapTab({ lang }: { lang: Lang }) {
 					to: [stop.longitude, stop.latitude],
 					fromStop: previousStop,
 					toStop: stop,
-					color: routeColors[index % routeColors.length],
 				};
 			}),
 		[tourMapStops],
-	);
-	const routeColorExpression = React.useMemo(
-		() =>
-			[
-				"match",
-				["get", "id"],
-				...routeSegments.flatMap((segment) => [segment.id, segment.color]),
-				"#2563eb",
-			] as unknown as ExpressionSpecification,
-		[routeSegments],
 	);
 	const tourMapBounds = React.useMemo<[[number, number], [number, number]]>(
 		() => [
@@ -304,7 +292,7 @@ export default function MapTab({ lang }: { lang: Lang }) {
 						curvature={0.28}
 						samples={96}
 						paint={{
-							"line-color": routeColorExpression,
+							"line-color": TOUR_ROUTE_COLOR,
 							"line-width": [
 								"case",
 								["==", ["get", "id"], activeSegmentId ?? ""],

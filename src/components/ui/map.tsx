@@ -195,6 +195,8 @@ type MapProps = {
 	onViewportChange?: (viewport: MapViewport) => void;
 	/** Show a loading indicator on the map */
 	loading?: boolean;
+	/** Render the default loading overlay while MapLibre initializes */
+	showLoader?: boolean;
 } & Omit<MapLibreGL.MapOptions, "container" | "style">;
 
 function DefaultLoader() {
@@ -230,6 +232,7 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 		viewport,
 		onViewportChange,
 		loading = false,
+		showLoader = true,
 		...props
 	},
 	ref,
@@ -298,13 +301,19 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 			// This is a workaround to avoid race conditions with the style loading
 			// else we have to force update every layer on setStyle change
 			styleTimeoutRef.current = setTimeout(() => {
-				setIsStyleLoaded(true);
+				if (map.isStyleLoaded()) {
+					setIsStyleLoaded(true);
+				}
 				if (projection) {
 					map.setProjection(projection);
 				}
 			}, 100);
 		};
-		const loadHandler = () => setIsLoaded(true);
+		const loadHandler = () => {
+			setIsLoaded(true);
+			setIsStyleLoaded(map.isStyleLoaded());
+			map.resize();
+		};
 
 		// Viewport change handler - skip if triggered by internal update
 		const handleMove = () => {
@@ -327,16 +336,7 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 			setIsStyleLoaded(false);
 			setMapInstance(null);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		viewport,
-		props,
-		projection,
-		resolvedTheme,
-		mapStyles.light,
-		mapStyles.dark,
-		clearStyleTimeout,
-	]);
+	}, []);
 
 	// Sync controlled viewport to map
 	useEffect(() => {
@@ -403,7 +403,7 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 				ref={containerRef}
 				className={cn("relative h-full w-full", className)}
 			>
-				{(!isLoaded || loading) && <DefaultLoader />}
+				{showLoader && (!isLoaded || loading) && <DefaultLoader />}
 				{/* SSR-safe: children render only when map is loaded on client */}
 				{mapInstance && children}
 			</div>
@@ -520,7 +520,7 @@ function MapMarker({
 		return markerInstance;
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [draggable, longitude, latitude, markerOptions]);
+	}, []);
 
 	useEffect(() => {
 		if (!map) return;
@@ -532,7 +532,7 @@ function MapMarker({
 		};
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [map, marker.addTo, marker.remove]);
+	}, [map, marker]);
 
 	const { offset, rotation, rotationAlignment, pitchAlignment } = markerOptions;
 
@@ -1913,7 +1913,7 @@ type MapClusterLayerProps<
 	clusterMaxZoom?: number;
 	/** Radius of each cluster when clustering points in pixels (default: 50) */
 	clusterRadius?: number;
-	/** Colors for cluster circles: [small, medium, large] based on point count (default: ["#22c55e", "#eab308", "var(--secondary)"]) */
+	/** Colors for cluster circles: [small, medium, large] based on point count (default: ["#22c55e", "#eab308", "#be123c"]) */
 	clusterColors?: [string, string, string];
 	/** Point count thresholds for color/size steps: [medium, large] (default: [100, 750]) */
 	clusterThresholds?: [number, number];
@@ -1935,7 +1935,7 @@ type MapClusterLayerProps<
 const DEFAULT_CLUSTER_COLORS: [string, string, string] = [
 	"#22c55e",
 	"#eab308",
-	"var(--secondary)",
+	"#be123c",
 ];
 const DEFAULT_CLUSTER_THRESHOLDS: [number, number] = [100, 750];
 

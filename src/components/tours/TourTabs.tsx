@@ -17,20 +17,24 @@ import ItineraryTab from "./ItineraryTab";
 import OverviewTab from "./OverviewTab";
 import PriceTab from "./PriceTab";
 
-const LazyMapTab = React.lazy(() => import("./MapTab"));
-
 function DeferredMapTab({ lang, active }: { lang: Lang; active: boolean }) {
+	const [Comp, setComp] = React.useState<React.ComponentType<{
+		lang: Lang;
+	}> | null>(null);
+
+	React.useEffect(() => {
+		if (active && !Comp) {
+			import("./MapTab").then((mod) => setComp(() => mod.default));
+		}
+	}, [active, Comp]);
+
 	if (!active) return null;
 
-	return (
-		<React.Suspense
-			fallback={
-				<div className="min-h-[520px]" role="status" aria-label="Loading map" />
-			}
-		>
-			<LazyMapTab lang={lang} />
-		</React.Suspense>
-	);
+	if (!Comp) {
+		return <div className="min-h-[520px]" aria-hidden="true" />;
+	}
+
+	return <Comp lang={lang} />;
 }
 interface Props {
 	tour: Tour;
