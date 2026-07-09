@@ -3,128 +3,137 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
 
-/* Estilos centralizados para contenido MDX - consistencia con el proyecto */
+
+/* ============================================
+   MDX CONTENT STYLES
+   ============================================ */
 @layer components {
-  .mdx-text h1 {
-    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-4;
-  }
+  .mdx-text {
+    h1 {
+      @apply text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-4;
+    }
 
-  .mdx-text h2 {
-    @apply text-2xl md:text-3xl font-bold text-foreground mb-6;
-  }
+    h2 {
+      @apply text-2xl md:text-3xl font-bold text-foreground mb-6;
+    }
 
-  .mdx-text h3 {
-    @apply text-xl font-semibold text-foreground mb-4;
-  }
+    h3 {
+      @apply text-xl font-semibold text-foreground mb-4;
+    }
 
-  .mdx-text h4 {
-    @apply text-lg font-semibold text-foreground mb-3;
-  }
+    h4 {
+      @apply text-lg font-semibold text-foreground mb-3;
+    }
 
-  .mdx-text p {
-    @apply text-base leading-relaxed text-foreground mb-4 !text-base;
-  }
+    p {
+      @apply text-base leading-relaxed text-foreground mb-4 !text-base;
+    }
 
-  .mdx-text ul,
-  .mdx-text ol {
-    @apply mb-4 pl-6 text-base;
-  }
+    ul,
+    ol {
+      @apply mb-4 pl-6 text-base;
+    }
 
-  .mdx-text li {
-    @apply mb-2 leading-relaxed;
-  }
+    li {
+      @apply mb-2 leading-relaxed;
+    }
 
-  .mdx-text a {
-    @apply text-primary font-semibold no-underline hover:text-secondary;
-  }
+    a {
+      @apply text-primary font-semibold no-underline hover:text-secondary;
+    }
 
-  .mdx-text blockquote {
-    @apply border-l-4 border-primary pl-4 py-2 my-4 bg-primary/5;
-  }
+    blockquote {
+      @apply border-l-4 border-primary pl-4 py-2 my-4 bg-primary/5;
+    }
 
-  .mdx-text hr {
-    @apply my-8 border-border;
-  }
+    hr {
+      @apply my-8 border-border;
+    }
 
-  .mdx-text img {
-    @apply rounded-sm my-6;
+    img {
+      @apply rounded-sm my-6;
+    }
   }
 }
 
+/* ============================================
+   CONTENT LAYOUT
+   ============================================ */
 .content-shell--mdx {
   background: var(--background);
 }
 
 .content-hero--mdx {
   position: relative;
-}
 
-.content-hero--mdx > .hero-bg-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  > .hero-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
 }
 
 .content-article {
   color: var(--foreground);
-}
 
-.content-article :where(.not-prose) {
-  margin-block: clamp(1.75rem, 1.3rem + 1.6vw, 3rem);
-}
+  :where(.not-prose) {
+    margin-block: clamp(1.75rem, 1.3rem + 1.6vw, 3rem);
+  }
 
-.content-article :where(.not-prose:first-child) {
-  margin-top: 0;
-}
+  :where(.not-prose:first-child) {
+    margin-top: 0;
+  }
 
-.content-article :where(.not-prose:last-child) {
-  scroll-margin-top: 7rem;
-}
+  :where(.not-prose:last-child) {
+    scroll-margin-top: 7rem;
+  }
 
-.content-article :where(section, h1, h2, h3, h4, h5, h6) {
-  scroll-margin-top: 7rem;
-}
+  :where(section, h1, h2, h3, h4, h5, h6) {
+    scroll-margin-top: 7rem;
+  }
 
-.content-article :is(hr) {
-  border-color: color-mix(in oklab, var(--border) 100%, transparent);
-}
+  :is(hr) {
+    border-color: color-mix(in oklab, var(--border) 100%, transparent);
+  }
 
-.content-article :is(.bg-white, .bg-white\/80, .bg-white\/95) {
-  background-color: white;
-}
-
-.content-article
-  .certificates-gallery
   :is(.bg-white, .bg-white\/80, .bg-white\/95) {
-  background-color: white;
-}
+    background-color: white;
+  }
 
-.content-article :is(.bg-muted, .bg-muted\/30, .bg-muted\/50, .bg-slate-50) {
-  background-color: color-mix(in oklab, var(--muted) 82%, white 18%);
-}
+  .certificates-gallery {
+    :is(.bg-white, .bg-white\/80, .bg-white\/95) {
+      background-color: white;
+    }
+  }
 
-.content-article :is(.border-gray-200, .border-border) {
-  border-color: color-mix(in oklab, var(--border) 100%, transparent);
-}
+  :is(.bg-muted, .bg-muted\/30, .bg-muted\/50, .bg-slate-50) {
+    background-color: color-mix(in oklab, var(--muted) 82%, white 18%);
+  }
 
-.content-article
+  :is(.border-gray-200, .border-border) {
+    border-color: color-mix(in oklab, var(--border) 100%, transparent);
+  }
+
   :is(
-    .shadow-lg,
-    .shadow-xl,
-    .shadow-2xl,
-    .shadow-sm,
-    .hover\:shadow-md:hover,
-    .hover\:shadow-lg:hover
-  ) {
-  box-shadow: 0 24px 60px -42px
-    color-mix(in oklab, var(--foreground) 28%, transparent);
+      .shadow-lg,
+      .shadow-xl,
+      .shadow-2xl,
+      .shadow-sm,
+      .hover\:shadow-md:hover,
+      .hover\:shadow-lg:hover
+    ) {
+    box-shadow: 0 24px 60px -42px
+      color-mix(in oklab, var(--foreground) 28%, transparent);
+  }
 }
 
+/* ============================================
+   DEFERRED CONTENT (content-visibility)
+   ============================================ */
 @supports (content-visibility: auto) {
   .content-deferred {
     content-visibility: auto;
@@ -140,551 +149,567 @@
   }
 }
 
-.about-page .about-surface {
-  background: var(--background);
+/* ============================================
+   ABOUT PAGE
+   ============================================ */
+.about-page {
+  .about-surface {
+    background: var(--background);
+  }
+
+  .about-band {
+    background: var(--muted);
+    border-block: 1px solid var(--border);
+  }
+
+  .about-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+  }
+
+  .about-card-highlight {
+    background: var(--foreground);
+    color: var(--background);
+  }
+
+  .about-stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
 }
 
-.about-page .about-band {
-  background: var(--muted);
-  border-block: 1px solid var(--border);
+/* ============================================
+   LEGAL PAGE
+   ============================================ */
+.legal-page {
+  .legal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+
+  .legal-accent-icon {
+    color: var(--primary);
+  }
 }
 
-.about-page .about-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  transition: all 0.3s ease;
-}
-
-.about-page .about-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
-
-.about-page .about-card-highlight {
-  background: var(--foreground);
-  color: var(--background);
-}
-
-.about-page .about-stat-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-}
-
-.legal-page .legal-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-}
-
-.legal-page .legal-accent-icon {
-  color: var(--primary);
-}
-
+/* ============================================
+   PAYMENT PAGE
+   ============================================ */
 .payment-page {
   --payment-bg: var(--background);
   --payment-border: var(--border);
   --payment-text: var(--foreground);
   --payment-muted: var(--muted-foreground);
   --payment-bg-subtle: var(--muted);
-}
 
-.payment-page .payment-options-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.payment-page .payment-option-card {
-  background: var(--payment-bg);
-  border: 1px solid var(--primary);
-  border-radius: 12px;
-  padding: 1.25rem;
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  column-gap: 1rem;
-  row-gap: 0.25rem;
-  align-items: start;
-}
-
-.payment-page .payment-option-card:nth-child(3) {
-  grid-column: 1 / -1;
-  background: color-mix(in oklab, var(--accent) 16%, var(--payment-bg));
-}
-
-.payment-page .option-icon {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  grid-row: 1 / span 2;
-  background: var(--accent);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-}
-
-.payment-page .option-title {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--payment-text);
-  margin: 0;
-  line-height: 1.3;
-}
-
-.payment-page .option-description {
-  font-size: 0.8125rem;
-  color: var(--payment-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.payment-page .payment-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.payment-page .payment-card {
-  background: var(--payment-bg);
-  border-radius: 1.25rem;
-  padding: 2rem;
-  border: 1px solid var(--border);
-}
-
-.payment-page .bank-card-wrapper {
-  position: relative;
-}
-
-.payment-page .bank-card-glow {
-  position: absolute;
-  inset: -1rem;
-  background: radial-gradient(
-    circle,
-    color-mix(in oklab, var(--primary) 15%, transparent) 0%,
-    transparent 70%
-  );
-  border-radius: 2rem;
-  filter: blur(1rem);
-  opacity: 0.5;
-  transition: opacity 0.7s ease;
-}
-
-.payment-page .bank-card-wrapper:hover .bank-card-glow {
-  opacity: 1;
-}
-
-.payment-page .bank-card-visual {
-  position: relative;
-  aspect-ratio: 1.586;
-  border-radius: 1.25rem;
-  padding: 2rem;
-  color: var(--foreground);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  border: 1px solid color-mix(in oklab, var(--primary) 30%, white);
-}
-
-.payment-page .interbank-card {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    color-mix(in oklab, var(--primary) 80%, var(--secondary)) 100%
-  );
-  color: var(--primary-foreground);
-}
-
-.payment-page .bcp-card {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    color-mix(in oklab, var(--primary) 80%, var(--secondary)) 100%
-  );
-  color: var(--primary-foreground);
-}
-
-.payment-page .bank-logo-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(0.5rem);
-}
-
-.payment-page .bank-name {
-  font-size: 1.125rem;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-}
-
-.payment-page .bank-card-chip-grid {
-  width: 3rem;
-  height: 2.5rem;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.9) 100%
-  );
-  border-radius: 0.375rem;
-  overflow: hidden;
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  border: 1px solid color-mix(in oklab, var(--border) 50%, white);
-}
-
-.payment-page .chip-cell {
-  border: 0.5px solid rgba(0, 0, 0, 0.1);
-}
-
-.payment-page .bank-card-number {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.payment-page .bank-card-label {
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.payment-page .bank-card-value {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.payment-page .bank-card-footer-info {
-  margin-top: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  overflow: hidden;
-}
-
-.payment-page .footer-info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.payment-page .footer-info-row:last-child {
-  border-bottom: none;
-  background: var(--muted);
-}
-
-.payment-page .footer-info-label {
-  font-size: 0.8125rem;
-  color: var(--muted-foreground);
-}
-
-.payment-page .footer-info-value {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--foreground);
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-}
-
-.payment-page .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.25rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--payment-border);
-}
-
-.payment-page .card-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-}
-
-.payment-page .brand-icon {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.6875rem;
-  background: var(--payment-bg-subtle);
-  color: var(--payment-text);
-}
-
-.payment-page .brand-icon.brand-paypal {
-  background: #002991;
-}
-
-.payment-page .brand-icon.brand-paypal img {
-  width: 86%;
-}
-
-.payment-page .brand-icon.brand-izipay {
-  background: var(--secondary);
-}
-
-.payment-page .brand-icon.brand-bank {
-  background: var(--white, var(--background));
-  border: 1px solid var(--payment-border);
-  color: var(--primary);
-}
-
-.payment-page .brand-icon.brand-transfer {
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-}
-
-.payment-page .brand-icon.brand-logo {
-  width: 118px;
-  min-width: 118px;
-  border: 0;
-  padding: 0.65rem 0.8rem;
-}
-
-.payment-page .brand-icon.brand-moneygram {
-  background: var(--secondary);
-}
-
-.payment-page .brand-icon.brand-western-union {
-  background: #111111;
-}
-
-.payment-page .brand-icon.brand-logo img {
-  display: block;
-  width: 100%;
-  max-height: 36px;
-  object-fit: contain;
-}
-
-.payment-page .brand-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--payment-text);
-  margin: 0;
-}
-
-.payment-page .brand-type {
-  font-size: 0.8125rem;
-  color: var(--payment-muted);
-  margin: 0;
-}
-
-.payment-page .secure-icon {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  background: var(--payment-bg-subtle);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--payment-text);
-}
-
-.payment-page .currency-badge {
-  background: var(--payment-bg-subtle);
-  color: var(--payment-text);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
-  letter-spacing: 0.025em;
-}
-
-.payment-page .card-fee {
-  font-size: 0.875rem;
-  color: var(--payment-muted);
-  margin-bottom: 1.25rem;
-  line-height: 1.5;
-}
-
-.payment-page .card-button {
-  width: 100%;
-  padding: 0.75rem 1.25rem;
-  background: var(--primary);
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 0.875rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  text-align: center;
-  text-decoration: none;
-  display: block;
-}
-
-.payment-page .card-button:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
-}
-
-.payment-page .account-details {
-  border: 1px solid var(--payment-border);
-  border-radius: 12px;
-  padding: 0;
-  margin-bottom: 1rem;
-  overflow: hidden;
-}
-
-.payment-page .account-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.875rem 1.25rem;
-  border-bottom: 1px solid var(--payment-border);
-}
-
-.payment-page .account-row:last-child {
-  border-bottom: none;
-}
-
-.payment-page .account-label {
-  font-size: 0.8125rem;
-  color: var(--payment-muted);
-}
-
-.payment-page .account-value {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--payment-text);
-}
-
-.payment-page .account-value.mono {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  letter-spacing: 0.02em;
-}
-
-.payment-page .account-address {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--payment-muted);
-  padding: 1rem;
-  border-top: 1px solid var(--payment-border);
-  background: var(--payment-bg-subtle);
-}
-
-.payment-page .transfer-details {
-  border: 1px solid var(--payment-border);
-  border-radius: 12px;
-  padding: 0;
-  margin-bottom: 1.25rem;
-  overflow: hidden;
-}
-
-.payment-page .transfer-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--payment-border);
-}
-
-.payment-page .transfer-row:last-child {
-  border-bottom: none;
-}
-
-.payment-page .transfer-label {
-  font-size: 0.875rem;
-  color: var(--payment-muted);
-}
-
-.payment-page .transfer-value {
-  font-weight: 600;
-  color: var(--payment-text);
-}
-
-.payment-page .transfer-value.mono {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-}
-
-.payment-page .payment-footer {
-  border-top: 1px solid var(--payment-border);
-  padding-top: 2rem;
-  margin-top: 1rem;
-}
-
-.payment-page .footer-items {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2.5rem;
-}
-
-.payment-page .footer-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--payment-muted);
-}
-
-.payment-page .footer-item svg {
-  color: var(--accent);
-}
-
-@media (max-width: 900px) {
-  .payment-page .payment-options-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .payment-page .payment-option-card:nth-child(3) {
-    grid-column: auto;
-  }
-
-  .payment-page .payment-option-card {
-    grid-template-columns: 44px minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .payment-page .payment-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .payment-page .footer-items {
-    flex-direction: column;
+  .payment-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .payment-option-card {
+    background: var(--payment-bg);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    column-gap: 1rem;
+    row-gap: 0.25rem;
+    align-items: start;
+
+    &:nth-child(3) {
+      grid-column: 1 / -1;
+      background: color-mix(in oklab, var(--accent) 16%, var(--payment-bg));
+    }
+  }
+
+  .option-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    grid-row: 1 / span 2;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    color: var(--primary);
+  }
+
+  .option-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .option-description {
+    font-size: 0.8125rem;
+    color: var(--payment-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .payment-card {
+    background: var(--payment-bg);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    border: 1px solid var(--border);
+  }
+
+  .bank-card-wrapper {
+    position: relative;
+  }
+
+  .bank-card-glow {
+    position: absolute;
+    inset: -1rem;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--primary) 15%, transparent) 0%,
+      transparent 70%
+    );
+    border-radius: 2rem;
+    filter: blur(1rem);
+    opacity: 0.5;
+    transition: opacity 0.7s ease;
+  }
+
+  .bank-card-wrapper:hover .bank-card-glow {
+    opacity: 1;
+  }
+
+  .bank-card-visual {
+    position: relative;
+    aspect-ratio: 1.586;
+    border-radius: 1.25rem;
+    padding: 2rem;
+    color: var(--foreground);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid color-mix(in oklab, var(--primary) 30%, white);
+  }
+
+  .interbank-card {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      color-mix(in oklab, var(--primary) 80%, var(--secondary)) 100%
+    );
+    color: var(--primary-foreground);
+  }
+
+  .bcp-card {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      color-mix(in oklab, var(--primary) 80%, var(--secondary)) 100%
+    );
+    color: var(--primary-foreground);
+  }
+
+  .bank-logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(0.5rem);
+  }
+
+  .bank-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+  }
+
+  .bank-card-chip-grid {
+    width: 3rem;
+    height: 2.5rem;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.9) 100%
+    );
+    border-radius: 0.375rem;
+    overflow: hidden;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    border: 1px solid color-mix(in oklab, var(--border) 50%, white);
+  }
+
+  .chip-cell {
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .bank-card-number {
+    font-family:
+      ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .bank-card-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .bank-card-value {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .bank-card-footer-info {
+    margin-top: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  .footer-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+
+    &:last-child {
+      border-bottom: none;
+      background: var(--muted);
+    }
+  }
+
+  .footer-info-label {
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  .footer-info-value {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--foreground);
+    font-family:
+      ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--payment-border);
+  }
+
+  .card-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .brand-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.6875rem;
+    background: var(--payment-bg-subtle);
+    color: var(--payment-text);
+
+    &.brand-paypal {
+      background: #002991;
+
+      img {
+        width: 86%;
+      }
+    }
+
+    &.brand-izipay {
+      background: var(--secondary);
+    }
+
+    &.brand-bank {
+      background: var(--white, var(--background));
+      border: 1px solid var(--payment-border);
+      color: var(--primary);
+    }
+
+    &.brand-transfer {
+      background: var(--secondary);
+      color: var(--secondary-foreground);
+    }
+
+    &.brand-logo {
+      width: 118px;
+      min-width: 118px;
+      border: 0;
+      padding: 0.65rem 0.8rem;
+
+      img {
+        display: block;
+        width: 100%;
+        max-height: 36px;
+        object-fit: contain;
+      }
+    }
+
+    &.brand-moneygram {
+      background: var(--secondary);
+    }
+
+    &.brand-western-union {
+      background: #111111;
+    }
+  }
+
+  .brand-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin: 0;
+  }
+
+  .brand-type {
+    font-size: 0.8125rem;
+    color: var(--payment-muted);
+    margin: 0;
+  }
+
+  .secure-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    background: var(--payment-bg-subtle);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--payment-text);
+  }
+
+  .currency-badge {
+    background: var(--payment-bg-subtle);
+    color: var(--payment-text);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    letter-spacing: 0.025em;
+  }
+
+  .card-fee {
+    font-size: 0.875rem;
+    color: var(--payment-muted);
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+  }
+
+  .card-button {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+
+    &:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+  }
+
+  .account-details {
+    border: 1px solid var(--payment-border);
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .account-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--payment-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .account-label {
+    font-size: 0.8125rem;
+    color: var(--payment-muted);
+  }
+
+  .account-value {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--payment-text);
+
+    &.mono {
+      font-family:
+        ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      letter-spacing: 0.02em;
+    }
+  }
+
+  .account-address {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--payment-muted);
+    padding: 1rem;
+    border-top: 1px solid var(--payment-border);
+    background: var(--payment-bg-subtle);
+  }
+
+  .transfer-details {
+    border: 1px solid var(--payment-border);
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .transfer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--payment-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .transfer-label {
+    font-size: 0.875rem;
+    color: var(--payment-muted);
+  }
+
+  .transfer-value {
+    font-weight: 600;
+    color: var(--payment-text);
+
+    &.mono {
+      font-family:
+        ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    }
+  }
+
+  .payment-footer {
+    border-top: 1px solid var(--payment-border);
+    padding-top: 2rem;
+    margin-top: 1rem;
+  }
+
+  .footer-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+
+  .footer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--payment-muted);
+
+    svg {
+      color: var(--accent);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .payment-options-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .payment-option-card:nth-child(3) {
+      grid-column: auto;
+    }
+
+    .payment-option-card {
+      grid-template-columns: 44px minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .payment-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-items {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
   }
 }
 
-/* Smooth scrolling for anchor links */
+/* ============================================
+   BASE HTML
+   ============================================ */
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
 }
 
+/* ============================================
+   THEME TOKENS
+   ============================================ */
 @theme {
-  /* Custom container sizes */
   --max-width-8xl: 90rem;
-  /* 1440px */
 }
 
 @theme inline {
@@ -726,6 +751,9 @@ html {
   --color-sidebar: var(--sidebar);
 }
 
+/* ============================================
+   CSS VARIABLES (LIGHT MODE)
+   ============================================ */
 :root {
   --radius: 0.75rem;
 
@@ -740,7 +768,6 @@ html {
 
   /* Brand */
   --primary: oklch(0.47 0.15 147.34);
-  /*--primary: oklch(0.64 0.1904 148);*/
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.5 0.19 20);
   --secondary-foreground: oklch(1 0 0);
@@ -772,7 +799,7 @@ html {
     var(--border)
   );
 
-  color-scheme: light dark;
+  color-scheme: light;
   accent-color: var(--primary);
   scrollbar-color: color-mix(in oklab, var(--primary) 70%, black)
     color-mix(in oklab, var(--muted) 92%, white);
@@ -787,6 +814,9 @@ html {
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
+/* ============================================
+   BASE LAYER (Tailwind)
+   ============================================ */
 @layer base {
   body {
     @apply bg-background text-foreground;
@@ -812,6 +842,10 @@ html {
     color: var(--foreground);
   }
 }
+
+/* ============================================
+   ACCESSIBILITY & PREFERENCES
+   ============================================ */
 @media (prefers-contrast: more) {
   :root {
     --muted-foreground: oklch(0.34 0 0);
@@ -843,7 +877,8 @@ html {
 .maplibregl-popup-content {
   padding: 0 !important;
 }
-/* Skip Link para accesibilidad (WCAG 2.4.1) */
+
+/* Skip link — WCAG 2.4.1 */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -856,15 +891,15 @@ html {
   border-radius: 0 0 8px 8px;
   text-decoration: none;
   transition: top 0.2s ease;
+
+  &:focus {
+    top: 0;
+    outline: 2px solid var(--foreground);
+    outline-offset: 2px;
+  }
 }
 
-.skip-link:focus {
-  top: 0;
-  outline: 2px solid var(--foreground);
-  outline-offset: 2px;
-}
-
-/* Scroll margin para elementos con foco (WCAG 2.4.11) */
+/* Focus-visible global — WCAG 2.4.11 */
 :focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 3px;
@@ -890,7 +925,7 @@ textarea:focus-visible,
   scroll-margin-top: 80px;
 }
 
-/* Reduced motion (WCAG 2.3.3) */
+/* Reduced motion — WCAG 2.3.3 */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -902,13 +937,4 @@ textarea:focus-visible,
   }
 }
 
-.dark {
-  --sidebar: hsl(240 5.9% 10%);
-  --sidebar-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-primary: hsl(224.3 76.3% 48%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
-}
+
