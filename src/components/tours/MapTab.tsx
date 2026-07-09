@@ -14,15 +14,10 @@ import {
 } from "@/components/ui/map";
 import type { Lang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import type { MapStop } from "@/types/tours";
 
-type TourMapStopSource = {
+type TourMapStopSource = Omit<MapStop, "id"> & {
 	id: string;
-	title: string;
-	duration: string;
-	routeText: string;
-	description: string;
-	latitude: number;
-	longitude: number;
 };
 
 type TourMapStop = TourMapStopSource & {
@@ -39,61 +34,7 @@ interface TourRouteSegment extends MapArcDatum {
 	toStop: TourMapStop;
 }
 
-const tourMapStopsSource: TourMapStopSource[] = [
-	{
-		id: "day-01-arequipa",
-		title: "Arequipa - Recorrido peatonal por la ciudad",
-		duration: "8:00 am - 2:00 pm",
-		routeText: "City Tour",
-		description:
-			"Recorrido por la Plaza de Armas, miradores y calles historicas antes de cerrar la primera jornada en Arequipa.",
-		latitude: -16.3959,
-		longitude: -71.5369,
-	},
-	{
-		id: "day-02-colca",
-		title: "Arequipa - Canon del Colca",
-		duration: "7:00 am - 5:00 pm",
-		routeText: "Viaje en bus",
-		description:
-			"Salida desde Arequipa hacia el valle del Colca con paradas panoramicas y tiempo para aclimatacion en ruta.",
-		latitude: -15.6094,
-		longitude: -71.9054,
-	},
-	{
-		id: "day-03-puno",
-		title: "Traslado desde el Canon del Colca - Puno",
-		duration: "8:00 am - 2:00 pm",
-		routeText: "Viaje en bus",
-		description:
-			"Ruta escenica desde el Colca hacia Puno atravesando paisajes altoandinos y paradas breves durante el traslado.",
-		latitude: -15.8402,
-		longitude: -70.0219,
-	},
-	{
-		id: "day-04-uros-taquile",
-		title: "Puno - Islas Flotantes de los Uros - Taquile - Puno",
-		duration: "7:30 am - 4:00 pm",
-		routeText: "Navegacion en lago",
-		description:
-			"Visita a las islas flotantes de los Uros y Taquile para conocer comunidades locales y volver a Puno por la tarde.",
-		latitude: -15.7658,
-		longitude: -69.6847,
-	},
-	{
-		id: "day-05-puno",
-		title: "Puno despedida",
-		duration: "9:00 am - 12:00 pm",
-		routeText: "Cierre del tour",
-		description:
-			"Manana libre en Puno para organizar la salida, ultimas compras o conexion con el siguiente destino.",
-		latitude: -15.835,
-		longitude: -70.027,
-	},
-];
-
 const TOUR_ROUTE_COLOR = "#16a34a";
-const TOUR_MAP_CENTER: [number, number] = [-70.76, -15.98];
 
 const dayPrefixes: Record<Lang, string> = {
 	es: "DIA",
@@ -149,8 +90,40 @@ function Pin({
 	);
 }
 
-export default function MapTab({ lang }: { lang: Lang }) {
+function normalizeMapStops(mapStops: MapStop[]): TourMapStopSource[] {
+	return mapStops
+		.map((stop) => ({
+			id: `map-stop-${stop.id}`,
+			order: Number(stop.order),
+			title: stop.title?.trim() || "",
+			description: stop.description?.trim() || "",
+			duration: stop.duration?.trim() || "",
+			routeText: stop.routeText?.trim() || "",
+			latitude: Number(stop.latitude),
+			longitude: Number(stop.longitude),
+		}))
+		.filter(
+			(stop) =>
+				Number.isFinite(stop.order) &&
+				stop.title &&
+				Number.isFinite(stop.latitude) &&
+				Number.isFinite(stop.longitude),
+		)
+		.sort((a, b) => a.order - b.order);
+}
+
+export default function MapTab({
+	lang,
+	mapStops,
+}: {
+	lang: Lang;
+	mapStops: MapStop[];
+}) {
 	const mapRef = React.useRef<MapLibreMap | null>(null);
+	const tourMapStopsSource = React.useMemo(
+		() => normalizeMapStops(mapStops),
+		[mapStops],
+	);
 	const tourMapStops = React.useMemo<TourMapStop[]>(() => {
 		const prefix = dayPrefixes[lang] ?? dayPrefixes.es;
 
@@ -159,7 +132,22 @@ export default function MapTab({ lang }: { lang: Lang }) {
 			dayNumber: String(index + 1).padStart(2, "0"),
 			day: `${prefix} ${String(index + 1).padStart(2, "0")}`,
 		}));
-	}, [lang]);
+	}, [lang, tourMapStopsSource]);
+	const tourMapCenter = React.useMemo<[number, number]>(() => {
+		const longitudeSum = tourMapStops.reduce(
+			(sum, stop) => sum + stop.longitude,
+			0,
+		);
+		const latitudeSum = tourMapStops.reduce(
+			(sum, stop) => sum + stop.latitude,
+			0,
+		);
+
+		return [
+			longitudeSum / tourMapStops.length,
+			latitudeSum / tourMapStops.length,
+		];
+	}, [tourMapStops]);
 	const routeSegments = React.useMemo<TourRouteSegment[]>(
 		() =>
 			tourMapStops.slice(1).map((stop, index) => {
@@ -253,20 +241,24 @@ export default function MapTab({ lang }: { lang: Lang }) {
 								</span>
 
 								<span className="mt-2 space-y-1.5 text-xs text-muted-foreground">
-									<span className="flex items-center gap-1.5">
-										<Clock
-											className="h-3.5 w-3.5 shrink-0 text-secondary"
-											aria-hidden="true"
-										/>
-										Tiempo de recorrido: {stop.duration}
-									</span>
-									<span className="flex items-center gap-1.5">
-										<Route
-											className="h-3.5 w-3.5 shrink-0 text-secondary"
-											aria-hidden="true"
-										/>
-										Tramo: {stop.routeText}
-									</span>
+									{stop.duration && (
+										<span className="flex items-center gap-1.5">
+											<Clock
+												className="h-3.5 w-3.5 shrink-0 text-secondary"
+												aria-hidden="true"
+											/>
+											Tiempo de recorrido: {stop.duration}
+										</span>
+									)}
+									{stop.routeText && (
+										<span className="flex items-center gap-1.5">
+											<Route
+												className="h-3.5 w-3.5 shrink-0 text-secondary"
+												aria-hidden="true"
+											/>
+											Tramo: {stop.routeText}
+										</span>
+									)}
 								</span>
 							</button>
 						);
@@ -277,7 +269,7 @@ export default function MapTab({ lang }: { lang: Lang }) {
 			<div className="order-2 min-h-[520px] overflow-hidden rounded-sm bg-muted/30 shadow-[0_30px_80px_-56px_rgba(15,23,42,0.8)] sm:min-h-[620px] lg:min-h-[720px]">
 				<TourMap
 					ref={mapRef}
-					center={TOUR_MAP_CENTER}
+					center={tourMapCenter}
 					zoom={6.2}
 					minZoom={5}
 					maxZoom={15}

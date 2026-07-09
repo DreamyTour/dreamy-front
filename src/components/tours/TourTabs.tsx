@@ -10,16 +10,25 @@ import {
 } from "@/components/icons/TourIcons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Lang } from "@/lib/i18n";
-import type { Tour } from "@/types/tours";
+import type { MapStop, Tour } from "@/types/tours";
 import IncludedTab from "./IncludedTab";
 import InformationTab from "./InformationTab";
 import ItineraryTab from "./ItineraryTab";
 import OverviewTab from "./OverviewTab";
 import PriceTab from "./PriceTab";
 
-function DeferredMapTab({ lang, active }: { lang: Lang; active: boolean }) {
+function DeferredMapTab({
+	lang,
+	active,
+	mapStops,
+}: {
+	lang: Lang;
+	active: boolean;
+	mapStops: MapStop[];
+}) {
 	const [Comp, setComp] = React.useState<React.ComponentType<{
 		lang: Lang;
+		mapStops: MapStop[];
 	}> | null>(null);
 
 	React.useEffect(() => {
@@ -34,7 +43,7 @@ function DeferredMapTab({ lang, active }: { lang: Lang; active: boolean }) {
 		return <div className="min-h-[520px]" aria-hidden="true" />;
 	}
 
-	return <Comp lang={lang} />;
+	return <Comp lang={lang} mapStops={mapStops} />;
 }
 interface Props {
 	tour: Tour;
@@ -64,7 +73,10 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	const hasPrice = Boolean(
 		tab?.price && (tab.price.titulo || tab.price.contenido),
 	);
-	const hasMaps = true;
+	const mapStops = Array.isArray(tab?.maps?.mapstops)
+		? tab.maps.mapstops
+		: [];
+	const hasMaps = mapStops.length > 0;
 	const mapsTitle = "Maps";
 	const visibleTabs = React.useMemo(
 		() =>
@@ -76,7 +88,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 				hasPrice && "price",
 				hasMaps && "maps",
 			].filter(Boolean) as string[],
-		[hasOverview, hasItinerary, hasIncluded, hasInformation, hasPrice],
+		[hasOverview, hasItinerary, hasIncluded, hasInformation, hasPrice, hasMaps],
 	);
 	const defaultActiveTab = visibleTabs[0] ?? "overview";
 	const [activeTab, setActiveTab] = React.useState(defaultActiveTab);
@@ -376,7 +388,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
 										<h2 id="tour-maps-title" className={tabPanelTitleClass}>
 											{mapsTitle}
 										</h2>
-										<DeferredMapTab lang={lang} active={activeTab === "maps"} />
+										<DeferredMapTab
+											lang={lang}
+											active={activeTab === "maps"}
+											mapStops={mapStops}
+										/>
 									</section>
 								</TabsContent>
 							)}
@@ -491,7 +507,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							</summary>
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{mapsTitle}</h2>
-								<DeferredMapTab lang={lang} active={isMapOpenMobile} />
+								<DeferredMapTab
+									lang={lang}
+									active={isMapOpenMobile}
+									mapStops={mapStops}
+								/>
 							</div>
 						</details>
 					)}

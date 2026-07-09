@@ -57,12 +57,29 @@ export interface Price {
 	contenido: StrapiBlock[]; // blocks ( Strapi v5)
 }
 
+export interface MapStop {
+	id: number;
+	order: number;
+	title: string;
+	description: string;
+	duration?: string;
+	routeText?: string;
+	latitude: number;
+	longitude: number;
+}
+
+export interface Maps {
+	id: number;
+	mapstops: MapStop[];
+}
+
 export interface Tab {
 	overview: Overview;
 	itinerary: Itinerary;
 	included: Included;
 	information: Information;
 	price: Price;
+	maps?: Maps | null;
 }
 
 export interface Category {

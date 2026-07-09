@@ -74,6 +74,7 @@ async function loadStrapiPagesByLang() {
 			locale: lang,
 			query: {
 				populate: "*",
+				"populate[tab][populate][maps][populate][mapstops]": true,
 			},
 		});
 
