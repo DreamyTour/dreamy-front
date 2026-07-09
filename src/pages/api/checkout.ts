@@ -41,6 +41,8 @@ interface CheckoutPayload {
 
 const PAYPAL_FEE_RATE = 0.08;
 const MAX_PASSENGERS_PER_BOOKING = 20;
+const PAYPAL_BUSINESS_EMAIL =
+	import.meta.env.PAYPAL_BUSINESS_EMAIL || "info@turismoperu.com.pe";
 
 function jsonResponse(body: unknown, status: number) {
 	return new Response(JSON.stringify(body), {
@@ -157,7 +159,6 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 
 		let emailSent = false;
-		let emailError: string | null = null;
 		const safeCart = {
 			tourName: escapeHtml(cart.tourName),
 			date: escapeHtml(cart.date || "Sin definir"),
@@ -287,7 +288,6 @@ export const POST: APIRoute = async ({ request }) => {
 			});
 
 			if (resendError) {
-				emailError = resendError.message;
 				console.error("Resend Error:", resendError);
 			} else {
 				emailSent = true;
@@ -297,7 +297,6 @@ export const POST: APIRoute = async ({ request }) => {
 			console.log("Resend not configured, skipping email");
 		}
 
-		const businessEmail = "info@turismoperu.com.pe";
 		const itemName = encodeURIComponent(cart.tourName);
 		const amount = amountPaid.toFixed(2);
 		const checkoutLang =
@@ -310,7 +309,7 @@ export const POST: APIRoute = async ({ request }) => {
 			`${new URL(request.url).origin}${successPath}`,
 		);
 
-		const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${businessEmail}&item_name=${itemName}&amount=${amount}&currency_code=USD&return=${returnUrl}`;
+		const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${PAYPAL_BUSINESS_EMAIL}&item_name=${itemName}&amount=${amount}&currency_code=USD&return=${returnUrl}`;
 
 		console.log("PayPal URL generated:", paypalUrl);
 
@@ -318,19 +317,12 @@ export const POST: APIRoute = async ({ request }) => {
 			{
 				success: true,
 				emailSent,
-				emailError,
 				redirectUrl: paypalUrl,
 			},
 			200,
 		);
 	} catch (error) {
 		console.error("Checkout API Error:", error);
-		return jsonResponse(
-			{
-				error: "Internal Server Error",
-				details: String(error),
-			},
-			500,
-		);
+		return jsonResponse({ error: "Internal Server Error" }, 500);
 	}
 };

@@ -44,12 +44,13 @@ export function groupStrapiRichTextBlocks(
 	blocks: StrapiBlock[] = [],
 ): Array<StrapiBlock | GalleryBlock> {
 	const grouped: Array<StrapiBlock | GalleryBlock> = [];
-	let imageBuffer: StrapiBlock[] = [];
+	const imageBuffer: StrapiBlock[] = [];
 
 	function flushImages() {
 		while (imageBuffer.length > 0) {
 			if (imageBuffer.length === 1) {
-				grouped.push(imageBuffer.shift()!);
+				const image = imageBuffer.shift();
+				if (image) grouped.push(image);
 			} else {
 				grouped.push({
 					type: "gallery",

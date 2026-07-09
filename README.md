@@ -21,7 +21,7 @@ Sitio web de Dreamy Tours construido con Astro, React y Tailwind CSS. El proyect
 
 ## Stack principal
 
-- Astro 6 con renderizado estatico y endpoints server-side.
+- Astro 7 con renderizado hibrido y endpoints server-side desplegados con Cloudflare.
 - React 19 para componentes interactivos.
 - Tailwind CSS v4 con variables de tema en `src/styles/global.css`.
 - MDX para paginas de contenido editorial.
@@ -62,6 +62,7 @@ VITE_STRAPI_URL=
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
 RESEND_TO_EMAIL=
+PAYPAL_BUSINESS_EMAIL=
 ```
 
 Variables usadas:
@@ -70,6 +71,7 @@ Variables usadas:
 - `RESEND_API_KEY`: API key opcional para enviar correos reales desde los formularios. Si no existe, algunos endpoints funcionan en modo simulacion.
 - `RESEND_FROM_EMAIL`: remitente verificado en Resend. Por defecto usa `Dreamy Tours <info@dreamy.tours>`.
 - `RESEND_TO_EMAIL`: destinatario(s) de formularios separados por coma. Por defecto usa `info@dreamy.tours`.
+- `PAYPAL_BUSINESS_EMAIL`: cuenta PayPal receptora. Por compatibilidad, usa `info@turismoperu.com.pe` si no se define.
 
 No subas valores privados de produccion al repositorio.
 
@@ -261,7 +263,7 @@ Preview:
 bun run preview
 ```
 
-En produccion, `astro.config.mjs` activa el adapter de Cloudflare cuando `NODE_ENV === "production"`.
+En produccion, `astro.config.mjs` usa siempre el adapter de Cloudflare para las rutas server-side y los endpoints API.
 
 El sitio esta configurado con:
 

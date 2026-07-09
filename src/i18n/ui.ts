@@ -1,5 +1,5 @@
-import { DEFAULT_LANG } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
+import { DEFAULT_LANG } from "@/lib/i18n";
 
 export const ui = {
 	es: {
@@ -19,7 +19,8 @@ export const ui = {
 		"homeStats.ariaLabel": "Cifras destacadas de Dreamy Tours",
 		"reviews.kicker": "Reseñas reales",
 		"reviews.title": "Lo que dicen nuestros clientes",
-		"reviews.description": "Estamos orgullosos de cuidar cada detalle de nuestros servicios para nuestros clientes, la satisfacción plena de nuestros viajeros es nuestra mejor recompensa y son ellos nuestros mejores defensores y quienes con frecuencia, nos recomiendan a familiares o amigos cuando planifican un viaje a nuestra región.",
+		"reviews.description":
+			"Estamos orgullosos de cuidar cada detalle de nuestros servicios para nuestros clientes, la satisfacción plena de nuestros viajeros es nuestra mejor recompensa y son ellos nuestros mejores defensores y quienes con frecuencia, nos recomiendan a familiares o amigos cuando planifican un viaje a nuestra región.",
 		"reviews.loading": "Cargando reseñas recientes...",
 		"reviews.latest": "Últimas 3",
 		"section.sinTours": "Próximamente agregaremos tours en esta sección.",
@@ -41,7 +42,8 @@ export const ui = {
 		"homeStats.ariaLabel": "Dreamy Tours highlights",
 		"reviews.kicker": "Real reviews",
 		"reviews.title": "What our customers say",
-		"reviews.description": "We are proud to take care of every detail of our services for our clients. The full satisfaction of our travelers is our best reward, and they are our best advocates, who frequently recommend us to family or friends when planning a trip to our region.",
+		"reviews.description":
+			"We are proud to take care of every detail of our services for our clients. The full satisfaction of our travelers is our best reward, and they are our best advocates, who frequently recommend us to family or friends when planning a trip to our region.",
 		"reviews.loading": "Loading recent reviews...",
 		"reviews.latest": "Latest 3",
 		"section.sinTours": "Tours coming soon to this section.",
@@ -63,7 +65,8 @@ export const ui = {
 		"homeStats.ariaLabel": "Destaques da Dreamy Tours",
 		"reviews.kicker": "Avaliações reais",
 		"reviews.title": "O que nossos clientes dizem",
-		"reviews.description": "Temos orgulho de cuidar de cada detalhe dos nossos serviços para os nossos clientes. A satisfação plena dos nossos viajantes é a nossa melhor recompensa e eles são os nossos melhores defensores, que frequentemente nos recomendam a familiares ou amigos quando planejam uma viagem à nossa região.",
+		"reviews.description":
+			"Temos orgulho de cuidar de cada detalhe dos nossos serviços para os nossos clientes. A satisfação plena dos nossos viajantes é a nossa melhor recompensa e eles são os nossos melhores defensores, que frequentemente nos recomendam a familiares ou amigos quando planejam uma viagem à nossa região.",
 		"reviews.loading": "Carregando avaliações recentes...",
 		"reviews.latest": "Últimas 3",
 		"section.sinTours": "Em breve adicionaremos tours nesta seção.",

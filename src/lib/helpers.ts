@@ -1,7 +1,7 @@
-import type { Lang } from "./i18n";
-import { rewriteUrl as rewriteLocalizedUrl } from "./i18n";
 import type { Imagen } from "@/types/common";
 import type { StrapiBlock, StrapiBlockChild } from "@/types/page";
+import type { Lang } from "./i18n";
+import { rewriteUrl as rewriteLocalizedUrl } from "./i18n";
 
 const strapiUrl =
 	import.meta.env.VITE_STRAPI_URL?.replace(/\/$/, "") ||
@@ -118,7 +118,7 @@ export function getYouTubeVideoId(
 
 	for (const pattern of patterns) {
 		const match = url.match(pattern);
-		if (match && match[1]) return match[1];
+		if (match?.[1]) return match[1];
 	}
 
 	return null;
@@ -163,7 +163,7 @@ export function generateDescription(content: unknown, maxLength = 160): string {
 	}
 
 	if (plainText.length <= maxLength) return plainText;
-	return plainText.substring(0, maxLength).trim() + "...";
+	return `${plainText.substring(0, maxLength).trim()}...`;
 }
 
 /**

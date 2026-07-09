@@ -14,10 +14,24 @@ import type { Tour } from "@/types/tours";
 import IncludedTab from "./IncludedTab";
 import InformationTab from "./InformationTab";
 import ItineraryTab from "./ItineraryTab";
-import MapTab from "./MapTab";
 import OverviewTab from "./OverviewTab";
 import PriceTab from "./PriceTab";
 
+const LazyMapTab = React.lazy(() => import("./MapTab"));
+
+function DeferredMapTab({ lang, active }: { lang: Lang; active: boolean }) {
+	if (!active) return null;
+
+	return (
+		<React.Suspense
+			fallback={
+				<div className="min-h-[520px]" role="status" aria-label="Loading map" />
+			}
+		>
+			<LazyMapTab lang={lang} />
+		</React.Suspense>
+	);
+}
 interface Props {
 	tour: Tour;
 	lang: Lang;
@@ -62,6 +76,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	);
 	const defaultActiveTab = visibleTabs[0] ?? "overview";
 	const [activeTab, setActiveTab] = React.useState(defaultActiveTab);
+	const [isMapOpenMobile, setIsMapOpenMobile] = React.useState(false);
 	const [isStuck, setIsStuck] = React.useState(false);
 
 	const tabsRef = React.useRef<HTMLDivElement>(null);
@@ -357,7 +372,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 										<h2 id="tour-maps-title" className={tabPanelTitleClass}>
 											{mapsTitle}
 										</h2>
-										<MapTab lang={lang} />
+										<DeferredMapTab lang={lang} active={activeTab === "maps"} />
 									</section>
 								</TabsContent>
 							)}
@@ -458,7 +473,10 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					)}
 
 					{hasMaps && (
-						<details className={mobileAccordionClass}>
+						<details
+							className={mobileAccordionClass}
+							onToggle={(event) => setIsMapOpenMobile(event.currentTarget.open)}
+						>
 							<summary className={mobileSummaryClass}>
 								<span className="text-left text-sm font-semibold text-foreground">
 									{mapsTitle}
@@ -469,7 +487,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							</summary>
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{mapsTitle}</h2>
-								<MapTab lang={lang} />
+								<DeferredMapTab lang={lang} active={isMapOpenMobile} />
 							</div>
 						</details>
 					)}
