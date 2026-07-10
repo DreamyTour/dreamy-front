@@ -202,7 +202,7 @@ export default function MapTab({
 	);
 
 	return (
-		<div className="tour-map-tab grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
+		<div className="tour-map-tab grid gap-4">
 			<style>{`
 				.tour-map-tab,
 				.tour-map-tab .maplibregl-map,
@@ -212,7 +212,7 @@ export default function MapTab({
 				}
 			`}</style>
 			<aside className="order-1 min-w-0 rounded-sm bg-background px-1 py-2 shadow-[0_22px_60px_-52px_rgba(15,23,42,0.65)]">
-				<div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-1 lg:block lg:max-h-[720px] lg:space-y-1 lg:overflow-y-auto lg:overflow-x-hidden lg:pr-1 lg:pb-0">
+				<div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-1">
 					{tourMapStops.map((stop) => {
 						const active = stop.id === selectedId;
 
@@ -221,10 +221,10 @@ export default function MapTab({
 								key={stop.id}
 								type="button"
 								className={cn(
-									"relative min-w-[16rem] rounded-sm px-4 py-3 text-left transition-all after:absolute after:right-[-0.25rem] after:top-3 after:h-[calc(100%-1.5rem)] after:w-px after:bg-border/80 after:content-[''] last:after:hidden lg:w-full lg:min-w-0 lg:after:bottom-[-0.125rem] lg:after:left-4 lg:after:right-4 lg:after:top-auto lg:after:h-px lg:after:w-auto",
+									"relative min-w-[16rem] rounded-sm px-4 py-3 text-left transition-all duration-200 after:absolute after:right-[-0.25rem] after:top-3 after:h-[calc(100%-1.5rem)] after:w-px after:bg-border/80 after:content-[''] last:after:hidden hover:-translate-y-0.5 hover:bg-muted/45 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
 									active
-										? "bg-muted/55 shadow-[0_18px_42px_-36px_rgba(15,23,42,0.7)]"
-										: "hover:bg-muted/35",
+										? "bg-muted/55 shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)]"
+										: "",
 								)}
 								onClick={() => {
 									selectStop(stop);
