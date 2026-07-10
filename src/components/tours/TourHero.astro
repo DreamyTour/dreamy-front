@@ -148,10 +148,10 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
 
         {
           hasBadges && (
-            <dl class="tour-badges mt-6 flex max-w-4xl flex-wrap items-stretch gap-2 md:flex-nowrap">
+            <dl class="tour-badges mt-6 grid max-w-4xl grid-cols-3 justify-start gap-2 md:grid-cols-[repeat(3,9.375rem)] xl:flex xl:flex-nowrap">
               {badges.map((badge, index) => (
                 <div
-                  class="tour-badge group grid w-fit max-w-[calc(50%-0.25rem)] min-w-0 grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-x-1.5 rounded-sm border border-white/18 bg-white/12 px-2 py-1.5 text-white shadow-[0_18px_42px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/18 md:min-h-[54px] md:w-auto md:max-w-none md:flex-1 md:basis-0 md:grid-cols-[2rem_minmax(0,1fr)] md:gap-x-2 md:px-2.5 md:py-2 xl:min-w-[150px] xl:shrink-0"
+                  class="tour-badge group grid h-[56px] w-full min-w-0 grid-cols-[1.75rem_minmax(0,1fr)] items-center gap-x-1.5 overflow-hidden rounded-sm border border-white/18 bg-white/12 px-2 py-1.5 text-white shadow-[0_18px_42px_-30px_rgba(0,0,0,0.9)] backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:bg-white/18 md:h-[58px] md:grid-cols-[2rem_minmax(0,1fr)] md:gap-x-2 md:px-2.5 md:py-2 xl:h-auto xl:min-h-[54px] xl:w-auto xl:min-w-[150px] xl:shrink-0 xl:overflow-visible"
                   style={`animation-delay: ${index * 90}ms;`}
                 >
                   <dt class="contents">
@@ -162,11 +162,11 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
                         className="h-3 w-3 transition-transform duration-300 group-hover:scale-110 md:h-3.5 md:w-3.5"
                       />
                     </span>
-                    <span class="min-w-0 text-[0.56rem] uppercase tracking-[0.1em] text-white/68 md:text-[0.58rem] md:tracking-[0.12em]">
+                    <span class="min-w-0 truncate text-[0.56rem] uppercase tracking-[0.1em] text-white/68 md:text-[0.58rem] md:tracking-[0.12em]">
                       {badge.titulo}
                     </span>
                   </dt>
-                  <dd class="col-start-2 mt-0.5 text-[0.7rem] font-medium leading-tight text-white md:text-xs">
+                  <dd class="col-start-2 mt-0.5 line-clamp-2 text-[0.7rem] font-medium leading-tight text-white md:text-xs xl:line-clamp-none">
                     {badge.content}
                   </dd>
                 </div>
