@@ -406,7 +406,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{hasOverview && tab.overview.titulo && (
 						<details open className={mobileAccordionClass}>
 							<summary className={mobileSummaryClass}>
-								<span className="text-left text-sm font-semibold text-foreground">
+								<span className="text-left text-base font-semibold text-foreground">
 									{tab.overview.titulo}
 								</span>
 								<span className={mobileIconClass}>
@@ -424,7 +424,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{hasItinerary && tab.itinerary.titulo && (
 						<details open={!hasOverview} className={mobileAccordionClass}>
 							<summary className={mobileSummaryClass}>
-								<span className="text-left text-sm font-semibold text-foreground">
+								<span className="text-left text-base font-semibold text-foreground">
 									{tab.itinerary.titulo}
 								</span>
 								<span className={mobileIconClass}>
@@ -442,7 +442,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{hasIncluded && tab.included.titulo && (
 						<details className={mobileAccordionClass}>
 							<summary className={mobileSummaryClass}>
-								<span className="text-left text-sm font-semibold text-foreground">
+								<span className="text-left text-base font-semibold text-foreground">
 									{tab.included.titulo}
 								</span>
 								<span className={mobileIconClass}>
@@ -460,7 +460,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{hasInformation && tab.information.titulo && (
 						<details className={mobileAccordionClass}>
 							<summary className={mobileSummaryClass}>
-								<span className="text-left text-sm font-semibold text-foreground">
+								<span className="text-left text-base font-semibold text-foreground">
 									{tab.information.titulo}
 								</span>
 								<span className={mobileIconClass}>
@@ -478,7 +478,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{hasPrice && tab.price.titulo && (
 						<details className={mobileAccordionClass}>
 							<summary className={mobileSummaryClass}>
-								<span className="text-left text-sm font-semibold text-foreground">
+								<span className="text-left text-base font-semibold text-foreground">
 									{tab.price.titulo}
 								</span>
 								<span className={mobileIconClass}>
@@ -498,7 +498,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							onToggle={(event) => setIsMapOpenMobile(event.currentTarget.open)}
 						>
 							<summary className={mobileSummaryClass}>
-								<span className="text-left text-sm font-semibold text-foreground">
+								<span className="text-left text-base font-semibold text-foreground">
 									{mapsTitle}
 								</span>
 								<span className={mobileIconClass}>

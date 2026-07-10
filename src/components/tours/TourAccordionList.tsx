@@ -18,9 +18,9 @@ interface Props {
 }
 
 const tabHeadingClass =
-	"text-xl font-extrabold leading-tight tracking-tight text-foreground";
+	"text-xl font-medium leading-tight tracking-tight text-foreground md:font-extrabold";
 const tabContentHeadingClass =
-	"mb-2 mt-4 text-xl font-extrabold leading-tight tracking-tight text-foreground";
+	"mb-2 mt-4 text-xl font-medium leading-tight tracking-tight text-foreground md:font-extrabold";
 const tabContentSubheadingClass =
 	"mb-2 mt-3 text-lg font-bold leading-snug text-foreground";
 

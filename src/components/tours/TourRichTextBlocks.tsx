@@ -5,7 +5,7 @@ import type { StrapiBlock, StrapiBlockChild } from "@/types/tours";
 type Variant = "included" | "price" | "overview";
 
 const tabHeadingClass =
-	"mb-2 mt-4 text-xl font-extrabold leading-tight tracking-tight text-foreground";
+	"mb-2 mt-4 text-xl font-medium leading-tight tracking-tight text-foreground md:font-extrabold";
 const tabSubheadingClass =
 	"mb-2 mt-3 text-lg font-bold leading-snug text-gray-800";
 
