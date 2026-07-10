@@ -95,7 +95,7 @@ export interface Tour {
 	content: StrapiBlock[];
 	slug: string;
 	priceTour?: number;
-	imagenDestacada: Imagen[];
+	imagenDestacada: Imagen | Imagen[];
 	badge: Badge[];
 	tab: Tab;
 	categories: Category[];

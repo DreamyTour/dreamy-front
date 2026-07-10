@@ -63,6 +63,16 @@ const {
 
 const siteUrl = Astro.site?.origin || "https://dreamy.tours";
 const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
+const tourFeaturedImages =
+  type === "tour" && tour
+    ? Array.isArray(tour.imagenDestacada)
+      ? tour.imagenDestacada
+      : tour.imagenDestacada
+        ? [tour.imagenDestacada]
+        : []
+    : [];
+const tourPrimaryImage = tourFeaturedImages[0];
+const tourLcpImage = tourFeaturedImages[tourFeaturedImages.length - 1];
 
 const hasIncaTrailBookingCalendar = Boolean(
   getIncaTrailBookingConfig(tour?.slug),
@@ -96,14 +106,12 @@ const seoProps =
     : type === "tour" && tour
       ? (() => {
           const tourDescription = generateDescription(tour.content);
-          const tourImage =
-            Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
-              ? getImageUrl(tour.imagenDestacada[0], "large")
-              : undefined;
-          const tourImageAlt =
-            Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
-              ? getImageAlt(tour.imagenDestacada[0], tour.titulo)
-              : tour.titulo;
+          const tourImage = tourPrimaryImage
+            ? getImageUrl(tourPrimaryImage, "large")
+            : undefined;
+          const tourImageAlt = tourPrimaryImage
+            ? getImageAlt(tourPrimaryImage, tour.titulo)
+            : tour.titulo;
           const tourSchemaImage = tour.seo?.metaImage
             ? getImageUrl(tour.seo.metaImage, "large")
             : tourImage;
@@ -174,21 +182,12 @@ const seoProps =
         : undefined;
 
 const tourLcpImageUrl =
-  type === "tour" &&
-  tour &&
-  Array.isArray(tour.imagenDestacada) &&
-  tour.imagenDestacada.length > 0
-    ? getImageUrl(
-        tour.imagenDestacada[tour.imagenDestacada.length - 1],
-        "medium",
-      )
+  tourLcpImage
+    ? getImageUrl(tourLcpImage, "medium")
     : undefined;
 const tourLcpImageSrcSet =
-  type === "tour" &&
-  tour &&
-  Array.isArray(tour.imagenDestacada) &&
-  tour.imagenDestacada.length > 0
-    ? getImageSrcSet(tour.imagenDestacada[tour.imagenDestacada.length - 1], [
+  tourLcpImage
+    ? getImageSrcSet(tourLcpImage, [
         "small",
         "medium",
         "large",

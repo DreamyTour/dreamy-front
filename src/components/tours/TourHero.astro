@@ -18,28 +18,32 @@ interface Props {
 const { tour, lang, badges } = Astro.props;
 if (!tour) return;
 
-const images = Array.isArray(tour.imagenDestacada)
+const featuredImages = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada
-      .map((img) => {
-        const originalUrl = getImageUrl(img);
-        const responsiveSrcSet = getImageSrcSet(img, [
-          "small",
-          "medium",
-          "large",
-        ]);
-        const originalSrcSet = img.width ? `${originalUrl} ${img.width}w` : "";
-        const heroSrcSet = [responsiveSrcSet, originalSrcSet]
-          .filter(Boolean)
-          .join(", ");
+  : tour.imagenDestacada
+    ? [tour.imagenDestacada]
+    : [];
 
-        return {
-          heroUrl: originalUrl,
-          heroSrcSet,
-          alt: getImageAlt(img, tour.titulo),
-        };
-      })
-      .filter((img) => img.heroUrl && img.heroUrl !== "/og-default.jpg")
-  : [];
+const images = featuredImages
+  .map((img) => {
+    const originalUrl = getImageUrl(img);
+    const responsiveSrcSet = getImageSrcSet(img, [
+      "small",
+      "medium",
+      "large",
+    ]);
+    const originalSrcSet = img.width ? `${originalUrl} ${img.width}w` : "";
+    const heroSrcSet = [responsiveSrcSet, originalSrcSet]
+      .filter(Boolean)
+      .join(", ");
+
+    return {
+      heroUrl: originalUrl,
+      heroSrcSet,
+      alt: getImageAlt(img, tour.titulo),
+    };
+  })
+  .filter((img) => img.heroUrl && img.heroUrl !== "/og-default.jpg");
 
 if (images.length === 0) {
   images.push({

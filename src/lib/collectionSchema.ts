@@ -51,10 +51,9 @@ export function buildCollectionSchemas({
 	const pageUrl = normalizeUrl(canonicalUrl);
 	const itemListElement = tours.map((tour, index) => {
 		const tourUrl = normalizeUrl(siteUrl + localizePath(`/${tour.slug}`, lang));
-		const image =
-			Array.isArray(tour.imagenDestacada) && tour.imagenDestacada[0]
-				? getImageUrl(tour.imagenDestacada[0], "large")
-				: undefined;
+		const image = tour.imagenDestacada
+			? getImageUrl(tour.imagenDestacada, "large")
+			: undefined;
 		const absoluteImage = toAbsoluteUrl(image, siteUrl);
 
 		return {
