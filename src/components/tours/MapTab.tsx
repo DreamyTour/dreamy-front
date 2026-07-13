@@ -202,7 +202,7 @@ export default function MapTab({
 	);
 
 	return (
-		<div className="tour-map-tab grid h-[clamp(28rem,72dvh,38rem)] grid-rows-[auto_minmax(0,1fr)] gap-4 lg:h-[680px]">
+		<div className="tour-map-tab grid h-[700px] grid-rows-[auto_minmax(0,1fr)] gap-4 lg:h-[840px]">
 			<style>{`
 				.tour-map-tab,
 				.tour-map-tab .maplibregl-map,
@@ -212,7 +212,7 @@ export default function MapTab({
 				}
 			`}</style>
 			<aside className="order-1 min-w-0 overflow-hidden rounded-sm bg-background px-1 py-2 shadow-[0_22px_60px_-52px_rgba(15,23,42,0.65)]">
-				<div className="flex max-h-36 gap-2 overflow-x-auto overflow-y-auto overscroll-contain pb-1 pr-1 [scrollbar-gutter:stable]">
+				<div className="flex gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
 					{tourMapStops.map((stop) => {
 						const active = stop.id === selectedId;
 

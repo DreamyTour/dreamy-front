@@ -40,12 +40,7 @@ function DeferredMapTab({
 	if (!active) return null;
 
 	if (!Comp) {
-		return (
-			<div
-				className="h-[clamp(28rem,72dvh,38rem)] lg:h-[680px]"
-				aria-hidden="true"
-			/>
-		);
+		return <div className="h-[700px] lg:h-[840px]" aria-hidden="true" />;
 	}
 
 	return <Comp lang={lang} mapStops={mapStops} />;
