@@ -202,7 +202,7 @@ export default function MapTab({
 	);
 
 	return (
-		<div className="tour-map-tab grid gap-4">
+		<div className="tour-map-tab grid h-[clamp(28rem,72dvh,38rem)] grid-rows-[auto_minmax(0,1fr)] gap-4 lg:h-[680px]">
 			<style>{`
 				.tour-map-tab,
 				.tour-map-tab .maplibregl-map,
@@ -211,8 +211,8 @@ export default function MapTab({
 					font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 				}
 			`}</style>
-			<aside className="order-1 min-w-0 rounded-sm bg-background px-1 py-2 shadow-[0_22px_60px_-52px_rgba(15,23,42,0.65)]">
-				<div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-1">
+			<aside className="order-1 min-w-0 overflow-hidden rounded-sm bg-background px-1 py-2 shadow-[0_22px_60px_-52px_rgba(15,23,42,0.65)]">
+				<div className="flex max-h-36 gap-2 overflow-x-auto overflow-y-auto overscroll-contain pb-1 pr-1 [scrollbar-gutter:stable]">
 					{tourMapStops.map((stop) => {
 						const active = stop.id === selectedId;
 
@@ -221,7 +221,7 @@ export default function MapTab({
 								key={stop.id}
 								type="button"
 								className={cn(
-									"relative min-w-[16rem] rounded-sm px-4 py-3 text-left transition-all duration-200 after:absolute after:right-[-0.25rem] after:top-3 after:h-[calc(100%-1.5rem)] after:w-px after:bg-border/80 after:content-[''] last:after:hidden hover:-translate-y-0.5 hover:bg-muted/45 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
+									"relative h-32 min-w-[16rem] overflow-hidden rounded-sm px-4 py-3 text-left transition-all duration-200 after:absolute after:right-[-0.25rem] after:top-3 after:h-[calc(100%-1.5rem)] after:w-px after:bg-border/80 after:content-[''] last:after:hidden hover:-translate-y-0.5 hover:bg-muted/45 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
 									active
 										? "bg-muted/55 shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)]"
 										: "",
@@ -236,13 +236,13 @@ export default function MapTab({
 									</span>
 								</span>
 
-								<span className="mt-2 block text-sm font-semibold leading-snug text-foreground">
+								<span className="mt-2 block overflow-hidden text-sm font-semibold leading-snug text-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
 									{stop.title}
 								</span>
 
-								<span className="mt-2 space-y-1.5 text-xs text-muted-foreground">
+								<span className="mt-2 block space-y-1.5 overflow-hidden text-xs text-muted-foreground">
 									{stop.duration && (
-										<span className="flex items-center gap-1.5">
+										<span className="flex items-center gap-1.5 truncate">
 											<Clock
 												className="h-3.5 w-3.5 shrink-0 text-secondary"
 												aria-hidden="true"
@@ -251,7 +251,7 @@ export default function MapTab({
 										</span>
 									)}
 									{stop.routeText && (
-										<span className="flex items-center gap-1.5">
+										<span className="flex items-center gap-1.5 truncate">
 											<Route
 												className="h-3.5 w-3.5 shrink-0 text-secondary"
 												aria-hidden="true"
@@ -266,7 +266,7 @@ export default function MapTab({
 				</div>
 			</aside>
 
-			<div className="order-2 min-h-[520px] overflow-hidden rounded-sm bg-muted/30 shadow-[0_30px_80px_-56px_rgba(15,23,42,0.8)] sm:min-h-[620px] lg:min-h-[720px]">
+			<div className="order-2 min-h-0 overflow-hidden rounded-sm bg-muted/30 shadow-[0_30px_80px_-56px_rgba(15,23,42,0.8)]">
 				<TourMap
 					ref={mapRef}
 					center={tourMapCenter}

@@ -40,7 +40,12 @@ function DeferredMapTab({
 	if (!active) return null;
 
 	if (!Comp) {
-		return <div className="min-h-[520px]" aria-hidden="true" />;
+		return (
+			<div
+				className="h-[clamp(28rem,72dvh,38rem)] lg:h-[680px]"
+				aria-hidden="true"
+			/>
+		);
 	}
 
 	return <Comp lang={lang} mapStops={mapStops} />;
@@ -73,9 +78,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	const hasPrice = Boolean(
 		tab?.price && (tab.price.titulo || tab.price.contenido),
 	);
-	const mapStops = Array.isArray(tab?.maps?.mapstops)
-		? tab.maps.mapstops
-		: [];
+	const mapStops = Array.isArray(tab?.maps?.mapstops) ? tab.maps.mapstops : [];
 	const hasMaps = mapStops.length > 0;
 	const mapsTitle = "Maps";
 	const visibleTabs = React.useMemo(
