@@ -6,7 +6,9 @@
 			"components.json",
 			"package.json",
 			"tsconfig.json",
-			"biome.json"
+			"biome.json",
+			"tests/**/*.{ts,tsx,js,jsx}",
+			"playwright.config.ts"
 		]
 	}
 }

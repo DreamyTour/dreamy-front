@@ -113,12 +113,11 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
   <header
     class="relative z-10 mx-auto w-full max-w-8xl px-6 pb-32 md:pb-36 lg:pb-40"
   >
-
     <h1
       id="home-hero-title"
       class="hero-title mb-5 max-w-5xl font-bold leading-[1.05] tracking-tight text-white"
     >
-      {data.titulo} 
+      {data.titulo}
     </h1>
 
     {
@@ -153,7 +152,10 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
 <script>
   const loadHeroVideo = () => {
     const video = document.querySelector(".hero-video");
-    if (!(video instanceof HTMLVideoElement) || video.dataset.loaded === "true") {
+    if (
+      !(video instanceof HTMLVideoElement) ||
+      video.dataset.loaded === "true"
+    ) {
       return;
     }
 

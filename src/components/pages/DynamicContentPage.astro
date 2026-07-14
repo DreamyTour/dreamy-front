@@ -181,18 +181,12 @@ const seoProps =
           })()
         : undefined;
 
-const tourLcpImageUrl =
-  tourLcpImage
-    ? getImageUrl(tourLcpImage, "medium")
-    : undefined;
-const tourLcpImageSrcSet =
-  tourLcpImage
-    ? getImageSrcSet(tourLcpImage, [
-        "small",
-        "medium",
-        "large",
-      ])
-    : undefined;
+const tourLcpImageUrl = tourLcpImage
+  ? getImageUrl(tourLcpImage, "medium")
+  : undefined;
+const tourLcpImageSrcSet = tourLcpImage
+  ? getImageSrcSet(tourLcpImage, ["small", "medium", "large"])
+  : undefined;
 
 const mdxUiCopy = {
   es: { eyebrow: "Guia Dreamy" },

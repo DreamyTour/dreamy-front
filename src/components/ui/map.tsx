@@ -311,7 +311,7 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 		};
 		const loadHandler = () => {
 			setIsLoaded(true);
-			setIsStyleLoaded(map.isStyleLoaded());
+			setIsStyleLoaded(Boolean(map.isStyleLoaded()));
 			map.resize();
 		};
 

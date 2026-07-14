@@ -229,7 +229,9 @@ const sliderLabels = {
   document.addEventListener("astro:page-load", initAllSliders);
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAllSliders, { once: true });
+    document.addEventListener("DOMContentLoaded", initAllSliders, {
+      once: true,
+    });
   } else {
     // DOM already ready (script runs after parse on pages without ClientRouter)
     initAllSliders();

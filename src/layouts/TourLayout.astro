@@ -15,7 +15,12 @@ interface Props {
 const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet } = Astro.props;
 ---
 
-<Layout seo={seo} lang={lang} lcpImageUrl={lcpImageUrl} lcpImageSrcSet={lcpImageSrcSet}>
+<Layout
+  seo={seo}
+  lang={lang}
+  lcpImageUrl={lcpImageUrl}
+  lcpImageSrcSet={lcpImageSrcSet}
+>
   <slot />
 </Layout>
 

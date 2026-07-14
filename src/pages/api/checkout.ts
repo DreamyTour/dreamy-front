@@ -29,26 +29,63 @@ interface CheckoutPayload {
 		phone?: string;
 	};
 	cart?: {
-		tourName?: string;
+		tourId?: string | number;
 		date?: string;
 		passengers?: number;
-		amountPaid?: number;
 		amountToPayLabel?: "minimum" | "total";
-		totalPrice?: number;
 		lang?: "en" | "es" | "pt";
 	};
 }
 
+interface StrapiTour {
+	documentId: string;
+	priceTour?: number;
+	titulo: string;
+}
+
+interface StrapiTourResponse {
+	data?: StrapiTour | null;
+}
+
 const PAYPAL_FEE_RATE = 0.08;
 const MAX_PASSENGERS_PER_BOOKING = 20;
+const MAX_REQUEST_BYTES = 64 * 1024;
+const STRAPI_REQUEST_TIMEOUT_MS = 8_000;
 const PAYPAL_BUSINESS_EMAIL =
 	import.meta.env.PAYPAL_BUSINESS_EMAIL || "info@turismoperu.com.pe";
 
 function jsonResponse(body: unknown, status: number) {
 	return new Response(JSON.stringify(body), {
 		status,
-		headers: { "Content-Type": "application/json" },
+		headers: {
+			"Cache-Control": "no-store",
+			"Content-Type": "application/json; charset=utf-8",
+			"X-Content-Type-Options": "nosniff",
+		},
 	});
+}
+
+async function getAuthoritativeTour(
+	tourId: string,
+): Promise<StrapiTour | null> {
+	const baseUrl = import.meta.env.STRAPI_URL || import.meta.env.VITE_STRAPI_URL;
+	if (!baseUrl) throw new Error("Strapi URL is not configured");
+
+	const url = new URL(`/api/tours/${encodeURIComponent(tourId)}`, baseUrl);
+	url.searchParams.append("fields[0]", "documentId");
+	url.searchParams.append("fields[1]", "titulo");
+	url.searchParams.append("fields[2]", "priceTour");
+
+	const response = await fetch(url, {
+		headers: { Accept: "application/json" },
+		signal: AbortSignal.timeout(STRAPI_REQUEST_TIMEOUT_MS),
+	});
+
+	if (response.status === 404) return null;
+	if (!response.ok) throw new Error(`Strapi returned ${response.status}`);
+
+	const payload = (await response.json()) as StrapiTourResponse;
+	return payload.data ?? null;
 }
 
 function isValidEmail(email: string) {
@@ -98,23 +135,29 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
+		const contentLength = Number(request.headers.get("content-length") || 0);
+		if (contentLength > MAX_REQUEST_BYTES) {
+			return jsonResponse({ error: "Request body is too large" }, 413);
+		}
+
 		const rawBody = await request.text();
 		if (!rawBody.trim()) {
 			return jsonResponse({ error: "Empty request body" }, 400);
+		}
+		if (new TextEncoder().encode(rawBody).byteLength > MAX_REQUEST_BYTES) {
+			return jsonResponse({ error: "Request body is too large" }, 413);
 		}
 
 		const data = JSON.parse(rawBody) as CheckoutPayload;
 		const { passengersInfo, contactInfo, cart } = data;
 		const passengers = Array.isArray(passengersInfo) ? passengersInfo : [];
 
-		console.log("Checkout API received:", {
-			passengersCount: passengers.length,
-			hasContactEmail: Boolean(contactInfo?.email),
-			tourName: cart?.tourName,
-		});
+		if (!cart) {
+			return jsonResponse({ error: "Missing cart data" }, 400);
+		}
 
-		if (!cart?.tourName || !cart.totalPrice) {
-			console.error("Missing cart data");
+		const tourId = String(cart.tourId || "").trim();
+		if (!/^[a-zA-Z0-9_-]{1,100}$/.test(tourId)) {
 			return jsonResponse({ error: "Missing cart data" }, 400);
 		}
 
@@ -123,12 +166,7 @@ export const POST: APIRoute = async ({ request }) => {
 			return jsonResponse({ error: "Missing contact email" }, 400);
 		}
 
-		const totalPrice = Number(cart.totalPrice);
 		const passengerCount = Number(cart.passengers);
-
-		if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
-			return jsonResponse({ error: "Invalid cart.totalPrice value" }, 400);
-		}
 
 		if (
 			!Number.isInteger(passengerCount) ||
@@ -153,6 +191,29 @@ export const POST: APIRoute = async ({ request }) => {
 			return jsonResponse({ error: "Invalid contact email" }, 400);
 		}
 
+		if (
+			cart.amountToPayLabel !== "minimum" &&
+			cart.amountToPayLabel !== "total"
+		) {
+			return jsonResponse({ error: "Invalid payment option" }, 400);
+		}
+
+		const checkoutLang =
+			cart.lang === "es" || cart.lang === "pt" ? cart.lang : "en";
+		let tour: StrapiTour | null;
+		try {
+			tour = await getAuthoritativeTour(tourId);
+		} catch (error) {
+			console.error("Unable to validate checkout price with Strapi", error);
+			return jsonResponse({ error: "Unable to validate tour price" }, 502);
+		}
+
+		const pricePerPerson = Number(tour?.priceTour);
+		if (!tour || !Number.isFinite(pricePerPerson) || pricePerPerson <= 0) {
+			return jsonResponse({ error: "Tour is unavailable for checkout" }, 409);
+		}
+		const totalPrice = pricePerPerson * passengerCount;
+
 		const amountPaid = getPaymentAmount({
 			totalPrice,
 			amountToPayLabel: cart.amountToPayLabel,
@@ -160,7 +221,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 		let emailSent = false;
 		const safeCart = {
-			tourName: escapeHtml(cart.tourName),
+			tourName: escapeHtml(tour.titulo),
 			date: escapeHtml(cart.date || "Sin definir"),
 			passengers: escapeHtml(cart.passengers),
 			amountPaid: Number.isFinite(amountPaid) ? amountPaid.toFixed(2) : "0.00",
@@ -223,7 +284,7 @@ export const POST: APIRoute = async ({ request }) => {
 			const { data: emailData, error: resendError } = await resend.emails.send({
 				from: getDreamySender(),
 				to: getDreamyRecipients(),
-				subject: `Reserva: ${cart.tourName} - Dreamy Tours`,
+				subject: `Reserva: ${tour.titulo} - Dreamy Tours`,
 				replyTo: contactInfo.email,
 				html: `
           <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; color: #333; line-height: 1.6;">
@@ -297,31 +358,33 @@ export const POST: APIRoute = async ({ request }) => {
 			console.log("Resend not configured, skipping email");
 		}
 
-		const itemName = encodeURIComponent(cart.tourName);
 		const amount = amountPaid.toFixed(2);
-		const checkoutLang =
-			cart.lang === "es" || cart.lang === "pt" ? cart.lang : "en";
 		const successPath =
 			checkoutLang === "en"
 				? "/checkout/success"
 				: `/${checkoutLang}/checkout/success`;
-		const returnUrl = encodeURIComponent(
-			`${new URL(request.url).origin}${successPath}`,
-		);
-
-		const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${PAYPAL_BUSINESS_EMAIL}&item_name=${itemName}&amount=${amount}&currency_code=USD&return=${returnUrl}`;
-
-		console.log("PayPal URL generated:", paypalUrl);
+		const paypalUrl = new URL("https://www.paypal.com/cgi-bin/webscr");
+		paypalUrl.search = new URLSearchParams({
+			cmd: "_xclick",
+			business: PAYPAL_BUSINESS_EMAIL,
+			item_name: tour.titulo,
+			amount,
+			currency_code: "USD",
+			return: `${new URL(request.url).origin}${successPath}`,
+		}).toString();
 
 		return jsonResponse(
 			{
 				success: true,
 				emailSent,
-				redirectUrl: paypalUrl,
+				redirectUrl: paypalUrl.toString(),
 			},
 			200,
 		);
 	} catch (error) {
+		if (error instanceof SyntaxError) {
+			return jsonResponse({ error: "Invalid JSON body" }, 400);
+		}
 		console.error("Checkout API Error:", error);
 		return jsonResponse({ error: "Internal Server Error" }, 500);
 	}

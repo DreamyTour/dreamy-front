@@ -75,7 +75,9 @@ function checkoutPayload(overrides = {}) {
 	};
 }
 
-async function waitForBookingIslandHydration(page: import("@playwright/test").Page) {
+async function waitForBookingIslandHydration(
+	page: import("@playwright/test").Page,
+) {
 	await page.waitForFunction(() =>
 		Array.from(document.querySelectorAll("astro-island")).some(
 			(island) =>
@@ -139,9 +141,7 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 		await expect(
 			form.getByRole("button", { name: /next|siguiente|proximo/i }),
 		).toBeEnabled();
-		await form
-			.getByRole("button", { name: /next|siguiente|proximo/i })
-			.click();
+		await form.getByRole("button", { name: /next|siguiente|proximo/i }).click();
 		await expect(
 			form.getByText(new RegExp(`\\b${currentYear}\\b`, "i")).first(),
 		).toBeVisible();
@@ -286,9 +286,7 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 	).toHaveCount(0);
 
 	if (testMonth > currentMonth) {
-		await form
-			.getByRole("button", { name: /next|siguiente|proximo/i })
-			.click();
+		await form.getByRole("button", { name: /next|siguiente|proximo/i }).click();
 	}
 
 	await form
@@ -337,9 +335,7 @@ test("Unlisted Inca Trail tours use the default contact form instead of the cale
 	await expect(
 		form.getByRole("combobox", { name: /route|ruta|rota/i }),
 	).toHaveCount(0);
-	await expect(
-		form.locator('select[name="travel-month"]'),
-	).toHaveCount(0);
+	await expect(form.locator('select[name="travel-month"]')).toHaveCount(0);
 });
 
 test("Inca Trail availability page shows tour names instead of route numbers", async ({
@@ -392,20 +388,16 @@ test("Inca Trail availability page shows tour names instead of route numbers", a
 	}
 });
 
-test("checkout API recalculates payment amount instead of trusting a tampered client amount", async ({
+test("checkout API rejects client prices without an authoritative Strapi tour id", async ({
 	request,
 }) => {
 	const response = await request.post("/api/checkout", {
 		data: checkoutPayload(),
 	});
 
-	expect(response.ok()).toBe(true);
+	expect(response.status()).toBe(400);
 	const body = await response.json();
-	const redirectUrl = new URL(body.redirectUrl);
-
-	expect(redirectUrl.hostname).toBe("www.paypal.com");
-	expect(redirectUrl.searchParams.get("amount")).toBe("669.60");
-	expect(redirectUrl.searchParams.get("item_name")).toBe("Inca Trail 4 Days");
+	expect(body.error).toBe("Missing cart data");
 });
 
 test("checkout API rejects risky or incomplete booking payloads", async ({

@@ -60,7 +60,10 @@ const defaultDescriptionByLang: Record<Lang, string> = {
   pt: "Explore passeios e pacotes turísticos no Peru e na Bolívia com a Dreamy Tours. Machu Picchu, Cusco, Lago Titicaca, Salar de Uyuni e mais destinos únicos.",
 };
 
-const description = rawDescription || defaultDescriptionByLang[lang as Lang] || defaultDescriptionByLang[DEFAULT_LANG];
+const description =
+  rawDescription ||
+  defaultDescriptionByLang[lang as Lang] ||
+  defaultDescriptionByLang[DEFAULT_LANG];
 
 //Get site URL from astro.config
 const siteUrl = Astro.site?.origin || "https://dreamy.tours";
@@ -121,7 +124,8 @@ const orgDescriptionByLang: Record<Lang, string> = {
   es: "Dreamy Tours es una agencia de viajes en Perú especializada en tours y paquetes turísticos a Machu Picchu, Cusco, Lago Titicaca, Bolivia y otros destinos de Latinoamérica.",
   pt: "A Dreamy Tours é uma agência de viagens no Peru especializada em passeios e pacotes turísticos para Machu Picchu, Cusco, Lago Titicaca, Bolívia e outros destinos na América Latina.",
 };
-const orgDescription = orgDescriptionByLang[lang as Lang] || orgDescriptionByLang[DEFAULT_LANG];
+const orgDescription =
+  orgDescriptionByLang[lang as Lang] || orgDescriptionByLang[DEFAULT_LANG];
 
 // Schema.org JSON-LD
 const websiteSchema = {
@@ -130,9 +134,7 @@ const websiteSchema = {
   "@id": `${siteUrl}/#website`,
   url: `${siteUrl}/`,
   name: "Dreamy Tours",
-  alternateName: [
-    "Dreamy Tours Peru",
-  ],
+  alternateName: ["Dreamy Tours Peru"],
   description: orgDescription,
   inLanguage: schemaLanguage,
   publisher: {
@@ -183,7 +185,9 @@ const webPageSchema = {
   publisher: {
     "@id": `${siteUrl}/#organization`,
   },
-  ...(type === "article" ? { mainEntity: { "@id": `${canonical}#article` } } : {}),
+  ...(type === "article"
+    ? { mainEntity: { "@id": `${canonical}#article` } }
+    : {}),
   ...(fullImageUrl ? { image: fullImageUrl } : {}),
 };
 
@@ -289,9 +293,7 @@ const additionalSchemas = (Array.isArray(schemas) ? schemas : [schemas]).filter(
 {
   alternateUrls
     .filter((alt) => alt.lang !== lang)
-    .map((alt) => (
-      <meta property="og:locale:alternate" content={alt.locale} />
-    ))
+    .map((alt) => <meta property="og:locale:alternate" content={alt.locale} />)
 }
 
 {/* Article specific meta tags */}
@@ -327,7 +329,6 @@ const additionalSchemas = (Array.isArray(schemas) ? schemas : [schemas]).filter(
 <meta name="author" content={author || "Dreamy Tours"} />
 <meta name="robots" content={robots} />
 <meta name="googlebot" content={robots} />
-
 
 <!-- Schema.org JSON-LD -->
 <script

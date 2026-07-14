@@ -68,10 +68,7 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
         <ul class="posts-mosaic m-0 list-none p-0">
           {postsList.slice(0, 1).map((blog: Blog) => (
             <li class="posts-mosaic__featured">
-              <CardPostHome
-                blog={blog}
-                lang={lang}
-              />
+              <CardPostHome blog={blog} lang={lang} />
             </li>
           ))}
           {postsList.slice(1, 2).map((blog: Blog) => (
@@ -172,6 +169,5 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
     .posts-mosaic__bottom:nth-child(5) {
       display: none;
     }
-
   }
 </style>

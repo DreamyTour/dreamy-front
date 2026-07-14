@@ -1,6 +1,9 @@
 ---
 import TeamCard from "./TeamCard.astro";
-import { ArrowLeftIcon, ArrowRightIcon } from "@/components/icons/NavigationIcons";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from "@/components/icons/NavigationIcons";
 
 interface TeamMember {
   name: string;
@@ -63,23 +66,25 @@ const sliderId = `team-slider-${department.replace(/\s/g, "-").toLowerCase()}`;
 
 <script>
   document.addEventListener("astro:page-load", () => {
-    document.querySelectorAll<HTMLElement>("[data-slider-id]").forEach((slider) => {
-      if (slider.dataset.initialized) return;
-      slider.dataset.initialized = "true";
+    document
+      .querySelectorAll<HTMLElement>("[data-slider-id]")
+      .forEach((slider) => {
+        if (slider.dataset.initialized) return;
+        slider.dataset.initialized = "true";
 
-      const container = slider.querySelector(".overflow-x-auto");
-      const prevBtn = slider.querySelector(".team-prev");
-      const nextBtn = slider.querySelector(".team-next");
+        const container = slider.querySelector(".overflow-x-auto");
+        const prevBtn = slider.querySelector(".team-prev");
+        const nextBtn = slider.querySelector(".team-next");
 
-      if (container && prevBtn && nextBtn) {
-        prevBtn.addEventListener("click", () => {
-          container.scrollBy({ left: -320, behavior: "smooth" });
-        });
+        if (container && prevBtn && nextBtn) {
+          prevBtn.addEventListener("click", () => {
+            container.scrollBy({ left: -320, behavior: "smooth" });
+          });
 
-        nextBtn.addEventListener("click", () => {
-          container.scrollBy({ left: 320, behavior: "smooth" });
-        });
-      }
-    });
+          nextBtn.addEventListener("click", () => {
+            container.scrollBy({ left: 320, behavior: "smooth" });
+          });
+        }
+      });
   });
 </script>

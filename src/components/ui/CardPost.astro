@@ -87,7 +87,9 @@ const imageHeight = isFeatured
   : "aspect-[16/10]";
 ---
 
-<article class:list={["group h-full", isFeatured && "md:col-span-2 lg:col-span-3"]}>
+<article
+  class:list={["group h-full", isFeatured && "md:col-span-2 lg:col-span-3"]}
+>
   <a
     href={rewriteUrl(`/blog/${blog.slug}`, lang)}
     aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
@@ -102,7 +104,13 @@ const imageHeight = isFeatured
     >
     </div>
 
-    <div class:list={["relative overflow-hidden shrink-0", isFeatured ? "w-full lg:w-[55%]" : "w-full", imageHeight]}>
+    <div
+      class:list={[
+        "relative overflow-hidden shrink-0",
+        isFeatured ? "w-full lg:w-[55%]" : "w-full",
+        imageHeight,
+      ]}
+    >
       {
         mainImage && mainImage !== "/og-default.jpg" ? (
           <img
@@ -170,7 +178,7 @@ const imageHeight = isFeatured
     <div
       class:list={[
         "relative flex flex-1 flex-col gap-4 px-5 pb-5 pt-5 md:px-6 md:pb-6",
-        isFeatured && "lg:w-[45%] lg:p-7 lg:justify-between"
+        isFeatured && "lg:w-[45%] lg:p-7 lg:justify-between",
       ]}
     >
       <div
@@ -205,12 +213,14 @@ const imageHeight = isFeatured
 
         {
           excerpt && (
-            <p class:list={[
-              "text-sm leading-6 text-muted-foreground md:text-[0.96rem]",
-              isFeatured
-                ? "flex-1 overflow-hidden line-clamp-[12]"
-                : "line-clamp-2"
-            ]}>
+            <p
+              class:list={[
+                "text-sm leading-6 text-muted-foreground md:text-[0.96rem]",
+                isFeatured
+                  ? "flex-1 overflow-hidden line-clamp-[12]"
+                  : "line-clamp-2",
+              ]}
+            >
               {excerpt}
             </p>
           )

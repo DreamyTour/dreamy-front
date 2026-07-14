@@ -8,7 +8,7 @@ import {
   GuideIcon,
   TransportIcon,
   MealsIcon,
-  DefaultBadgeIcon
+  DefaultBadgeIcon,
 } from "@/components/icons/BadgeIcons";
 
 interface Props {
@@ -92,30 +92,12 @@ else if (
   iconType = "meals";
 ---
 
-{
-  iconType === "duration" && <DurationIcon className={className} />
-}
-{
-  iconType === "difficulty" && <DifficultyIcon className={className} />
-}
-{
-  iconType === "group" && <GroupIcon className={className} />
-}
-{
-  iconType === "serviceType" && <ServiceTypeIcon className={className} />
-}
-{
-  iconType === "altitude" && <AltitudeIcon className={className} />
-}
-{
-  iconType === "guide" && <GuideIcon className={className} />
-}
-{
-  iconType === "transport" && <TransportIcon className={className} />
-}
-{
-  iconType === "meals" && <MealsIcon className={className} />
-}
-{
-  iconType === "default" && <DefaultBadgeIcon className={className} />
-}
+{iconType === "duration" && <DurationIcon className={className} />}
+{iconType === "difficulty" && <DifficultyIcon className={className} />}
+{iconType === "group" && <GroupIcon className={className} />}
+{iconType === "serviceType" && <ServiceTypeIcon className={className} />}
+{iconType === "altitude" && <AltitudeIcon className={className} />}
+{iconType === "guide" && <GuideIcon className={className} />}
+{iconType === "transport" && <TransportIcon className={className} />}
+{iconType === "meals" && <MealsIcon className={className} />}
+{iconType === "default" && <DefaultBadgeIcon className={className} />}

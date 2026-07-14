@@ -47,57 +47,55 @@ const pageContent = page.content?.trim() || "";
       class="content-shell max-w-8xl mx-auto px-4 py-6 md:px-6 md:py-8 lg:px-8 lg:py-10"
     >
       <section class="content-hero page-hero-agency text-foreground">
-      <div
-        class="relative py-8 md:py-10 lg:py-12"
-      >
-        <div
-          class="grid gap-8 lg:grid-cols-[minmax(0,0.64fr)_minmax(520px,1fr)] lg:items-start lg:gap-12"
-        >
-          <div class="max-w-2xl self-start">
-            <h1
-              class="content-hero-title max-w-xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-foreground sm:text-5xl lg:text-[3.2rem]"
-            >
-              {page.titulo}
-            </h1>
+        <div class="relative py-8 md:py-10 lg:py-12">
+          <div
+            class="grid gap-8 lg:grid-cols-[minmax(0,0.64fr)_minmax(520px,1fr)] lg:items-start lg:gap-12"
+          >
+            <div class="max-w-2xl self-start">
+              <h1
+                class="content-hero-title max-w-xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-foreground sm:text-5xl lg:text-[3.2rem]"
+              >
+                {page.titulo}
+              </h1>
 
-            {
-              pageContent && (
-                <p class="page-hero-summary mt-7 text-[0.96rem] leading-7 text-muted-foreground">
-                  {pageContent}
-                </p>
-              )
-            }
-          </div>
+              {
+                pageContent && (
+                  <p class="page-hero-summary mt-7 text-[0.96rem] leading-7 text-muted-foreground">
+                    {pageContent}
+                  </p>
+                )
+              }
+            </div>
 
-          <div class="relative self-start">
-            {
-              pageVideoId ? (
-                <div
-                  id="category-video"
-                  class="page-hero-media relative overflow-hidden rounded-sm border border-border bg-card shadow-[0_30px_80px_-58px_color-mix(in_oklab,var(--foreground)_62%,transparent)]"
-                >
-                  <div class="overflow-hidden bg-black">
-                    <LiteYouTube
-                      videoId={pageVideoId}
-                      title={page.titulo || "Video"}
-                      backgroundImage={pageVideoThumbnail || undefined}
-                      withShadowImage={!!pageVideoThumbnail}
-                    />
+            <div class="relative self-start">
+              {
+                pageVideoId ? (
+                  <div
+                    id="category-video"
+                    class="page-hero-media relative overflow-hidden rounded-sm border border-border bg-card shadow-[0_30px_80px_-58px_color-mix(in_oklab,var(--foreground)_62%,transparent)]"
+                  >
+                    <div class="overflow-hidden bg-black">
+                      <LiteYouTube
+                        videoId={pageVideoId}
+                        title={page.titulo || "Video"}
+                        backgroundImage={pageVideoThumbnail || undefined}
+                        withShadowImage={!!pageVideoThumbnail}
+                      />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div class="page-hero-media relative overflow-hidden rounded-sm border border-border bg-muted/25 px-8 py-14 shadow-[0_30px_80px_-58px_color-mix(in_oklab,var(--foreground)_52%,transparent)]">
-                  <div class="mx-auto max-w-lg text-center">
-                    <p class="text-base leading-7 text-muted-foreground">
-                      {page.content}
-                    </p>
+                ) : (
+                  <div class="page-hero-media relative overflow-hidden rounded-sm border border-border bg-muted/25 px-8 py-14 shadow-[0_30px_80px_-58px_color-mix(in_oklab,var(--foreground)_52%,transparent)]">
+                    <div class="mx-auto max-w-lg text-center">
+                      <p class="text-base leading-7 text-muted-foreground">
+                        {page.content}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )
-            }
+                )
+              }
+            </div>
           </div>
         </div>
-      </div>
       </section>
 
       {
@@ -126,102 +124,102 @@ const pageContent = page.content?.trim() || "";
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {page.preguntasAcordeon.map((pregunta: Pregunta) => (
-                  <details class="group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)] transition-colors duration-300 open:border-primary/20 open:bg-primary/[0.02]">
-                    <summary class="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden md:px-6">
-                      <span class="text-left text-sm font-semibold text-foreground md:text-base">
-                        {pregunta.titulo}
-                      </span>
-                      <span class="flex h-10 w-10 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary transition-transform duration-200 group-open:rotate-180">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </span>
-                    </summary>
-                    <div class="border-t border-primary/10 px-5 pb-5 pt-4 md:px-6 md:pb-6">
-                      {pregunta.contenido &&
-                        Array.isArray(pregunta.contenido) && (
-                          <div class="space-y-3">
-                            {pregunta.contenido.map((block: StrapiBlock) => {
-                              if (block.type === "paragraph") {
-                                return (
-                                  <p class="text-base leading-7 text-muted-foreground">
-                                    {(block.children || [])
-                                      .map(
-                                        (child: StrapiBlockChild) =>
-                                          child.text || "",
-                                      )
-                                      .join("")}
-                                  </p>
-                                );
-                              }
-                              if (block.type === "heading") {
-                                const level = block.level;
-                                const headingText = (block.children || [])
-                                  .map(
-                                    (child: StrapiBlockChild) =>
-                                      child.text || "",
-                                  )
-                                  .join("");
-                                if (level === 1) {
+                    <details class="group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)] transition-colors duration-300 open:border-primary/20 open:bg-primary/[0.02]">
+                      <summary class="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden md:px-6">
+                        <span class="text-left text-sm font-semibold text-foreground md:text-base">
+                          {pregunta.titulo}
+                        </span>
+                        <span class="flex h-10 w-10 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary transition-transform duration-200 group-open:rotate-180">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </span>
+                      </summary>
+                      <div class="border-t border-primary/10 px-5 pb-5 pt-4 md:px-6 md:pb-6">
+                        {pregunta.contenido &&
+                          Array.isArray(pregunta.contenido) && (
+                            <div class="space-y-3">
+                              {pregunta.contenido.map((block: StrapiBlock) => {
+                                if (block.type === "paragraph") {
                                   return (
-                                    <h2 class="text-xl font-bold text-foreground">
-                                      {headingText}
-                                    </h2>
+                                    <p class="text-base leading-7 text-muted-foreground">
+                                      {(block.children || [])
+                                        .map(
+                                          (child: StrapiBlockChild) =>
+                                            child.text || "",
+                                        )
+                                        .join("")}
+                                    </p>
                                   );
                                 }
-                                if (level === 2) {
+                                if (block.type === "heading") {
+                                  const level = block.level;
+                                  const headingText = (block.children || [])
+                                    .map(
+                                      (child: StrapiBlockChild) =>
+                                        child.text || "",
+                                    )
+                                    .join("");
+                                  if (level === 1) {
+                                    return (
+                                      <h2 class="text-xl font-bold text-foreground">
+                                        {headingText}
+                                      </h2>
+                                    );
+                                  }
+                                  if (level === 2) {
+                                    return (
+                                      <h2 class="text-lg font-bold text-foreground">
+                                        {headingText}
+                                      </h2>
+                                    );
+                                  }
                                   return (
-                                    <h2 class="text-lg font-bold text-foreground">
+                                    <h3 class="text-base font-semibold text-foreground">
                                       {headingText}
-                                    </h2>
+                                    </h3>
                                   );
                                 }
-                                return (
-                                  <h3 class="text-base font-semibold text-foreground">
-                                    {headingText}
-                                  </h3>
-                                );
-                              }
-                              if (block.type === "list") {
-                                const format = block.format;
-                                const ListTag =
-                                  format === "ordered" ? "ol" : "ul";
-                                return (
-                                  <ListTag
-                                    class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
-                                  >
-                                    {(block.children || []).map(
-                                      (listItem: StrapiBlockChild) => (
-                                        <li class="text-muted-foreground">
-                                          {(listItem.children || [])
-                                            .map(
-                                              (child: StrapiBlockChild) =>
-                                                child.text || "",
-                                            )
-                                            .join("")}
-                                        </li>
-                                      ),
-                                    )}
-                                  </ListTag>
-                                );
-                              }
-                              return null;
-                            })}
-                          </div>
-                        )}
-                    </div>
-                  </details>
+                                if (block.type === "list") {
+                                  const format = block.format;
+                                  const ListTag =
+                                    format === "ordered" ? "ol" : "ul";
+                                  return (
+                                    <ListTag
+                                      class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
+                                    >
+                                      {(block.children || []).map(
+                                        (listItem: StrapiBlockChild) => (
+                                          <li class="text-muted-foreground">
+                                            {(listItem.children || [])
+                                              .map(
+                                                (child: StrapiBlockChild) =>
+                                                  child.text || "",
+                                              )
+                                              .join("")}
+                                          </li>
+                                        ),
+                                      )}
+                                    </ListTag>
+                                  );
+                                }
+                                return null;
+                              })}
+                            </div>
+                          )}
+                      </div>
+                    </details>
                   ))}
                 </div>
               </div>

@@ -8,8 +8,10 @@ interface Props {
 }
 
 const { page, lang } = Astro.props;
-const previousLabel = lang === "es" ? "Anterior" : lang === "pt" ? "Anterior" : "Previous";
-const nextLabel = lang === "es" ? "Siguiente" : lang === "pt" ? "Proximo" : "Next";
+const previousLabel =
+  lang === "es" ? "Anterior" : lang === "pt" ? "Anterior" : "Previous";
+const nextLabel =
+  lang === "es" ? "Siguiente" : lang === "pt" ? "Proximo" : "Next";
 const linkClass =
   "px-5 py-2.5 rounded-sm border border-border text-foreground transition-colors flex items-center gap-2 bg-card shadow-sm hover:border-secondary/60 hover:text-secondary hover:shadow-md";
 const disabledClass =

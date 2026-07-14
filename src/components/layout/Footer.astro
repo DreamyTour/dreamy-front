@@ -160,7 +160,9 @@ const normalizeWhatsAppUrl = (label?: string, url?: string) =>
                     const isLink = index < 2;
                     const content = (
                       <>
-                        <span class={`mt-0.5 shrink-0 text-emerald-50/75 transition-all duration-300 ${isLink ? 'group-hover:scale-110 group-hover:text-emerald-400' : ''}`}>
+                        <span
+                          class={`mt-0.5 shrink-0 text-emerald-50/75 transition-all duration-300 ${isLink ? "group-hover:scale-110 group-hover:text-emerald-400" : ""}`}
+                        >
                           {index === 0 && <EmailIcon className="size-5" />}
                           {index === 1 && <WhatsAppIcon className="size-5" />}
                           {index === 2 && <PhoneIcon className="size-5" />}

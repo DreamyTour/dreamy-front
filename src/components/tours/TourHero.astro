@@ -27,11 +27,7 @@ const featuredImages = Array.isArray(tour.imagenDestacada)
 const images = featuredImages
   .map((img) => {
     const originalUrl = getImageUrl(img);
-    const responsiveSrcSet = getImageSrcSet(img, [
-      "small",
-      "medium",
-      "large",
-    ]);
+    const responsiveSrcSet = getImageSrcSet(img, ["small", "medium", "large"]);
     const originalSrcSet = img.width ? `${originalUrl} ${img.width}w` : "";
     const heroSrcSet = [responsiveSrcSet, originalSrcSet]
       .filter(Boolean)

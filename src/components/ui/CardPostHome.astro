@@ -28,26 +28,19 @@ const hasImage = mainImage && mainImage !== "/og-default.jpg";
     aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
   >
     <div
-      class:list={["home-post-card__media", !hasImage && "home-post-card__media--fallback"]}
+      class:list={[
+        "home-post-card__media",
+        !hasImage && "home-post-card__media--fallback",
+      ]}
       style={hasImage ? `background-image: url("${mainImage}")` : undefined}
       aria-hidden="true"
     >
-      {
-        !hasImage && (
-          <div class="home-post-card__fallback">No image</div>
-        )
-      }
+      {!hasImage && <div class="home-post-card__fallback">No image</div>}
     </div>
 
     <span class="home-post-card__shade" aria-hidden="true"></span>
 
-    {
-      category && (
-        <span class="home-post-card__category">
-          {category}
-        </span>
-      )
-    }
+    {category && <span class="home-post-card__category">{category}</span>}
 
     <div class="home-post-card__content">
       <h3 class="home-post-card__title">{blog.titulo}</h3>

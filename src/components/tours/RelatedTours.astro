@@ -35,13 +35,11 @@ const { tours, lang } = Astro.props;
           </div>
         </div>
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {
-            tours.map((tour) => (
-              <li class="min-w-0">
-                <TourCard tour={tour} lang={lang} />
-              </li>
-            ))
-          }
+          {tours.map((tour) => (
+            <li class="min-w-0">
+              <TourCard tour={tour} lang={lang} />
+            </li>
+          ))}
         </ul>
       </div>
     </section>

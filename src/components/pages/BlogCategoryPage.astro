@@ -82,7 +82,10 @@ const seoProps =
 ---
 
 <Layout seo={seoProps} lang={lang}>
-  <section class="blog-page-shell relative isolate overflow-hidden" aria-labelledby="blog-category-title">
+  <section
+    class="blog-page-shell relative isolate overflow-hidden"
+    aria-labelledby="blog-category-title"
+  >
     {
       slugMap && Object.keys(slugMap).length > 0 && (
         <script
@@ -191,7 +194,7 @@ const seoProps =
 </Layout>
 
 <style>
-  .blog-page-shell::before{
+  .blog-page-shell::before {
     position: absolute;
     inset: 0;
     z-index: -1;
