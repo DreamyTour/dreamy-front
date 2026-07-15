@@ -127,7 +127,7 @@ El endpoint hace proxy a `https://calendar.dreamy.tours/v1/tickets`.
 - Ruta `1`: Camino Inca clasico de 4 dias.
 - Ruta `5`: Camino Inca corto de 2 dias.
 
-La seleccion de fecha y pasajeros se guarda en `localStorage.bookingCart` y redirige a checkout. Los slugs, rutas y duraciones se definen en `src/lib/incaTrailBooking.ts`. El ano publico se configura en `src/components/content/IncaTrailAvailabilityPage.astro`.
+La seleccion de fecha y pasajeros se guarda en `localStorage.bookingCart` y redirige a checkout. Los slugs, rutas y duraciones se definen en `src/lib/incaTrailBooking.ts`. El año publico se configura en `src/components/content/IncaTrailAvailabilityPage.astro`.
 
 ## Checkout y APIs
 
