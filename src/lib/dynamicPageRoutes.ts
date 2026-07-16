@@ -2,7 +2,7 @@ import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import { DEFAULT_LANG, LANGS, type Lang } from "@/lib/i18n";
 import type { ManualSEO } from "@/lib/seo";
 import { fetchAllStrapi } from "@/lib/strapi";
-import { dedupeLocalizedDocuments } from "@/lib/utils";
+import { dedupeLocalizedDocuments, sortToursByOrder } from "@/lib/utils";
 import type { Page, Category as PageCategory } from "@/types/page";
 import type { Tour, Category as TourCategory } from "@/types/tours";
 
@@ -74,6 +74,8 @@ async function loadStrapiPagesByLang() {
 			locale: lang,
 			query: {
 				populate: "*",
+				"sort[0]": "orden:asc",
+				"sort[1]": "titulo:asc",
 				"populate[tab][populate][maps][populate][mapstops]": true,
 			},
 		});
@@ -87,7 +89,9 @@ async function loadStrapiPagesByLang() {
 		});
 
 		allToursByLang[lang] =
-			tours && Array.isArray(tours) ? dedupeLocalizedDocuments(tours) : [];
+			tours && Array.isArray(tours)
+				? sortToursByOrder(dedupeLocalizedDocuments(tours))
+				: [];
 		allPagesByLang[lang] =
 			pages && Array.isArray(pages) ? dedupeLocalizedDocuments(pages) : [];
 	}

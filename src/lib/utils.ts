@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import type { Lang } from "@/lib/i18n";
 import { rewriteUrl as rewriteLocalizedUrl } from "@/lib/i18n";
 import type { Global, Link, MenuItem } from "@/types/global";
+import type { Tour } from "@/types/tours";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -33,6 +34,20 @@ export function dedupeLocalizedDocuments<T extends { documentId: string }>(
 	}
 
 	return Array.from(byDocumentId.values());
+}
+
+/** Sort tours by their Strapi order, keeping unnumbered tours at the end. */
+export function sortToursByOrder<T extends Pick<Tour, "orden" | "titulo">>(
+	tours: T[],
+): T[] {
+	return [...tours].sort((a, b) => {
+		const orderA =
+			typeof a.orden === "number" ? a.orden : Number.POSITIVE_INFINITY;
+		const orderB =
+			typeof b.orden === "number" ? b.orden : Number.POSITIVE_INFINITY;
+
+		return orderA - orderB || (a.titulo || "").localeCompare(b.titulo || "");
+	});
 }
 
 export function rewriteUrl(url: string | undefined, currentLang: Lang): string {

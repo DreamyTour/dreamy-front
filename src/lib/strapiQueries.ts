@@ -1,6 +1,6 @@
 import type { Lang } from "@/lib/i18n";
 import fetchApi from "@/lib/strapi";
-import { dedupeLocalizedDocuments } from "@/lib/utils";
+import { dedupeLocalizedDocuments, sortToursByOrder } from "@/lib/utils";
 import type { Tour } from "@/types/tours";
 
 interface CategoryQuery {
@@ -25,11 +25,13 @@ export async function fetchToursByCategory({
 		query: {
 			"filters[categories][slug][$eq]": categorySlug,
 			"pagination[limit]": limit,
+			"sort[0]": "orden:asc",
+			"sort[1]": "titulo:asc",
 			populate: "*",
 		},
 	});
 
 	if (!Array.isArray(tours)) return [];
 
-	return dedupe ? dedupeLocalizedDocuments(tours) : tours;
+	return sortToursByOrder(dedupe ? dedupeLocalizedDocuments(tours) : tours);
 }

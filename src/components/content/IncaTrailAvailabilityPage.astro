@@ -3,7 +3,7 @@ import PageLayout from "@/layouts/PageLayout.astro";
 import TourCard from "@/components/ui/TourCard.astro";
 import IncaTrailAvailabilityBookingIsland from "@/components/content/IncaTrailAvailabilityBookingIsland.astro";
 import { fetchAllStrapi } from "@/lib/strapi";
-import { dedupeLocalizedDocuments } from "@/lib/utils";
+import { dedupeLocalizedDocuments, sortToursByOrder } from "@/lib/utils";
 import type { Lang } from "@/lib/i18n";
 import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { Tour, Category as TourCategory } from "@/types/tours";
@@ -251,11 +251,17 @@ function isIncaTrailCategory(category: TourCategory) {
 const toursRaw = await fetchAllStrapi<Tour>({
   endpoint: "tours",
   locale: lang,
+  query: {
+    "sort[0]": "orden:asc",
+    "sort[1]": "titulo:asc",
+  },
 });
 
-const tours = dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : [])
-  .filter((tour) => tour.categories?.some(isIncaTrailCategory))
-  .sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+const tours = sortToursByOrder(
+  dedupeLocalizedDocuments(Array.isArray(toursRaw) ? toursRaw : []).filter(
+    (tour) => tour.categories?.some(isIncaTrailCategory),
+  ),
+);
 
 type AvailabilityBookingTour = {
   road: string;
