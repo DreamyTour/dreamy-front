@@ -480,7 +480,7 @@ export default function IncaTrailAvailabilityCalendar({
 				))}
 			</div>
 
-			<div className="relative grid grid-cols-7 gap-1.5 bg-white p-2 sm:gap-2">
+			<div className="relative grid grid-cols-7 gap-px overflow-hidden bg-[#efe3d6]">
 				{loadState === "loading" && (
 					<div className="absolute inset-0 z-10 flex items-center justify-center bg-white/75 backdrop-blur-[1px]">
 						<div className="flex items-center gap-2 rounded-full border border-[#ead9c7] bg-white px-4 py-2 text-sm font-semibold text-[#244237] shadow-sm">
@@ -497,7 +497,7 @@ export default function IncaTrailAvailabilityCalendar({
 				{emptyCells.map((key) => (
 					<div
 						key={key}
-						className={`${compact ? "h-[64px] sm:h-[72px]" : "h-[68px] sm:h-[82px]"} rounded-md bg-neutral-50`}
+						className={`${compact ? "h-[54px] sm:h-[58px]" : "h-[58px] sm:h-[64px]"} bg-[#fffaf4]`}
 					/>
 				))}
 
@@ -511,12 +511,10 @@ export default function IncaTrailAvailabilityCalendar({
 							const isSelected = selectedDate === dateKey;
 							const isSelectedRange = selectedDateKeys.has(dateKey);
 							const toneStyles: Record<string, string> = {
-								available:
-									"border-[#bfe6ce] bg-white text-[#0f5f35] hover:border-[#8fd8aa] hover:bg-[#f4fbf7]",
-								limited:
-									"border-amber-300 bg-white text-amber-700 hover:border-amber-400 hover:bg-amber-50",
+								available: "bg-white text-[#0f5f35] hover:bg-[#f4fbf7]",
+								limited: "bg-white text-amber-700 hover:bg-amber-50",
 								unavailable:
-									"border-secondary/25 bg-white text-secondary cursor-not-allowed opacity-75",
+									"bg-[#fffaf4] text-secondary cursor-not-allowed opacity-70",
 							};
 							const toneHeader: Record<string, string> = {
 								available: "bg-[#8fd8aa] text-[#064324]",
@@ -542,9 +540,9 @@ export default function IncaTrailAvailabilityCalendar({
 									onClick={() =>
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
-									className={`relative flex ${compact ? "h-[64px] sm:h-[72px]" : "h-[68px] sm:h-[82px]"} flex-col overflow-hidden rounded-md border shadow-[0_8px_20px_-18px_rgba(31,45,41,0.62)] transition focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
+									className={`relative flex ${compact ? "h-[54px] sm:h-[58px]" : "h-[58px] sm:h-[64px]"} flex-col overflow-hidden transition-colors focus-visible:z-[2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#244237] ${toneStyles[tone]} ${
 										isSelectedRange
-											? "!border-secondary/55 !bg-white !text-secondary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--secondary)_28%,transparent),0_14px_28px_-22px_color-mix(in_oklab,var(--secondary)_55%,transparent)]"
+											? "!bg-white !text-secondary ring-1 ring-inset ring-secondary/45"
 											: ""
 									} ${
 										isSelected ? "z-[1] ring-2 ring-inset ring-secondary" : ""
@@ -557,13 +555,13 @@ export default function IncaTrailAvailabilityCalendar({
 									}`}
 								>
 									<span
-										className={`flex h-6 w-full items-center justify-end px-2 text-sm font-extrabold leading-none ${isSelectedRange ? "bg-secondary text-secondary-foreground" : toneHeader[tone]}`}
+										className={`flex h-5 w-full items-center justify-end px-1.5 text-xs font-extrabold leading-none ${isSelectedRange ? "bg-secondary text-secondary-foreground" : toneHeader[tone]}`}
 									>
 										{String(day).padStart(2, "0")}
 									</span>
-									<span className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5 px-1.5 py-1.5">
+									<span className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1">
 										<span
-											className={`inline-flex max-w-full items-center text-sm font-black leading-none tracking-normal [text-box:trim-both_cap_alphabetic] sm:text-xl ${
+											className={`inline-flex max-w-full items-center text-sm font-black leading-none tracking-normal [text-box:trim-both_cap_alphabetic] sm:text-lg ${
 												isSelectedRange ? "text-secondary" : toneIcon[tone]
 											}`}
 										>
