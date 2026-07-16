@@ -16,8 +16,9 @@ const { tour, lang } = Astro.props;
 if (!tour) return null;
 
 const t = useTranslations(lang);
-const mainImage = getImageUrl(tour.imagenDestacada, "small");
-const imageAlt = getImageAlt(tour.imagenDestacada, tour.titulo);
+const metaImage = tour.seo?.metaImage;
+const mainImage = getImageUrl(metaImage, "small");
+const imageAlt = getImageAlt(metaImage, tour.titulo);
 const primaryCategory = tour.categories?.[0]?.nombre;
 ---
 
