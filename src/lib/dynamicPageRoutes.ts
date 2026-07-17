@@ -18,6 +18,7 @@ export interface MdxFrontmatter {
 export interface DynamicPageProps {
 	type: "mdx" | "tour" | "page";
 	tour?: Tour;
+	tourPageCategory?: { title: string; slug: string };
 	page?: Page;
 	slugMap?: Record<string, string>;
 	pageSlugMap?: Record<string, string>;
@@ -141,10 +142,7 @@ function getRelatedTours(tour: Tour, tours: Tour[]) {
 }
 
 function getToursByPageCategory(page: Page, tours: Tour[]) {
-	const pageDestinationCategory =
-		page?.categories?.find(
-			(category: PageCategory) => category.slug !== "peru-tours",
-		) ?? (page?.slug ? { slug: page.slug, nombre: page.titulo } : undefined);
+	const pageDestinationCategory = getPageDestinationCategory(page);
 
 	if (!pageDestinationCategory?.slug) return [];
 
@@ -154,6 +152,29 @@ function getToursByPageCategory(page: Page, tours: Tour[]) {
 				category.slug === pageDestinationCategory.slug,
 		),
 	);
+}
+
+function getPageDestinationCategory(page: Page) {
+	return (
+		page?.categories?.find(
+			(category: PageCategory) => category.slug !== "peru-tours",
+		) ?? (page?.slug ? { slug: page.slug, nombre: page.titulo } : undefined)
+	);
+}
+
+function getTourPageCategory(tour: Tour, pages: Page[]) {
+	const tourCategorySlugs = new Set(
+		tour.categories?.map((category) => category.slug) ?? [],
+	);
+	const match = pages
+		.map((page) => ({ page, category: getPageDestinationCategory(page) }))
+		.find(({ category }) =>
+			category?.slug ? tourCategorySlugs.has(category.slug) : false,
+		);
+
+	return match?.category
+		? { title: match.category.nombre, slug: match.page.slug }
+		: undefined;
 }
 
 export async function getDefaultLangDynamicPaths(): Promise<
@@ -180,6 +201,7 @@ export async function getDefaultLangDynamicPaths(): Promise<
 	const slugsByDocId = buildTourSlugMap(allToursByLang);
 	const pageSlugsByDocId = buildPageSlugMap(allPagesByLang);
 	const defaultTours = allToursByLang[DEFAULT_LANG] || [];
+	const defaultPages = allPagesByLang[DEFAULT_LANG] || [];
 
 	for (const tour of defaultTours) {
 		paths.push({
@@ -187,6 +209,7 @@ export async function getDefaultLangDynamicPaths(): Promise<
 			props: {
 				type: "tour",
 				tour,
+				tourPageCategory: getTourPageCategory(tour, defaultPages),
 				slugMap: slugsByDocId[tour.documentId] ?? {},
 				toursRelated: getRelatedTours(tour, defaultTours),
 			},
@@ -234,6 +257,7 @@ export async function getLocalizedDynamicPaths(): Promise<
 
 	for (const lang of LANGS) {
 		const tours = allToursByLang[lang] || [];
+		const pages = allPagesByLang[lang] || [];
 
 		for (const tour of tours) {
 			paths.push({
@@ -241,6 +265,7 @@ export async function getLocalizedDynamicPaths(): Promise<
 				props: {
 					type: "tour",
 					tour,
+					tourPageCategory: getTourPageCategory(tour, pages),
 					slugMap: slugsByDocId[tour.documentId] ?? {},
 					toursRelated: getRelatedTours(tour, tours),
 				},

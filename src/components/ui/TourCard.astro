@@ -51,17 +51,19 @@ const cardBadge =
             `tour-card-badge--${cardBadge.variant}`,
           ]}
         >
-          {cardBadge.variant === "best-seller" ? (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m12 2.75 2.62 5.3 5.85.85-4.24 4.13 1 5.83L12 16.11l-5.23 2.75 1-5.83L3.53 8.9l5.85-.85L12 2.75Z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20.6 13.6 13.7 20.5a2 2 0 0 1-2.8 0l-7.4-7.4a2 2 0 0 1 0-2.8V4.5a1 1 0 0 1 1-1h5.8a2 2 0 0 1 1.4.6l6.9 6.7a2 2 0 0 1 0 2.8Z" />
-              <circle cx="7.5" cy="7.5" r="1.35" />
-            </svg>
-          )}
-          <span>{cardBadge.label}</span>
+          <span class="tour-card-badge__content">
+            {cardBadge.variant === "best-seller" ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 2.75 2.62 5.3 5.85.85-4.24 4.13 1 5.83L12 16.11l-5.23 2.75 1-5.83L3.53 8.9l5.85-.85L12 2.75Z" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20.6 13.6 13.7 20.5a2 2 0 0 1-2.8 0l-7.4-7.4a2 2 0 0 1 0-2.8V4.5a1 1 0 0 1 1-1h5.8a2 2 0 0 1 1.4.6l6.9 6.7a2 2 0 0 1 0 2.8Z" />
+                <circle cx="7.5" cy="7.5" r="1.35" />
+              </svg>
+            )}
+            <span>{cardBadge.label}</span>
+          </span>
         </div>
       )
     }
@@ -166,135 +168,52 @@ const cardBadge =
   .tour-card-badge {
     position: absolute;
     inset-block-start: 1rem;
-    inset-inline-start: 1rem;
+    inset-inline-start: 0;
     z-index: 20;
+    border: 0;
+    border-radius: 0;
+    padding: 0.48rem 1.05rem 0.48rem 0.75rem;
+    font-size: 0.62rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      calc(100% - 0.48rem) 50%,
+      100% 100%,
+      0 100%
+    );
+    filter: drop-shadow(0 5px 5px rgb(0 0 0 / 20%));
+  }
+
+  .tour-card-badge__content {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    overflow: hidden;
-    border: 1px solid transparent;
-    border-radius: 0.5rem;
-    padding: 0.56rem 0.78rem;
-    font-size: 0.69rem;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
-    box-shadow: 0 10px 24px -12px rgb(0 0 0 / 55%);
-    transition: transform 300ms ease;
+    gap: 0.38rem;
   }
 
-  .group:hover .tour-card-badge {
-    transform: translateY(-2px);
-  }
-
-  .tour-card-badge svg {
-    inline-size: 0.85rem;
-    block-size: 0.85rem;
+  .tour-card-badge__content svg {
+    inline-size: 0.78rem;
+    block-size: 0.78rem;
     flex: none;
     fill: currentColor;
   }
 
+  .tour-card-badge__content > span {
+    text-box: trim-both cap alphabetic;
+  }
+
   .tour-card-badge--best-seller {
-    inset-inline-start: 0;
-    inset-inline-end: auto;
-    border-color: #ffe8a3;
-    border-inline-start: 0;
-    border-radius: 0 0.5rem 0.5rem 0;
-    padding-inline: 1rem 1.25rem;
-    background: linear-gradient(
-      115deg,
-      #fff6c9 0%,
-      #e2a92e 38%,
-      #ffd86a 66%,
-      #fff1ad 100%
-    );
-    color: #4b2d00;
-    clip-path: polygon(
-      0 0,
-      calc(100% - 0.55rem) 0,
-      100% 50%,
-      calc(100% - 0.55rem) 100%,
-      0 100%
-    );
-    box-shadow:
-      0 12px 30px -10px rgb(65 38 0 / 78%),
-      0 0 0 2px rgb(98 58 0 / 18%) inset,
-      0 1px 0 rgb(255 255 255 / 88%) inset;
-  }
-
-  .tour-card-badge--best-seller svg {
-    inline-size: 1.35rem;
-    block-size: 1.35rem;
-    border: 1px solid rgb(255 237 170 / 65%);
-    border-radius: 50%;
-    background: #603b00;
-    color: #ffdd72;
-    padding: 0.25rem;
-    box-shadow: 0 2px 7px rgb(74 42 0 / 35%);
-  }
-
-  .tour-card-badge--best-seller::after {
-    position: absolute;
-    inset-block: -60%;
-    inset-inline-start: -45%;
-    inline-size: 32%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgb(255 255 255 / 55%),
-      transparent
-    );
-    content: "";
-    transform: rotate(18deg);
-    transition: inset-inline-start 600ms ease;
-  }
-
-  .group:hover .tour-card-badge--best-seller::after {
-    inset-inline-start: 115%;
+    background: #f2c94c;
+    color: #3f2c00;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 42%) inset;
   }
 
   .tour-card-badge--promotion {
-    inset-inline-start: 0;
-    border-color: color-mix(in oklab, var(--secondary) 84%, white);
-    border-inline-start: 0;
-    border-radius: 0 0.5rem 0.5rem 0;
-    padding-inline: 1rem 1.25rem;
-    background:
-      repeating-linear-gradient(
-        125deg,
-        transparent 0 8px,
-        rgb(255 255 255 / 7%) 8px 12px
-      ),
-      linear-gradient(
-        135deg,
-        color-mix(in oklab, var(--secondary) 74%, black),
-        var(--secondary) 62%,
-        color-mix(in oklab, var(--secondary) 88%, white)
-      );
+    background: var(--secondary);
     color: var(--secondary-foreground);
-    clip-path: polygon(
-      0 0,
-      calc(100% - 0.55rem) 0,
-      100% 50%,
-      calc(100% - 0.55rem) 100%,
-      0 100%
-    );
-    box-shadow:
-      0 12px 28px -10px color-mix(in oklab, var(--secondary) 84%, black),
-      0 1px 0 color-mix(in oklab, white 35%, transparent) inset;
-  }
-
-  .tour-card-badge--promotion svg {
-    inline-size: 1rem;
-    block-size: 1rem;
-    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 22%));
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .tour-card-badge,
-    .tour-card-badge--best-seller::after {
-      transition: none;
-    }
+    box-shadow: 0 1px 0 rgb(255 255 255 / 18%) inset;
   }
 </style>

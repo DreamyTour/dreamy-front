@@ -39,6 +39,7 @@ interface Props {
   type: "mdx" | "tour" | "page";
   lang: Lang;
   tour?: Tour;
+  tourPageCategory?: { title: string; slug: string };
   page?: Page;
   slugMap?: Record<string, string>;
   pageSlugMap?: Record<string, string>;
@@ -52,6 +53,7 @@ const {
   type,
   lang,
   tour,
+  tourPageCategory,
   page,
   slugMap,
   pageSlugMap,
@@ -280,7 +282,12 @@ const MdxContent = mdxComponent?.default;
       lcpImageSrcSet={tourLcpImageSrcSet}
     >
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 pb-12">
-        <TourHero tour={tour} lang={lang} badges={tour.badge} />
+        <TourHero
+          tour={tour}
+          lang={lang}
+          badges={tour.badge}
+          pageCategory={tourPageCategory}
+        />
 
         <section
           class="w-full mt-8"

@@ -8,14 +8,16 @@ import {
   getImageUrl,
   extractTextFromBlocks,
 } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   tour: Tour;
   lang: Lang;
   badges?: Badge[];
+  pageCategory?: { title: string; slug: string };
 }
 
-const { tour, lang, badges } = Astro.props;
+const { tour, lang, badges, pageCategory } = Astro.props;
 if (!tour) return;
 
 const featuredImages = Array.isArray(tour.imagenDestacada)
@@ -53,6 +55,14 @@ const heroImage = images[images.length - 1];
 const categoryName = tour.categories?.[0]?.nombre;
 const hasBadges = badges && badges.length > 0;
 const description = extractTextFromBlocks(tour.content);
+const breadcrumbCategory = pageCategory;
+
+const breadcrumbCopy = {
+  en: { home: "Home", ariaLabel: "Breadcrumb" },
+  es: { home: "Inicio", ariaLabel: "Migas de pan" },
+  pt: { home: "Início", ariaLabel: "Trilha de navegação" },
+} as const;
+const breadcrumbLabels = breadcrumbCopy[lang] ?? breadcrumbCopy.en;
 
 const ctaLabels = {
   en: {
@@ -178,15 +188,62 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
     </div>
   </div>
 
+  <nav
+    class="tour-breadcrumb relative left-1/2 mt-8 w-screen -translate-x-1/2 overflow-x-auto pb-2 pt-5 md:mt-10 md:pb-3 md:pt-6"
+    aria-label={breadcrumbLabels.ariaLabel}
+  >
+    <ol
+      class="relative z-10 mx-auto flex w-full min-w-max max-w-8xl items-center gap-2.5 px-4 text-[0.8125rem] font-semibold text-slate-500 sm:gap-3 sm:px-6 sm:text-sm lg:px-8"
+    >
+      <li class="shrink-0">
+        <a
+          href={rewriteUrl("/", lang)}
+          class="transition-colors hover:text-primary"
+        >
+          {breadcrumbLabels.home}
+        </a>
+      </li>
+
+      {
+        breadcrumbCategory && (
+          <>
+            <li
+              class="shrink-0 text-sm leading-none text-slate-400 sm:text-base"
+              aria-hidden="true"
+            >
+              &rarr;
+            </li>
+            <li class="shrink-0">
+              <a
+                href={rewriteUrl(`/${breadcrumbCategory.slug}`, lang)}
+                class="transition-colors hover:text-primary"
+              >
+                {breadcrumbCategory.title}
+              </a>
+            </li>
+          </>
+        )
+      }
+
+      <li
+        class="shrink-0 text-sm leading-none text-slate-400 sm:text-base"
+        aria-hidden="true"
+      >
+        &rarr;
+      </li>
+      <li class="shrink-0 text-slate-600" aria-current="page">
+        {tour.titulo}
+      </li>
+    </ol>
+  </nav>
+
   <div
-    class="tour-hero-content mx-auto mt-10 grid max-w-8xl items-stretch gap-5 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_340px]"
+    class="tour-hero-content mx-auto mt-5 grid max-w-8xl items-stretch gap-5 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_340px]"
   >
     <div
       class="h-full rounded-sm border border-primary/30 bg-background p-4 lg:p-5"
     >
-      <p
-        class="text-base leading-relaxed text-slate-800 md:text-[1.05rem]"
-      >
+      <p class="text-base leading-relaxed text-slate-800 md:text-[1.05rem]">
         {description}
       </p>
     </div>
@@ -257,6 +314,14 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
 </section>
 
 <style is:inline>
+  .tour-breadcrumb {
+    scrollbar-width: none;
+  }
+
+  .tour-breadcrumb::-webkit-scrollbar {
+    display: none;
+  }
+
   .tour-hero-container .tour-hero-image {
     animation: tour-hero-slow-zoom 26s ease-in-out infinite alternate;
     transform-origin: center;
