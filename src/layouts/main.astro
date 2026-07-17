@@ -68,20 +68,6 @@ const seoProps = seo || {
 
 <html lang={currentLang}>
   <head>
-    <!-- Google Tag Manager -->
-    <script is:inline>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-W4FKKPL4");
-    </script>
-    <!-- End Google Tag Manager -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
@@ -129,5 +115,53 @@ const seoProps = seo || {
     </main>
     <Footer data={globalData?.footer} lang={currentLang} />
     <WhatsAppFloatingButton />
+
+    <!-- GTM se carga tras la primera interacción o cuando el navegador queda libre. -->
+    <script is:inline>
+      (() => {
+        let loaded = false;
+        const events = ["pointerdown", "keydown", "touchstart"];
+
+        const loadGtm = () => {
+          if (loaded) return;
+          loaded = true;
+          events.forEach((eventName) =>
+            window.removeEventListener(eventName, loadGtm),
+          );
+
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            "gtm.start": new Date().getTime(),
+            event: "gtm.js",
+          });
+
+          const script = document.createElement("script");
+          script.async = true;
+          script.fetchPriority = "low";
+          script.src =
+            "https://www.googletagmanager.com/gtm.js?id=GTM-W4FKKPL4";
+          document.head.appendChild(script);
+        };
+
+        events.forEach((eventName) =>
+          window.addEventListener(eventName, loadGtm, {
+            once: true,
+            passive: true,
+          }),
+        );
+
+        window.addEventListener(
+          "load",
+          () => {
+            if ("requestIdleCallback" in window) {
+              window.requestIdleCallback(loadGtm, { timeout: 5000 });
+            } else {
+              window.setTimeout(loadGtm, 4000);
+            }
+          },
+          { once: true },
+        );
+      })();
+    </script>
   </body>
 </html>

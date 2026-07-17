@@ -3,7 +3,8 @@ import type { Global, Link } from "@/types/global";
 
 import TopBar from "@/components/layout/TopBar.astro";
 import HeaderTop from "@/components/layout/HeaderTop.astro";
-import Menu from "@/components/layout/Menu.tsx";
+import DesktopMenu from "@/components/layout/DesktopMenu.tsx";
+import MobileMenu from "@/components/layout/MobileMenu.astro";
 import type { Lang } from "@/lib/i18n";
 import { localizePath } from "@/lib/i18n";
 
@@ -44,12 +45,17 @@ const mobileQuickActions = [
   <TopBar data={data?.topBar} lang={lang} />
   <HeaderTop data={data?.headerTop} lang={lang} />
   <hr class="border-t border-primary/20" aria-hidden="true" />
-  <Menu
+  <DesktopMenu
+    menu={data?.menu}
+    lang={lang}
+    client:media="(min-width: 1280px)"
+    transition:persist
+  />
+  <MobileMenu
     menu={data?.menu}
     quickActions={mobileQuickActions}
     logoUrl={mobileLogoUrl}
     lang={lang}
-    client:idle
     transition:persist
   />
 </header>
