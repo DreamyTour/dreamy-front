@@ -4,6 +4,8 @@ import { DEFAULT_LANG } from "@/lib/i18n";
 export const ui = {
 	es: {
 		"tour.verItinerario": "Ver Itinerario",
+		"tour.cardBadge.bestSeller": "Best seller",
+		"tour.cardBadge.promotion": "Promoción",
 		"blog.leerMas": "Leer más",
 		"section.verMas": "Ver más",
 		"section.verMasPaquetes": "Ver más Paquetes",
@@ -27,6 +29,8 @@ export const ui = {
 	},
 	en: {
 		"tour.verItinerario": "View Itinerary",
+		"tour.cardBadge.bestSeller": "Best seller",
+		"tour.cardBadge.promotion": "Promotion",
 		"blog.leerMas": "Read more",
 		"section.verMas": "View more",
 		"section.verMasPaquetes": "View more Packages",
@@ -50,6 +54,8 @@ export const ui = {
 	},
 	pt: {
 		"tour.verItinerario": "Ver Itinerário",
+		"tour.cardBadge.bestSeller": "Best seller",
+		"tour.cardBadge.promotion": "Promoção",
 		"blog.leerMas": "Leia mais",
 		"section.verMas": "Ver mais",
 		"section.verMasPaquetes": "Ver mais Pacotes",
