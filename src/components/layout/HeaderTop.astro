@@ -4,6 +4,7 @@ import LanguageSwitcherInline from "@/components/LanguageSwitcherInline.astro";
 import type { Lang } from "@/lib/i18n";
 import { localizePath } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
+import TourSearch from "@/components/layout/TourSearch";
 
 interface Props {
   data?: HeaderTopType;
@@ -82,6 +83,7 @@ const getLinkProps = (
         </ul>
       </nav>
       <div class="flex flex-wrap items-center justify-end gap-2">
+        <TourSearch lang={lang} client:media="(min-width: 1280px)" />
         <nav class="hidden xl:block" aria-label="Acciones rápidas">
           <ul class="flex flex-wrap justify-end gap-2">
             {
