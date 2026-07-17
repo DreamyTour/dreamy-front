@@ -42,18 +42,16 @@ const formatValue = (value: number, suffix: string) =>
   data-home-stats
 >
   <div class="home-stats-shell mx-auto max-w-8xl">
-    <ul
-      class="home-stats-grid grid gap-2.5 text-center grid-cols-2 lg:grid-cols-4"
-    >
+    <ul class="home-stats-grid grid grid-cols-2 text-center lg:grid-cols-4">
       {
         stats.map((stat, index) => (
           <li
-            class="home-stat-item relative flex min-h-26 flex-col items-center justify-center overflow-hidden px-4 py-4 sm:min-h-28 lg:min-h-32"
+            class="home-stat-item relative flex min-h-28 flex-col items-center justify-center px-4 py-5 sm:min-h-32 lg:min-h-36"
             style={`--stat-delay: ${index * 90}ms`}
             aria-label={`${formatValue(stat.value, stat.suffix)} ${stat.label}`}
           >
             <span
-              class="home-stat-number text-xl font-black leading-none tracking-tight lg:text-3xl"
+              class="home-stat-number font-black leading-none tracking-tight"
               data-stat-number
               data-target={stat.value}
               data-suffix={stat.suffix}
@@ -61,7 +59,7 @@ const formatValue = (value: number, suffix: string) =>
             >
               {formatValue(stat.value, stat.suffix)}
             </span>
-            <span class="home-stat-label mt-2.5 max-w-[12rem] text-[0.62rem] font-extrabold uppercase leading-4 tracking-[0.12em] sm:text-[0.7rem]">
+            <span class="home-stat-label mt-3 max-w-[12rem] text-[0.62rem] font-bold uppercase leading-4 tracking-[0.14em] sm:text-[0.7rem]">
               {stat.label}
             </span>
           </li>
@@ -148,14 +146,47 @@ const formatValue = (value: number, suffix: string) =>
 
 <style>
   .home-stats {
-    --stats-line: color-mix(in oklab, var(--secondary) 18%, transparent);
+    --stats-line: color-mix(in oklab, var(--primary) 12%, var(--border));
     container: home-stats / inline-size;
   }
 
   .home-stats-shell {
     position: relative;
     z-index: 1;
-    overflow: visible;
+    overflow: clip;
+    border: 1px solid color-mix(in oklab, var(--primary) 10%, var(--border));
+    border-radius: 1.35rem;
+    background: linear-gradient(
+      112deg,
+      white 0%,
+      color-mix(in oklab, white 97%, var(--accent-warm)) 55%,
+      color-mix(in oklab, white 96%, var(--primary)) 100%
+    );
+    box-shadow:
+      0 30px 70px -42px color-mix(in oklab, var(--foreground) 28%, transparent),
+      0 1px 0 white inset;
+  }
+
+  .home-stats-shell::before {
+    position: absolute;
+    pointer-events: none;
+    content: "";
+  }
+
+  .home-stats-shell::before {
+    inset: 0;
+    background:
+      radial-gradient(
+        circle at 8% 0%,
+        color-mix(in oklab, var(--primary) 7%, transparent),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 94% 120%,
+        color-mix(in oklab, var(--secondary) 7%, transparent),
+        transparent 34%
+      );
+    opacity: 0.9;
   }
 
   .home-stats-grid {
@@ -164,57 +195,37 @@ const formatValue = (value: number, suffix: string) =>
   }
 
   .home-stat-item {
-    border: 1px solid color-mix(in oklab, var(--secondary) 14%, white);
-    border-radius: 0.875rem;
-    background: color-mix(in oklab, white 96%, var(--background) 4%);
-    box-shadow:
-      0 18px 40px -30px color-mix(in oklab, black 20%, transparent),
-      0 1px 0 color-mix(in oklab, white 88%, transparent) inset;
     opacity: 0;
     transform: translateY(18px);
     transition:
-      background 240ms ease,
-      box-shadow 240ms ease,
+      background-color 240ms ease,
       transform 240ms ease;
   }
 
   .home-stat-item::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at 50% 0%,
-      color-mix(in oklab, var(--secondary) 12%, transparent),
-      transparent 58%
-    );
-    opacity: 0.2;
-    transition: opacity 240ms ease;
+    inset-block-start: 1.15rem;
+    inset-inline-start: 50%;
+    inline-size: 1.65rem;
+    block-size: 2px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--secondary) 78%, white);
+    opacity: 0.9;
+    transform: translateX(-50%);
   }
 
   .home-stat-item:not(:last-child)::after {
     content: "";
     position: absolute;
-    inset-block: 1.25rem;
+    inset-block: 1.5rem;
     inset-inline-end: 0;
     width: 1px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      var(--stats-line),
-      transparent
-    );
-    opacity: 0;
+    background: var(--stats-line);
   }
 
   .home-stat-item:hover {
-    background: white;
-    box-shadow: 0 28px 58px -34px
-      color-mix(in oklab, var(--secondary) 30%, var(--primary) 20%);
-    transform: translateY(-1px);
-  }
-
-  .home-stat-item:hover::before {
-    opacity: 1;
+    background-color: color-mix(in oklab, var(--primary) 3.5%, transparent);
   }
 
   .home-stats.is-visible .home-stat-item {
@@ -230,15 +241,16 @@ const formatValue = (value: number, suffix: string) =>
   .home-stat-number {
     position: relative;
     z-index: 1;
-    color: color-mix(in oklab, var(--primary) 72%, black 28%);
-    font-size: clamp(1.55rem, 2.35cqi, 2.35rem);
+    color: color-mix(in oklab, var(--primary) 82%, black);
+    font-size: clamp(1.7rem, 2.65cqi, 2.65rem);
     font-variant-numeric: tabular-nums;
+    text-shadow: none;
   }
 
   .home-stat-label {
     position: relative;
     z-index: 1;
-    color: color-mix(in oklab, var(--foreground) 76%, var(--secondary));
+    color: color-mix(in oklab, var(--foreground) 72%, var(--primary));
     text-wrap: balance;
   }
 
@@ -265,23 +277,31 @@ const formatValue = (value: number, suffix: string) =>
   }
 
   @media (max-width: 1023px) {
-    .home-stat-item:not(:last-child)::after {
+    .home-stat-item::after {
+      display: block;
+    }
+
+    .home-stat-item:nth-child(2n)::after {
       display: none;
+    }
+
+    .home-stat-item:nth-child(-n + 2) {
+      border-block-end: 1px solid var(--stats-line);
     }
   }
 
   @container home-stats (max-width: 520px) {
     .home-stats-shell {
-      border-radius: 1.1rem;
+      border-radius: 1rem;
     }
 
     .home-stat-item {
-      min-block-size: 6.5rem;
-      padding-block: 1rem;
+      min-block-size: 7rem;
+      padding-block: 1.25rem;
     }
 
     .home-stat-number {
-      font-size: clamp(1.45rem, 8.5cqi, 2rem);
+      font-size: clamp(1.5rem, 8.5cqi, 2.15rem);
     }
 
     .home-stat-label {
