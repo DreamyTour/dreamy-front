@@ -153,11 +153,13 @@ const seoProps = seo || {
         window.addEventListener(
           "load",
           () => {
-            if ("requestIdleCallback" in window) {
-              window.requestIdleCallback(loadGtm, { timeout: 5000 });
-            } else {
-              window.setTimeout(loadGtm, 4000);
-            }
+            window.setTimeout(() => {
+              if ("requestIdleCallback" in window) {
+                window.requestIdleCallback(loadGtm, { timeout: 1000 });
+              } else {
+                loadGtm();
+              }
+            }, 8000);
           },
           { once: true },
         );
