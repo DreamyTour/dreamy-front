@@ -1,5 +1,5 @@
 ---
-import { LANGS, type Lang } from "@/lib/i18n";
+import { LANGS, type Lang, localizePath, stripLangPrefix } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 import type { Link, MenuItem, Menu as MenuType } from "@/types/global";
 
@@ -46,93 +46,91 @@ const languageFlags: Record<Lang, string> = {
         </a>
       </li>
 
-      <li class="relative ml-auto" data-language-switcher>
-        <button
-          type="button"
-          aria-haspopup="menu"
-          aria-expanded="false"
-          aria-controls="language-menu-mobile"
-          aria-label="Cambiar idioma"
-          data-language-toggle
-          class="inline-flex h-9 min-w-[124px] items-center justify-between gap-2 rounded-md border border-border bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2"
-        >
-          <span class="inline-flex items-center gap-2">
-            <span
-              class="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-[0_1px_2px_rgba(15,23,42,0.12)]"
-            >
-              <img
-                src={languageFlags[lang]}
-                alt=""
-                aria-hidden="true"
-                class="h-full w-full object-cover"
-                loading="eager"
-              />
-            </span>
-            <span>{languageNames[lang]}</span>
-          </span>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            class="size-4 text-slate-500 transition-transform duration-200"
-            aria-hidden="true"
-            data-language-chevron><path d="m6 9 6 6 6-6"></path></svg
+      <li class="ml-auto">
+        <details class="group relative" data-language-switcher>
+          <summary
+            aria-label="Cambiar idioma"
+            class="inline-flex h-9 min-w-[124px] cursor-pointer list-none items-center justify-between gap-2 rounded-md border border-border bg-white px-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-colors duration-200 hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-700 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden"
           >
-        </button>
+            <span class="inline-flex items-center gap-2">
+              <span
+                class="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-[0_1px_2px_rgba(15,23,42,0.12)]"
+              >
+                <img
+                  src={languageFlags[lang]}
+                  alt=""
+                  aria-hidden="true"
+                  class="h-full w-full object-cover"
+                  loading="eager"
+                />
+              </span>
+              <span>{languageNames[lang]}</span>
+            </span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="size-4 text-slate-500 transition-transform duration-200 group-open:rotate-180"
+              aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg
+            >
+          </summary>
 
-        <div
-          id="language-menu-mobile"
-          role="menu"
-          hidden
-          data-language-menu
-          class="absolute right-0 z-50 mt-2 min-w-[170px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
-        >
-          {
-            LANGS.map((optionLang) => {
-              const selected = optionLang === lang;
-              return (
-                <button
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={selected}
-                  data-language={optionLang}
-                  class:list={[
-                    "flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm transition-colors duration-150 focus-visible:outline-none",
-                    selected
-                      ? "bg-primary/10 font-semibold text-primary ring-1 ring-inset ring-primary/15 hover:bg-primary/12 focus-visible:bg-primary/12"
-                      : "text-slate-700 hover:bg-slate-100 focus-visible:bg-slate-100",
-                  ]}
-                >
-                  <span class="inline-flex items-center gap-2.5">
-                    <span class="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-[0_1px_2px_rgba(15,23,42,0.12)]">
-                      <img
-                        src={languageFlags[optionLang]}
-                        alt=""
-                        aria-hidden="true"
-                        class="h-full w-full object-cover"
-                        loading="lazy"
-                      />
+          <div
+            id="language-menu-mobile"
+            role="menu"
+            data-language-menu
+            class="absolute right-0 z-50 mt-2 min-w-[170px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
+          >
+            {
+              LANGS.map((optionLang) => {
+                const selected = optionLang === lang;
+                return (
+                  <a
+                    href={localizePath(
+                      stripLangPrefix(Astro.url.pathname),
+                      optionLang,
+                    )}
+                    role="menuitemradio"
+                    aria-checked={selected}
+                    data-language={optionLang}
+                    class:list={[
+                      "flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm transition-colors duration-150 focus-visible:outline-none",
+                      selected
+                        ? "bg-primary/10 font-semibold text-primary ring-1 ring-inset ring-primary/15 hover:bg-primary/12 focus-visible:bg-primary/12"
+                        : "text-slate-700 hover:bg-slate-100 focus-visible:bg-slate-100",
+                    ]}
+                  >
+                    <span class="inline-flex items-center gap-2.5">
+                      <span class="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-[0_1px_2px_rgba(15,23,42,0.12)]">
+                        <img
+                          src={languageFlags[optionLang]}
+                          alt=""
+                          aria-hidden="true"
+                          class="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </span>
+                      <span>{languageNames[optionLang]}</span>
                     </span>
-                    <span>{languageNames[optionLang]}</span>
-                  </span>
-                  {selected && (
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      class="size-4 text-primary"
-                      aria-hidden="true"
-                    >
-                      <path d="m5 12 4 4L19 6" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })
-          }
-        </div>
+                    {selected && (
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        class="size-4 text-primary"
+                        aria-hidden="true"
+                      >
+                        <path d="m5 12 4 4L19 6" />
+                      </svg>
+                    )}
+                  </a>
+                );
+              })
+            }
+          </div>
+        </details>
       </li>
 
       <li>
@@ -372,17 +370,11 @@ const languageFlags: Record<Lang, string> = {
         const closeIcon = root.querySelector<SVGElement>(
           "[data-menu-close-icon]",
         );
-        const languageSwitcher = root.querySelector<HTMLElement>(
+        const languageSwitcher = root.querySelector<HTMLDetailsElement>(
           "[data-language-switcher]",
-        );
-        const languageToggle = root.querySelector<HTMLButtonElement>(
-          "[data-language-toggle]",
         );
         const languageMenu = root.querySelector<HTMLElement>(
           "[data-language-menu]",
-        );
-        const languageChevron = root.querySelector<SVGElement>(
-          "[data-language-chevron]",
         );
         if (!toggle || !menu || !overlay) return;
 
@@ -406,13 +398,6 @@ const languageFlags: Record<Lang, string> = {
           } else if (restoreFocus) {
             toggle.focus();
           }
-        };
-
-        const setLanguageOpen = (open: boolean) => {
-          if (!languageToggle || !languageMenu) return;
-          languageToggle.setAttribute("aria-expanded", String(open));
-          languageMenu.hidden = !open;
-          languageChevron?.classList.toggle("rotate-180", open);
         };
 
         toggle.addEventListener("click", () =>
@@ -441,18 +426,17 @@ const languageFlags: Record<Lang, string> = {
             });
           });
 
-        languageToggle?.addEventListener("click", () =>
-          setLanguageOpen(
-            languageToggle.getAttribute("aria-expanded") !== "true",
-          ),
-        );
         languageMenu
-          ?.querySelectorAll<HTMLButtonElement>("[data-language]")
-          .forEach((button) => {
-            button.addEventListener("click", () => {
-              const nextLang = button.dataset.language as Lang;
-              if (nextLang === root.dataset.currentLang)
-                return setLanguageOpen(false);
+          ?.querySelectorAll<HTMLAnchorElement>("[data-language]")
+          .forEach((link) => {
+            link.addEventListener("click", (event) => {
+              const nextLang = link.dataset.language as Lang;
+              languageSwitcher?.removeAttribute("open");
+              if (nextLang === root.dataset.currentLang) {
+                event.preventDefault();
+                return;
+              }
+              event.preventDefault();
               window.location.href = resolveLocalizedPath(nextLang);
             });
           });
@@ -462,12 +446,12 @@ const languageFlags: Record<Lang, string> = {
             languageSwitcher &&
             !languageSwitcher.contains(event.target as Node)
           ) {
-            setLanguageOpen(false);
+            languageSwitcher.removeAttribute("open");
           }
         });
         document.addEventListener("keydown", (event) => {
           if (event.key === "Escape") {
-            setLanguageOpen(false);
+            languageSwitcher?.removeAttribute("open");
             if (toggle.getAttribute("aria-expanded") === "true")
               setMenuOpen(false, true);
             return;
