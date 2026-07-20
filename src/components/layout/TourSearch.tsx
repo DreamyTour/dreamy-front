@@ -1,8 +1,8 @@
 import { Clock3, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Lang } from "@/lib/i18n";
-import { rewriteUrl } from "@/lib/utils";
 import type { TourSearchItem } from "@/lib/tourSearch";
+import { rewriteUrl } from "@/lib/utils";
 
 interface TourSearchProps {
 	lang: Lang;
@@ -152,7 +152,7 @@ export default function TourSearch({ lang }: TourSearchProps) {
 					}}
 					placeholder={copy.placeholder}
 					autoComplete="off"
-					aria-controls="header-tour-search-results"
+					aria-controls={showPanel ? "header-tour-search-results" : undefined}
 					className="h-9 w-[clamp(13rem,17vw,16rem)] rounded-full border border-border bg-white py-2 pl-9 pr-3 text-xs font-medium text-foreground shadow-sm outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-foreground/45 hover:border-primary/30 focus:border-primary/45 focus:ring-2 focus:ring-primary/10"
 				/>
 			</search>
