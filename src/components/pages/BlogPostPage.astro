@@ -86,14 +86,11 @@ const {
   lang,
   allCategories,
   slugMap,
-  globalData,
   relatedBlogs,
   categoryPostCounts,
   totalPostCount,
 } = Astro.props as BlogPostProps;
 
-const socialLogos =
-  globalData?.footer?.socialLogo || globalData?.socialLogo || [];
 const heroImage = getImageUrl(blog.portadaImage, "large");
 const heroImageAlt = getImageAlt(blog.portadaImage, blog.titulo);
 const seoProps = buildSEOProps({
@@ -478,7 +475,6 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
           categories={allCategories}
           currentSlug={blog.category_blogs?.[0]?.slug}
           lang={lang}
-          socialLogos={socialLogos}
           categoryPostCounts={categoryPostCounts}
           totalPostCount={totalPostCount}
         />
@@ -512,7 +508,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
             {relatedBlogs.map((relatedBlog: Blog) => (
-              <CardPost blog={relatedBlog} lang={lang} />
+              <CardPost blog={relatedBlog} lang={lang} headingLevel="h3" />
             ))}
           </div>
         </section>

@@ -2,7 +2,7 @@
 import type { Blog } from "@/types/blog";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
-import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -10,33 +10,37 @@ interface Props {
   lang: Lang;
   isFeatured?: boolean;
   showDescription?: boolean;
+  headingLevel?: "h2" | "h3";
 }
 
-const { blog, lang, isFeatured = false, showDescription = false } = Astro.props;
+const {
+  blog,
+  lang,
+  showDescription = false,
+  headingLevel = "h2",
+} = Astro.props;
 
 if (!blog) return null;
 
 const t = useTranslations(lang);
-const mainImage = getImageUrl(blog.portadaImage, "small");
+const mainImage = getImageUrl(blog.portadaImage, "medium");
+const imageSrcSet = getImageSrcSet(blog.portadaImage, [
+  "thumbnail",
+  "small",
+  "medium",
+]);
 const imageAlt = getImageAlt(blog.portadaImage, blog.titulo);
-
 const category = blog.category_blogs?.[0]?.nombre || null;
-
 const publishedDate = blog.publishedAt || blog.createdAt;
 const formattedDate = publishedDate
   ? new Date(publishedDate).toLocaleDateString(
       lang === "es" ? "es-ES" : lang === "pt" ? "pt-BR" : "en-US",
-      {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      },
+      { day: "numeric", month: "short", year: "numeric" },
     )
   : null;
 
 function extractPlainText(value: unknown): string {
   if (!value) return "";
-
   if (typeof value === "string") {
     return value
       .replace(/<[^>]+>/g, " ")
@@ -44,207 +48,127 @@ function extractPlainText(value: unknown): string {
       .replace(/\s+/g, " ")
       .trim();
   }
-
   if (Array.isArray(value)) {
     return value
-      .map((item) => extractPlainText(item))
+      .map(extractPlainText)
       .filter(Boolean)
       .join(" ")
       .replace(/\s+/g, " ")
       .trim();
   }
-
   if (typeof value === "object") {
     const record = value as Record<string, unknown>;
-    const ownText = typeof record.text === "string" ? record.text : "";
-    const childrenText = extractPlainText(record.children);
-
-    return [ownText, childrenText]
+    return [
+      typeof record.text === "string" ? record.text : "",
+      extractPlainText(record.children),
+    ]
       .filter(Boolean)
       .join(" ")
       .replace(/\s+/g, " ")
       .trim();
   }
-
   return "";
 }
 
 const plainContent = extractPlainText(blog.contenido);
-
-const excerptLimit = isFeatured ? 700 : 138;
 const excerpt =
   showDescription && plainContent
-    ? plainContent.length > excerptLimit
-      ? `${plainContent.slice(0, excerptLimit - 3).trimEnd()}...`
+    ? plainContent.length > 132
+      ? `${plainContent.slice(0, 129).trimEnd()}...`
       : plainContent
     : null;
-
-const cardHeight = isFeatured
-  ? "min-h-[500px] lg:min-h-[360px] lg:h-[360px]"
-  : "min-h-[360px]";
-const imageHeight = isFeatured
-  ? "aspect-[16/8.4] lg:aspect-auto lg:h-full"
-  : "aspect-[16/10]";
+const wordCount = plainContent.split(/\s+/).filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.ceil(wordCount / 210));
+const readingText = `${readingMinutes} min`;
+const Heading = headingLevel;
 ---
 
-<article
-  class:list={["group h-full", isFeatured && "md:col-span-2 lg:col-span-3"]}
->
+<article class="group h-full min-w-0">
   <a
     href={rewriteUrl(`/blog/${blog.slug}`, lang)}
     aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
-    class:list={[
-      "relative flex h-full flex-col overflow-hidden rounded-sm border border-[color-mix(in_oklab,var(--primary)_9%,var(--border))] bg-white text-foreground shadow-[0_18px_44px_var(--blog-card-shadow)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-secondary/32 hover:shadow-[0_24px_60px_var(--blog-card-shadow-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
-      isFeatured && "lg:flex-row",
-      cardHeight,
-    ]}
+    class="flex h-full min-h-[25rem] flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-[0_14px_34px_-24px_rgba(15,32,23,0.45)] transition duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_22px_46px_-24px_rgba(15,32,23,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45 motion-reduce:transform-none"
   >
-    <div
-      class="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[linear-gradient(90deg,transparent,var(--secondary),transparent)] opacity-45"
-    >
-    </div>
-
-    <div
-      class:list={[
-        "relative overflow-hidden shrink-0",
-        isFeatured ? "w-full lg:w-[55%]" : "w-full",
-        imageHeight,
-      ]}
-    >
+    <div class="relative aspect-[4/2.7] shrink-0 overflow-hidden bg-muted">
       {
         mainImage && mainImage !== "/og-default.jpg" ? (
           <img
             src={mainImage}
-            sizes={
-              isFeatured
-                ? "(max-width: 1023px) 92vw, 768px"
-                : "(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 380px"
-            }
+            srcset={imageSrcSet || undefined}
+            sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
             alt={imageAlt}
-            class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+            width="640"
+            height="432"
+            class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.045] motion-reduce:transform-none"
             loading="lazy"
             decoding="async"
           />
         ) : (
-          <div class="flex h-full items-center justify-center bg-[linear-gradient(135deg,_color-mix(in_oklab,var(--primary)_14%,white),_color-mix(in_oklab,var(--secondary)_16%,white))]">
-            <span class="rounded-[3px] border border-primary/10 bg-card/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary/65 shadow-sm">
-              No image
+          <div class="grid h-full place-items-center bg-[linear-gradient(145deg,color-mix(in_oklab,var(--primary)_13%,white),color-mix(in_oklab,var(--secondary)_12%,white))]">
+            <span class="text-xs font-semibold uppercase tracking-[0.16em] text-primary/70">
+              Dreamy Tours
             </span>
           </div>
         )
       }
 
-      <div
-        class="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.18)_0%,transparent_42%,color-mix(in_oklab,var(--blog-image-shade)_58%,transparent)_100%)]"
-      >
-      </div>
-      <div
-        class="absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(0deg,color-mix(in_oklab,var(--blog-image-shade)_68%,transparent),transparent)]"
-      >
-      </div>
-
-      <div
-        class="absolute left-4 top-4 flex max-w-[calc(100%-2rem)] items-center gap-3"
-      >
-        {
-          category && (
-            <span class="line-clamp-1 inline-flex max-w-full items-center rounded-xs bg-secondary px-3.5 py-1.5 text-[0.6rem] uppercase tracking-[0.16em] text-white shadow-[0_10px_30px_color-mix(in_oklab,var(--blog-image-shade)_36%,transparent)]">
-              {category}
-            </span>
-          )
-        }
-      </div>
-
-      <span
-        class="absolute bottom-4 right-4 grid h-10 w-10 place-items-center rounded-full border border-white/25 bg-white/16 text-white shadow-[0_12px_32px_rgba(0,0,0,0.22)] backdrop-blur-md transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:bg-secondary"
-        aria-hidden="true"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M7 17 17 7"></path>
-          <path d="M9 7h8v8"></path>
-        </svg>
-      </span>
+      {
+        category && (
+          <span class="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] truncate rounded-full bg-secondary px-3 py-1 text-[0.64rem] font-bold uppercase tracking-[0.08em] text-secondary-foreground shadow-sm">
+            {category}
+          </span>
+        )
+      }
     </div>
 
-    <div
-      class:list={[
-        "relative flex flex-1 flex-col gap-4 px-5 pb-5 pt-5 md:px-6 md:pb-6",
-        isFeatured && "lg:w-[45%] lg:p-7 lg:justify-between",
-      ]}
-    >
+    <div class="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+      <Heading
+        class="line-clamp-3 text-lg font-semibold leading-[1.12] tracking-[-0.01em] text-foreground"
+      >
+        {blog.titulo}
+      </Heading>
+
+      {
+        excerpt && (
+          <p class="line-clamp-3 text-sm leading-5 text-muted-foreground">
+            {excerpt}
+          </p>
+        )
+      }
+
       <div
-        class="flex items-center gap-4 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+        class="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3.5 text-xs text-muted-foreground"
       >
         {
-          formattedDate ? (
-            <span class="inline-flex min-w-0 items-center gap-2">
-              <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
+          formattedDate && (
+            <span class="inline-flex items-center gap-1.5">
+              <svg
+                class="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z" />
+              </svg>
               {formattedDate}
             </span>
-          ) : (
-            <span class="inline-flex min-w-0 items-center gap-2">
-              <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-secondary/60" />
-              Journal
-            </span>
           )
         }
-      </div>
-
-      <div class="space-y-3.5">
-        <h3
-          class:list={[
-            "line-clamp-3 font-semibold leading-[1.16] text-foreground",
-            isFeatured
-              ? "text-[1.38rem] md:text-[1.68rem]"
-              : "text-[1.08rem] md:text-[1.24rem]",
-          ]}
-        >
-          {blog.titulo}
-        </h3>
-
-        {
-          excerpt && (
-            <p
-              class:list={[
-                "text-sm leading-6 text-muted-foreground md:text-[0.96rem]",
-                isFeatured
-                  ? "flex-1 overflow-hidden line-clamp-[12]"
-                  : "line-clamp-2",
-              ]}
-            >
-              {excerpt}
-            </p>
-          )
-        }
-      </div>
-
-      <div class="mt-auto flex items-center border-t border-border pt-4">
-        <span
-          class="relative inline-flex items-center gap-2 text-[0.76rem] font-bold uppercase tracking-[0.16em] text-secondary after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 group-hover:after:scale-x-100"
-        >
-          {t("blog.leerMas")}
+        <span class="inline-flex items-center gap-1.5">
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-            fill="none"
+            class="size-4"
             viewBox="0 0 24 24"
+            fill="none"
             stroke="currentColor"
             stroke-width="2"
+            aria-hidden="true"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 7v5l3 2"></path>
           </svg>
+          {readingText}
         </span>
       </div>
     </div>

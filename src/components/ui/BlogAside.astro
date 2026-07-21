@@ -1,54 +1,38 @@
 ---
 import type { Lang } from "@/lib/i18n";
-import { getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 import { getCategoryIcon } from "@/lib/blogCategories";
+import BlogCategoryDropdown, {
+  type BlogCategoryOption,
+} from "@/components/blog/BlogCategoryDropdown";
 
 interface Category {
   slug: string;
   nombre: string;
 }
 
-interface SocialLogo {
-  url: string;
-  label?: string;
-  imagen?: {
-    url: string;
-  };
-}
-
 interface Props {
   categories: Category[];
   currentSlug?: string;
   lang: Lang;
-  socialLogos?: SocialLogo[];
   categoryPostCounts?: Record<string, number>;
   totalPostCount?: number;
+  layout?: "sidebar" | "toolbar";
 }
 
 const {
   categories,
   currentSlug,
   lang,
-  socialLogos = [],
   categoryPostCounts = {},
   totalPostCount = 0,
+  layout = "sidebar",
 } = Astro.props;
-
-const formatUrl = (url: string) =>
-  url?.startsWith("http") ? url : `https://${url}`;
 
 const copy = {
   categories:
     lang === "es" ? "Categorías" : lang === "pt" ? "Categorias" : "Categories",
-  viewAll:
-    lang === "es"
-      ? `Ver todo (${totalPostCount})`
-      : lang === "pt"
-        ? `Ver todos (${totalPostCount})`
-        : `View all (${totalPostCount})`,
-  followUs:
-    lang === "es" ? "Síguenos" : lang === "pt" ? "Siga-nos" : "Follow us",
+  viewAll: lang === "es" ? "Todos" : lang === "pt" ? "Todos" : "All",
   navLabel:
     lang === "es"
       ? "Categorías del blog"
@@ -57,210 +41,196 @@ const copy = {
         : "Blog categories",
 };
 
-const getSocialBrandStyle = (label: string = "", url: string = "") => {
-  const text = `${label} ${url}`.toLowerCase();
-  if (text.includes("youtube")) return "--social-brand: #FF0000;";
-  if (text.includes("facebook")) return "--social-brand: #1877F2;";
-  if (text.includes("instagram") || text.includes("insta"))
-    return "--social-brand: #E4405F;";
-  if (text.includes("pinterest") || text.includes("pint"))
-    return "--social-brand: #BD081C;";
-  if (text.includes("tiktok")) return "--social-brand: #000000;";
-  if (text.includes("twitter") || text.includes("x.com"))
-    return "--social-brand: #1DA1F2;";
-  return "--social-brand: var(--primary);";
-};
+const allHref = rewriteUrl("/blog", lang);
+const currentCategoryLabel =
+  categories.find((category) => category.slug === currentSlug)?.nombre ??
+  copy.viewAll;
+const mobileCategoryOptions: BlogCategoryOption[] = [
+  {
+    slug: "",
+    label: copy.viewAll,
+    href: allHref,
+    count: totalPostCount,
+    active: !currentSlug,
+  },
+  ...categories.map((category) => ({
+    slug: category.slug,
+    label: category.nombre,
+    href: rewriteUrl(`/blog/${category.slug}`, lang),
+    count: categoryPostCounts[category.slug] ?? 0,
+    active: currentSlug === category.slug,
+  })),
+];
 ---
 
-<aside class="w-full shrink-0 lg:w-80 xl:w-[21rem]">
-  <section
-    aria-labelledby="blog-aside-title"
-    class="blog-aside-card relative overflow-hidden rounded-[3px] border border-[var(--blog-aside-border)] p-5 lg:sticky lg:top-10"
-  >
-    <header
-      class="mb-5 flex items-center justify-between gap-4 border-b border-[var(--blog-aside-border)] pb-4"
+{
+  layout === "toolbar" ? (
+    <aside
+      class="blog-category-toolbar w-full"
+      aria-labelledby="blog-category-toolbar-title"
     >
-      <h2
-        id="blog-aside-title"
-        class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-foreground/58"
-      >
+      <h2 id="blog-category-toolbar-title" class="sr-only">
         {copy.categories}
       </h2>
-      <a
-        href={rewriteUrl("/blog", lang)}
-        class={`shrink-0 text-xs font-semibold transition-colors duration-200 ${
-          !currentSlug
-            ? "font-bold text-foreground"
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-      >
-        {copy.viewAll}
-      </a>
-    </header>
 
-    <nav class="flex flex-col gap-1.5" aria-label={copy.navLabel}>
-      {
-        categories.map((cat: Category) => {
+      <div class="sm:hidden">
+        <BlogCategoryDropdown
+          client:load
+          label={copy.categories}
+          currentLabel={currentCategoryLabel}
+          options={mobileCategoryOptions}
+        />
+      </div>
+
+      <nav class="hidden gap-2 sm:flex sm:flex-wrap" aria-label={copy.navLabel}>
+        <a
+          href={allHref}
+          aria-current={!currentSlug ? "page" : undefined}
+          class:list={[
+            "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+            !currentSlug
+              ? "border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
+              : "border-secondary/55 bg-card text-foreground/70 hover:border-secondary hover:text-foreground",
+          ]}
+        >
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="m8.5 15.5 7-7M9 9h.01M15 15h.01" />
+          </svg>
+          {copy.viewAll}
+          <span
+            class:list={[
+              "text-xs",
+              !currentSlug ? "text-white/72" : "text-muted-foreground",
+            ]}
+          >
+            {totalPostCount}
+          </span>
+        </a>
+
+        {categories.map((cat: Category) => {
           const isActive = currentSlug === cat.slug;
           const count = categoryPostCounts[cat.slug] ?? 0;
           return (
             <a
               href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-              class={`blog-aside-link relative flex items-center justify-between gap-3 rounded-[3px] border px-3 py-2.5 text-[14px] transition-all duration-200 ${
+              aria-current={isActive ? "page" : undefined}
+              class:list={[
+                "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
                 isActive
-                  ? "is-active border-[var(--blog-aside-border-strong)] bg-[var(--blog-aside-active)] font-semibold text-foreground shadow-[0_4px_12px_var(--blog-aside-glow)] before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-full before:bg-[var(--blog-aside-mark)]"
-                  : "border-transparent text-foreground/78 hover:border-[var(--blog-aside-border-strong)] hover:bg-[var(--blog-aside-hover)] hover:text-foreground hover:shadow-[0_10px_24px_var(--blog-aside-hover-shadow)]"
-              }`}
+                  ? "border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
+                  : "border-secondary/55 bg-card text-foreground/70 hover:border-secondary hover:text-foreground hover:shadow-sm",
+              ]}
             >
-              <div class="flex items-center gap-3 min-w-0">
-                <span
-                  class={`shrink-0 flex items-center justify-center transition-colors duration-200 ${
-                    isActive
-                      ? "text-[var(--blog-aside-mark)]"
-                      : "text-foreground/52"
-                  }`}
-                  set:html={getCategoryIcon(cat.slug)}
-                />
-                <span class="truncate">{cat.nombre}</span>
-              </div>
               <span
-                class={`shrink-0 text-xs transition-colors duration-200 ${
-                  isActive
-                    ? "font-semibold text-foreground/62"
-                    : "text-foreground/50"
-                }`}
+                class:list={[
+                  "grid size-4 place-items-center",
+                  isActive ? "text-white" : "text-primary",
+                ]}
+                set:html={getCategoryIcon(cat.slug)}
+              />
+              <span>{cat.nombre}</span>
+              <span
+                class:list={[
+                  "text-xs",
+                  isActive ? "text-white/72" : "text-muted-foreground",
+                ]}
               >
-                ({count})
+                {count}
               </span>
             </a>
           );
-        })
-      }
-    </nav>
-
-    {
-      Array.isArray(socialLogos) && socialLogos.length > 0 && (
-        <section
-          class="mt-6 border-t border-[var(--blog-aside-border)] pt-6"
-          aria-labelledby="blog-aside-social-title"
-        >
+        })}
+      </nav>
+    </aside>
+  ) : (
+    <aside class="w-full shrink-0 lg:w-80 xl:w-[21rem]">
+      <section
+        aria-labelledby="blog-aside-title"
+        class="blog-aside-card relative overflow-hidden rounded-xl border border-[var(--blog-aside-border)] p-5 lg:sticky lg:top-10"
+      >
+        <header class="mb-5 flex items-center justify-between gap-4 border-b border-[var(--blog-aside-border)] pb-4">
           <h2
-            id="blog-aside-social-title"
-            class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-foreground/58"
+            id="blog-aside-title"
+            class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/58"
           >
-            {copy.followUs}
+            {copy.categories}
           </h2>
-          <div class="flex flex-wrap gap-2.5">
-            {socialLogos.map((social: SocialLogo) => (
+          <a
+            href={allHref}
+            class:list={[
+              "shrink-0 text-xs font-semibold transition-colors duration-200",
+              !currentSlug
+                ? "font-bold text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            ]}
+          >
+            {copy.viewAll} ({totalPostCount})
+          </a>
+        </header>
+
+        <nav class="flex flex-col gap-1.5" aria-label={copy.navLabel}>
+          {categories.map((cat: Category) => {
+            const isActive = currentSlug === cat.slug;
+            const count = categoryPostCounts[cat.slug] ?? 0;
+            return (
               <a
-                href={formatUrl(social.url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={social.label || "Social"}
-                aria-label={social.label || "Social"}
-                class="social-brand-link group flex size-11 items-center justify-center rounded-[3px] border border-[var(--blog-aside-border)] bg-card transition-all duration-300 ease-out hover:-translate-y-1"
-                style={getSocialBrandStyle(social.label, social.url)}
+                href={rewriteUrl(`/blog/${cat.slug}`, lang)}
+                aria-current={isActive ? "page" : undefined}
+                class:list={[
+                  "blog-aside-link relative flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm transition duration-200",
+                  isActive
+                    ? "is-active border-primary/20 bg-primary/8 font-semibold text-foreground before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-full before:bg-primary"
+                    : "border-transparent text-foreground/78 hover:border-border hover:bg-muted hover:text-foreground",
+                ]}
               >
-                {social.imagen?.url ? (
-                  <img
-                    src={getImageUrl(social.imagen)}
-                    alt={social.label || "Social"}
-                    class="h-6 w-6 object-contain brightness-0 opacity-70 transition-all duration-300 ease-out group-hover:brightness-0 group-hover:invert group-hover:opacity-100"
-                    loading="lazy"
-                    decoding="async"
+                <span class="flex min-w-0 items-center gap-3">
+                  <span
+                    class:list={[
+                      "grid size-4 shrink-0 place-items-center",
+                      isActive ? "text-primary" : "text-foreground/52",
+                    ]}
+                    set:html={getCategoryIcon(cat.slug)}
                   />
-                ) : (
-                  <span class="text-xs font-bold uppercase text-foreground/70 transition-colors duration-300 ease-out group-hover:text-white">
-                    {(social.label || "S").charAt(0)}
-                  </span>
-                )}
+                  <span class="truncate">{cat.nombre}</span>
+                </span>
+                <span class="shrink-0 text-xs text-muted-foreground">
+                  ({count})
+                </span>
               </a>
-            ))}
-          </div>
-        </section>
-      )
-    }
-  </section>
-</aside>
+            );
+          })}
+        </nav>
+      </section>
+    </aside>
+  )
+}
 
 <style>
+  .blog-category-pill:hover {
+    translate: 0 -2px;
+  }
+
   .blog-aside-card {
-    --blog-aside-active: linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--primary) 10%, white) 0%,
-      color-mix(in oklab, var(--secondary) 7%, white) 100%
-    );
-    --blog-aside-hover: linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--primary) 6%, white) 0%,
-      color-mix(in oklab, var(--accent-warm) 12%, white) 100%
-    );
-    --blog-aside-border-strong: color-mix(
-      in oklab,
-      var(--primary) 26%,
-      var(--border)
-    );
-    --blog-aside-mark: color-mix(
-      in oklab,
-      var(--primary) 72%,
-      var(--secondary)
-    );
-    --blog-aside-glow: color-mix(in oklab, var(--foreground) 7%, transparent);
-    --blog-aside-hover-shadow: color-mix(
-      in oklab,
-      var(--foreground) 10%,
-      transparent
-    );
-    background: linear-gradient(
-      180deg,
-      var(--blog-aside-surface) 0%,
-      var(--card) 54%,
-      color-mix(in oklab, var(--muted) 36%, white) 100%
-    );
-    box-shadow:
-      0 18px 55px var(--blog-card-shadow),
-      inset 0 1px 0 color-mix(in oklab, white 86%, transparent);
-  }
-
-  .blog-aside-card::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      color-mix(in oklab, var(--foreground) 16%, transparent),
-      transparent
-    );
-  }
-
-  .blog-aside-link {
-    outline-offset: 3px;
+    background: linear-gradient(180deg, var(--blog-aside-surface), var(--card));
+    box-shadow: 0 18px 55px var(--blog-card-shadow);
   }
 
   .blog-aside-link:hover {
     translate: 4px 0;
   }
 
-  .blog-aside-link.is-active {
-    translate: 2px 0;
-  }
-
-  .blog-aside-link:focus-visible {
-    outline: 2px solid color-mix(in oklab, var(--primary) 42%, white);
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .blog-aside-link,
-    .blog-aside-link:hover,
-    .blog-aside-link.is-active {
+    .blog-category-pill:hover,
+    .blog-aside-link:hover {
       translate: none;
     }
-  }
-
-  .social-brand-link:hover {
-    background-color: var(--social-brand) !important;
-    border-color: var(--social-brand) !important;
   }
 </style>

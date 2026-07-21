@@ -1,8 +1,10 @@
 ---
 import Layout from "@/layouts/main.astro";
-import CardPost from "@/components/ui/CardPost.astro";
-import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogFeaturedPosts from "@/components/blog/BlogFeaturedPosts.astro";
 import BlogPagination from "@/components/blog/BlogPagination.astro";
+import BlogAside from "@/components/ui/BlogAside.astro";
+import BlogContactCta from "@/components/ui/BlogContactCta.astro";
+import CardPost from "@/components/ui/CardPost.astro";
 import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
 import { buildBlogIndexSchemas } from "@/lib/pageSchema";
@@ -16,40 +18,53 @@ interface Props extends BlogListProps {
 const {
   page,
   allCategories,
-  socialLogos,
   categoryPostCounts,
   totalPostCount,
   lang = DEFAULT_LANG,
 } = Astro.props;
 
 const blogsList = page.data;
-const featuredBlog = page.currentPage === 1 ? blogsList[0] : null;
-const remainingBlogs = featuredBlog ? blogsList.slice(1) : blogsList;
+const featuredBlogs = page.currentPage === 1 ? blogsList.slice(0, 3) : [];
+const remainingBlogs =
+  featuredBlogs.length > 0 ? blogsList.slice(3) : blogsList;
 
 const blogSeoByLang: Record<
   Lang,
-  { title: string; description: string; pageLabel: string; empty: string }
+  {
+    title: string;
+    description: string;
+    heading: string;
+    eyebrow: string;
+    pageLabel: string;
+    empty: string;
+  }
 > = {
   en: {
     title: "Travel Blog - Peru and Bolivia Tours | Dreamy Tours",
     description:
       "Travel guides, tips and destination inspiration for Peru, Bolivia, Machu Picchu, Lake Titicaca and Uyuni.",
+    heading: "Guides, ideas and inspiration for your next journey",
+    eyebrow: "Travel blog",
     pageLabel: "Page",
     empty: "No blog posts available",
   },
   es: {
     title: "Blog de Viajes - Tours en Peru y Bolivia | Dreamy Tours",
     description:
-      "Guias de viaje, consejos e inspiracion para Peru, Bolivia, Machu Picchu, Lago Titicaca y Uyuni.",
-    pageLabel: "Pagina",
+      "Guías de viaje, consejos e inspiración para descubrir Perú, Bolivia, Machu Picchu, el Lago Titicaca y Uyuni.",
+    heading: "Guías, consejos e inspiración para tu próximo viaje",
+    eyebrow: "Blog de viajes",
+    pageLabel: "Página",
     empty: "No hay blogs disponibles",
   },
   pt: {
     title: "Blog de Viagens - Tours no Peru e Bolivia | Dreamy Tours",
     description:
-      "Guias de viagem, dicas e inspiracao para Peru, Bolivia, Machu Picchu, Lago Titicaca e Uyuni.",
-    pageLabel: "Pagina",
-    empty: "Nao ha posts disponiveis",
+      "Guias de viagem, dicas e inspiração para descobrir Peru, Bolívia, Machu Picchu, Lago Titicaca e Uyuni.",
+    heading: "Guias, dicas e inspiração para sua próxima viagem",
+    eyebrow: "Blog de viagens",
+    pageLabel: "Página",
+    empty: "Não há posts disponíveis",
   },
 };
 const blogSeo = blogSeoByLang[lang];
@@ -79,70 +94,87 @@ const seoProps = buildSEOProps({
     class="blog-page-shell relative isolate overflow-hidden"
     aria-labelledby="blog-index-title"
   >
-    <div class="blog-index-page w-full py-16 md:py-24">
-      <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header class="mx-auto mb-12 max-w-4xl text-center md:mb-16">
-          <p
-            class="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-secondary"
-          >
-            Dreamy Journal
-          </p>
-          <h1
-            id="blog-index-title"
-            class="text-4xl font-semibold leading-[0.98] text-primary md:text-6xl lg:text-7xl"
-          >
-            Blog
-          </h1>
-          <p
-            class="mx-auto mt-6 max-w-2xl text-base leading-7 text-foreground/68 md:text-lg"
-          >
-            {blogSeo.description}
-          </p>
-        </header>
+    <div
+      class="mx-auto w-full max-w-8xl px-4 pb-16 pt-8 sm:px-6 md:pb-20 md:pt-10 lg:px-8"
+    >
+      {
+        featuredBlogs.length > 0 && (
+          <BlogFeaturedPosts blogs={featuredBlogs} lang={lang} />
+        )
+      }
 
-        <section
-          class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_22rem]"
+      <header
+        class:list={[
+          "max-w-5xl",
+          featuredBlogs.length > 0 ? "mt-14 md:mt-20" : "mt-8 md:mt-12",
+        ]}
+      >
+        <p
+          class="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.16em] text-secondary"
         >
-          <div class="w-full min-w-0">
-            {
-              blogsList.length > 0 ? (
-                <>
-                  <div class="blog-post-grid">
-                    {featuredBlog && (
-                      <CardPost
-                        blog={featuredBlog}
-                        lang={lang}
-                        isFeatured
-                        showDescription
-                      />
-                    )}
-                    {remainingBlogs.map((blog: Blog) => (
-                      <CardPost blog={blog} lang={lang} />
-                    ))}
-                  </div>
+          {blogSeo.eyebrow}
+          <span class="h-px w-12 bg-secondary/45" aria-hidden="true"></span>
+        </p>
+        <h1
+          id="blog-index-title"
+          class="text-3xl font-semibold leading-[1.04] tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl lg:text-[3.35rem]"
+        >
+          {blogSeo.heading}
+        </h1>
+        <p
+          class="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg"
+        >
+          {blogSeo.description}
+        </p>
+      </header>
 
-                  <BlogPagination page={page} lang={lang} />
-                </>
-              ) : (
-                <p class="text-center text-muted-foreground">{blogSeo.empty}</p>
-              )
-            }
-          </div>
-
-          <BlogAside
-            categories={allCategories}
-            lang={lang}
-            socialLogos={socialLogos}
-            categoryPostCounts={categoryPostCounts}
-            totalPostCount={totalPostCount}
-          />
-        </section>
+      <div class="mt-7">
+        <BlogAside
+          categories={allCategories}
+          lang={lang}
+          categoryPostCounts={categoryPostCounts}
+          totalPostCount={totalPostCount}
+          layout="toolbar"
+        />
       </div>
+
+      <section class="mt-8" aria-label={blogSeo.heading}>
+        {
+          blogsList.length > 0 ? (
+            <>
+              {remainingBlogs.length > 0 ? (
+                <div class="blog-post-grid">
+                  {remainingBlogs.map((blog: Blog) => (
+                    <CardPost blog={blog} lang={lang} showDescription />
+                  ))}
+                </div>
+              ) : null}
+
+              <BlogPagination page={page} lang={lang} />
+            </>
+          ) : (
+            <p class="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
+              {blogSeo.empty}
+            </p>
+          )
+        }
+      </section>
+
+      {blogsList.length > 0 && <BlogContactCta lang={lang} />}
     </div>
   </section>
 </Layout>
 
 <style>
+  .blog-page-shell {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--blog-surface) 58%, white) 0%,
+      var(--background) 38%,
+      color-mix(in oklab, var(--blog-surface) 38%, white) 100%
+    );
+  }
+
   .blog-page-shell::before {
     position: absolute;
     inset: 0;
@@ -152,30 +184,32 @@ const seoProps = buildSEOProps({
     background-repeat: repeat;
     background-size: 520px 520px;
     content: "";
-    opacity: 0.035;
+    opacity: 0.025;
     pointer-events: none;
-  }
-
-  .blog-index-page {
-    background: transparent;
   }
 
   .blog-post-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(1rem, 1.5vw, 1.5rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
     align-items: stretch;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     .blog-post-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
     .blog-post-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .blog-post-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 </style>

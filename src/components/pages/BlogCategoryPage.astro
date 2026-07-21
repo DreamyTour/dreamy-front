@@ -20,7 +20,6 @@ const {
   allCategories,
   currentCategory,
   categorySlug,
-  socialLogos,
   slugMap,
   categoryPostCounts,
   totalPostCount,
@@ -145,28 +144,33 @@ const seoProps =
     }
 
     <div class="blog-category-page py-12 lg:py-16">
-      <div
-        class="max-w-8xl mx-auto grid gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14 lg:px-8 xl:grid-cols-[minmax(0,1fr)_22rem]"
-      >
+      <div class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
         <div class="w-full min-w-0">
           {
             currentCategory?.descripcion && (
-              <p class="mb-8 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
+              <p class="mb-7 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
                 {currentCategory.descripcion}
               </p>
             )
           }
+
+          <div class="mb-8">
+            <BlogAside
+              categories={allCategories}
+              currentSlug={categorySlug}
+              lang={lang}
+              categoryPostCounts={categoryPostCounts}
+              totalPostCount={totalPostCount}
+              layout="toolbar"
+            />
+          </div>
+
           {
             blogsList.length > 0 ? (
               <>
                 <div class="blog-category-grid">
-                  {blogsList.map((blog: Blog, index: number) => (
-                    <CardPost
-                      blog={blog}
-                      lang={lang}
-                      isFeatured={index === 0}
-                      showDescription={index === 0 || index === 1}
-                    />
+                  {blogsList.map((blog: Blog) => (
+                    <CardPost blog={blog} lang={lang} showDescription />
                   ))}
                 </div>
 
@@ -179,15 +183,6 @@ const seoProps =
             )
           }
         </div>
-
-        <BlogAside
-          categories={allCategories}
-          currentSlug={categorySlug}
-          lang={lang}
-          socialLogos={socialLogos}
-          categoryPostCounts={categoryPostCounts}
-          totalPostCount={totalPostCount}
-        />
       </div>
     </div>
   </section>
@@ -213,20 +208,26 @@ const seoProps =
 
   .blog-category-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
     align-items: stretch;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     .blog-category-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1024px) {
     .blog-category-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .blog-category-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 </style>

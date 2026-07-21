@@ -1,0 +1,244 @@
+---
+import type { Lang } from "@/lib/i18n";
+import { getImageAlt, getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
+import type { Blog } from "@/types/blog";
+
+interface Props {
+  blogs: Blog[];
+  lang: Lang;
+}
+
+const { blogs, lang } = Astro.props;
+
+const locale = lang === "es" ? "es-ES" : lang === "pt" ? "pt-BR" : "en-US";
+const readingLabel =
+  lang === "es"
+    ? "min de lectura"
+    : lang === "pt"
+      ? "min de leitura"
+      : "min read";
+const readArticleLabel =
+  lang === "es"
+    ? "Leer articulo"
+    : lang === "pt"
+      ? "Ler artigo"
+      : "Read article";
+
+function extractPlainText(value: unknown): string {
+  if (!value) return "";
+  if (typeof value === "string") {
+    return value
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&[^;]+;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  if (Array.isArray(value)) {
+    return value
+      .map(extractPlainText)
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    return [
+      typeof record.text === "string" ? record.text : "",
+      extractPlainText(record.children),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  return "";
+}
+
+function getReadingMinutes(content: unknown): number {
+  const words = extractPlainText(content).split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 210));
+}
+
+function formatDate(date: string | undefined): string | null {
+  if (!date) return null;
+  return new Date(date).toLocaleDateString(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+---
+
+{
+  blogs.length > 0 && (
+    <section
+      class="featured-posts"
+      aria-label={
+        lang === "es"
+          ? "Articulos recientes"
+          : lang === "pt"
+            ? "Artigos recentes"
+            : "Latest articles"
+      }
+    >
+      {blogs.map((blog, index) => {
+        const isMain = index === 0;
+        const imageUrl = getImageUrl(
+          blog.portadaImage,
+          isMain ? "large" : "medium",
+        );
+        const imageSrcSet = getImageSrcSet(blog.portadaImage, [
+          "small",
+          "medium",
+          "large",
+        ]);
+        const imageAlt = getImageAlt(blog.portadaImage, blog.titulo);
+        const publishedDate = formatDate(blog.publishedAt || blog.createdAt);
+        const category = blog.category_blogs?.[0]?.nombre;
+        const plainContent = extractPlainText(blog.contenido);
+        const excerpt =
+          plainContent.length > 190
+            ? `${plainContent.slice(0, 187).trimEnd()}...`
+            : plainContent;
+
+        return (
+          <article
+            class:list={[
+              "featured-post group",
+              isMain && "featured-post--main",
+            ]}
+          >
+            <a
+              href={rewriteUrl(`/blog/${blog.slug}`, lang)}
+              aria-label={`${readArticleLabel}: ${blog.titulo}`}
+              class="relative flex h-full overflow-hidden rounded-2xl bg-primary text-white shadow-[0_18px_45px_-24px_rgba(10,35,24,0.55)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_58px_-24px_rgba(10,35,24,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-4 motion-reduce:transform-none"
+            >
+              {imageUrl && imageUrl !== "/og-default.jpg" ? (
+                <img
+                  src={imageUrl}
+                  srcset={imageSrcSet || undefined}
+                  sizes={
+                    isMain
+                      ? "(max-width: 1023px) 100vw, 66vw"
+                      : "(max-width: 1023px) 100vw, 33vw"
+                  }
+                  alt={imageAlt}
+                  width="1200"
+                  height="800"
+                  class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.035] motion-reduce:transform-none"
+                  loading="eager"
+                  fetchpriority={isMain ? "high" : "auto"}
+                  decoding="async"
+                />
+              ) : (
+                <div class="absolute inset-0 bg-[linear-gradient(145deg,color-mix(in_oklab,var(--primary)_88%,black),color-mix(in_oklab,var(--secondary)_42%,var(--primary)))]" />
+              )}
+
+              <div
+                class="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,14,10,0.04)_20%,rgba(4,14,10,0.86)_100%)]"
+                aria-hidden="true"
+              />
+
+              <div
+                class:list={[
+                  "relative mt-auto flex w-full flex-col items-start",
+                  isMain ? "gap-3 p-6 sm:p-8 lg:p-9" : "gap-2.5 p-5 sm:p-6",
+                ]}
+              >
+                {category && (
+                  <span class="inline-flex rounded-full bg-secondary px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.1em] text-secondary-foreground shadow-sm">
+                    {category}
+                  </span>
+                )}
+
+                <h2
+                  class:list={[
+                    "max-w-4xl font-semibold leading-[1.06] text-white drop-shadow-sm",
+                    isMain
+                      ? "text-3xl sm:text-4xl lg:text-[2.6rem]"
+                      : "text-xl sm:text-2xl",
+                  ]}
+                >
+                  {blog.titulo}
+                </h2>
+
+                {isMain && (
+                  <p class="hidden max-w-3xl text-base leading-6 text-white/86 sm:line-clamp-2">
+                    {excerpt}
+                  </p>
+                )}
+
+                <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-white/88 sm:text-sm">
+                  {publishedDate && (
+                    <span class="inline-flex items-center gap-2">
+                      <svg
+                        class="size-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        aria-hidden="true"
+                      >
+                        <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z" />
+                      </svg>
+                      {publishedDate}
+                    </span>
+                  )}
+                  <span class="inline-flex items-center gap-2">
+                    <svg
+                      class="size-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" />
+                    </svg>
+                    {getReadingMinutes(blog.contenido)} {readingLabel}
+                  </span>
+                </div>
+              </div>
+            </a>
+          </article>
+        );
+      })}
+    </section>
+  )
+}
+
+<style>
+  .featured-posts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .featured-post {
+    min-height: 18rem;
+  }
+
+  .featured-post--main {
+    min-height: 25rem;
+  }
+
+  @media (min-width: 1024px) {
+    .featured-posts {
+      grid-template-columns: minmax(0, 1.85fr) minmax(19rem, 1fr);
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      min-height: 34rem;
+    }
+
+    .featured-post {
+      min-height: 0;
+    }
+
+    .featured-post--main {
+      grid-row: 1 / span 2;
+      min-height: 34rem;
+    }
+  }
+</style>
