@@ -89,7 +89,11 @@ const {
   relatedBlogs,
   categoryPostCounts,
   totalPostCount,
+  globalData,
 } = Astro.props as BlogPostProps;
+
+const socialLogos =
+  globalData?.footer?.socialLogo || globalData?.socialLogo || [];
 
 const heroImage = getImageUrl(blog.portadaImage, "large");
 const heroImageAlt = getImageAlt(blog.portadaImage, blog.titulo);
@@ -477,6 +481,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
           lang={lang}
           categoryPostCounts={categoryPostCounts}
           totalPostCount={totalPostCount}
+          socialLogos={socialLogos}
         />
       </div>
     </section>

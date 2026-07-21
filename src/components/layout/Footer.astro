@@ -10,6 +10,7 @@ import type { Footer as FooterType } from "@/types/global";
 import type { Lang } from "@/lib/i18n";
 import { getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
+import { normalizeWhatsAppUrl } from "@/lib/socialLinks";
 
 interface Props {
   data?: FooterType;
@@ -17,13 +18,6 @@ interface Props {
 }
 
 const { data, lang } = Astro.props;
-
-const whatsappUrl = "https://wa.me/51969787221";
-const isWhatsAppLink = (label?: string, url?: string) =>
-  /whatsapp/i.test(label || "") ||
-  /(?:wa\.me|api\.whatsapp\.com|whatsapp\.com)/i.test(url || "");
-const normalizeWhatsAppUrl = (label?: string, url?: string) =>
-  isWhatsAppLink(label, url) ? whatsappUrl : url;
 ---
 
 <footer

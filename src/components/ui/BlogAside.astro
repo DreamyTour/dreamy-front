@@ -2,9 +2,17 @@
 import type { Lang } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 import { getCategoryIcon } from "@/lib/blogCategories";
+import { getImageUrl } from "@/lib/helpers";
+import {
+  isWhatsAppLink,
+  normalizeWhatsAppUrl,
+  WHATSAPP_URL,
+} from "@/lib/socialLinks";
 import BlogCategoryDropdown, {
   type BlogCategoryOption,
 } from "@/components/blog/BlogCategoryDropdown";
+import { WhatsAppIcon } from "@/components/icons/SocialContactIcons";
+import type { Logo } from "@/types/common";
 
 interface Category {
   slug: string;
@@ -18,6 +26,7 @@ interface Props {
   categoryPostCounts?: Record<string, number>;
   totalPostCount?: number;
   layout?: "sidebar" | "toolbar";
+  socialLogos?: Logo[];
 }
 
 const {
@@ -27,6 +36,7 @@ const {
   categoryPostCounts = {},
   totalPostCount = 0,
   layout = "sidebar",
+  socialLogos = [],
 } = Astro.props;
 
 const copy = {
@@ -39,6 +49,21 @@ const copy = {
       : lang === "pt"
         ? "Categorias do blog"
         : "Blog categories",
+  followUs:
+    lang === "es" ? "Síguenos" : lang === "pt" ? "Siga-nos" : "Follow us",
+  socialLabel:
+    lang === "es"
+      ? "Redes sociales"
+      : lang === "pt"
+        ? "Redes sociais"
+        : "Social media",
+  visitSocial: lang === "es" ? "Visitar" : lang === "pt" ? "Visitar" : "Visit",
+  travelerReviews:
+    lang === "es"
+      ? "Opiniones de viajeros"
+      : lang === "pt"
+        ? "Avaliações de viajantes"
+        : "Traveler reviews",
 };
 
 const allHref = rewriteUrl("/blog", lang);
@@ -61,6 +86,88 @@ const mobileCategoryOptions: BlogCategoryOption[] = [
     active: currentSlug === category.slug,
   })),
 ];
+
+function getSocialName(label?: string, url?: string) {
+  const cleanLabel = label?.replace(/\s*logo\s*/gi, "").trim();
+  if (cleanLabel) return cleanLabel;
+
+  try {
+    const hostname = new URL(url || "").hostname.replace(/^www\./, "");
+    return hostname.split(".")[0] || "Social";
+  } catch {
+    return "Social";
+  }
+}
+
+function getSocialDetail(name: string, url: string) {
+  if (/whatsapp/i.test(name)) return "+51 969 787 221";
+  if (/facebook/i.test(name)) return "Dreamy Tours";
+  if (/tripadvisor/i.test(name)) return copy.travelerReviews;
+
+  try {
+    const pathname = new URL(url).pathname.replace(/^\/+|\/+$/g, "");
+    if (!pathname) return "Dreamy Tours";
+    const handle = pathname.split("/")[0];
+    return handle.startsWith("@") ? handle : `@${handle}`;
+  } catch {
+    return "Dreamy Tours";
+  }
+}
+
+function getSocialTone(name: string) {
+  if (/facebook/i.test(name)) return "bg-[#2563eb]";
+  if (/instagram/i.test(name))
+    return "bg-[linear-gradient(135deg,#7c3aed,#ec4899,#f97316)]";
+  if (/whatsapp/i.test(name)) return "bg-[#20bd5a]";
+  if (/youtube/i.test(name)) return "bg-[#ff0033]";
+  if (/tripadvisor/i.test(name)) return "bg-[#00aa6c]";
+  if (/pinterest/i.test(name)) return "bg-[#bd081c]";
+  if (/tiktok/i.test(name)) return "bg-[#111827]";
+  return "bg-primary";
+}
+
+type SidebarSocialLink = {
+  id: number;
+  name: string;
+  href: string;
+  detail: string;
+  tone: string;
+  isWhatsApp: boolean;
+  imagen?: Logo["imagen"];
+};
+
+const footerSocialLinks: SidebarSocialLink[] = socialLogos
+  .filter((social) => social.url && !isWhatsAppLink(social.label, social.url))
+  .map((social) => {
+    const name = getSocialName(social.label, social.url);
+    return {
+      id: social.id,
+      imagen: social.imagen,
+      name,
+      href: normalizeWhatsAppUrl(social.label, social.url) || social.url,
+      detail: getSocialDetail(name, social.url),
+      tone: getSocialTone(name),
+      isWhatsApp: false,
+    };
+  });
+
+const whatsappSocialLink: SidebarSocialLink = {
+  id: -1,
+  name: "WhatsApp",
+  href: WHATSAPP_URL,
+  detail: "+51 969 787 221",
+  tone: getSocialTone("WhatsApp"),
+  isWhatsApp: true,
+};
+const instagramIndex = footerSocialLinks.findIndex((social) =>
+  /instagram/i.test(social.name),
+);
+const sidebarSocialLinks = [...footerSocialLinks];
+sidebarSocialLinks.splice(
+  instagramIndex >= 0 ? instagramIndex + 1 : 0,
+  0,
+  whatsappSocialLink,
+);
 ---
 
 {
@@ -152,63 +259,168 @@ const mobileCategoryOptions: BlogCategoryOption[] = [
     </aside>
   ) : (
     <aside class="w-full shrink-0 lg:w-80 xl:w-[21rem]">
-      <section
-        aria-labelledby="blog-aside-title"
-        class="blog-aside-card relative overflow-hidden rounded-xl border border-[var(--blog-aside-border)] p-5 lg:sticky lg:top-10"
-      >
-        <header class="mb-5 flex items-center justify-between gap-4 border-b border-[var(--blog-aside-border)] pb-4">
-          <h2
-            id="blog-aside-title"
-            class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/58"
-          >
-            {copy.categories}
-          </h2>
-          <a
-            href={allHref}
-            class:list={[
-              "shrink-0 text-xs font-semibold transition-colors duration-200",
-              !currentSlug
-                ? "font-bold text-foreground"
-                : "text-muted-foreground hover:text-foreground",
-            ]}
-          >
-            {copy.viewAll} ({totalPostCount})
-          </a>
-        </header>
+      <div class="flex flex-col gap-5">
+        <section
+          aria-labelledby="blog-aside-title"
+          class="blog-aside-card relative overflow-hidden rounded-xl border border-border bg-card p-4"
+        >
+          <header class="mb-4 border-b border-border px-1 pb-4">
+            <h2
+              id="blog-aside-title"
+              class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-foreground/65"
+            >
+              <span class="h-px w-6 bg-secondary" aria-hidden="true" />
+              {copy.categories}
+            </h2>
+          </header>
 
-        <nav class="flex flex-col gap-1.5" aria-label={copy.navLabel}>
-          {categories.map((cat: Category) => {
-            const isActive = currentSlug === cat.slug;
-            const count = categoryPostCounts[cat.slug] ?? 0;
-            return (
-              <a
-                href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-                aria-current={isActive ? "page" : undefined}
+          <nav class="flex flex-col gap-2" aria-label={copy.navLabel}>
+            <a
+              href={allHref}
+              aria-current={!currentSlug ? "page" : undefined}
+              class:list={[
+                "blog-aside-link flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+                !currentSlug
+                  ? "is-active border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
+                  : "border-border bg-card text-foreground/70 hover:border-secondary/55 hover:text-foreground hover:shadow-sm",
+              ]}
+            >
+              <span class="flex min-w-0 items-center gap-3">
+                <svg
+                  class="size-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="m8.5 15.5 7-7M9 9h.01M15 15h.01" />
+                </svg>
+                <span class="truncate">{copy.viewAll}</span>
+              </span>
+              <span
                 class:list={[
-                  "blog-aside-link relative flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm transition duration-200",
-                  isActive
-                    ? "is-active border-primary/20 bg-primary/8 font-semibold text-foreground before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-full before:bg-primary"
-                    : "border-transparent text-foreground/78 hover:border-border hover:bg-muted hover:text-foreground",
+                  "shrink-0 text-xs",
+                  !currentSlug ? "text-white/72" : "text-muted-foreground",
                 ]}
               >
-                <span class="flex min-w-0 items-center gap-3">
+                {totalPostCount}
+              </span>
+            </a>
+
+            {categories.map((cat: Category) => {
+              const isActive = currentSlug === cat.slug;
+              const count = categoryPostCounts[cat.slug] ?? 0;
+              return (
+                <a
+                  href={rewriteUrl(`/blog/${cat.slug}`, lang)}
+                  aria-current={isActive ? "page" : undefined}
+                  class:list={[
+                    "blog-aside-link flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+                    isActive
+                      ? "is-active border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
+                      : "border-border bg-card text-foreground/70 hover:border-secondary/55 hover:text-foreground hover:shadow-sm",
+                  ]}
+                >
+                  <span class="flex min-w-0 items-center gap-3">
+                    <span
+                      class:list={[
+                        "grid size-4 shrink-0 place-items-center",
+                        isActive ? "text-white" : "text-primary",
+                      ]}
+                      set:html={getCategoryIcon(cat.slug)}
+                    />
+                    <span class="truncate">{cat.nombre}</span>
+                  </span>
                   <span
                     class:list={[
-                      "grid size-4 shrink-0 place-items-center",
-                      isActive ? "text-primary" : "text-foreground/52",
+                      "shrink-0 text-xs",
+                      isActive ? "text-white/72" : "text-muted-foreground",
                     ]}
-                    set:html={getCategoryIcon(cat.slug)}
-                  />
-                  <span class="truncate">{cat.nombre}</span>
-                </span>
-                <span class="shrink-0 text-xs text-muted-foreground">
-                  ({count})
-                </span>
-              </a>
-            );
-          })}
-        </nav>
-      </section>
+                  >
+                    {count}
+                  </span>
+                </a>
+              );
+            })}
+          </nav>
+        </section>
+
+        {sidebarSocialLinks.length > 0 && (
+          <section
+            aria-labelledby="blog-social-title"
+            class="blog-social-card overflow-hidden rounded-xl border border-border bg-card"
+          >
+            <header class="border-b border-border px-5 py-4">
+              <h2
+                id="blog-social-title"
+                class="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/65"
+              >
+                {copy.followUs}
+              </h2>
+            </header>
+
+            <ul class="flex flex-col gap-2.5 p-4" aria-label={copy.socialLabel}>
+              {sidebarSocialLinks.map((social) => (
+                <li>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${copy.visitSocial} ${social.name}`}
+                    class="blog-social-link group flex min-h-16 items-center gap-3 rounded-lg border border-transparent bg-muted/55 px-3 py-2.5 text-foreground transition duration-200 hover:border-border hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45"
+                  >
+                    <span
+                      class:list={[
+                        "grid size-10 shrink-0 place-items-center rounded-lg text-white shadow-sm",
+                        social.tone,
+                      ]}
+                      aria-hidden="true"
+                    >
+                      {social.isWhatsApp ? (
+                        <WhatsAppIcon className="size-5" />
+                      ) : (
+                        social.imagen?.url && (
+                          <img
+                            src={getImageUrl(social.imagen)}
+                            alt=""
+                            class="size-5 object-contain brightness-0 invert"
+                            width="20"
+                            height="20"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        )
+                      )}
+                    </span>
+
+                    <span class="min-w-0 flex-1">
+                      <span class="block truncate text-sm font-semibold leading-tight">
+                        {social.name}
+                      </span>
+                      <span class="mt-1 block truncate text-xs text-muted-foreground">
+                        {social.detail}
+                      </span>
+                    </span>
+
+                    <svg
+                      class="size-4 shrink-0 text-muted-foreground/60 transition duration-200 group-hover:translate-x-0.5 group-hover:text-foreground/65"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
     </aside>
   )
 }
@@ -219,8 +431,15 @@ const mobileCategoryOptions: BlogCategoryOption[] = [
   }
 
   .blog-aside-card {
-    background: linear-gradient(180deg, var(--blog-aside-surface), var(--card));
     box-shadow: 0 18px 55px var(--blog-card-shadow);
+  }
+
+  .blog-social-card {
+    box-shadow: 0 18px 55px var(--blog-card-shadow);
+  }
+
+  .blog-social-link:hover {
+    translate: 3px 0;
   }
 
   .blog-aside-link:hover {
@@ -229,7 +448,8 @@ const mobileCategoryOptions: BlogCategoryOption[] = [
 
   @media (prefers-reduced-motion: reduce) {
     .blog-category-pill:hover,
-    .blog-aside-link:hover {
+    .blog-aside-link:hover,
+    .blog-social-link:hover {
       translate: none;
     }
   }
