@@ -131,13 +131,15 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
 
     {
       blog.portadaImage ? (
-        <header class="relative mx-auto mt-8 h-[54vh] min-h-[420px] max-h-[620px] w-full max-w-8xl overflow-hidden rounded-sm">
+        <header class="relative h-[420px] w-full overflow-hidden sm:h-[500px] lg:h-[600px]">
           <img
             src={heroImage}
             srcset={heroImageSrcSet || undefined}
             sizes="100vw"
             alt=""
             aria-hidden="true"
+            width="2000"
+            height="600"
             class="absolute inset-0 h-full w-full object-cover"
             loading="eager"
             fetchpriority="high"
@@ -148,16 +150,16 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
             aria-hidden="true"
           />
 
-          <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col justify-end px-4 pb-12 md:px-8">
-            <div class="mb-4 flex flex-wrap gap-3">
+          <div class="relative z-10 mx-auto flex h-full max-w-8xl flex-col justify-end px-4 pb-7 sm:pb-9 md:px-8 md:pb-12">
+            <div class="mb-3 flex flex-wrap gap-3 sm:mb-4">
               {blog.category_blogs?.map((category: CategoryBlog) => (
-                <span class="rounded-[3px] border border-white/35 bg-black/20 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+                <span class="rounded-md border border-primary bg-primary px-3.5 py-1.5 text-xs font-semibold lowercase tracking-[0.04em] text-primary-foreground shadow-sm">
                   {category.nombre}
                 </span>
               ))}
             </div>
 
-            <h1 class="mb-4 max-w-5xl text-4xl font-semibold leading-[1.02] text-white drop-shadow-lg md:text-5xl lg:text-6xl">
+            <h1 class="mb-4 max-w-5xl text-3xl font-semibold leading-[1.02] text-white drop-shadow-lg sm:text-4xl md:text-5xl lg:text-6xl">
               {blog.titulo}
             </h1>
 
@@ -187,7 +189,7 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
         <header class="mx-auto max-w-8xl px-4 py-16 text-center md:px-8">
           <div class="mb-6 flex flex-wrap justify-center gap-3">
             {blog.category_blogs?.map((category: CategoryBlog) => (
-              <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+              <span class="rounded-md bg-primary px-3 py-1 text-xs font-semibold lowercase tracking-[0.04em] text-primary-foreground shadow-sm">
                 {category.nombre}
               </span>
             ))}
@@ -383,16 +385,26 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
 
                   if (block.type === "gallery") {
                     const images = (block as any).images || [];
+                    const isThreeImageGallery = images.length === 3;
                     const gridColsClass =
                       images.length === 2
                         ? "grid-cols-1 md:grid-cols-2"
-                        : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3";
+                        : isThreeImageGallery
+                          ? "grid-cols-2 md:grid-cols-3"
+                          : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3";
                     return (
                       <div class={`my-10 grid gap-4 ${gridColsClass}`}>
-                        {images.map((imgBlock: any) => {
+                        {images.map((imgBlock: any, imageIndex: number) => {
                           const image = imgBlock.image as BlogImage | undefined;
+                          const isLastMobileImage =
+                            isThreeImageGallery && imageIndex === 2;
                           return (
-                            <figure class="mx-auto flex w-full flex-col justify-between">
+                            <figure
+                              class:list={[
+                                "mx-auto flex w-full flex-col justify-between",
+                                isLastMobileImage && "col-span-2 md:col-span-1",
+                              ]}
+                            >
                               <img
                                 src={getImageUrl(image, "large")}
                                 srcset={
@@ -403,7 +415,13 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
                                     "large",
                                   ]) || undefined
                                 }
-                                sizes="(max-width: 1023px) 100vw, 33vw"
+                                sizes={
+                                  isThreeImageGallery
+                                    ? isLastMobileImage
+                                      ? "(max-width: 767px) 100vw, 33vw"
+                                      : "(max-width: 767px) 50vw, 33vw"
+                                    : "(max-width: 1023px) 100vw, 33vw"
+                                }
                                 alt={getImageAlt(image, "Blog image")}
                                 class="h-64 w-full rounded-sm border border-border bg-muted object-cover shadow-sm"
                                 loading="lazy"

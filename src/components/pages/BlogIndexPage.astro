@@ -20,6 +20,7 @@ const {
   allCategories,
   categoryPostCounts,
   totalPostCount,
+  socialLogos,
   lang = DEFAULT_LANG,
 } = Astro.props;
 
@@ -103,62 +104,79 @@ const seoProps = buildSEOProps({
         )
       }
 
-      <header
+      <div
         class:list={[
-          "max-w-5xl",
+          "grid items-start gap-8 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[21rem_minmax(0,1fr)] xl:gap-12",
           featuredBlogs.length > 0 ? "mt-14 md:mt-20" : "mt-8 md:mt-12",
         ]}
       >
-        <p
-          class="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.16em] text-secondary"
-        >
-          {blogSeo.eyebrow}
-          <span class="h-px w-12 bg-secondary/45" aria-hidden="true"></span>
-        </p>
-        <h1
-          id="blog-index-title"
-          class="text-3xl font-semibold leading-[1.04] tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl lg:text-[3.35rem]"
-        >
-          {blogSeo.heading}
-        </h1>
-        <p
-          class="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg"
-        >
-          {blogSeo.description}
-        </p>
-      </header>
+        <div class="lg:sticky lg:top-24">
+          <div class="lg:hidden">
+            <BlogAside
+              categories={allCategories}
+              lang={lang}
+              categoryPostCounts={categoryPostCounts}
+              totalPostCount={totalPostCount}
+              layout="toolbar"
+            />
+          </div>
 
-      <div class="mt-7">
-        <BlogAside
-          categories={allCategories}
-          lang={lang}
-          categoryPostCounts={categoryPostCounts}
-          totalPostCount={totalPostCount}
-          layout="toolbar"
-        />
-      </div>
+          <div class="hidden lg:block">
+            <BlogAside
+              categories={allCategories}
+              lang={lang}
+              categoryPostCounts={categoryPostCounts}
+              totalPostCount={totalPostCount}
+              socialLogos={socialLogos}
+              layout="sidebar"
+            />
+          </div>
+        </div>
 
-      <section class="mt-8" aria-label={blogSeo.heading}>
-        {
-          blogsList.length > 0 ? (
-            <>
-              {remainingBlogs.length > 0 ? (
-                <div class="blog-post-grid">
-                  {remainingBlogs.map((blog: Blog) => (
-                    <CardPost blog={blog} lang={lang} showDescription />
-                  ))}
-                </div>
-              ) : null}
-
-              <BlogPagination page={page} lang={lang} />
-            </>
-          ) : (
-            <p class="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
-              {blogSeo.empty}
+        <div class="min-w-0">
+          <header class="max-w-4xl">
+            <p
+              class="mb-3 flex items-center gap-3 text-xs font-semibold lowercase tracking-[0.06em] text-primary"
+            >
+              {blogSeo.eyebrow}
+              <span class="h-px w-12 bg-primary/35" aria-hidden="true"></span>
             </p>
-          )
-        }
-      </section>
+            <h1
+              id="blog-index-title"
+              class="text-3xl font-semibold leading-[1.04] tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl"
+            >
+              {blogSeo.heading}
+            </h1>
+            <p
+              class="mt-4 max-w-3xl text-base leading-7 text-muted-foreground md:text-lg"
+            >
+              {blogSeo.description}
+            </p>
+          </header>
+
+          <section class="mt-8" aria-label={blogSeo.heading}>
+            {
+              blogsList.length > 0 ? (
+                <>
+                  {remainingBlogs.length > 0 ? (
+                    <div class="blog-post-grid">
+                      {remainingBlogs.map((blog: Blog) => (
+                        <CardPost blog={blog} lang={lang} showDescription />
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <BlogPagination page={page} lang={lang} />
+                </>
+              ) : (
+                <p class="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
+                  {blogSeo.empty}
+                </p>
+              )
+            }
+          </section>
+        </div>
+      </div>
 
       {blogsList.length > 0 && <BlogContactCta lang={lang} />}
     </div>
@@ -203,13 +221,13 @@ const seoProps = buildSEOProps({
 
   @media (min-width: 1024px) {
     .blog-post-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1280px) {
     .blog-post-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 </style>

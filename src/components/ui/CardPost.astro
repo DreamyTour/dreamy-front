@@ -79,17 +79,29 @@ const excerpt =
     : null;
 const wordCount = plainContent.split(/\s+/).filter(Boolean).length;
 const readingMinutes = Math.max(1, Math.ceil(wordCount / 210));
-const readingText = `${readingMinutes} min`;
+const readingUnit =
+  lang === "es"
+    ? "min de lectura"
+    : lang === "pt"
+      ? "min de leitura"
+      : "min read";
+const readingText = `${readingMinutes} ${readingUnit}`;
 const Heading = headingLevel;
+const postUrl = rewriteUrl(`/blog/${blog.slug}`, lang);
 ---
 
-<article class="group h-full min-w-0">
-  <a
-    href={rewriteUrl(`/blog/${blog.slug}`, lang)}
-    aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
-    class="flex h-full min-h-[25rem] flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-[0_14px_34px_-24px_rgba(15,32,23,0.45)] transition duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_22px_46px_-24px_rgba(15,32,23,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45 motion-reduce:transform-none"
+<article class="group @container h-full min-w-0">
+  <div
+    class:list={[
+      "relative flex h-full transform-[translateY(0)] flex-col overflow-hidden rounded-[1.25rem] border border-[color-mix(in_oklab,var(--primary)_10%,var(--border))] bg-card text-foreground shadow-[0_2px_5px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_16px_36px_-28px_color-mix(in_oklab,var(--foreground)_30%,transparent)] transition-[transform_.3s_cubic-bezier(.2,_0,_0,_1),box-shadow_.3s,border-color_.3s] hover:transform-[translateY(-0.25rem)] hover:border-primary/25 hover:shadow-[0_4px_10px_color-mix(in_oklab,var(--primary)_5%,transparent),0_24px_54px_-30px_color-mix(in_oklab,var(--primary)_32%,transparent)] motion-reduce:transform-none motion-reduce:transition-none",
+      showDescription ? "min-h-[27rem]" : "min-h-[23.5rem]",
+    ]}
   >
-    <div class="relative aspect-[4/2.7] shrink-0 overflow-hidden bg-muted">
+    <a
+      href={postUrl}
+      aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
+      class="relative block aspect-[16/10] shrink-0 overflow-hidden bg-muted focus-visible:z-10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/40"
+    >
       {
         mainImage && mainImage !== "/og-default.jpg" ? (
           <img
@@ -98,67 +110,64 @@ const Heading = headingLevel;
             sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
             alt={imageAlt}
             width="640"
-            height="432"
-            class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.045] motion-reduce:transform-none"
+            height="400"
+            class="h-full w-full object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.025] motion-reduce:transform-none"
             loading="lazy"
             decoding="async"
           />
         ) : (
           <div class="grid h-full place-items-center bg-[linear-gradient(145deg,color-mix(in_oklab,var(--primary)_13%,white),color-mix(in_oklab,var(--secondary)_12%,white))]">
-            <span class="text-xs font-semibold uppercase tracking-[0.16em] text-primary/70">
-              Dreamy Tours
+            <span class="text-xs font-semibold lowercase tracking-[0.05em] text-primary/70">
+              dreamy tours
             </span>
           </div>
         )
       }
 
-      {
-        category && (
-          <span class="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] truncate rounded-full bg-secondary px-3 py-1 text-[0.64rem] font-bold uppercase tracking-[0.08em] text-secondary-foreground shadow-sm">
-            {category}
-          </span>
-        )
-      }
-    </div>
-
-    <div class="flex flex-1 flex-col gap-3 p-4 sm:p-5">
-      <Heading
-        class="line-clamp-3 text-lg font-semibold leading-[1.12] tracking-[-0.01em] text-foreground"
-      >
-        {blog.titulo}
-      </Heading>
-
-      {
-        excerpt && (
-          <p class="line-clamp-3 text-sm leading-5 text-muted-foreground">
-            {excerpt}
-          </p>
-        )
-      }
-
       <div
-        class="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3.5 text-xs text-muted-foreground"
+        class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_52%,color-mix(in_oklab,var(--blog-image-shade)_38%,transparent)_100%)]"
+        aria-hidden="true"
       >
+      </div>
+
+      <span
+        class="absolute bottom-4 right-4 grid size-10 place-items-center rounded-full border border-white/35 bg-white/90 text-primary shadow-[0_10px_24px_-12px_rgba(0,0,0,0.55)] transition-transform duration-[300ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 opacity-70 group-hover:opacity-100 motion-reduce:transform-none"
+        aria-hidden="true"
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M7 17 17 7"></path>
+          <path d="M9 7h8v8"></path>
+        </svg>
+      </span>
+    </a>
+
+    <div class="flex flex-1 flex-col p-5 @[24rem]:p-6">
+      <div class="flex min-w-0 items-center justify-between gap-4">
         {
-          formattedDate && (
-            <span class="inline-flex items-center gap-1.5">
-              <svg
-                class="size-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                aria-hidden="true"
-              >
-                <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z" />
-              </svg>
-              {formattedDate}
+          category ? (
+            <span class="max-w-[52%] truncate rounded-md bg-primary px-2.5 py-1 text-[0.7rem] font-semibold lowercase tracking-[0.02em] text-primary-foreground">
+              {category}
+            </span>
+          ) : (
+            <span class="text-[0.72rem] font-medium lowercase text-primary/70">
+              journal
             </span>
           )
         }
-        <span class="inline-flex items-center gap-1.5">
+
+        <span
+          class="inline-flex shrink-0 items-center gap-1.5 text-[0.7rem] font-medium lowercase text-muted-foreground"
+        >
           <svg
-            class="size-4"
+            class="size-3.5 text-secondary"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -171,6 +180,82 @@ const Heading = headingLevel;
           {readingText}
         </span>
       </div>
+
+      <Heading
+        class="mt-4 line-clamp-3 text-[1.2rem] font-semibold leading-[1.12] tracking-[-0.025em] text-foreground @[24rem]:text-[1.35rem]"
+      >
+        <a
+          href={postUrl}
+          class="rounded-sm transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+        >
+          {blog.titulo}
+        </a>
+      </Heading>
+
+      {
+        excerpt && (
+          <p class="mt-3 line-clamp-3 text-sm leading-5 text-muted-foreground">
+            {excerpt}
+          </p>
+        )
+      }
+
+      <div class="mt-auto pt-6">
+        <div
+          class="flex items-center justify-between gap-3 border-t border-[color-mix(in_oklab,var(--primary)_9%,var(--border))] pt-4"
+        >
+          {
+            formattedDate && (
+              <time
+                datetime={publishedDate}
+                class="inline-flex shrink-0 items-center gap-1.5 text-[0.7rem] font-medium lowercase text-muted-foreground"
+              >
+                <svg
+                  class="size-3.5 text-secondary"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M8 2v4" />
+                  <path d="M16 2v4" />
+                  <rect width="18" height="18" x="3" y="4" rx="2" />
+                  <path d="M3 10h18" />
+                </svg>
+                {formattedDate}
+              </time>
+            )
+          }
+
+          <a
+            href={postUrl}
+            aria-label={`${t("blog.leerMas")}: ${blog.titulo}`}
+            class="inline-flex shrink-0 items-center gap-2 rounded-sm text-[0.82rem] font-semibold lowercase text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+          >
+            <span
+              class="decoration-primary decoration-1 underline-offset-4 group-hover:underline"
+            >
+              {t("blog.leerMas")}
+            </span>
+            <svg
+              class="size-4 transition-transform duration-300 ease-[cubic-bezier(.2,0,0,1)] group-hover:translate-x-0.5 motion-reduce:transform-none"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m13 6 6 6-6 6"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
-  </a>
+  </div>
 </article>

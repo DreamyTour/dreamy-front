@@ -11,28 +11,62 @@ const hasHeadings = headings && headings.length > 0;
 
 {
   hasHeadings && (
-    <nav class="toc mb-8 rounded-sm border border-border bg-muted/60 p-5">
-      <h2 class="mb-4 text-sm font-bold uppercase tracking-wider text-foreground">
-        Tabla de Contenidos
-      </h2>
-      <ul class="space-y-2">
-        {headings.map((heading) => (
-          <li>
-            <a
-              href={`#${heading.id}`}
-              class="block border-l-2 border-transparent py-1.5 pl-3 text-sm text-muted-foreground transition-colors duration-200 hover:border-primary hover:text-primary"
+    <details
+      open
+      class="group mb-8 overflow-hidden rounded-lg border border-primary/15 bg-muted/60 shadow-sm"
+    >
+      <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold lowercase tracking-[0.04em] text-foreground transition-colors duration-200 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-primary/20 [&::-webkit-details-marker]:hidden">
+        <span class="flex items-center gap-3">
+          <span class="grid size-8 place-items-center rounded-md bg-primary text-primary-foreground">
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
             >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+              <path d="M4 6h16" />
+              <path d="M4 12h16" />
+              <path d="M4 18h10" />
+            </svg>
+          </span>
+          Tabla de contenidos
+        </span>
+
+        <svg
+          class="size-5 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+
+      <nav
+        aria-label="Tabla de contenidos"
+        class="border-t border-primary/10 px-5 pb-5 pt-4"
+      >
+        <ul class="space-y-1">
+          {headings.map((heading) => (
+            <li>
+              <a
+                href={`#${heading.id}`}
+                class="block rounded-r-md border-l-2 border-transparent py-2 pl-3 text-sm text-muted-foreground transition-colors duration-200 hover:border-primary hover:bg-primary/5 hover:text-primary focus-visible:border-primary focus-visible:bg-primary/5 focus-visible:text-primary focus-visible:outline-none"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
   )
 }
-
-<style>
-  .toc a {
-    scroll-margin-top: 100px;
-  }
-</style>

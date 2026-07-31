@@ -72,7 +72,7 @@ export default function BlogCategoryDropdown({
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger className="group flex w-full items-center justify-between gap-3 rounded-xl border border-secondary/55 bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_10px_26px_-18px_color-mix(in_oklab,var(--foreground)_45%,transparent)] outline-none transition duration-200 hover:border-secondary hover:bg-card hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--secondary)_55%,transparent)] focus-visible:outline-none! focus-visible:shadow-[0_0_0_3px_color-mix(in_oklab,var(--secondary)_32%,transparent)]! data-[state=open]:border-secondary data-[state=open]:bg-secondary/8 [&_svg]:size-4">
+      <DropdownMenuTrigger className="group flex w-full items-center justify-between gap-3 rounded-xl border border-primary/55 bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_10px_26px_-18px_color-mix(in_oklab,var(--foreground)_45%,transparent)] outline-none transition duration-200 hover:border-primary hover:bg-card hover:shadow-[0_14px_30px_-18px_color-mix(in_oklab,var(--primary)_55%,transparent)] focus-visible:outline-none! focus-visible:shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_32%,transparent)]! data-[state=open]:border-primary data-[state=open]:bg-primary/8 [&_svg]:size-4">
         <span className="flex min-w-0 items-center gap-2">
           <CurrentIcon aria-hidden="true" className="text-primary" />
           <span className="truncate">{currentLabel}</span>
@@ -100,10 +100,10 @@ export default function BlogCategoryDropdown({
                 key={option.href}
                 asChild
                 className={cn(
-                  "group my-0.5 rounded-lg px-3 py-2.5 transition-colors duration-200 hover:bg-secondary/8 hover:text-foreground focus:bg-secondary/8 focus:text-foreground focus-visible:outline-none! focus-visible:shadow-none! data-[highlighted]:bg-secondary/8 data-[highlighted]:text-foreground",
+                  "group my-0.5 rounded-lg px-3 py-2.5 transition-colors duration-200 hover:bg-primary/8 hover:text-foreground focus:bg-primary/8 focus:text-foreground focus-visible:outline-none! focus-visible:shadow-none! data-[highlighted]:bg-primary/8 data-[highlighted]:text-foreground",
                   option.active
-                    ? "bg-secondary font-semibold text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)] hover:bg-secondary hover:text-secondary-foreground focus:bg-secondary focus:text-secondary-foreground focus-visible:bg-secondary! focus-visible:text-secondary-foreground! data-[highlighted]:bg-secondary data-[highlighted]:text-secondary-foreground"
-                    : "text-foreground/70 focus-visible:bg-secondary/8!",
+                    ? "bg-primary font-semibold text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)] hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground focus-visible:bg-primary! focus-visible:text-primary-foreground! data-[highlighted]:bg-primary data-[highlighted]:text-primary-foreground"
+                    : "text-foreground/70 focus-visible:bg-primary/8!",
                 )}
               >
                 <a
@@ -115,14 +115,14 @@ export default function BlogCategoryDropdown({
                     className={cn(
                       "transition-colors",
                       option.active
-                        ? "text-secondary-foreground"
-                        : "text-primary group-hover:text-secondary group-focus:text-secondary group-data-[highlighted]:text-secondary",
+                        ? "text-primary-foreground"
+                        : "text-primary group-hover:text-primary group-focus:text-primary group-data-[highlighted]:text-primary",
                     )}
                   />
                   <span className="truncate">{option.label}</span>
                   <DropdownMenuShortcut
                     className={cn(
-                      option.active && "text-secondary-foreground/75",
+                      option.active && "text-primary-foreground/75",
                     )}
                   >
                     {option.count}

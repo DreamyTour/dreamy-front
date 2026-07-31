@@ -27,6 +27,7 @@ interface Props {
   totalPostCount?: number;
   layout?: "sidebar" | "toolbar";
   socialLogos?: Logo[];
+  showSocial?: boolean;
 }
 
 const {
@@ -37,6 +38,7 @@ const {
   totalPostCount = 0,
   layout = "sidebar",
   socialLogos = [],
+  showSocial = true,
 } = Astro.props;
 
 const copy = {
@@ -194,10 +196,10 @@ sidebarSocialLinks.splice(
           href={allHref}
           aria-current={!currentSlug ? "page" : undefined}
           class:list={[
-            "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+            "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
             !currentSlug
-              ? "border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
-              : "border-secondary/55 bg-card text-foreground/70 hover:border-secondary hover:text-foreground",
+              ? "border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
+              : "border-primary/25 bg-card text-foreground/70 hover:border-primary/55 hover:text-primary",
           ]}
         >
           <svg
@@ -230,10 +232,10 @@ sidebarSocialLinks.splice(
               href={rewriteUrl(`/blog/${cat.slug}`, lang)}
               aria-current={isActive ? "page" : undefined}
               class:list={[
-                "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+                "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 isActive
-                  ? "border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
-                  : "border-secondary/55 bg-card text-foreground/70 hover:border-secondary hover:text-foreground hover:shadow-sm",
+                  ? "border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
+                  : "border-primary/25 bg-card text-foreground/70 hover:border-primary/55 hover:text-primary hover:shadow-sm",
               ]}
             >
               <span
@@ -267,9 +269,9 @@ sidebarSocialLinks.splice(
           <header class="mb-4 border-b border-border px-1 pb-4">
             <h2
               id="blog-aside-title"
-              class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-foreground/65"
+              class="flex items-center gap-2 text-xs font-semibold lowercase tracking-[0.06em] text-primary"
             >
-              <span class="h-px w-6 bg-secondary" aria-hidden="true" />
+              <span class="h-px w-6 bg-primary/55" aria-hidden="true" />
               {copy.categories}
             </h2>
           </header>
@@ -279,10 +281,10 @@ sidebarSocialLinks.splice(
               href={allHref}
               aria-current={!currentSlug ? "page" : undefined}
               class:list={[
-                "blog-aside-link flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+                "blog-aside-link flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 !currentSlug
-                  ? "is-active border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
-                  : "border-border bg-card text-foreground/70 hover:border-secondary/55 hover:text-foreground hover:shadow-sm",
+                  ? "is-active border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
+                  : "border-primary/15 bg-card text-foreground/70 hover:border-primary/40 hover:text-primary hover:shadow-sm",
               ]}
             >
               <span class="flex min-w-0 items-center gap-3">
@@ -317,10 +319,10 @@ sidebarSocialLinks.splice(
                   href={rewriteUrl(`/blog/${cat.slug}`, lang)}
                   aria-current={isActive ? "page" : undefined}
                   class:list={[
-                    "blog-aside-link flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/55",
+                    "blog-aside-link flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                     isActive
-                      ? "is-active border-secondary bg-secondary text-secondary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--secondary)_70%,transparent)]"
-                      : "border-border bg-card text-foreground/70 hover:border-secondary/55 hover:text-foreground hover:shadow-sm",
+                      ? "is-active border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
+                      : "border-primary/15 bg-card text-foreground/70 hover:border-primary/40 hover:text-primary hover:shadow-sm",
                   ]}
                 >
                   <span class="flex min-w-0 items-center gap-3">
@@ -347,7 +349,7 @@ sidebarSocialLinks.splice(
           </nav>
         </section>
 
-        {sidebarSocialLinks.length > 0 && (
+        {showSocial && sidebarSocialLinks.length > 0 && (
           <section
             aria-labelledby="blog-social-title"
             class="blog-social-card overflow-hidden rounded-xl border border-border bg-card"
@@ -427,7 +429,7 @@ sidebarSocialLinks.splice(
 
 <style>
   .blog-category-pill:hover {
-    translate: 0 -2px;
+    translate: 0 -1px;
   }
 
   .blog-aside-card {
@@ -443,7 +445,7 @@ sidebarSocialLinks.splice(
   }
 
   .blog-aside-link:hover {
-    translate: 4px 0;
+    translate: 2px 0;
   }
 
   @media (prefers-reduced-motion: reduce) {
