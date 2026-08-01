@@ -116,7 +116,13 @@ const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
 ]);
 ---
 
-<Layout seo={seoProps} lang={lang}>
+<Layout
+  seo={seoProps}
+  lang={lang}
+  lcpImageUrl={blog.portadaImage ? heroImage : undefined}
+  lcpImageSrcSet={blog.portadaImage ? heroImageSrcSet : undefined}
+  lcpImageMedia="(max-width: 767px)"
+>
   <div class="blog-post-page">
     {
       slugMap && Object.keys(slugMap).length > 0 && (

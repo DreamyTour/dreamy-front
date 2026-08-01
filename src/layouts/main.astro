@@ -19,6 +19,7 @@ interface Props {
   lang?: Lang;
   lcpImageUrl?: string;
   lcpImageSrcSet?: string;
+  lcpImageMedia?: string;
   enableClientRouter?: boolean;
 }
 
@@ -27,6 +28,7 @@ const {
   lang: langProp,
   lcpImageUrl,
   lcpImageSrcSet,
+  lcpImageMedia,
   enableClientRouter = true,
 } = Astro.props;
 
@@ -83,6 +85,7 @@ const seoProps = seo || {
           rel="preload"
           as="image"
           href={lcpImageUrl}
+          {...(lcpImageMedia ? { media: lcpImageMedia } : {})}
           {...(lcpImageSrcSet
             ? { imagesrcset: lcpImageSrcSet, imagesizes: "100vw" }
             : {})}
