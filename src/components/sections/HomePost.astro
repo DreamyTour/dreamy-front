@@ -65,19 +65,26 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
           )}
         </header>
 
-        <ul class="posts-mosaic m-0 list-none p-0">
+        <ul class="m-0 grid list-none grid-cols-1 gap-1.5 p-0 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(15.625rem,1fr))]">
           {postsList.slice(0, 1).map((blog: Blog) => (
-            <li class="posts-mosaic__featured">
+            <li class="flex flex-col md:col-span-2 lg:col-span-2 lg:row-start-1">
               <CardPostHome blog={blog} lang={lang} />
             </li>
           ))}
           {postsList.slice(1, 2).map((blog: Blog) => (
-            <li class="posts-mosaic__secondary">
+            <li class="flex flex-col lg:col-span-2 lg:col-start-3 lg:row-span-2 lg:row-start-1">
               <CardPostHome blog={blog} lang={lang} variant="tall" />
             </li>
           ))}
-          {postsList.slice(2, 5).map((blog: Blog) => (
-            <li class="posts-mosaic__bottom">
+          {postsList.slice(2, 5).map((blog: Blog, index: number) => (
+            <li
+              class:list={[
+                "flex flex-col lg:row-start-2",
+                index === 0 && "lg:col-start-1",
+                index === 1 && "lg:col-start-2",
+                index === 2 && "md:col-span-2 lg:hidden",
+              ]}
+            >
               <CardPostHome blog={blog} lang={lang} />
             </li>
           ))}
@@ -108,66 +115,3 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
     </section>
   )
 }
-
-<style>
-  .posts-mosaic {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.35rem;
-  }
-
-  .posts-mosaic__featured,
-  .posts-mosaic__secondary,
-  .posts-mosaic__bottom {
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (min-width: 768px) {
-    .posts-mosaic {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .posts-mosaic__featured {
-      grid-column: 1 / -1;
-    }
-
-    .posts-mosaic__bottom:nth-child(5) {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .posts-mosaic {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-template-rows: repeat(2, minmax(250px, 1fr));
-      align-items: stretch;
-    }
-
-    .posts-mosaic__featured {
-      grid-column: 1 / 3;
-      grid-row: 1;
-    }
-
-    .posts-mosaic__secondary {
-      grid-column: 3 / 5;
-      grid-row: 1 / 3;
-    }
-
-    .posts-mosaic__bottom {
-      grid-row: 2;
-    }
-
-    .posts-mosaic__bottom:nth-child(3) {
-      grid-column: 1;
-    }
-
-    .posts-mosaic__bottom:nth-child(4) {
-      grid-column: 2;
-    }
-
-    .posts-mosaic__bottom:nth-child(5) {
-      display: none;
-    }
-  }
-</style>
