@@ -4,6 +4,7 @@ import type { Hero } from "@/types/home";
 import type { Lang } from "@/lib/i18n";
 import { getImageUrl } from "@/lib/helpers";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
+import dreamyToursMobile from "@/assets/dreamy-tours.webp";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -69,17 +70,20 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
   {
     videoUrl !== "/og-default.jpg" ? (
       <>
-        <img
-          src={backgroundImageMobile.src}
-          alt=""
-          aria-hidden="true"
-          class="absolute inset-0 h-full w-full object-cover md:hidden"
-          width={backgroundImageMobile.width}
-          height={backgroundImageMobile.height}
-          loading="eager"
-          decoding="sync"
-          fetchpriority="high"
-        />
+        <picture>
+          <source media="(max-width: 767px)" srcset={dreamyToursMobile.src} />
+          <img
+            src={backgroundImageMobile.src}
+            alt=""
+            aria-hidden="true"
+            class="absolute inset-0 h-full w-full object-cover md:hidden"
+            width={dreamyToursMobile.width}
+            height={dreamyToursMobile.height}
+            loading="eager"
+            decoding="sync"
+            fetchpriority="high"
+          />
+        </picture>
         <video
           class="hero-video absolute inset-0 hidden h-full w-full object-cover md:block"
           width={backgroundImageMobile.width}
@@ -95,19 +99,27 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
         />
       </>
     ) : (
-      <img
-        src={backgroundImageMobile.src}
-        alt=""
-        aria-hidden="true"
-        class="absolute inset-0 h-full w-full object-cover"
-        width={backgroundImageMobile.width}
-        height={backgroundImageMobile.height}
-        loading="eager"
-        decoding="sync"
-        fetchpriority="high"
-      />
+      <picture>
+        <source media="(max-width: 767px)" srcset={dreamyToursMobile.src} />
+        <img
+          src={backgroundImageMobile.src}
+          alt=""
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover"
+          width={backgroundImageMobile.width}
+          height={backgroundImageMobile.height}
+          loading="eager"
+          decoding="sync"
+          fetchpriority="high"
+        />
+      </picture>
     )
   }
+
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/45 to-black/15 md:hidden"
+  />
 
   {/* Content */}
   <header
