@@ -22,7 +22,11 @@ const languageFlags: Record<Lang, string> = {
 const menuId = "language-menu-desktop";
 ---
 
-<div class="language-switcher relative" data-language-switcher>
+<div
+  class="language-switcher relative"
+  data-language-switcher
+  data-desktop-language-switcher
+>
   <button
     type="button"
     aria-haspopup="menu"
@@ -195,11 +199,15 @@ const menuId = "language-menu-desktop";
 
     document.addEventListener("click", (event) => {
       const target = event.target;
-      const activeSwitcher = target.closest?.("[data-language-switcher]");
+      const activeSwitcher = target.closest?.(
+        "[data-desktop-language-switcher]",
+      );
 
-      document.querySelectorAll("[data-language-switcher]").forEach((item) => {
-        if (item !== activeSwitcher) closeSwitcher(item);
-      });
+      document
+        .querySelectorAll("[data-desktop-language-switcher]")
+        .forEach((item) => {
+          if (item !== activeSwitcher) closeSwitcher(item);
+        });
 
       const toggle = target.closest?.("[data-language-toggle]");
       if (toggle && activeSwitcher) {
@@ -225,9 +233,11 @@ const menuId = "language-menu-desktop";
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      document.querySelectorAll("[data-language-switcher]").forEach((item) => {
-        closeSwitcher(item);
-      });
+      document
+        .querySelectorAll("[data-desktop-language-switcher]")
+        .forEach((item) => {
+          closeSwitcher(item);
+        });
     });
   })();
 </script>
