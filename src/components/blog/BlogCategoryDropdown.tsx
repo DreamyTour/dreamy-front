@@ -1,15 +1,19 @@
 import {
+  BirdIcon,
+  Building2Icon,
   ChevronDownIcon,
   CircleSlash2Icon,
   ClipboardListIcon,
   CloudSunIcon,
   CompassIcon,
   FootprintsIcon,
+  LandmarkIcon,
+  type LucideIcon,
   MapPinIcon,
   MountainIcon,
+  PlaneIcon,
   TreesIcon,
   WavesIcon,
-  type LucideIcon,
 } from "lucide-react";
 
 import {
@@ -21,6 +25,10 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  type BlogCategoryIconName,
+  getCategoryIconName,
+} from "@/lib/blogCategories";
 import { cn } from "@/lib/utils";
 
 export interface BlogCategoryOption {
@@ -37,29 +45,25 @@ interface Props {
   options: BlogCategoryOption[];
 }
 
+const optionIcons: Record<BlogCategoryIconName, LucideIcon> = {
+  mountain: MountainIcon,
+  hiking: FootprintsIcon,
+  location: MapPinIcon,
+  weather: CloudSunIcon,
+  waves: WavesIcon,
+  forest: TreesIcon,
+  itinerary: ClipboardListIcon,
+  city: Building2Icon,
+  landmark: LandmarkIcon,
+  bird: BirdIcon,
+  plane: PlaneIcon,
+  compass: CompassIcon,
+};
+
 function getOptionIcon(slug: string): LucideIcon {
-  const normalizedSlug = slug.toLowerCase();
+  if (!slug) return CircleSlash2Icon;
 
-  if (!normalizedSlug) return CircleSlash2Icon;
-  if (/machu|picchu|monta|mountain/.test(normalizedSlug)) return MountainIcon;
-  if (/trail|camino|trilha|trek|hike|walk/.test(normalizedSlug)) {
-    return FootprintsIcon;
-  }
-  if (/cusco|pin|destino|destination|ubica|location/.test(normalizedSlug)) {
-    return MapPinIcon;
-  }
-  if (/weather|clima|tiempo|cloud|nube/.test(normalizedSlug)) {
-    return CloudSunIcon;
-  }
-  if (/lake|lago|titicaca|water|waves/.test(normalizedSlug)) return WavesIcon;
-  if (/amazon|selva|jungle|tree|arbol|forest|floresta/.test(normalizedSlug)) {
-    return TreesIcon;
-  }
-  if (/itinerar|map|plan|guia|guide|ruta|route/.test(normalizedSlug)) {
-    return ClipboardListIcon;
-  }
-
-  return CompassIcon;
+  return optionIcons[getCategoryIconName(slug)];
 }
 
 export default function BlogCategoryDropdown({
