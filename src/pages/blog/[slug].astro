@@ -13,6 +13,7 @@ const props = Astro.props as BlogPostProps;
 <BlogPostPage
   blog={props.blog}
   lang={props.lang ?? DEFAULT_LANG}
+  searchBlogs={props.searchBlogs}
   allCategories={props.allCategories}
   slugMap={props.slugMap}
   globalData={props.globalData}

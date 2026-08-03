@@ -2,12 +2,14 @@
 import Layout from "@/layouts/main.astro";
 import BlogFeaturedPosts from "@/components/blog/BlogFeaturedPosts.astro";
 import BlogPagination from "@/components/blog/BlogPagination.astro";
+import BlogSearch from "@/components/blog/BlogSearch";
 import BlogAside from "@/components/ui/BlogAside.astro";
 import BlogContactCta from "@/components/ui/BlogContactCta.astro";
 import CardPost from "@/components/ui/CardPost.astro";
 import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 import { buildSEOProps } from "@/lib/seo";
 import { buildBlogIndexSchemas } from "@/lib/pageSchema";
+import { buildBlogSearchItems } from "@/lib/blogSearch";
 import type { Blog } from "@/types/blog";
 import type { BlogListProps } from "@/lib/blogRoutes";
 
@@ -17,6 +19,7 @@ interface Props extends BlogListProps {
 
 const {
   page,
+  searchBlogs,
   allCategories,
   categoryPostCounts,
   totalPostCount,
@@ -25,6 +28,7 @@ const {
 } = Astro.props;
 
 const blogsList = page.data;
+const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
 const featuredBlogs = page.currentPage === 1 ? blogsList.slice(0, 3) : [];
 const remainingBlogs =
   featuredBlogs.length > 0 ? blogsList.slice(3) : blogsList;
@@ -111,7 +115,15 @@ const seoProps = buildSEOProps({
         ]}
       >
         <div class="lg:sticky lg:top-24">
-          <div class="lg:hidden">
+          <BlogSearch
+            client:load
+            items={blogSearchItems}
+            lang={lang}
+            targetId="blog-index-search-results"
+            defaultContentId="blog-index-default-posts"
+          />
+
+          <div class="mt-5 lg:hidden">
             <BlogAside
               categories={allCategories}
               lang={lang}
@@ -121,7 +133,7 @@ const seoProps = buildSEOProps({
             />
           </div>
 
-          <div class="hidden lg:block">
+          <div class="mt-5 hidden lg:block">
             <BlogAside
               categories={allCategories}
               lang={lang}
@@ -155,25 +167,29 @@ const seoProps = buildSEOProps({
           </header>
 
           <section class="mt-8" aria-label={blogSeo.heading}>
-            {
-              blogsList.length > 0 ? (
-                <>
-                  {remainingBlogs.length > 0 ? (
-                    <div class="blog-post-grid">
-                      {remainingBlogs.map((blog: Blog) => (
-                        <CardPost blog={blog} lang={lang} showDescription />
-                      ))}
-                    </div>
-                  ) : null}
+            <div id="blog-index-search-results"></div>
 
-                  <BlogPagination page={page} lang={lang} />
-                </>
-              ) : (
-                <p class="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
-                  {blogSeo.empty}
-                </p>
-              )
-            }
+            <div id="blog-index-default-posts">
+              {
+                blogsList.length > 0 ? (
+                  <>
+                    {remainingBlogs.length > 0 ? (
+                      <div class="blog-post-grid">
+                        {remainingBlogs.map((blog: Blog) => (
+                          <CardPost blog={blog} lang={lang} showDescription />
+                        ))}
+                      </div>
+                    ) : null}
+
+                    <BlogPagination page={page} lang={lang} />
+                  </>
+                ) : (
+                  <p class="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
+                    {blogSeo.empty}
+                  </p>
+                )
+              }
+            </div>
           </section>
         </div>
       </div>

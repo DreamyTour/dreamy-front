@@ -3,10 +3,12 @@ import Layout from "@/layouts/main.astro";
 import CardPost from "@/components/ui/CardPost.astro";
 import BlogAside from "@/components/ui/BlogAside.astro";
 import BlogPagination from "@/components/blog/BlogPagination.astro";
+import BlogSearch from "@/components/blog/BlogSearch";
 import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
 import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
 import { buildSEOProps } from "@/lib/seo";
 import { buildBlogCategorySchemas } from "@/lib/pageSchema";
+import { buildBlogSearchItems } from "@/lib/blogSearch";
 import { serializeJsonForHtml } from "@/lib/html";
 import type { Blog } from "@/types/blog";
 import type { BlogCategoryProps } from "@/lib/blogRoutes";
@@ -17,6 +19,7 @@ interface Props extends BlogCategoryProps {
 
 const {
   page,
+  searchBlogs,
   allCategories,
   currentCategory,
   categorySlug,
@@ -28,6 +31,7 @@ const {
 } = Astro.props;
 
 const blogsList = page.data;
+const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
 const heroImage = currentCategory?.imagenDestacada
   ? getImageUrl(currentCategory.imagenDestacada, "large")
   : "";
@@ -144,7 +148,15 @@ const seoProps =
           class="grid items-start gap-8 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[21rem_minmax(0,1fr)] xl:gap-12"
         >
           <div class="lg:sticky lg:top-24">
-            <div class="lg:hidden">
+            <BlogSearch
+              client:load
+              items={blogSearchItems}
+              lang={lang}
+              targetId="blog-category-search-results"
+              defaultContentId="blog-category-default-posts"
+            />
+
+            <div class="mt-5 lg:hidden">
               <BlogAside
                 categories={allCategories}
                 currentSlug={categorySlug}
@@ -155,7 +167,7 @@ const seoProps =
               />
             </div>
 
-            <div class="hidden lg:block">
+            <div class="mt-5 hidden lg:block">
               <BlogAside
                 categories={allCategories}
                 currentSlug={categorySlug}
@@ -177,23 +189,27 @@ const seoProps =
               )
             }
 
-            {
-              blogsList.length > 0 ? (
-                <>
-                  <div class="blog-category-grid">
-                    {blogsList.map((blog: Blog) => (
-                      <CardPost blog={blog} lang={lang} showDescription />
-                    ))}
-                  </div>
+            <div id="blog-category-search-results"></div>
 
-                  <BlogPagination page={page} lang={lang} />
-                </>
-              ) : (
-                <p class="text-center text-muted-foreground">
-                  {emptyByLang[lang]}
-                </p>
-              )
-            }
+            <div id="blog-category-default-posts">
+              {
+                blogsList.length > 0 ? (
+                  <>
+                    <div class="blog-category-grid">
+                      {blogsList.map((blog: Blog) => (
+                        <CardPost blog={blog} lang={lang} showDescription />
+                      ))}
+                    </div>
+
+                    <BlogPagination page={page} lang={lang} />
+                  </>
+                ) : (
+                  <p class="text-center text-muted-foreground">
+                    {emptyByLang[lang]}
+                  </p>
+                )
+              }
+            </div>
           </div>
         </div>
       </div>

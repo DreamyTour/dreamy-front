@@ -28,6 +28,7 @@ export type Paginate = (
 export type BlogListProps = {
 	page: PaginatedBlogPage;
 	lang: Lang;
+	searchBlogs: Blog[];
 	allCategories: CategoryBlog[];
 	socialLogos: Logo[];
 	categoryPostCounts: Record<string, number>;
@@ -37,6 +38,7 @@ export type BlogListProps = {
 export type BlogPostProps = {
 	blog: Blog;
 	lang: Lang;
+	searchBlogs: Blog[];
 	allCategories: CategoryBlog[];
 	slugMap: Record<string, string>;
 	globalData: GlobalData;
@@ -50,6 +52,7 @@ export type BlogPostProps = {
 export type BlogCategoryProps = {
 	page: PaginatedBlogPage;
 	lang: Lang;
+	searchBlogs: Blog[];
 	allCategories: CategoryBlog[];
 	currentCategory: CategoryBlog;
 	categorySlug: string;
@@ -170,9 +173,10 @@ export async function getBlogIndexPaths({
 			...paginate(blogsList, {
 				params: localized ? { lang } : undefined,
 				pageSize: 9,
-				props: {
-					lang,
-					allCategories,
+			props: {
+				lang,
+				searchBlogs: blogsList,
+				allCategories,
 					socialLogos: getSocialLogos(globalData),
 					categoryPostCounts: getCategoryPostCounts(blogsList),
 					totalPostCount: blogsList.length,
@@ -205,6 +209,7 @@ export async function getBlogPostPaths({ localized }: { localized: boolean }) {
 				props: {
 					blog,
 					lang: lang as Lang,
+					searchBlogs: blogsList,
 					allCategories: categoriesByLang[lang] || [],
 					slugMap: slugsByDocId[blog.documentId] ?? {},
 					globalData: globalDataByLang[lang],
@@ -246,6 +251,7 @@ export async function getBlogPostPaths({ localized }: { localized: boolean }) {
 					redirectTo: `/${DEFAULT_LANG}/blog/${defaultBlog.slug}`,
 					blog: defaultBlog,
 					lang: lang as Lang,
+					searchBlogs: defaultLangBlogs,
 					allCategories: [],
 					slugMap: slugsByDocId[defaultBlog.documentId] ?? {},
 					globalData: globalDataByLang[lang] || globalDataByLang[DEFAULT_LANG],
@@ -289,6 +295,7 @@ export async function getBlogCategoryPaths({
 			);
 			const sharedProps = {
 				lang,
+				searchBlogs: blogsList,
 				allCategories,
 				currentCategory: category,
 				categorySlug,
