@@ -23,6 +23,7 @@ const {
   slugMap,
   categoryPostCounts,
   totalPostCount,
+  socialLogos,
   lang = DEFAULT_LANG,
 } = Astro.props;
 
@@ -139,43 +140,61 @@ const seoProps =
 
     <div class="blog-category-page py-12 lg:py-16">
       <div class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8">
-        <div class="w-full min-w-0">
-          {
-            currentCategory?.descripcion && (
-              <p class="mb-7 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
-                {currentCategory.descripcion}
-              </p>
-            )
-          }
+        <div
+          class="grid items-start gap-8 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[21rem_minmax(0,1fr)] xl:gap-12"
+        >
+          <div class="lg:sticky lg:top-24">
+            <div class="lg:hidden">
+              <BlogAside
+                categories={allCategories}
+                currentSlug={categorySlug}
+                lang={lang}
+                categoryPostCounts={categoryPostCounts}
+                totalPostCount={totalPostCount}
+                layout="toolbar"
+              />
+            </div>
 
-          <div class="mb-8">
-            <BlogAside
-              categories={allCategories}
-              currentSlug={categorySlug}
-              lang={lang}
-              categoryPostCounts={categoryPostCounts}
-              totalPostCount={totalPostCount}
-              layout="toolbar"
-            />
+            <div class="hidden lg:block">
+              <BlogAside
+                categories={allCategories}
+                currentSlug={categorySlug}
+                lang={lang}
+                categoryPostCounts={categoryPostCounts}
+                totalPostCount={totalPostCount}
+                socialLogos={socialLogos}
+                layout="sidebar"
+              />
+            </div>
           </div>
 
-          {
-            blogsList.length > 0 ? (
-              <>
-                <div class="blog-category-grid">
-                  {blogsList.map((blog: Blog) => (
-                    <CardPost blog={blog} lang={lang} showDescription />
-                  ))}
-                </div>
+          <div class="min-w-0">
+            {
+              currentCategory?.descripcion && (
+                <p class="mb-7 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
+                  {currentCategory.descripcion}
+                </p>
+              )
+            }
 
-                <BlogPagination page={page} lang={lang} />
-              </>
-            ) : (
-              <p class="text-center text-muted-foreground">
-                {emptyByLang[lang]}
-              </p>
-            )
-          }
+            {
+              blogsList.length > 0 ? (
+                <>
+                  <div class="blog-category-grid">
+                    {blogsList.map((blog: Blog) => (
+                      <CardPost blog={blog} lang={lang} showDescription />
+                    ))}
+                  </div>
+
+                  <BlogPagination page={page} lang={lang} />
+                </>
+              ) : (
+                <p class="text-center text-muted-foreground">
+                  {emptyByLang[lang]}
+                </p>
+              )
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -215,13 +234,13 @@ const seoProps =
 
   @media (min-width: 1024px) {
     .blog-category-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 1280px) {
     .blog-category-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 </style>

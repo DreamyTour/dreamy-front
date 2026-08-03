@@ -182,7 +182,7 @@ sidebarSocialLinks.splice(
         {copy.categories}
       </h2>
 
-      <div class="sm:hidden">
+      <div>
         <BlogCategoryDropdown
           client:load
           label={copy.categories}
@@ -190,74 +190,6 @@ sidebarSocialLinks.splice(
           options={mobileCategoryOptions}
         />
       </div>
-
-      <nav class="hidden gap-2 sm:flex sm:flex-wrap" aria-label={copy.navLabel}>
-        <a
-          href={allHref}
-          aria-current={!currentSlug ? "page" : undefined}
-          class:list={[
-            "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-            !currentSlug
-              ? "border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
-              : "border-primary/25 bg-card text-foreground/70 hover:border-primary/55 hover:text-primary",
-          ]}
-        >
-          <svg
-            class="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="9" />
-            <path d="m8.5 15.5 7-7M9 9h.01M15 15h.01" />
-          </svg>
-          {copy.viewAll}
-          <span
-            class:list={[
-              "text-xs",
-              !currentSlug ? "text-white/72" : "text-muted-foreground",
-            ]}
-          >
-            {totalPostCount}
-          </span>
-        </a>
-
-        {categories.map((cat: Category) => {
-          const isActive = currentSlug === cat.slug;
-          const count = categoryPostCounts[cat.slug] ?? 0;
-          return (
-            <a
-              href={rewriteUrl(`/blog/${cat.slug}`, lang)}
-              aria-current={isActive ? "page" : undefined}
-              class:list={[
-                "blog-category-pill inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                isActive
-                  ? "border-primary bg-primary text-primary-foreground shadow-[0_8px_20px_-12px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
-                  : "border-primary/25 bg-card text-foreground/70 hover:border-primary/55 hover:text-primary hover:shadow-sm",
-              ]}
-            >
-              <span
-                class:list={[
-                  "grid size-4 place-items-center",
-                  isActive ? "text-white" : "text-primary",
-                ]}
-                set:html={getCategoryIcon(cat.slug)}
-              />
-              <span>{cat.nombre}</span>
-              <span
-                class:list={[
-                  "text-xs",
-                  isActive ? "text-white/72" : "text-muted-foreground",
-                ]}
-              >
-                {count}
-              </span>
-            </a>
-          );
-        })}
-      </nav>
     </aside>
   ) : (
     <aside class="w-full shrink-0 lg:w-80 xl:w-[21rem]">
@@ -428,10 +360,6 @@ sidebarSocialLinks.splice(
 }
 
 <style>
-  .blog-category-pill:hover {
-    translate: 0 -1px;
-  }
-
   .blog-aside-card {
     box-shadow: 0 18px 55px var(--blog-card-shadow);
   }
@@ -449,7 +377,6 @@ sidebarSocialLinks.splice(
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .blog-category-pill:hover,
     .blog-aside-link:hover,
     .blog-social-link:hover {
       translate: none;
