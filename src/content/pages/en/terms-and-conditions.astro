@@ -1,6 +1,4 @@
 ---
-import TermsAndConditionsContent from "@/components/content/TermsAndConditionsContent.astro";
-
 export const frontmatter = {
   title: "Terms & Conditions",
   description: "Policies, Terms & Conditions - Dreamy Tours",
@@ -12,8 +10,424 @@ export const frontmatter = {
     metaTitle: "Terms & Conditions | Turismo Perú Bolivia",
     metaDescription: "Policies, Terms & Conditions - Dreamy Tours",
   },
-  slugs: { es: "terminos-condiciones", en: "terms-and-conditions", pt: "termos-e-condicoes" },
+  slugs: {
+    es: "terminos-condiciones",
+    en: "terms-and-conditions",
+    pt: "termos-e-condicoes",
+  },
+};
+
+const copy = {
+  labels: ["Legal", "Service conditions"],
+  noticeTitle: "Important notice",
+  noticeText:
+    "The tourist-services system in Peru may differ from the one in your country. Please read these conditions carefully before making a reservation.",
+  itinerary: {
+    title: "Itineraries",
+    text: "Activity programmes are planned with great care. However, for operational reasons, the order of activities in an itinerary or a specific route may need to change, with the client's prior knowledge.",
+    highlight: "The itinerary should only be considered a basic guide.",
+  },
+  responsibility: {
+    title: "Responsibility",
+    intro:
+      "Dreamy Tours acts on behalf of its clients when arranging the required transport, accommodation and other tourist services. We do not accept responsibility for accidents, losses, delays or interference caused by force majeure or events beyond our responsibility.",
+    requirementsTitle: "Passenger requirements",
+    requirementsText:
+      "Passengers are responsible for having all the requirements needed for their trip. Missing documentation may cause delays, service cancellations, tax payments or other inconveniences.",
+    requirements: [
+      "Visas, passports and the Andean Migration Card (TAM).",
+      "A current ISIC card for students, when applicable.",
+      "Vaccinations and authorisations for minors, when applicable.",
+    ],
+    restrictions: [
+      [
+        "Itinerary changes",
+        "Dreamy Tours may alter, modify or cancel an itinerary for safety reasons, including natural events, political issues, epidemics or circumstances beyond our organisation. No refund will be issued in these cases.",
+      ],
+      [
+        "Physical limitations",
+        "Tell us about any limitations before booking so that we can recommend suitable services. We may limit participation in activities when the group's safety requires it.",
+      ],
+      [
+        "Unwell passengers",
+        "We cannot take an unwell passenger on an excursion if they could present a risk to themselves or the group. The guide may assess this at the start of the tour.",
+      ],
+      [
+        "Unsafe condition",
+        "We cannot take passengers who are intoxicated or in a condition that threatens the tour, the group’s health or their own safety.",
+      ],
+      [
+        "Illnesses and disabilities",
+        "The company is not responsible for illnesses contracted or physical or mental conditions that put the passenger or third parties at risk, or that prevent the service from being provided. Claims or refunds on these grounds will not apply.",
+      ],
+    ],
+  },
+  insurance: {
+    title: "Travel insurance",
+    text: "We strongly recommend taking out travel insurance and sending us a copy by email, WhatsApp or to our office.",
+    coverTitle: "Recommended coverage",
+    coverage: [
+      "Accidents, medical expenses and emergency repatriation, including air ambulances and rescue.",
+      "Cancellations and lost luggage.",
+    ],
+  },
+  prices: {
+    title: "Prices",
+    details: [
+      "All rates are expressed in US dollars and are calculated per person.",
+      "Rates are subject to availability and change.",
+      "Rates do not apply to holidays, Easter, long weekends, national holidays, Christmas or New Year.",
+    ],
+    cards: [
+      ["Currency", "USD ($)", "US dollar"],
+      ["Infants", "0–2 years", "Free; no food, bed or seat"],
+      ["Children", "3–10 years", "Special rate; share a room"],
+      ["Adults", "11+ years", "Full rate"],
+    ],
+    note: "Minors must travel with an identity document.",
+  },
+  bookings: {
+    title: "Bookings",
+    text: "A booking is valid only with written confirmation and the agreed payment. In special cases, even after a deposit, reconfirmation may be required because of supplier restrictions or regulatory conditions.",
+    details:
+      "When booking, send us first names, surnames, passport numbers, nationality and date of birth. The final price is agreed with our reservations department.",
+    emailLabel: "Bookings",
+  },
+  changes: {
+    title: "Booking changes",
+    text: "Changes to bookings, itineraries, dates or participants are accepted subject to availability and payment of the corresponding penalties and administrative costs.",
+  },
 };
 ---
 
-<TermsAndConditionsContent lang="en" />
+<div class="legal-page mx-auto max-w-5xl space-y-9">
+  <div
+    class="flex flex-wrap items-center gap-2"
+    aria-label={copy.labels.join(", ")}
+  >
+    {
+      copy.labels.map((label, index) => (
+        <span
+          class:list={[
+            "rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]",
+            index === 0
+              ? "border-primary/20 bg-primary/10 text-primary"
+              : "border-secondary/20 bg-secondary/10 text-secondary",
+          ]}
+        >
+          {label}
+        </span>
+      ))
+    }
+  </div>
+  <aside
+    class="relative overflow-hidden rounded-2xl border border-border border-l-4 border-l-secondary bg-card p-6 shadow-sm sm:p-8"
+    aria-labelledby="terms-notice"
+  >
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div
+        class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-secondary/20 bg-secondary/10 text-secondary"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="size-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          ><path
+            d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+          ></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+      </div><div>
+        <h2 id="terms-notice" class="text-xl font-bold tracking-tight">
+          {copy.noticeTitle}
+        </h2><p class="mt-2 max-w-3xl leading-7 text-muted-foreground">
+          {copy.noticeText}
+        </p>
+      </div>
+    </div>
+  </aside>
+  <section aria-labelledby="terms-itineraries">
+    <div class="mb-4 flex items-center gap-3">
+      <span
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
+        >01</span
+      ><h2 id="terms-itineraries" class="text-2xl font-bold tracking-tight">
+        {copy.itinerary.title}
+      </h2>
+    </div><article
+      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none sm:p-7"
+    >
+      <span
+        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
+        aria-hidden="true"></span><div class="pl-3">
+        <p class="max-w-4xl leading-7 text-muted-foreground">
+          {copy.itinerary.text}
+        </p><p class="mt-4 font-semibold leading-7 text-primary">
+          {copy.itinerary.highlight}
+        </p>
+      </div>
+    </article>
+  </section>
+  <section aria-labelledby="terms-responsibility">
+    <div class="mb-4 flex items-center gap-3">
+      <span
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground"
+        >02</span
+      ><h2 id="terms-responsibility" class="text-2xl font-bold tracking-tight">
+        {copy.responsibility.title}
+      </h2>
+    </div><div class="space-y-5">
+      <article
+        class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+      >
+        <span
+          class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-secondary"
+          aria-hidden="true"></span><p
+          class="max-w-4xl pl-3 leading-7 text-muted-foreground"
+        >
+          {copy.responsibility.intro}
+        </p>
+      </article><article
+        class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+      >
+        <span
+          class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
+          aria-hidden="true"></span><div class="pl-3">
+          <h3 class="text-lg font-bold">
+            {copy.responsibility.requirementsTitle}
+          </h3><p class="mt-2 max-w-4xl leading-7 text-muted-foreground">
+            {copy.responsibility.requirementsText}
+          </p><ul
+            class="mt-4 grid list-none gap-2 p-0 text-sm leading-6 text-muted-foreground sm:grid-cols-2"
+            role="list"
+          >
+            {
+              copy.responsibility.requirements.map((requirement) => (
+                <li class="flex gap-2">
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="mt-0.5 size-4 shrink-0 text-primary"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m5 12 4 4L19 6" />
+                    </svg>
+                    <span>{requirement}</span>
+                  </>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </article><ul class="grid list-none gap-4 p-0 md:grid-cols-2" role="list">
+        {
+          copy.responsibility.restrictions.map(([title, text], index) => (
+            <li
+              class:list={[
+                "relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none",
+                index === 4 && "md:col-span-2",
+              ]}
+            >
+              <>
+                <span
+                  class:list={[
+                    "absolute inset-y-4 left-0 w-1 rounded-r-full",
+                    index % 2 === 0 ? "bg-secondary" : "bg-primary",
+                  ]}
+                  aria-hidden="true"
+                />
+                <div class="pl-3">
+                  <>
+                    <h3
+                      class:list={[
+                        "font-bold",
+                        index % 2 === 0 ? "text-secondary" : "text-primary",
+                      ]}
+                    >
+                      {title}
+                    </h3>
+                    <p class="mt-2 text-sm leading-6 text-muted-foreground">
+                      {text}
+                    </p>
+                  </>
+                </div>
+              </>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+  <section aria-labelledby="terms-insurance">
+    <div class="mb-4 flex items-center gap-3">
+      <span
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
+        >03</span
+      ><h2 id="terms-insurance" class="text-2xl font-bold tracking-tight">
+        {copy.insurance.title}
+      </h2>
+    </div><article
+      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+    >
+      <span
+        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
+        aria-hidden="true"></span><div class="pl-3">
+        <p class="max-w-4xl leading-7 text-muted-foreground">
+          {copy.insurance.text}
+        </p><div
+          class="mt-5 rounded-xl border border-primary/15 bg-primary/5 p-4"
+        >
+          <h3 class="font-bold text-primary">{copy.insurance.coverTitle}</h3><ul
+            class="mt-3 space-y-2 text-sm leading-6 text-muted-foreground"
+          >
+            {
+              copy.insurance.coverage.map((item) => (
+                <li class="flex gap-2">
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="mt-0.5 size-4 shrink-0 text-primary"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m5 12 4 4L19 6" />
+                    </svg>
+                    <span>{item}</span>
+                  </>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </article>
+  </section>
+  <section aria-labelledby="terms-prices">
+    <div class="mb-4 flex items-center gap-3">
+      <span
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground"
+        >04</span
+      ><h2 id="terms-prices" class="text-2xl font-bold tracking-tight">
+        {copy.prices.title}
+      </h2>
+    </div><article
+      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+    >
+      <span
+        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-secondary"
+        aria-hidden="true"></span><div class="pl-3">
+        <ul class="space-y-3 leading-7 text-muted-foreground">
+          {
+            copy.prices.details.map((detail) => (
+              <li class="flex gap-3">
+                <>
+                  <span
+                    class="mt-2 size-2 shrink-0 rounded-full bg-secondary"
+                    aria-hidden="true"
+                  />
+                  <span>{detail}</span>
+                </>
+              </li>
+            ))
+          }
+        </ul><dl class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {
+            copy.prices.cards.map(([label, value, detail], index) => (
+              <div
+                class:list={[
+                  "rounded-xl border p-4",
+                  index % 2 === 0
+                    ? "border-primary/15 bg-primary/5"
+                    : "border-secondary/15 bg-secondary/5",
+                ]}
+              >
+                <>
+                  <dt class="text-sm font-semibold text-muted-foreground">
+                    {label}
+                  </dt>
+                  <dd
+                    class:list={[
+                      "mt-1 text-lg font-bold",
+                      index % 2 === 0 ? "text-primary" : "text-secondary",
+                    ]}
+                  >
+                    {value}
+                  </dd>
+                  <dd class="mt-1 text-xs leading-5 text-muted-foreground">
+                    {detail}
+                  </dd>
+                </>
+              </div>
+            ))
+          }
+        </dl><p class="mt-4 text-sm font-medium text-secondary">
+          {copy.prices.note}
+        </p>
+      </div>
+    </article>
+  </section>
+  <section aria-labelledby="terms-bookings">
+    <div class="mb-4 flex items-center gap-3">
+      <span
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
+        >05</span
+      ><h2 id="terms-bookings" class="text-2xl font-bold tracking-tight">
+        {copy.bookings.title}
+      </h2>
+    </div><article
+      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
+    >
+      <span
+        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
+        aria-hidden="true"></span><div class="pl-3">
+        <p class="max-w-4xl leading-7 text-muted-foreground">
+          {copy.bookings.text}
+        </p><p class="mt-4 max-w-4xl leading-7 text-muted-foreground">
+          {copy.bookings.details}
+        </p><div
+          class="mt-5 flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span class="text-sm font-bold">{copy.bookings.emailLabel}</span><a
+            href="mailto:info@dreamy.tours"
+            class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
+            >info@dreamy.tours</a>
+        </div>
+      </div>
+    </article>
+  </section>
+  <section aria-labelledby="terms-changes">
+    <div class="mb-4 flex items-center gap-3">
+      <span
+        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground"
+        >06</span
+      ><h2 id="terms-changes" class="text-2xl font-bold tracking-tight">
+        {copy.changes.title}
+      </h2>
+    </div><article
+      class="relative overflow-hidden rounded-2xl border border-secondary/20 bg-secondary/5 p-6 shadow-sm sm:p-7"
+    >
+      <div
+        class="absolute -right-16 -top-16 size-40 rounded-full bg-secondary/10 blur-3xl"
+        aria-hidden="true"
+      >
+      </div><p class="relative max-w-4xl leading-7 text-muted-foreground">
+        {copy.changes.text}
+      </p>
+    </article>
+  </section>
+</div>
