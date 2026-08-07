@@ -9,7 +9,7 @@
    MDX CONTENT STYLES
    ============================================ */
 @layer components {
-  .mdx-text {
+  .content-text {
     h1 {
       @apply text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight mb-4;
     }
@@ -60,11 +60,11 @@
 /* ============================================
    CONTENT LAYOUT
    ============================================ */
-.content-shell--mdx {
+.content-shell--static {
   background: var(--background);
 }
 
-.content-hero--mdx {
+.content-hero--static {
   position: relative;
 
   > .hero-bg-img {

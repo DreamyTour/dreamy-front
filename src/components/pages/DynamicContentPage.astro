@@ -10,7 +10,7 @@ import BookingFormIsland from "@/components/tours/BookingFormIsland.astro";
 import RelatedTours from "@/components/tours/RelatedTours.astro";
 import type { Tour } from "@/types/tours";
 import type { Page } from "@/types/page";
-import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ManualSEO } from "@/lib/seo";
 import { buildSEOProps } from "@/lib/seo";
@@ -26,25 +26,27 @@ import { buildTourSchemas } from "@/lib/tourSchema";
 import { buildCollectionSchemas } from "@/lib/collectionSchema";
 import { buildFaqPageSchema, buildStaticPageSchemas } from "@/lib/pageSchema";
 
-interface MdxFrontmatter {
+interface ContentFrontmatter {
   title: string;
   description?: string;
   lang: Lang;
+  layout?: "esnna";
   seo?: ManualSEO;
+  heroEyebrow?: string;
   heroImage?: string;
   heroImageAlt?: string;
 }
 
 interface Props {
-  type: "mdx" | "tour" | "page";
+  type: "content" | "tour" | "page";
   lang: Lang;
   tour?: Tour;
   tourPageCategory?: { title: string; slug: string };
   page?: Page;
   slugMap?: Record<string, string>;
   pageSlugMap?: Record<string, string>;
-  mdxComponent?: { default?: AstroComponentFactory };
-  mdxFrontmatter?: MdxFrontmatter;
+  contentComponent?: { default?: AstroComponentFactory };
+  contentFrontmatter?: ContentFrontmatter;
   toursRelated?: Tour[];
   toursByCategory?: Tour[];
 }
@@ -57,8 +59,8 @@ const {
   page,
   slugMap,
   pageSlugMap,
-  mdxComponent,
-  mdxFrontmatter,
+  contentComponent,
+  contentFrontmatter,
   toursRelated = [],
   toursByCategory = [],
 } = Astro.props;
@@ -81,13 +83,13 @@ const hasIncaTrailBookingCalendar = Boolean(
 );
 
 const seoProps =
-  type === "mdx" && mdxFrontmatter
+  type === "content" && contentFrontmatter
     ? buildSEOProps({
-        seo: mdxFrontmatter.seo,
-        fallbackTitle: mdxFrontmatter.title || "Pagina",
-        fallbackDescription: mdxFrontmatter.description || "",
-        fallbackImage: mdxFrontmatter.heroImage,
-        fallbackImageAlt: mdxFrontmatter.heroImageAlt,
+        seo: contentFrontmatter.seo,
+        fallbackTitle: contentFrontmatter.title || "Pagina",
+        fallbackDescription: contentFrontmatter.description || "",
+        fallbackImage: contentFrontmatter.heroImage,
+        fallbackImageAlt: contentFrontmatter.heroImageAlt,
         type: "website",
         lang,
         slugMap: pageSlugMap,
@@ -96,12 +98,12 @@ const seoProps =
           siteUrl,
           lang,
           title:
-            mdxFrontmatter.seo?.metaTitle || mdxFrontmatter.title || "Pagina",
+            contentFrontmatter.seo?.metaTitle || contentFrontmatter.title || "Pagina",
           description:
-            mdxFrontmatter.seo?.metaDescription ||
-            mdxFrontmatter.description ||
+            contentFrontmatter.seo?.metaDescription ||
+            contentFrontmatter.description ||
             "",
-          imageUrl: mdxFrontmatter.heroImage,
+          imageUrl: contentFrontmatter.heroImage,
           pathname: Astro.url.pathname,
         }),
       })
@@ -190,23 +192,18 @@ const tourLcpImageSrcSet = tourLcpImage
   ? getImageSrcSet(tourLcpImage, ["small", "medium", "large"])
   : undefined;
 
-const mdxUiCopy = {
-  es: { eyebrow: "Guia Dreamy" },
-  en: { eyebrow: "Dreamy Guide" },
-  pt: { eyebrow: "Guia Dreamy" },
-} as const;
-
-const mdxCopy = mdxUiCopy[lang] ?? mdxUiCopy[DEFAULT_LANG];
+const contentEyebrow =
+  contentFrontmatter?.heroEyebrow ?? contentFrontmatter?.title ?? "Dreamy Tours";
 const heroImage =
-  (mdxFrontmatter?.heroImage as string | undefined) ||
+  (contentFrontmatter?.heroImage as string | undefined) ||
   "/imagenes/sobre_nosotros.avif";
 const heroImageAlt =
-  (mdxFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
-const MdxContent = mdxComponent?.default;
+  (contentFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
+const ContentComponent = contentComponent?.default;
 ---
 
 {
-  type === "mdx" && MdxContent && mdxFrontmatter && (
+  type === "content" && ContentComponent && contentFrontmatter && (
     <Layout seo={seoProps} lang={lang}>
       <script
         is:inline
@@ -214,8 +211,8 @@ const MdxContent = mdxComponent?.default;
         type="application/json"
         set:html={serializeJsonForHtml(pageSlugMap || {})}
       />
-      <div class="content-shell content-shell--mdx w-full mx-auto">
-        <section class="content-hero content-hero--mdx relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
+      <div class="content-shell content-shell--static mx-auto w-full">
+        <section class="content-hero content-hero--static relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
           <img
             src={heroImage}
             alt={heroImageAlt}
@@ -235,16 +232,16 @@ const MdxContent = mdxComponent?.default;
                   class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]"
                   aria-hidden="true"
                 />
-                <span>{mdxCopy.eyebrow}</span>
+                <span>{contentEyebrow}</span>
               </p>
 
               <h1 class="content-hero-title mt-6 text-white text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
-                {mdxFrontmatter.title}
+                {contentFrontmatter.title}
               </h1>
 
-              {mdxFrontmatter.description && (
+              {contentFrontmatter.description && (
                 <p class="mx-auto mt-6 max-w-3xl text-base leading-8 text-white/80 md:text-lg lg:text-[1.08rem]">
-                  {mdxFrontmatter.description}
+                  {contentFrontmatter.description}
                 </p>
               )}
 
@@ -262,11 +259,17 @@ const MdxContent = mdxComponent?.default;
           </div>
         </section>
 
-        <div class="relative mx-auto mt-4 max-w-7xl">
-          <article class="content-article mdx-text max-w-none px-6 md:px-10 lg:px-12 py-8 md:py-10 lg:py-12">
-            <MdxContent />
+        {contentFrontmatter.layout === "esnna" ? (
+          <article class="content-article content-text max-w-none p-0">
+            <ContentComponent />
           </article>
-        </div>
+        ) : (
+          <div class="relative mx-auto mt-4 max-w-7xl">
+            <article class="content-article content-text max-w-none px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
+              <ContentComponent />
+            </article>
+          </div>
+        )}
       </div>
     </Layout>
   )

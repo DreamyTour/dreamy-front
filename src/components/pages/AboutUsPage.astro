@@ -1,0 +1,1540 @@
+---
+import type { Lang } from "@/lib/i18n";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const copyByLanguage = {
+  es: {
+    introLead:
+      "DREAMY TOURS se distingue por proporcionar un servicio diferente y fuera de lo tradicional, tanto en la organización como en las excursiones. Operamos con principios éticos y de responsabilidad social, promoviendo el desarrollo y bienestar de nuestro equipo, manteniendo un compromiso continuo con la seguridad y el respeto al medio ambiente.",
+    introBody:
+      "Hoy contamos con un portafolio de profesionales dedicados a la atención al cliente, ayudando a nuestros viajeros a convertir sus sueños de viajar y descubrir otras culturas en experiencias inolvidables.",
+    essence: "Nuestra Esencia",
+    mission: "Misión",
+    missionBody:
+      "Proveer un servicio de calidad y confiabilidad, superando las expectativas de nuestros clientes con paquetes turísticos que revelan las maravillas de Perú, con un equipo especializado y tecnología para un servicio personalizado.",
+    vision: "Visión",
+    visionBody:
+      "Ser una agencia líder en el mercado turístico de Cusco y a nivel internacional, con productos innovadores y un tour operador que contribuya al desarrollo socioeconómico de las comunidades.",
+    values: "Valores",
+    valuesBody:
+      "Valoramos la transmisión de costumbres y tradiciones ancestrales, capacitando a nuestro equipo en primeros auxilios, manejo de alimentos, seguridad vial y atención ante emergencias.",
+    philosophyEyebrow: "Filosofía",
+    philosophyTitle: "Nuestro Compromiso",
+    philosophy:
+      '"Dreamy Tours promueve un turismo responsable, basado en el respeto por las personas y destinos, buscando una interacción auténtica con la Vida Real de las comunidades que visitamos, evitando ser cómplices de su destrucción y explotación."',
+    licensesEyebrow: "Licencias",
+    licensesTitle: "Autorizaciones y Certificaciones",
+    licenseLead: "Dreamy Tours - Agencia de Viajes y Operador Turístico",
+    licenseLeadRest:
+      ", cumple con todos los requisitos y licencias principales para operar y ofrecer los diversos servicios del sector turístico en todo el territorio peruano.",
+    licenseIntro:
+      "Las instituciones mencionadas a continuación están a cargo de regular la industria turística en Perú y estamos suscritos a ellas de la siguiente manera:",
+    licenseCards: [
+      {
+        name: "DIRCETUR",
+        fullName: "Dirección Regional de Comercio Exterior y Turismo",
+        body: "Contamos con la autorización de DIRCETUR (Dirección Regional de Comercio Exterior y Turismo de Cusco), organización gubernamental que promueve la competencia, sostenibilidad y diversificación de los productos exportables peruanos, el turismo y la artesanía.",
+        status: "Autorización Vigente",
+        icon: "building",
+      },
+      {
+        name: "PROMPERÚ",
+        fullName: "Comisión de Promoción del Perú",
+        body: "Estamos suscritos a PROMPERÚ (Comisión de Promoción del Perú para la Exportación y Turismo), institución perteneciente al Ministerio de Comercio Exterior y Turismo de nuestro país.",
+        status: "Miembro Activo",
+        icon: "globe",
+      },
+      {
+        name: "SUNAT",
+        fullName: "Superintendencia Nacional de Administración Tributaria",
+        body: "Estamos registrados en SUNAT, institución adscrita al Ministerio de Economía y Finanzas del Perú.",
+        status: "Registro al día",
+        icon: "folder",
+        code: "RUC: 20609347318",
+      },
+    ],
+    ministry:
+      "Institución adscrita al Ministerio de Comercio Exterior y Turismo",
+    certificatesEyebrow: "Certificados",
+    certificatesTitle: "Nuestras Acreditaciones",
+    certificatesBody:
+      "Dreamy Tours cumple con todos los requisitos y licencias principales para operar en el sector turístico en todo el territorio peruano.",
+    certifications: [
+      {
+        name: "DIRCETUR",
+        detail: "Gobierno Regional de Cusco",
+        status: "Autorización Vigente",
+        icon: "check",
+      },
+      {
+        name: "PROMPERÚ",
+        detail: "Comisión de Promoción del Perú",
+        status: "Miembro Activo",
+        icon: "globe",
+      },
+      {
+        name: "SUNAT",
+        detail: "RUC: 20609347318",
+        status: "Registro al día",
+        icon: "folder",
+      },
+      {
+        name: "MINCETUR",
+        detail: "Ministerio de Comercio Exterior",
+        status: "Registro Nacional",
+        icon: "building",
+      },
+    ],
+    previous: "Acreditación anterior",
+    next: "Siguiente acreditación",
+    professionalsEyebrow: "Profesionales",
+    teamTitle: "El equipo detrás de cada viaje",
+    teamBody:
+      "Un equipo dedicado a hacer que cada itinerario se sienta personal, organizado e inolvidable.",
+    departments: [
+      {
+        name: "Tecnología & IT",
+        count: "3 profesionales",
+        layout: "vertical",
+        members: [
+          { name: "Erian", role: "Web Developer", tags: ["React", "Tailwind"] },
+          { name: "Nilo", role: "Web Developer", tags: ["Node.js", "MongoDB"] },
+          { name: "Jack", role: "Web Master", tags: ["DevOps", "AWS"] },
+        ],
+      },
+      {
+        name: "Operaciones",
+        count: "2 profesionales",
+        layout: "horizontal",
+        members: [
+          {
+            name: "Zayda",
+            role: "Operaciones",
+            description: "Coordinación de excursiones y logística en campo.",
+            tags: ["Guía", "Logística"],
+          },
+          {
+            name: "Juliana",
+            role: "Operaciones",
+            description: "Atención al cliente y gestión de reservas.",
+            tags: ["Atención", "Reservas"],
+          },
+        ],
+      },
+      {
+        name: "Contabilidad",
+        count: "2 profesionales",
+        layout: "horizontal",
+        members: [
+          {
+            name: "Susana",
+            role: "Contabilidad",
+            description: "Gestión financiera y contabilidad general.",
+            tags: ["Finanzas", "Tributos"],
+          },
+          {
+            name: "Lizbeth",
+            role: "Asistente Contabilidad",
+            description: "Soporte contable y facturación.",
+            tags: ["Facturación", "Soporte"],
+          },
+        ],
+      },
+    ],
+    ctaTitle: "¿Listo para tu próxima aventura?",
+    ctaBody:
+      "Déjanos ser tu guía en Perú y Bolivia. Creamos experiencias únicas que recordarás para siempre.",
+    tours: "Ver Tours",
+    contact: "Contactar",
+    contactHref: "/es/planea-tu-viaje",
+  },
+  en: {
+    introLead:
+      "DREAMY TOURS stands out for providing a service beyond the traditional, both in planning and in every excursion. We operate with ethical and social responsibility principles, promoting the well-being of our team while maintaining a continuous commitment to safety and environmental respect.",
+    introBody:
+      "Today we have a portfolio of professionals dedicated to customer care, helping travellers turn their dreams of travelling and discovering other cultures into unforgettable experiences.",
+    essence: "Our Essence",
+    mission: "Mission",
+    missionBody:
+      "To provide quality and reliable service, exceeding our clients' expectations with travel packages that reveal the wonders of Peru through a specialised team and personalised service.",
+    vision: "Vision",
+    visionBody:
+      "To be a leading agency in Cusco and internationally, with innovative products and tour operations that contribute to the socioeconomic development of communities.",
+    values: "Values",
+    valuesBody:
+      "We value the transmission of ancestral customs and traditions, preparing our team in first aid, food handling, road safety, and emergency care.",
+    philosophyEyebrow: "Philosophy",
+    philosophyTitle: "Our Commitment",
+    philosophy:
+      '"Dreamy Tours promotes responsible tourism based on respect for people and destinations, seeking authentic interaction with the real life of the communities we visit."',
+    licensesEyebrow: "Licences",
+    licensesTitle: "Authorisations and Certifications",
+    licenseLead: "Dreamy Tours - Travel Agency and Tour Operator",
+    licenseLeadRest:
+      ", meets the main requirements and licences to operate and offer tourism services throughout Peru.",
+    licenseIntro:
+      "The institutions below regulate tourism in Peru and we are registered with them as follows:",
+    licenseCards: [
+      {
+        name: "DIRCETUR",
+        fullName: "Regional Directorate of Foreign Trade and Tourism",
+        body: "We hold authorisation from DIRCETUR, the Regional Directorate of Foreign Trade and Tourism of Cusco.",
+        status: "Current authorisation",
+        icon: "building",
+      },
+      {
+        name: "PROMPERÚ",
+        fullName: "Peru Promotion Commission",
+        body: "We are registered with PROMPERÚ, an institution of Peru's Ministry of Foreign Trade and Tourism.",
+        status: "Active member",
+        icon: "globe",
+      },
+      {
+        name: "SUNAT",
+        fullName: "National Tax Administration",
+        body: "We are registered with SUNAT, Peru's National Tax Administration.",
+        status: "Up-to-date registration",
+        icon: "folder",
+        code: "Tax ID: 20609347318",
+      },
+    ],
+    ministry:
+      "Institution attached to the Ministry of Foreign Trade and Tourism",
+    certificatesEyebrow: "Certificates",
+    certificatesTitle: "Our Accreditations",
+    certificatesBody:
+      "Dreamy Tours meets the main requirements and licences to operate in Peru's tourism sector.",
+    certifications: [
+      {
+        name: "DIRCETUR",
+        detail: "Regional Government of Cusco",
+        status: "Current authorisation",
+        icon: "check",
+      },
+      {
+        name: "PROMPERÚ",
+        detail: "Peru Promotion Commission",
+        status: "Active member",
+        icon: "globe",
+      },
+      {
+        name: "SUNAT",
+        detail: "Tax ID: 20609347318",
+        status: "Up-to-date registration",
+        icon: "folder",
+      },
+      {
+        name: "MINCETUR",
+        detail: "Ministry of Foreign Trade",
+        status: "National registration",
+        icon: "building",
+      },
+    ],
+    previous: "Previous accreditation",
+    next: "Next accreditation",
+    professionalsEyebrow: "Professionals",
+    teamTitle: "The team behind every journey",
+    teamBody:
+      "A team dedicated to making every itinerary feel personal, organised, and unforgettable.",
+    departments: [
+      {
+        name: "Technology & IT",
+        count: "3 professionals",
+        layout: "vertical",
+        members: [
+          { name: "Erian", role: "Web Developer", tags: ["React", "Tailwind"] },
+          { name: "Nilo", role: "Web Developer", tags: ["Node.js", "MongoDB"] },
+          { name: "Jack", role: "Web Master", tags: ["DevOps", "AWS"] },
+        ],
+      },
+      {
+        name: "Operations",
+        count: "2 professionals",
+        layout: "horizontal",
+        members: [
+          {
+            name: "Zayda",
+            role: "Operations",
+            description: "Excursion coordination and field logistics.",
+            tags: ["Guiding", "Logistics"],
+          },
+          {
+            name: "Juliana",
+            role: "Operations",
+            description: "Customer care and booking management.",
+            tags: ["Care", "Bookings"],
+          },
+        ],
+      },
+      {
+        name: "Accounting",
+        count: "2 professionals",
+        layout: "horizontal",
+        members: [
+          {
+            name: "Susana",
+            role: "Accounting",
+            description: "Financial management and general accounting.",
+            tags: ["Finance", "Tax"],
+          },
+          {
+            name: "Lizbeth",
+            role: "Accounting Assistant",
+            description: "Accounting support and invoicing.",
+            tags: ["Invoicing", "Support"],
+          },
+        ],
+      },
+    ],
+    ctaTitle: "Ready for your next adventure?",
+    ctaBody:
+      "Let us be your guide in Peru and Bolivia. We create unique experiences you will remember forever.",
+    tours: "Explore Tours",
+    contact: "Get in touch",
+    contactHref: "/plan-your-trip",
+  },
+  pt: {
+    introLead:
+      "A DREAMY TOURS se distingue por oferecer um serviço diferente e fora do tradicional, tanto na organização quanto nas excursões. Atuamos com princípios éticos e de responsabilidade social, promovendo o bem-estar da nossa equipe e mantendo um compromisso contínuo com a segurança e o meio ambiente.",
+    introBody:
+      "Hoje contamos com profissionais dedicados ao atendimento, ajudando viajantes a transformar o sonho de conhecer outras culturas em experiências inesquecíveis.",
+    essence: "A Nossa Essência",
+    mission: "Missão",
+    missionBody:
+      "Oferecer um serviço de qualidade e confiança, superando expectativas com pacotes que revelam as maravilhas do Peru e atendimento personalizado.",
+    vision: "Visão",
+    visionBody:
+      "Ser uma agência de referência em Cusco e internacionalmente, com produtos inovadores que contribuam para o desenvolvimento das comunidades.",
+    values: "Valores",
+    valuesBody:
+      "Valorizamos a transmissão de costumes e tradições ancestrais, preparando a nossa equipe em primeiros socorros, segurança e atendimento em emergências.",
+    philosophyEyebrow: "Filosofia",
+    philosophyTitle: "O Nosso Compromisso",
+    philosophy:
+      '"A Dreamy Tours promove um turismo responsável, baseado no respeito pelas pessoas e destinos, buscando uma interação autêntica com as comunidades que visitamos."',
+    licensesEyebrow: "Licenças",
+    licensesTitle: "Autorizações e Certificações",
+    licenseLead: "Dreamy Tours - Agência de Viagens e Operadora de Turismo",
+    licenseLeadRest:
+      ", cumpre os principais requisitos e licenças para operar serviços turísticos em todo o Peru.",
+    licenseIntro:
+      "As instituições abaixo regulam o turismo no Peru e estamos registrados nelas da seguinte forma:",
+    licenseCards: [
+      {
+        name: "DIRCETUR",
+        fullName: "Direção Regional de Comércio Exterior e Turismo",
+        body: "Contamos com autorização da DIRCETUR, Direção Regional de Comércio Exterior e Turismo de Cusco.",
+        status: "Autorização vigente",
+        icon: "building",
+      },
+      {
+        name: "PROMPERÚ",
+        fullName: "Comissão de Promoção do Peru",
+        body: "Estamos registrados na PROMPERÚ, instituição do Ministério de Comércio Exterior e Turismo.",
+        status: "Membro ativo",
+        icon: "globe",
+      },
+      {
+        name: "SUNAT",
+        fullName: "Administração Tributária Nacional",
+        body: "Estamos registrados na SUNAT, a administração tributária nacional do Peru.",
+        status: "Registro em dia",
+        icon: "folder",
+        code: "RUC: 20609347318",
+      },
+    ],
+    ministry:
+      "Instituição vinculada ao Ministério de Comércio Exterior e Turismo",
+    certificatesEyebrow: "Certificados",
+    certificatesTitle: "As Nossas Credenciais",
+    certificatesBody:
+      "A Dreamy Tours cumpre os principais requisitos e licenças para operar no setor turístico peruano.",
+    certifications: [
+      {
+        name: "DIRCETUR",
+        detail: "Governo Regional de Cusco",
+        status: "Autorização vigente",
+        icon: "check",
+      },
+      {
+        name: "PROMPERÚ",
+        detail: "Comissão de Promoção do Peru",
+        status: "Membro ativo",
+        icon: "globe",
+      },
+      {
+        name: "SUNAT",
+        detail: "RUC: 20609347318",
+        status: "Registro em dia",
+        icon: "folder",
+      },
+      {
+        name: "MINCETUR",
+        detail: "Ministério de Comércio Exterior",
+        status: "Registro nacional",
+        icon: "building",
+      },
+    ],
+    previous: "Credencial anterior",
+    next: "Próxima credencial",
+    professionalsEyebrow: "Profissionais",
+    teamTitle: "A equipe por trás de cada viagem",
+    teamBody:
+      "Uma equipe dedicada a fazer cada roteiro parecer pessoal, organizado e inesquecível.",
+    departments: [
+      {
+        name: "Tecnologia & TI",
+        count: "3 profissionais",
+        layout: "vertical",
+        members: [
+          {
+            name: "Erian",
+            role: "Desenvolvedor Web",
+            tags: ["React", "Tailwind"],
+          },
+          {
+            name: "Nilo",
+            role: "Desenvolvedor Web",
+            tags: ["Node.js", "MongoDB"],
+          },
+          { name: "Jack", role: "Web Master", tags: ["DevOps", "AWS"] },
+        ],
+      },
+      {
+        name: "Operações",
+        count: "2 profissionais",
+        layout: "horizontal",
+        members: [
+          {
+            name: "Zayda",
+            role: "Operações",
+            description: "Coordenação de excursões e logística em campo.",
+            tags: ["Guiamento", "Logística"],
+          },
+          {
+            name: "Juliana",
+            role: "Operações",
+            description: "Atendimento ao cliente e gestão de reservas.",
+            tags: ["Atendimento", "Reservas"],
+          },
+        ],
+      },
+      {
+        name: "Contabilidade",
+        count: "2 profissionais",
+        layout: "horizontal",
+        members: [
+          {
+            name: "Susana",
+            role: "Contabilidade",
+            description: "Gestão financeira e contabilidade geral.",
+            tags: ["Finanças", "Tributos"],
+          },
+          {
+            name: "Lizbeth",
+            role: "Assistente de Contabilidade",
+            description: "Suporte contábil e faturamento.",
+            tags: ["Faturamento", "Suporte"],
+          },
+        ],
+      },
+    ],
+    ctaTitle: "Pronto para a sua próxima aventura?",
+    ctaBody:
+      "Deixe-nos ser o seu guia no Peru e na Bolívia. Criamos experiências únicas que você lembrará para sempre.",
+    tours: "Ver Tours",
+    contact: "Entrar em contacto",
+    contactHref: "/pt/planeje-sua-viagem",
+  },
+} as const;
+
+const copy = copyByLanguage[lang];
+const sliderId = `about-certifications-${lang}`;
+const sliderCertificates = [
+  {
+    ...copy.certifications[0],
+    image: "/imagenes/certificados/gercetur.webp",
+  },
+  {
+    name: "MINCETUR",
+    detail:
+      lang === "es"
+        ? "Ministerio de Comercio Exterior"
+        : lang === "pt"
+          ? "Ministério de Comércio Exterior"
+          : "Ministry of Foreign Trade",
+    status:
+      lang === "es"
+        ? "Registro Nacional"
+        : lang === "pt"
+          ? "Registro nacional"
+          : "National registration",
+    image: "/imagenes/certificados/mincetur-dreamy.webp",
+  },
+  {
+    ...copy.certifications[2],
+    image: "/imagenes/certificados/ficha-ruc.webp",
+  },
+  {
+    name:
+      lang === "es"
+        ? "Licencia de Operación"
+        : lang === "pt"
+          ? "Licença de Operação"
+          : "Operating Licence",
+    detail:
+      lang === "es"
+        ? "Licencia de funcionamiento"
+        : lang === "pt"
+          ? "Licença de funcionamento"
+          : "Operating licence",
+    status:
+      lang === "es"
+        ? "Documento vigente"
+        : lang === "pt"
+          ? "Documento vigente"
+          : "Current document",
+    image: "/imagenes/certificados/licencia-dreamy.webp",
+  },
+  {
+    name:
+      lang === "es"
+        ? "Certificado de Inspección"
+        : lang === "pt"
+          ? "Certificado de Inspeção"
+          : "Inspection Certificate",
+    detail:
+      lang === "es"
+        ? "Documento de inspección"
+        : lang === "pt"
+          ? "Documento de inspeção"
+          : "Inspection document",
+    status:
+      lang === "es"
+        ? "Documento vigente"
+        : lang === "pt"
+          ? "Documento vigente"
+          : "Current document",
+    image: "/imagenes/certificados/fertificado-inspeccion.webp",
+  },
+] as const;
+
+const teamImages: Record<string, string> = {
+  Erian: "/imagenes/personal/erian.avif",
+  Jack: "/imagenes/personal/jack.avif",
+  Juliana: "/imagenes/personal/juliana.avif",
+  Lizbeth: "/imagenes/personal/lizbeth.avif",
+  Nilo: "/imagenes/personal/nilo.avif",
+  Susana: "/imagenes/personal/susana.avif",
+  Zayda: "/imagenes/personal/zaida.avif",
+};
+---
+
+<div class="about-proposal not-prose">
+  <section class="about-proposal__intro">
+    <div class="about-proposal__intro-card">
+      <p class="about-proposal__intro-lead">
+        <strong>DREAMY TOURS</strong>
+        {copy.introLead.replace("DREAMY TOURS ", "")}
+      </p>
+      <div class="about-proposal__intro-divider">
+        <p>{copy.introBody}</p>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="about-proposal__essence"
+    aria-labelledby="about-essence-title"
+  >
+    <div class="about-proposal__section-title">
+      <h2 id="about-essence-title">{copy.essence}</h2>
+      <span aria-hidden="true"></span>
+    </div>
+    <div class="about-proposal__essence-grid">
+      <article class="about-proposal__essence-card">
+        <span class="about-proposal__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"
+            ><path
+              d="M9 20 3.55 17.28A1 1 0 0 1 3 16.38V5.62a1 1 0 0 1 1.45-.89L9 7m0 13 6-3m-6 3V7m6 10 4.55 2.28A1 1 0 0 0 21 18.38V7.62a1 1 0 0 0-.55-.89L15 4m0 13V4m0 0L9 7"
+            ></path></svg
+          >
+        </span>
+        <h3>{copy.mission}</h3>
+        <p>{copy.missionBody}</p>
+      </article>
+      <article
+        class="about-proposal__essence-card about-proposal__essence-card--offset-one"
+      >
+        <span class="about-proposal__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"
+            ><circle cx="12" cy="12" r="3"></circle><path
+              d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12Z"
+            ></path></svg
+          >
+        </span>
+        <h3>{copy.vision}</h3>
+        <p>{copy.visionBody}</p>
+      </article>
+      <article
+        class="about-proposal__essence-card about-proposal__essence-card--offset-two"
+      >
+        <span class="about-proposal__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"
+            ><path
+              d="M4.32 6.32a4.5 4.5 0 0 0 0 6.36L12 20.36l7.68-7.68a4.5 4.5 0 0 0-6.36-6.36L12 7.64l-1.32-1.32a4.5 4.5 0 0 0-6.36 0Z"
+            ></path></svg
+          >
+        </span>
+        <h3>{copy.values}</h3>
+        <p>{copy.valuesBody}</p>
+      </article>
+    </div>
+  </section>
+
+  <section
+    class="about-proposal__philosophy"
+    aria-labelledby="about-philosophy-title"
+  >
+    <div class="about-proposal__philosophy-content">
+      <p class="about-proposal__eyebrow">{copy.philosophyEyebrow}</p>
+      <h2 id="about-philosophy-title">{copy.philosophyTitle}</h2>
+      <div class="about-proposal__philosophy-card">
+        <p>{copy.philosophy}</p>
+        <div aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="about-proposal__licenses"
+    aria-labelledby="about-licenses-title"
+  >
+    <div class="about-proposal__licenses-content">
+      <div class="about-proposal__section-title">
+        <p class="about-proposal__eyebrow">{copy.licensesEyebrow}</p>
+        <h2 id="about-licenses-title">{copy.licensesTitle}</h2>
+        <span aria-hidden="true"></span>
+      </div>
+      <div class="about-proposal__licenses-intro">
+        <p><strong>{copy.licenseLead}</strong>{copy.licenseLeadRest}</p>
+        <p>{copy.licenseIntro}</p>
+      </div>
+      <ul class="about-proposal__license-grid" role="list">
+        {
+          copy.licenseCards.map((license) => (
+            <li class="about-proposal__license-card">
+              <div class="about-proposal__license-card-title">
+                <span
+                  class="about-proposal__icon about-proposal__icon--small"
+                  aria-hidden="true"
+                >
+                  {license.icon === "building" && (
+                    <svg viewBox="0 0 24 24">
+                      <path d="M3 21h18M5 21V5h14v16M9 9h1m4 0h1M9 13h1m4 0h1M9 17h1m4 0h1" />
+                    </svg>
+                  )}
+                  {license.icon === "globe" && (
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+                    </svg>
+                  )}
+                  {license.icon === "folder" && (
+                    <svg viewBox="0 0 24 24">
+                      <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2Z" />
+                    </svg>
+                  )}
+                </span>
+                <div>
+                  <>
+                    <h3>{license.name}</h3>
+                    <p>{license.fullName}</p>
+                  </>
+                </div>
+              </div>
+              <p>{license.body}</p>
+              {"code" in license && license.code && <code>{license.code}</code>}
+              <div class="about-proposal__status">
+                <>
+                  <span aria-hidden="true" />
+                  <strong>{license.status}</strong>
+                </>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="about-proposal__ministry">
+        <svg viewBox="0 0 24 24" aria-hidden="true"
+          ><path d="m9 12 2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          ></path></svg
+        >{copy.ministry}
+      </p>
+    </div>
+  </section>
+
+  <section
+    class="about-proposal__certifications"
+    aria-labelledby="about-certifications-title"
+  >
+    <div class="about-proposal__certifications-content">
+      <p class="about-proposal__eyebrow">{copy.certificatesEyebrow}</p>
+      <h2 id="about-certifications-title">{copy.certificatesTitle}</h2>
+      <p class="about-proposal__certifications-copy">{copy.certificatesBody}</p>
+      <div class="about-proposal__slider" data-about-slider={sliderId}>
+        <div class="about-proposal__slider-viewport">
+          <div class="about-proposal__slider-track">
+            {
+              sliderCertificates.map((certificate) => (
+                <article class="about-proposal__slider-item">
+                  <div class="about-proposal__certificate-card">
+                    <img
+                      src={certificate.image}
+                      alt={certificate.name}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="about-proposal__certificate-card-copy">
+                      <h3>{certificate.name}</h3>
+                      <p>{certificate.detail}</p>
+                      <strong>✓ {certificate.status}</strong>
+                    </div>
+                  </div>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+        <button
+          type="button"
+          class="about-proposal__slider-button about-proposal__slider-button--previous"
+          data-slider-previous
+          aria-label={copy.previous}
+          ><svg viewBox="0 0 24 24" aria-hidden="true"
+            ><path d="m15 19-7-7 7-7"></path></svg
+          ></button
+        >
+        <button
+          type="button"
+          class="about-proposal__slider-button about-proposal__slider-button--next"
+          data-slider-next
+          aria-label={copy.next}
+          ><svg viewBox="0 0 24 24" aria-hidden="true"
+            ><path d="m9 5 7 7-7 7"></path></svg
+          ></button
+        >
+        <div
+          class="about-proposal__slider-dots"
+          aria-label={copy.certificatesTitle}
+        >
+          {
+            sliderCertificates.map((certificate, index) => (
+              <button
+                type="button"
+                data-slider-dot={index}
+                aria-label={`${certificate.name}: ${certificate.status}`}
+              />
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-proposal__team" aria-labelledby="about-team-title">
+    <div class="about-proposal__team-heading">
+      <p class="about-proposal__eyebrow">{copy.professionalsEyebrow}</p>
+      <h2 id="about-team-title">{copy.teamTitle}</h2>
+      <p>{copy.teamBody}</p>
+      <span aria-hidden="true"></span>
+    </div>
+    {
+      copy.departments.map((department) => (
+        <section
+          class:list={[
+            "about-proposal__department",
+            {
+              "about-proposal__department--vertical":
+                department.layout === "vertical",
+            },
+          ]}
+          aria-labelledby={`department-${department.name.replaceAll(" ", "-").toLowerCase()}`}
+        >
+          <div class="about-proposal__department-heading">
+            <>
+              <span aria-hidden="true" />
+              <h3
+                id={`department-${department.name.replaceAll(" ", "-").toLowerCase()}`}
+              >
+                {department.name}
+              </h3>
+              <small>{department.count}</small>
+            </>
+          </div>
+          <ul class="about-proposal__team-grid" role="list">
+            {department.members.map((member) => (
+              <li class="about-proposal__team-card">
+                <div class="about-proposal__team-card-image">
+                  <img
+                    src={teamImages[member.name]}
+                    alt={[member.name, member.role].join(", ")}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div class="about-proposal__team-card-content">
+                  <h4>{member.name}</h4>
+                  <p>{member.role}</p>
+                  {"description" in member && member.description && (
+                    <small>{member.description}</small>
+                  )}
+                  <div>
+                    {member.tags.map((tag) => (
+                      <span>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </section>
+
+  <section class="about-proposal__cta" aria-labelledby="about-cta-title">
+    <div>
+      <h2 id="about-cta-title">{copy.ctaTitle}</h2><p>{copy.ctaBody}</p><div>
+        <a href="/">{copy.tours}</a><a href={copy.contactHref}>{copy.contact}</a
+        >
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .about-proposal {
+    --about-paper: color-mix(
+      in oklab,
+      var(--accent-warm) 12%,
+      var(--background)
+    );
+    --about-card: var(--card);
+    --about-rule: color-mix(in oklab, var(--primary) 18%, var(--border));
+    color: var(--foreground);
+  }
+  .about-proposal__intro,
+  .about-proposal__essence,
+  .about-proposal__team {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 4rem 1.5rem;
+  }
+  .about-proposal__intro {
+    max-width: 64rem;
+    padding-block: 4rem 5rem;
+  }
+  .about-proposal__intro-card,
+  .about-proposal__essence-card,
+  .about-proposal__philosophy-card,
+  .about-proposal__licenses-intro,
+  .about-proposal__license-card,
+  .about-proposal__certificate-card,
+  .about-proposal__team-card {
+    border: 1px solid var(--about-rule);
+    background: var(--about-card);
+    box-shadow: 0 1.25rem 2.75rem -2.25rem
+      color-mix(in oklab, var(--foreground) 45%, transparent);
+  }
+  .about-proposal__intro-card {
+    padding: clamp(1.75rem, 5vw, 3rem);
+    border-radius: 1.5rem;
+  }
+  .about-proposal__intro-lead {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.7;
+  }
+  .about-proposal__intro-lead strong,
+  .about-proposal__licenses-intro strong {
+    color: var(--primary);
+  }
+  .about-proposal__intro-divider {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--about-rule);
+  }
+  .about-proposal__intro-divider p {
+    margin: 0;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+  }
+  .about-proposal__section-title,
+  .about-proposal__team-heading,
+  .about-proposal__certifications-content {
+    text-align: center;
+  }
+  .about-proposal h2 {
+    margin: 0;
+    color: var(--foreground);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+  .about-proposal__section-title > span,
+  .about-proposal__team-heading > span {
+    display: block;
+    width: 5rem;
+    height: 0.25rem;
+    margin: 1.2rem auto 0;
+    border-radius: 999px;
+    background: var(--secondary);
+  }
+  .about-proposal__essence {
+    padding-bottom: 5rem;
+  }
+  .about-proposal__essence-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .about-proposal__essence-card {
+    min-height: 22rem;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .about-proposal__essence-card--offset-one {
+    margin-top: 1rem;
+  }
+  .about-proposal__essence-card--offset-two {
+    margin-top: 2rem;
+  }
+  .about-proposal__icon {
+    display: grid;
+    width: 4rem;
+    height: 4rem;
+    place-items: center;
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--primary) 11%, var(--background));
+    color: var(--primary);
+  }
+  .about-proposal__icon svg,
+  .about-proposal__ministry svg,
+  .about-proposal__slider-button svg {
+    width: 2rem;
+    height: 2rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+  .about-proposal__icon--small {
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+  }
+  .about-proposal__icon--small svg {
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+  .about-proposal__icon--large {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 0.9rem;
+    border-radius: 50%;
+  }
+  .about-proposal__essence-card h3 {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1.5rem;
+  }
+  .about-proposal__essence-card p {
+    margin: 0;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+  }
+  .about-proposal__philosophy {
+    padding: 5rem 1.5rem;
+    background-color: var(--about-paper);
+    background-image: radial-gradient(
+      color-mix(in oklab, var(--primary) 18%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 1rem 1rem;
+  }
+  .about-proposal__philosophy-content {
+    max-width: 64rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .about-proposal__eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .about-proposal__philosophy-card {
+    position: relative;
+    margin-top: 2rem;
+    padding: clamp(1.75rem, 5vw, 3rem);
+    overflow: hidden;
+    border-radius: 1.5rem;
+  }
+  .about-proposal__philosophy-card::before {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 0.3rem;
+    background: var(--secondary);
+    content: "";
+  }
+  .about-proposal__philosophy-card > p {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: clamp(1.1rem, 2vw, 1.45rem);
+    font-style: italic;
+    line-height: 1.65;
+  }
+  .about-proposal__philosophy-card > div {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  .about-proposal__philosophy-card > div span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--secondary);
+  }
+  .about-proposal__licenses {
+    padding: 4.5rem 1.5rem;
+    background: var(--background);
+  }
+  .about-proposal__licenses-content {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+  .about-proposal__licenses-intro {
+    margin-top: 2.5rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border-radius: 1.5rem;
+  }
+  .about-proposal__licenses-intro p {
+    margin: 0;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+  }
+  .about-proposal__licenses-intro p + p {
+    margin-top: 1rem;
+  }
+  .about-proposal__license-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .about-proposal__license-card {
+    padding: 1.5rem;
+    border-left: 0.3rem solid var(--primary);
+    border-radius: 1rem;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .about-proposal__license-card-title {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+  }
+  .about-proposal__license-card h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  .about-proposal__license-card-title p {
+    margin: 0.15rem 0 0;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+  .about-proposal__license-card > p {
+    margin: 1rem 0 0;
+    color: var(--muted-foreground);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+  .about-proposal__license-card code {
+    display: block;
+    margin-top: 0.9rem;
+    padding: 0.5rem;
+    border-radius: 0.35rem;
+    background: var(--muted);
+    color: var(--foreground);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+  .about-proposal__status {
+    display: flex;
+    gap: 0.45rem;
+    align-items: center;
+    margin-top: 1rem;
+    color: var(--primary);
+    font-size: 0.75rem;
+  }
+  .about-proposal__status span {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+  .about-proposal__ministry {
+    display: inline-flex;
+    margin: 2.5rem auto 0;
+    padding: 0.75rem 1.25rem;
+    gap: 0.65rem;
+    align-items: center;
+    border: 1px solid color-mix(in oklab, var(--primary) 20%, var(--border));
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--primary) 7%, var(--background));
+    color: var(--foreground);
+    font-size: 0.85rem;
+  }
+  .about-proposal__ministry svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--primary);
+  }
+  .about-proposal__certifications {
+    padding: 4.5rem 1.5rem;
+    border-top: 1px solid var(--about-rule);
+    background: var(--muted);
+  }
+  .about-proposal__certifications-content {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+  .about-proposal__certifications-copy {
+    max-width: 42rem;
+    margin: 1rem auto 2.5rem;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+  }
+  .about-proposal__slider {
+    position: relative;
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+  .about-proposal__slider-viewport {
+    overflow: hidden;
+  }
+  .about-proposal__slider-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+  }
+  .about-proposal__slider-item {
+    box-sizing: border-box;
+    flex: 0 0 100%;
+    padding-inline: 0.75rem;
+  }
+  .about-proposal__certificate-card {
+    overflow: hidden;
+    border-radius: 1rem;
+    text-align: center;
+  }
+  .about-proposal__certificate-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    padding: 1rem;
+    background: white;
+    object-fit: contain;
+  }
+  .about-proposal__certificate-card-copy {
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--about-rule);
+  }
+  .about-proposal__certificate-card h3,
+  .about-proposal__certificate-card p,
+  .about-proposal__certificate-card strong {
+    margin: 0;
+  }
+  .about-proposal__certificate-card h3 {
+    font-size: 1.1rem;
+  }
+  .about-proposal__certificate-card p {
+    margin-top: 0.2rem;
+    color: var(--muted-foreground);
+    font-size: 0.8rem;
+  }
+  .about-proposal__certificate-card strong {
+    margin-top: 0.4rem;
+    color: var(--primary);
+    font-size: 0.75rem;
+  }
+  .about-proposal__slider-button {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border: 1px solid var(--about-rule);
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--primary);
+    box-shadow: 0 0.5rem 1.5rem -1rem
+      color-mix(in oklab, var(--foreground) 55%, transparent);
+    transform: translateY(-50%);
+  }
+  .about-proposal__slider-button--previous {
+    left: -1rem;
+  }
+  .about-proposal__slider-button--next {
+    right: -1rem;
+  }
+  .about-proposal__slider-button svg {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+  .about-proposal__slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  .about-proposal__slider-dots button {
+    width: 0.6rem;
+    height: 0.6rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--foreground) 17%, transparent);
+    transition:
+      width 0.25s ease,
+      background 0.25s ease;
+  }
+  .about-proposal__slider-dots button[aria-current="true"] {
+    width: 1.8rem;
+    background: var(--primary);
+  }
+  .about-proposal__team {
+    padding-top: 5rem;
+  }
+  .about-proposal__team-heading {
+    max-width: 42rem;
+    margin: 0 auto 4rem;
+  }
+  .about-proposal__team-heading > p:not(.about-proposal__eyebrow) {
+    margin: 1rem 0 0;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+  }
+  .about-proposal__department {
+    margin-top: 3.5rem;
+  }
+  .about-proposal__department-heading {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .about-proposal__department-heading > span {
+    width: 0.3rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: var(--secondary);
+  }
+  .about-proposal__department-heading h3 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+  .about-proposal__department-heading small {
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--primary) 10%, var(--background));
+    color: var(--primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .about-proposal__team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .about-proposal__department--vertical .about-proposal__team-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .about-proposal__team-card {
+    display: flex;
+    overflow: hidden;
+    border-radius: 1rem;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .about-proposal__team-card-image {
+    min-width: 40%;
+    min-height: 12rem;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--primary) 16%, white);
+  }
+  .about-proposal__team-card-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 12rem;
+    object-fit: cover;
+  }
+  .about-proposal__department--vertical .about-proposal__team-card {
+    display: block;
+  }
+  .about-proposal__department--vertical .about-proposal__team-card-image {
+    min-width: 0;
+    min-height: 12rem;
+  }
+  .about-proposal__department--vertical .about-proposal__team-card-image img {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+  .about-proposal__team-card-content {
+    padding: 1.5rem;
+    flex: 1;
+  }
+  .about-proposal__team-card-content h4,
+  .about-proposal__team-card-content p,
+  .about-proposal__team-card-content small {
+    margin: 0;
+  }
+  .about-proposal__team-card-content h4 {
+    color: var(--foreground);
+    font-size: 1.2rem;
+  }
+  .about-proposal__team-card-content > p {
+    margin-top: 0.2rem;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .about-proposal__team-card-content > small {
+    display: block;
+    margin-top: 0.6rem;
+    color: var(--muted-foreground);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .about-proposal__team-card-content > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.85rem;
+  }
+  .about-proposal__team-card-content > div span {
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--primary) 9%, var(--background));
+    color: var(--primary);
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+  .about-proposal__cta {
+    padding: 4.5rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    text-align: center;
+  }
+  .about-proposal__cta > div {
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+  .about-proposal__cta h2 {
+    color: white;
+  }
+  .about-proposal__cta p {
+    max-width: 40rem;
+    margin: 1rem auto 0;
+    color: rgb(255 255 255 / 0.8);
+    line-height: 1.7;
+  }
+  .about-proposal__cta > div > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+  .about-proposal__cta a {
+    display: inline-flex;
+    min-height: 3rem;
+    padding: 0.75rem 1.35rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    border-radius: 999px;
+    background: white;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .about-proposal__cta a + a {
+    background: transparent;
+    color: white;
+  }
+  @media (hover: hover) {
+    .about-proposal__essence-card:hover,
+    .about-proposal__license-card:hover,
+    .about-proposal__team-card:hover {
+      box-shadow: 0 1.5rem 3rem -2rem
+        color-mix(in oklab, var(--foreground) 60%, transparent);
+      transform: translateY(-0.25rem);
+    }
+    .about-proposal__slider-button:hover {
+      background: var(--primary);
+      color: white;
+    }
+    .about-proposal__cta a:hover {
+      background: color-mix(in oklab, white 88%, var(--accent-warm));
+    }
+    .about-proposal__cta a + a:hover {
+      background: rgb(255 255 255 / 0.12);
+    }
+  }
+  @media (min-width: 48rem) {
+    .about-proposal__slider-item {
+      flex-basis: 50%;
+    }
+  }
+  @media (min-width: 64rem) {
+    .about-proposal__slider-item {
+      flex-basis: 33.333%;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .about-proposal__essence-grid,
+    .about-proposal__license-grid,
+    .about-proposal__team-grid,
+    .about-proposal__department--vertical .about-proposal__team-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-proposal__essence-card--offset-one,
+    .about-proposal__essence-card--offset-two {
+      margin-top: 0;
+    }
+    .about-proposal__team-card {
+      display: block;
+    }
+    .about-proposal__team-card-image {
+      min-width: 0;
+    }
+    .about-proposal__slider-button--previous {
+      left: -0.25rem;
+    }
+    .about-proposal__slider-button--next {
+      right: -0.25rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document
+      .querySelectorAll<HTMLElement>("[data-about-slider]")
+      .forEach((slider) => {
+        if (slider.dataset.initialized) return;
+        slider.dataset.initialized = "true";
+
+        const track = slider.querySelector<HTMLElement>(
+          ".about-proposal__slider-track",
+        );
+        const items = slider.querySelectorAll<HTMLElement>(
+          ".about-proposal__slider-item",
+        );
+        const dots =
+          slider.querySelectorAll<HTMLButtonElement>("[data-slider-dot]");
+        const previous = slider.querySelector<HTMLButtonElement>(
+          "[data-slider-previous]",
+        );
+        const next =
+          slider.querySelector<HTMLButtonElement>("[data-slider-next]");
+        if (!track || !items.length || !previous || !next) return;
+
+        let index = 0;
+        let interval: number | undefined;
+        const reducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        );
+
+        const perView = () =>
+          window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1;
+        const maxIndex = () => Math.max(0, items.length - perView());
+        const update = () => {
+          index = Math.min(index, maxIndex());
+          track.style.transform = `translateX(-${index * (100 / perView())}%)`;
+          dots.forEach((dot, dotIndex) => {
+            const isActive = dotIndex === index;
+            dot.hidden = dotIndex > maxIndex();
+            dot.setAttribute("aria-current", String(isActive));
+          });
+          previous.disabled = index === 0;
+          next.disabled = index === maxIndex();
+        };
+        const move = (direction: number) => {
+          index = Math.max(0, Math.min(maxIndex(), index + direction));
+          update();
+        };
+        const stopAutoSlide = () => {
+          if (interval) window.clearInterval(interval);
+          interval = undefined;
+        };
+        const startAutoSlide = () => {
+          stopAutoSlide();
+          if (reducedMotion.matches || maxIndex() === 0) return;
+          interval = window.setInterval(() => {
+            index = index >= maxIndex() ? 0 : index + 1;
+            update();
+          }, 5000);
+        };
+
+        previous.addEventListener("click", () => move(-1));
+        next.addEventListener("click", () => move(1));
+        dots.forEach((dot, dotIndex) =>
+          dot.addEventListener("click", () => {
+            index = dotIndex;
+            update();
+            startAutoSlide();
+          }),
+        );
+        slider.addEventListener("mouseenter", stopAutoSlide);
+        slider.addEventListener("mouseleave", startAutoSlide);
+        window.addEventListener("resize", () => {
+          update();
+          startAutoSlide();
+        });
+        reducedMotion.addEventListener("change", startAutoSlide);
+        update();
+        startAutoSlide();
+      });
+  });
+</script>

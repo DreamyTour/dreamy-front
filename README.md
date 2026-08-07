@@ -246,7 +246,7 @@ La respuesta de home debe conservar estos campos:
 
 Las rutas src/pages/[slug].astro y src/pages/[lang]/[slug].astro resuelven tres tipos de contenido:
 
-- mdx: paginas locales versionadas en el repositorio.
+- content: páginas locales versionadas en el repositorio como componentes Astro.
 - page: paginas dinamicas provenientes del endpoint pages de Strapi.
 - tour: fichas provenientes del endpoint tours de Strapi.
 

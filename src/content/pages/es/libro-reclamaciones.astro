@@ -1,0 +1,45 @@
+---
+export const frontmatter = {
+  title: "Libro de Reclamaciones",
+  description: "Libro de Reclamaciones - Turismo Perú Bolivia",
+  lang: "es",
+  heroEyebrow: "Soporte",
+  heroImage: "/imagenes/sobre_nosotros.avif",
+  heroImageAlt: "Libro de Reclamaciones - Dreamy Tours",
+  seo: {
+    metaTitle: "Libro de Reclamaciones | Turismo Perú Bolivia",
+    metaDescription: "Libro de Reclamaciones - Turismo Perú Bolivia",
+  },
+  slugs: {
+    es: "libro-reclamaciones",
+    en: "complaints-book",
+    pt: "livro-de-reclamacoes",
+  },
+};
+
+import LibroReclamaciones from "@/components/content/LibroReclamaciones";
+---
+
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 my-6">
+
+<blockquote><p>📖 <strong>Estimados usuarios</strong>, el Libro de Reclamaciones es exclusivamente a la insatisfacción o disconformidad del usuario respecto a un servicio brindado por <strong>DREAMY TOURS</strong>. Los campos que se presentan son obligatorios para poder realizar su reclamo.</p></blockquote>
+
+<blockquote><p>«Conforme a lo establecido en el Código de Protección y Defensa del Consumidor este establecimiento cuenta con un Libro de Reclamaciones a tu disposición Solicitalo para registrar una queja o reclamo»</p></blockquote>
+
+</div>
+
+<hr />
+
+<div class="bg-white rounded-sm shadow-lg p-8 border border-gray-200">
+
+<LibroReclamaciones lang="es" client:visible />
+
+</div>
+
+<hr />
+
+<div class="bg-blue-50 border-l-4 border-blue-500 p-6 my-8">
+
+<blockquote><p>📌 <strong>Nota:</strong> Su reclamo será respondido en un plazo máximo de 30 días hábiles conforme a la normativa vigente.</p></blockquote>
+
+</div>

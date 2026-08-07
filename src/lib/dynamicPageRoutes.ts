@@ -6,7 +6,7 @@ import { dedupeLocalizedDocuments, sortToursByOrder } from "@/lib/utils";
 import type { Page, Category as PageCategory } from "@/types/page";
 import type { Tour, Category as TourCategory } from "@/types/tours";
 
-export interface MdxFrontmatter {
+export interface ContentFrontmatter {
 	title: string;
 	description?: string;
 	lang: Lang;
@@ -16,14 +16,14 @@ export interface MdxFrontmatter {
 }
 
 export interface DynamicPageProps {
-	type: "mdx" | "tour" | "page";
+	type: "content" | "tour" | "page";
 	tour?: Tour;
 	tourPageCategory?: { title: string; slug: string };
 	page?: Page;
 	slugMap?: Record<string, string>;
 	pageSlugMap?: Record<string, string>;
-	mdxComponent?: { default?: AstroComponentFactory };
-	mdxFrontmatter?: MdxFrontmatter;
+	contentComponent?: { default?: AstroComponentFactory };
+	contentFrontmatter?: ContentFrontmatter;
 	isRedirect?: boolean;
 	redirectTo?: string;
 	toursRelated?: Tour[];
@@ -40,24 +40,26 @@ type LocalizedRoutePath = {
 	props: Partial<DynamicPageProps>;
 };
 
-async function loadMdxPages() {
-	const mdxPages = import.meta.glob("@/content/pages/**/*.mdx");
+async function loadContentPages() {
+	const contentPages = import.meta.glob("@/content/pages/**/*.astro");
 	const entries: Array<{
 		lang: string;
 		slug: string;
 		mod: { default?: AstroComponentFactory };
-		frontmatter: MdxFrontmatter & { slugs?: Record<string, string> };
+		frontmatter: ContentFrontmatter & { slugs?: Record<string, string> };
 	}> = [];
 
-	for (const path in mdxPages) {
-		const mod = (await mdxPages[path]()) as {
+	for (const path in contentPages) {
+		const mod = (await contentPages[path]()) as {
 			default?: AstroComponentFactory;
-			frontmatter?: MdxFrontmatter & { slugs?: Record<string, string> };
+			frontmatter?: ContentFrontmatter & { slugs?: Record<string, string> };
 		};
 		const frontmatter = mod.frontmatter;
 		if (!frontmatter) continue;
 
-		const subpath = path.split("/content/pages/")[1].replace(".mdx", "");
+		const subpath = path
+			.split("/content/pages/")[1]
+			.replace(/\.astro$/, "");
 		const [lang, slug] = subpath.split("/");
 		entries.push({ lang, slug, mod, frontmatter });
 	}
@@ -181,17 +183,17 @@ export async function getDefaultLangDynamicPaths(): Promise<
 	DefaultRoutePath[]
 > {
 	const paths: DefaultRoutePath[] = [];
-	const mdxPages = await loadMdxPages();
+	const contentPages = await loadContentPages();
 
-	for (const { lang, slug, mod, frontmatter } of mdxPages) {
+	for (const { lang, slug, mod, frontmatter } of contentPages) {
 		if (lang !== DEFAULT_LANG) continue;
 
 		paths.push({
 			params: { slug },
 			props: {
-				type: "mdx",
-				mdxComponent: mod,
-				mdxFrontmatter: frontmatter,
+				type: "content",
+				contentComponent: mod,
+				contentFrontmatter: frontmatter,
 				pageSlugMap: frontmatter.slugs || {},
 			},
 		});
@@ -238,15 +240,15 @@ export async function getLocalizedDynamicPaths(): Promise<
 	LocalizedRoutePath[]
 > {
 	const paths: LocalizedRoutePath[] = [];
-	const mdxPages = await loadMdxPages();
+	const contentPages = await loadContentPages();
 
-	for (const { lang, slug, mod, frontmatter } of mdxPages) {
+	for (const { lang, slug, mod, frontmatter } of contentPages) {
 		paths.push({
 			params: { lang, slug },
 			props: {
-				type: "mdx",
-				mdxComponent: mod,
-				mdxFrontmatter: frontmatter,
+				type: "content",
+				contentComponent: mod,
+				contentFrontmatter: frontmatter,
 				pageSlugMap: frontmatter.slugs || {},
 			},
 		});

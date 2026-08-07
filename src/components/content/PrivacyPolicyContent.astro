@@ -1,0 +1,153 @@
+---
+import type { Lang } from "@/lib/i18n";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const privacyCopy = {
+  es: {
+    protectionLabel: "Protección de datos",
+    protectionTitle: "Tu privacidad es importante para nosotros",
+    protectionText: "En Dreamy Tours protegemos tus datos personales y los tratamos con transparencia, seguridad y conforme a la normativa aplicable.",
+    purposeLabel: "Uso responsable",
+    purposeTitle: "Finalidades del tratamiento",
+    purposes: [
+      ["Prestación del servicio", "Usamos tus datos para proporcionarte el servicio solicitado a través de nuestra plataforma profesional."],
+      ["Mejora de tu experiencia", "Podemos informarte sobre nuevos servicios relacionados para mejorar tu experiencia con nosotros."],
+      ["Ofertas y promociones", "Podemos enviarte comunicaciones sobre intereses, ofertas y promociones exclusivas."],
+      ["Control de calidad", "Evaluamos la calidad del servicio para mantener nuestros altos estándares."],
+      ["Mejora continua", "Analizamos el nivel de satisfacción y recopilamos estadísticas para mejorar continuamente nuestros servicios."],
+    ],
+    consentLabel: "Consentimiento y revocación",
+    noConsentTitle: "Sin consentimiento",
+    noConsentText: "Si no se concede el consentimiento, la información se utilizará solo para la ejecución del servicio. Tu experiencia podría limitarse a los aspectos funcionales.",
+    revocationTitle: "Revocación",
+    revocationText: "El consentimiento puede revocarse en cualquier momento por escrito en las oficinas de Dreamy Tours. Respetamos tu derecho a cambiar de opinión.",
+    rightsLabel: "Tus derechos",
+    rightsTitle: "Derechos ARCO",
+    rightsText: "Puedes solicitar el acceso, la rectificación, la cancelación u oponerte al tratamiento de tus datos personales. Contacta a Dreamy Tours cuando necesites ejercer estos derechos.",
+    rights: ["Acceso", "Rectificación", "Cancelación", "Oposición"],
+    contactTitle: "¿Tienes preguntas?",
+    contactText: "Para consultas o para ejercer tus derechos, contacta a nuestro equipo de protección de datos.",
+  },
+  en: {
+    protectionLabel: "Data protection",
+    protectionTitle: "Your privacy matters to us",
+    protectionText: "At Dreamy Tours, we protect your personal data and handle it transparently, securely, and in accordance with applicable regulations.",
+    purposeLabel: "Responsible use",
+    purposeTitle: "Purposes of processing",
+    purposes: [
+      ["Service delivery", "We use your data to provide the service you request through our professional platform."],
+      ["Improving your experience", "We may tell you about related services to improve your experience with us."],
+      ["Offers and promotions", "We may send you communications about interests, offers, and exclusive promotions."],
+      ["Quality control", "We evaluate service quality to maintain our high standards."],
+      ["Continuous improvement", "We analyse satisfaction levels and collect statistics to continuously improve our services."],
+    ],
+    consentLabel: "Consent and withdrawal",
+    noConsentTitle: "Without consent",
+    noConsentText: "If consent is not granted, the information will only be used to provide the service. Your experience may be limited to functional aspects.",
+    revocationTitle: "Withdrawal of consent",
+    revocationText: "Consent may be withdrawn at any time in writing at Dreamy Tours' offices. We respect your right to change your mind.",
+    rightsLabel: "Your rights",
+    rightsTitle: "ARCO Rights",
+    rightsText: "You may request access, rectification, cancellation, or object to the processing of your personal data. Contact Dreamy Tours whenever you need to exercise these rights.",
+    rights: ["Access", "Rectification", "Cancellation", "Objection"],
+    contactTitle: "Do you have questions?",
+    contactText: "For enquiries or to exercise your rights, contact our data protection team.",
+  },
+  pt: {
+    protectionLabel: "Proteção de dados",
+    protectionTitle: "A sua privacidade é importante para nós",
+    protectionText: "Na Dreamy Tours protegemos os seus dados pessoais e tratamo-los com transparência, segurança e de acordo com a legislação aplicável.",
+    purposeLabel: "Uso responsável",
+    purposeTitle: "Finalidades do tratamento",
+    purposes: [
+      ["Prestação do serviço", "Utilizamos os seus dados para prestar o serviço solicitado através da nossa plataforma profissional."],
+      ["Melhoria da sua experiência", "Podemos informá-lo sobre serviços relacionados para melhorar a sua experiência connosco."],
+      ["Ofertas e promoções", "Podemos enviar-lhe comunicações sobre interesses, ofertas e promoções exclusivas."],
+      ["Controlo de qualidade", "Avaliamos a qualidade do serviço para manter os nossos elevados padrões."],
+      ["Melhoria contínua", "Analisamos o nível de satisfação e recolhemos estatísticas para melhorar continuamente os nossos serviços."],
+    ],
+    consentLabel: "Consentimento e revogação",
+    noConsentTitle: "Sem consentimento",
+    noConsentText: "Se o consentimento não for concedido, as informações serão utilizadas apenas para a execução do serviço. A sua experiência poderá ficar limitada aos aspetos funcionais.",
+    revocationTitle: "Revogação",
+    revocationText: "O consentimento pode ser revogado a qualquer momento, por escrito, nos escritórios da Dreamy Tours. Respeitamos o seu direito de mudar de opinião.",
+    rightsLabel: "Os seus direitos",
+    rightsTitle: "Direitos ARCO",
+    rightsText: "Pode solicitar acesso, retificação, cancelamento ou opor-se ao tratamento dos seus dados pessoais. Contacte a Dreamy Tours sempre que precisar de exercer estes direitos.",
+    rights: ["Acesso", "Retificação", "Cancelamento", "Oposição"],
+    contactTitle: "Tem alguma pergunta?",
+    contactText: "Para dúvidas ou para exercer os seus direitos, contacte a nossa equipa de proteção de dados.",
+  },
+} as const;
+
+const copy = privacyCopy[lang] ?? privacyCopy.es;
+---
+
+<div class="legal-page mx-auto max-w-5xl space-y-10">
+  <section class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg sm:p-8" aria-labelledby="proteccion-datos">
+    <div class="absolute inset-y-0 left-0 w-1 bg-primary" aria-hidden="true"></div>
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
+      <div class="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3z" /><path d="m9 12 2 2 4-4" /></svg>
+      </div>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">{copy.protectionLabel}</p>
+        <h2 id="proteccion-datos" class="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{copy.protectionTitle}</h2>
+        <p class="mt-3 max-w-3xl leading-7 text-muted-foreground">{copy.protectionText}</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="finalidades-datos">
+    <div class="mb-5 flex items-start gap-3">
+      <div class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-secondary/20 bg-secondary/10 text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>
+      </div>
+      <div><p class="text-xs font-bold uppercase tracking-[0.16em] text-secondary">{copy.purposeLabel}</p><h2 id="finalidades-datos" class="mt-1 text-2xl font-bold tracking-tight">{copy.purposeTitle}</h2></div>
+    </div>
+
+    <ol class="grid list-none gap-4 p-0 md:grid-cols-2">
+      {copy.purposes.map(([title, description], index) => {
+        const isSecondary = index === 2 || index === 4;
+        return <li class:list={["relative flex h-full gap-4 overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg", index === 4 && "md:col-span-2"]}>
+          <span class:list={["absolute inset-y-4 left-0 w-1 rounded-r-full", isSecondary ? "bg-secondary" : "bg-primary"]} aria-hidden="true"></span>
+          <span class:list={["flex size-10 shrink-0 items-center justify-center rounded-full border text-sm font-bold", isSecondary ? "border-secondary/20 bg-secondary/10 text-secondary" : "border-primary/20 bg-primary/10 text-primary"]}>{index + 1}</span>
+          <div><h3 class="font-bold">{title}</h3><p class="mt-1 text-sm leading-6 text-muted-foreground">{description}</p></div>
+        </li>;
+      })}
+    </ol>
+  </section>
+
+  <section class="grid gap-5 md:grid-cols-2" aria-label={copy.consentLabel}>
+    <article class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <span class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-secondary" aria-hidden="true"></span>
+      <div class="pl-3"><div class="flex items-center gap-3"><div class="flex size-11 items-center justify-center rounded-xl border border-secondary/20 bg-secondary/10 text-secondary"><svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m4.9 4.9 14.2 14.2" /></svg></div><h2 class="text-xl font-bold">{copy.noConsentTitle}</h2></div><p class="mt-4 leading-7 text-muted-foreground">{copy.noConsentText}</p></div>
+    </article>
+    <article class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <span class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary" aria-hidden="true"></span>
+      <div class="pl-3"><div class="flex items-center gap-3"><div class="flex size-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary"><svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg></div><h2 class="text-xl font-bold">{copy.revocationTitle}</h2></div><p class="mt-4 leading-7 text-muted-foreground">{copy.revocationText}</p></div>
+    </article>
+  </section>
+
+  <section class="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 p-6 shadow-lg sm:p-8" aria-labelledby="derechos-arco">
+    <div class="absolute -right-16 -top-16 size-48 rounded-full bg-primary/10 blur-3xl" aria-hidden="true"></div>
+    <div class="relative flex flex-col gap-5 md:flex-row md:items-center">
+      <div class="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-card text-primary shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12 11 14 15 10" /><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 1 0-8.953 10.95c.549.055.998-.398.998-.95Z" /></svg></div>
+      <div class="min-w-0 flex-1"><p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">{copy.rightsLabel}</p><h2 id="derechos-arco" class="mt-1 text-2xl font-bold tracking-tight">{copy.rightsTitle}</h2><p class="mt-3 max-w-3xl leading-7 text-muted-foreground">{copy.rightsText}</p>
+        <ul class="mt-5 flex list-none flex-wrap gap-2 p-0" role="list">
+          {copy.rights.map((right, index) => <li class:list={["rounded-full border bg-card px-3 py-1 text-xs font-bold", index > 1 ? "border-secondary/20 text-secondary" : "border-primary/20 text-primary"]}>{right}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-lg sm:p-8" aria-labelledby="contacto-privacidad">
+    <div class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-secondary" aria-hidden="true"></div>
+    <div class="flex flex-col gap-5 pl-3 sm:flex-row sm:items-center sm:justify-between"><div class="flex items-start gap-4"><div class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-secondary/20 bg-secondary/10 text-secondary"><svg xmlns="http://www.w3.org/2000/svg" class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg></div><div><h2 id="contacto-privacidad" class="text-xl font-bold">{copy.contactTitle}</h2><p class="mt-1 leading-7 text-muted-foreground">{copy.contactText}</p></div></div><a href="mailto:info@dreamy.tours" class="inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">info@dreamy.tours</a></div>
+  </section>
+</div>
