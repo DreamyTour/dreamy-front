@@ -4,7 +4,7 @@ export const frontmatter = {
   description: "Gender Equality Policy - Dreamy Tours",
   lang: "en",
   heroEyebrow: "Commitment",
-  heroImage: "/imagenes/sobre_nosotros.avif",
+  heroImage: "/imagenes/circuitos.webp",
   heroImageAlt: "Gender Equality Policy - Dreamy Tours",
   seo: {
     metaTitle: "Gender Equality Policy | Turismo Perú Bolivia",
@@ -16,121 +16,237 @@ export const frontmatter = {
     pt: "igualdade-de-genero",
   },
 };
+
+const copy = {
+  intro: {
+    title: "A commitment to equality",
+    text: "At Dreamy Tours, we are firmly committed to gender equality and non-discrimination in every area of our work.",
+  },
+  pillars: [
+    {
+      icon: "⚖",
+      title: "Equal opportunities",
+      text: "We guarantee the same treatment and opportunities for all our employees, regardless of gender.",
+      tone: "green",
+    },
+    {
+      icon: "🛡",
+      title: "A safe environment",
+      text: "Zero tolerance for sexual harassment and gender discrimination in our workspaces and on our tours.",
+      tone: "red",
+    },
+    {
+      icon: "◈",
+      title: "Pay equity",
+      text: "Fair pay for equal work. Merit and experience are our only compensation drivers.",
+      tone: "green",
+    },
+    {
+      icon: "◎",
+      title: "Representation",
+      text: "We actively promote the equal participation of women at every leadership level within our company.",
+      tone: "red",
+    },
+  ],
+  actionsTitle: "Concrete actions",
+  actions: [
+    ["Training programmes", "Gender equality training for all our staff."],
+    [
+      "Gender committees",
+      "Teams dedicated to preventing and responding to harassment.",
+    ],
+    [
+      "Work-life balance",
+      "Policies that support a balance between work and family.",
+    ],
+    [
+      "Anonymous reporting channel",
+      "A safe and confidential space for reporting incidents.",
+    ],
+  ],
+  report: {
+    title: "Report an incident",
+    text: "If you know of or experience discrimination, please report it to:",
+    email: "info@dreamytours.com",
+    note: "Every report is treated with confidentiality and seriousness.",
+  },
+  footer: ["A real commitment", "Zero tolerance", "Equality in action"],
+};
 ---
 
-<div class="mb-12 text-center md:text-left">
-  <span class="inline-block px-4 py-1 rounded-full bg-secondary/10 text-secondary font-bold text-xs mb-4">Social Responsibility</span>
-  <h1 class="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight mb-4">Gender Equality Policy</h1>
-  <p class="text-muted-foreground text-lg leading-relaxed">At Dreamy Tours, we are committed to gender equality and non-discrimination.</p>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition">
-    <div class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
-      <span class="text-xl">⚖️</span>
-    </div>
-    <h3 class="text-xl font-bold mb-2">Equal Opportunities</h3>
-    <p class="text-gray-600">We guarantee the same treatment and opportunities for all our employees, regardless of gender.</p>
-  </div>
-  
-  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition">
-    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-      <span class="text-xl">🛡️</span>
-    </div>
-    <h3 class="text-xl font-bold mb-2">Safe Environment</h3>
-    <p class="text-gray-600">Zero tolerance for sexual harassment and gender discrimination in our workspaces and tours.</p>
-  </div>
-
-<div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition">
-  <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-    <span class="text-xl">💵</span>
-  </div>
-  <h3 class="text-xl font-bold mb-2">Pay Equity</h3>
-  <p class="text-gray-600">Fair wages for equal work. Merit and experience are our only compensation
-    drivers.</p>
-</div>
-
-  <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition">
-    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-      <span class="text-xl">👥</span>
-    </div>
-    <h3 class="text-xl font-bold mb-2">Representation</h3>
-    <p class="text-gray-600">We actively promote equal participation of women at all leadership levels within our company.</p>
-  </div>
-</div>
-
-<h2>Concrete Actions</h2>
-
-<div class="bg-slate-50 p-6 rounded-lg border border-slate-100 mb-8">
-  <ul class="space-y-3">
-    <li class="flex items-center gap-3">
-      <svg
-        class="w-5 h-5 text-green-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+<div
+  class="not-prose bg-[#fafbfc] px-5 py-12 text-slate-800 [&_h2]:text-balance [&_li]:text-pretty [&_p]:text-pretty sm:py-16 lg:py-20"
+>
+  <div class="mx-auto w-full max-w-5xl">
+    <section
+      class="relative mb-8 overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm sm:p-8"
+      aria-labelledby="gender-intro"
+    >
+      <div
+        class="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        ></path>
-      </svg>
-      <span>Gender equality training programs for our staff.</span>
-    </li>
-    <li class="flex items-center gap-3">
-      <svg
-        class="w-5 h-5 text-green-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+        <span
+          class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-[#00a43d]/20 bg-[#00a43d]/10 text-2xl text-[#008a32]"
+          aria-hidden="true">✦</span
+        ><div>
+          <h2 id="gender-intro" class="text-lg font-bold text-slate-800">
+            {copy.intro.title}
+          </h2><p class="mt-1 max-w-4xl text-sm leading-relaxed text-slate-600">
+            {copy.intro.text}
+          </p>
+        </div>
+      </div>
+    </section>
+    <section
+      class="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2"
+      aria-label="Gender equality policy pillars"
+    >
+      {
+        copy.pillars.map((pillar) => {
+          const isGreen = pillar.tone === "green";
+          return (
+            <article class="relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm transition-[box-shadow,border-color] duration-300 hover:border-slate-300 hover:shadow-md motion-reduce:transition-none">
+              <>
+                <span
+                  class:list={[
+                    "absolute left-0 top-[10%] h-[80%] w-1 rounded-r-full",
+                    isGreen ? "bg-[#00a43d]" : "bg-[#b71532]",
+                  ]}
+                  aria-hidden="true"
+                />
+                <div class="pl-3">
+                  <>
+                    <div class="mb-3 flex items-center gap-3">
+                      <>
+                        <span
+                          class:list={[
+                            "flex size-10 items-center justify-center rounded-full border text-xl",
+                            isGreen
+                              ? "border-[#00a43d]/15 bg-[#e6f5eb] text-[#008a32]"
+                              : "border-[#b71532]/15 bg-[#f8e8eb] text-[#9e0f2a]",
+                          ]}
+                          aria-hidden="true"
+                        >
+                          {pillar.icon}
+                        </span>
+                        <h2 class="text-lg font-bold text-slate-800">
+                          {pillar.title}
+                        </h2>
+                      </>
+                    </div>
+                    <p class="text-sm leading-relaxed text-slate-600">
+                      {pillar.text}
+                    </p>
+                  </>
+                </div>
+              </>
+            </article>
+          );
+        })
+      }
+    </section>
+    <section class="mb-8" aria-labelledby="gender-actions">
+      <div class="mb-4 flex items-center gap-3">
+        <span
+          class="flex size-9 items-center justify-center rounded-full bg-[#e6f5eb] text-[#008a32]"
+          aria-hidden="true">✓</span
+        ><h2 id="gender-actions" class="text-xl font-bold text-slate-800">
+          {copy.actionsTitle}
+        </h2>
+      </div><ol class="grid list-none gap-4 p-0 md:grid-cols-2" role="list">
+        {
+          copy.actions.map(([title, text], index) => {
+            const isGreen = index % 2 === 0;
+            return (
+              <li class="relative flex items-center gap-4 overflow-hidden rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-md motion-reduce:transition-none">
+                <>
+                  <span
+                    class:list={[
+                      "absolute left-0 top-[10%] h-[80%] w-1 rounded-r-full",
+                      isGreen ? "bg-[#00a43d]" : "bg-[#b71532]",
+                    ]}
+                    aria-hidden="true"
+                  />
+                  <span
+                    class:list={[
+                      "flex size-10 shrink-0 items-center justify-center rounded-full border text-sm font-bold",
+                      isGreen
+                        ? "border-[#00a43d]/10 bg-[#e6f5eb] text-[#00a43d]"
+                        : "border-[#b71532]/10 bg-[#f8e8eb] text-[#b71532]",
+                    ]}
+                    aria-hidden="true"
+                  >
+                    {index + 1}
+                  </span>
+                  <div>
+                    <>
+                      <h3 class="text-sm font-semibold text-slate-800">
+                        {title}
+                      </h3>
+                      <p class="mt-1 text-xs leading-relaxed text-slate-500">
+                        {text}
+                      </p>
+                    </>
+                  </div>
+                </>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+    <aside
+      class="relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm sm:p-8"
+      aria-labelledby="gender-report"
+    >
+      <span
+        class="absolute left-0 top-[10%] h-[80%] w-1 rounded-r-full bg-[#b71532]"
+        aria-hidden="true"></span><div
+        class="flex flex-col items-start gap-4 pl-3 sm:flex-row sm:items-center"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        ></path>
-      </svg>
-      <span>Gender committees to prevent harassment.</span>
-    </li>
-    <li class="flex items-center gap-3">
-      <svg
-        class="w-5 h-5 text-green-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+        <span
+          class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-[#b71532]/20 bg-[#b71532]/10 text-2xl text-[#9e0f2a]"
+          aria-hidden="true">!</span
+        ><div>
+          <h2 id="gender-report" class="text-lg font-bold text-slate-800">
+            {copy.report.title}
+          </h2><p class="mt-1 text-sm leading-relaxed text-slate-600">
+            {copy.report.text}
+          </p><a
+            href={`mailto:${copy.report.email}`}
+            class="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#008a32] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00a43d] focus-visible:ring-offset-2"
+            >{copy.report.email}</a
+          ><p class="mt-2 text-xs text-slate-400">{copy.report.note}</p>
+        </div>
+      </div>
+    </aside>
+    <footer class="mt-8 text-center">
+      <div
+        class="flex flex-wrap items-center justify-center gap-4 text-xs font-light text-slate-500"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        ></path>
-      </svg>
-      <span>Work-family balance policies.</span>
-    </li>
-    <li class="flex items-center gap-3">
-      <svg
-        class="w-5 h-5 text-green-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
+        {
+          copy.footer.map((label, index) => (
+            <span class="inline-flex items-center gap-2 rounded-full border border-slate-200/60 bg-white/70 px-4 py-1.5 shadow-sm">
+              <span
+                class:list={[
+                  "size-2 rounded-full",
+                  index === 1 ? "bg-[#b71532]" : "bg-[#00a43d]",
+                ]}
+                aria-hidden="true"
+              />
+              {label}
+            </span>
+          ))
+        }
+      </div><div
+        class="mt-6 h-px w-full bg-gradient-to-r from-transparent via-[#00a43d]/30 to-transparent"
+        aria-hidden="true"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        ></path>
-      </svg>
-      <span>Anonymous reporting channel for incidents.</span>
-    </li>
-  </ul>
-</div>
-
-<div class="bg-secondary/10 border-l-4 border-secondary p-6 my-8 rounded-r-lg">
-  <h3 class="font-bold text-lg mb-2 text-secondary">Report an Incident</h3>
-  <p class="text-secondary">If you know or experience any discrimination situation, report it to:{" "} <a href="mailto:info@dreamytours.com" class="font-bold hover:underline">info@dreamytours.com</a></p>
+      </div><p
+        class="mt-3 text-[0.6rem] uppercase tracking-[0.2em] text-slate-400"
+      >
+        ✦ Dreamy Tours · Gender equality as a core principle ✦
+      </p>
+    </footer>
+  </div>
 </div>
