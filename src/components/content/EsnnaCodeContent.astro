@@ -1,0 +1,514 @@
+---
+import type { Lang } from "@/lib/i18n";
+import CertificatesGallery from "@/components/ui/CertificatesGallery.astro";
+
+interface Props {
+  lang: Lang;
+}
+
+type CommitmentTone = "green" | "red";
+
+interface Commitment {
+  title: string;
+  description: string;
+  tone: CommitmentTone;
+}
+
+interface EsnnaCopy {
+  commitmentTitle: string;
+  commitmentText: string;
+  commitmentsLabel: string;
+  legalTitle: string;
+  legalText: string;
+  footerText: string;
+  badges: string[];
+  certificatesEyebrow: string;
+  certificatesTitle: string;
+  certificateActionLabel: string;
+  certificateDialogLabel: string;
+  closeCertificatesLabel: string;
+  certificates: Array<{ src: string; title: string }>;
+  commitments: Commitment[];
+}
+
+const { lang } = Astro.props;
+
+const esnnaCopy: Record<Lang, EsnnaCopy> = {
+  es: {
+    commitmentTitle: "Compromiso firme contra la explotación sexual",
+    commitmentText:
+      "En virtud de la Ley N.º 28251, asumimos los siguientes compromisos mínimos como proveedores de servicios turísticos para prevenir y combatir la explotación sexual de niños, niñas y adolescentes en el ámbito del turismo.",
+    commitmentsLabel: "Medidas de control del Código ESNNA",
+    legalTitle: "Advertencia legal",
+    legalText:
+      "En desarrollo de la Ley N.º 28251, la agencia advierte a los turistas que la explotación y el abuso sexual de menores en el país son penalizados penal y administrativamente, de acuerdo con las leyes vigentes.",
+    footerText: "Dreamy Tours · Código de Conducta ESNNA · Versión actualizada",
+    badges: ["Compromiso ético", "Tolerancia cero", "Protección infantil"],
+    certificatesEyebrow: "Dreamy Tours",
+    certificatesTitle: "Certificaciones",
+    certificateActionLabel: "Ver",
+    certificateDialogLabel: "Certificación",
+    closeCertificatesLabel: "Cerrar ventana de certificaciones",
+    certificates: [
+      {
+        src: "/imagenes/certificados/codigo-esnna.avif",
+        title: "Código ESNNA",
+      },
+      {
+        src: "/imagenes/certificados/turismo-responsable.avif",
+        title: "Turismo Responsable",
+      },
+    ],
+    commitments: [
+      {
+        title: "No ofrecer planes de explotación",
+        description:
+          "Abstenerse de ofrecer, expresa o solapadamente, planes de explotación sexual en programas de promoción turística.",
+        tone: "green",
+      },
+      {
+        title: "No informar sobre lugares de explotación",
+        description:
+          "No brindar información a turistas, directa o indirectamente, sobre lugares donde se practique explotación sexual comercial.",
+        tone: "green",
+      },
+      {
+        title: "No trasladar a puntos de explotación",
+        description:
+          "Abstenerse de conducir turistas, directa o indirectamente, a establecimientos o lugares donde se practique explotación sexual.",
+        tone: "red",
+      },
+      {
+        title: "No proporcionar vehículos para explotación",
+        description:
+          "No proporcionar vehículos en rutas turísticas con fines de explotación o abuso sexual de niños, niñas y adolescentes.",
+        tone: "red",
+      },
+      {
+        title: "Impedir el ingreso de menores",
+        description:
+          "Prevenir el ingreso de niños, niñas y adolescentes a hoteles, bares y establecimientos turísticos con fines de explotación o abuso.",
+        tone: "red",
+      },
+      {
+        title: "Prevenir ofertas de servicios sexuales",
+        description:
+          "Adoptar medidas para que el personal vinculado a la empresa no ofrezca servicios turísticos que permitan actividad sexual con menores.",
+        tone: "green",
+      },
+      {
+        title: "Denunciar ante las autoridades",
+        description:
+          "Denunciar ante MINCETUR y las autoridades competentes los hechos de explotación sexual de los que se tenga conocimiento.",
+        tone: "red",
+      },
+      {
+        title: "Diseñar y difundir una política interna",
+        description:
+          "Diseñar y difundir una política interna con medidas para prevenir y contrarrestar la explotación sexual.",
+        tone: "green",
+      },
+      {
+        title: "Capacitar al personal",
+        description:
+          "Capacitar a todo el personal vinculado a la empresa sobre la prevención de la explotación sexual comercial.",
+        tone: "green",
+      },
+      {
+        title: "Informar sobre consecuencias legales",
+        description:
+          "Informar a los usuarios sobre las consecuencias legales en Perú de la explotación y el abuso sexual de niños y adolescentes.",
+        tone: "red",
+      },
+      {
+        title: "Exhibir el código en un lugar visible",
+        description:
+          "Colocar en un lugar visible este Código de Conducta y otros compromisos para la protección de niños, niñas y adolescentes.",
+        tone: "green",
+      },
+    ],
+  },
+  en: {
+    commitmentTitle: "A firm commitment against sexual exploitation",
+    commitmentText:
+      "Under Law No. 28251, we adopt the following minimum commitments as a tourism service provider to prevent and combat the sexual exploitation of children and adolescents in tourism.",
+    commitmentsLabel: "ESNNA Code control measures",
+    legalTitle: "Legal warning",
+    legalText:
+      "In accordance with Law No. 28251, the agency warns tourists that the exploitation and sexual abuse of minors in Peru are punishable under criminal and administrative law.",
+    footerText: "Dreamy Tours · ESNNA Code of Conduct · Updated version",
+    badges: ["Ethical commitment", "Zero tolerance", "Child protection"],
+    certificatesEyebrow: "Dreamy Tours",
+    certificatesTitle: "Certifications",
+    certificateActionLabel: "View",
+    certificateDialogLabel: "Certification",
+    closeCertificatesLabel: "Close certifications dialog",
+    certificates: [
+      { src: "/imagenes/certificados/codigo-esnna.avif", title: "ESNNA Code" },
+      {
+        src: "/imagenes/certificados/turismo-responsable.avif",
+        title: "Responsible Tourism",
+      },
+    ],
+    commitments: [
+      {
+        title: "Do not offer exploitation plans",
+        description:
+          "Do not explicitly or covertly offer sexual-exploitation plans in tourism promotion programmes.",
+        tone: "green",
+      },
+      {
+        title: "Do not provide information about exploitation sites",
+        description:
+          "Do not provide tourists, directly or indirectly, information about places where commercial sexual exploitation takes place.",
+        tone: "green",
+      },
+      {
+        title: "Do not transport people to exploitation sites",
+        description:
+          "Do not take tourists, directly or indirectly, to establishments or places where sexual exploitation takes place.",
+        tone: "red",
+      },
+      {
+        title: "Do not provide vehicles for exploitation",
+        description:
+          "Do not provide vehicles on tourist routes for the exploitation or sexual abuse of children and adolescents.",
+        tone: "red",
+      },
+      {
+        title: "Prevent minors from entering",
+        description:
+          "Prevent children and adolescents from entering hotels, bars and tourism establishments for exploitation or abuse.",
+        tone: "red",
+      },
+      {
+        title: "Prevent offers of sexual services",
+        description:
+          "Adopt measures to ensure company personnel do not offer tourism services that permit sexual activity with minors.",
+        tone: "green",
+      },
+      {
+        title: "Report to the authorities",
+        description:
+          "Report to MINCETUR and the competent authorities any known acts of sexual exploitation.",
+        tone: "red",
+      },
+      {
+        title: "Design and communicate an internal policy",
+        description:
+          "Design and communicate an internal policy with measures to prevent and counter sexual exploitation.",
+        tone: "green",
+      },
+      {
+        title: "Train staff",
+        description:
+          "Train all company personnel on the prevention of commercial sexual exploitation.",
+        tone: "green",
+      },
+      {
+        title: "Inform guests of legal consequences",
+        description:
+          "Inform users about the legal consequences in Peru of exploiting and abusing children and adolescents.",
+        tone: "red",
+      },
+      {
+        title: "Display the code in a visible place",
+        description:
+          "Display this Code of Conduct and other child-protection commitments in a visible place.",
+        tone: "green",
+      },
+    ],
+  },
+  pt: {
+    commitmentTitle: "Compromisso firme contra a exploração sexual",
+    commitmentText:
+      "Em conformidade com a Lei n.º 28251, assumimos os seguintes compromissos mínimos como prestadores de serviços turísticos para prevenir e combater a exploração sexual de crianças e adolescentes no turismo.",
+    commitmentsLabel: "Medidas de controlo do Código ESNNA",
+    legalTitle: "Advertência legal",
+    legalText:
+      "Em conformidade com a Lei n.º 28251, a agência adverte os turistas de que a exploração e o abuso sexual de menores no Peru são punidos penal e administrativamente, de acordo com a legislação em vigor.",
+    footerText: "Dreamy Tours · Código de Conduta ESNNA · Versão atualizada",
+    badges: ["Compromisso ético", "Tolerância zero", "Proteção infantil"],
+    certificatesEyebrow: "Dreamy Tours",
+    certificatesTitle: "Certificações",
+    certificateActionLabel: "Ver",
+    certificateDialogLabel: "Certificação",
+    closeCertificatesLabel: "Fechar janela de certificações",
+    certificates: [
+      {
+        src: "/imagenes/certificados/codigo-esnna.avif",
+        title: "Código ESNNA",
+      },
+      {
+        src: "/imagenes/certificados/turismo-responsable.avif",
+        title: "Turismo Responsável",
+      },
+    ],
+    commitments: [
+      {
+        title: "Não oferecer planos de exploração",
+        description:
+          "Abster-se de oferecer, de forma expressa ou velada, planos de exploração sexual em programas de promoção turística.",
+        tone: "green",
+      },
+      {
+        title: "Não informar sobre locais de exploração",
+        description:
+          "Não fornecer aos turistas, direta ou indiretamente, informações sobre locais onde ocorra exploração sexual comercial.",
+        tone: "green",
+      },
+      {
+        title: "Não transportar para locais de exploração",
+        description:
+          "Abster-se de conduzir turistas, direta ou indiretamente, a estabelecimentos ou locais onde ocorra exploração sexual.",
+        tone: "red",
+      },
+      {
+        title: "Não fornecer veículos para exploração",
+        description:
+          "Não fornecer veículos em rotas turísticas para fins de exploração ou abuso sexual de crianças e adolescentes.",
+        tone: "red",
+      },
+      {
+        title: "Impedir a entrada de menores",
+        description:
+          "Impedir a entrada de crianças e adolescentes em hotéis, bares e estabelecimentos turísticos para fins de exploração ou abuso.",
+        tone: "red",
+      },
+      {
+        title: "Prevenir ofertas de serviços sexuais",
+        description:
+          "Adotar medidas para que o pessoal ligado à empresa não ofereça serviços turísticos que permitam atividade sexual com menores.",
+        tone: "green",
+      },
+      {
+        title: "Denunciar às autoridades",
+        description:
+          "Denunciar ao MINCETUR e às autoridades competentes os factos de exploração sexual de que se tenha conhecimento.",
+        tone: "red",
+      },
+      {
+        title: "Criar e divulgar uma política interna",
+        description:
+          "Criar e divulgar uma política interna com medidas para prevenir e combater a exploração sexual.",
+        tone: "green",
+      },
+      {
+        title: "Formar o pessoal",
+        description:
+          "Formar todo o pessoal ligado à empresa sobre a prevenção da exploração sexual comercial.",
+        tone: "green",
+      },
+      {
+        title: "Informar sobre as consequências legais",
+        description:
+          "Informar os utilizadores sobre as consequências legais no Peru da exploração e do abuso de crianças e adolescentes.",
+        tone: "red",
+      },
+      {
+        title: "Exibir o código em local visível",
+        description:
+          "Exibir este Código de Conduta e outros compromissos de proteção infantil num local visível.",
+        tone: "green",
+      },
+    ],
+  },
+};
+
+const copy = esnnaCopy[lang] ?? esnnaCopy.es;
+const commitmentColumns = [
+  copy.commitments.slice(0, 6),
+  copy.commitments.slice(6),
+];
+---
+
+<div class="not-prose bg-[#fafbfc] px-5 py-12 text-slate-800 sm:py-16 lg:py-20">
+  <div class="mx-auto w-full max-w-5xl">
+    <section
+      class="mb-8 rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm sm:p-8"
+      aria-labelledby="esnna-commitment-heading"
+    >
+      <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+        <span
+          class="inline-flex shrink-0 rounded-2xl border border-[#00a43d]/20 bg-[#00a43d]/10 p-3 text-[#008a32]"
+          aria-hidden="true"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-7"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3v8Z"
+            ></path><path d="m9 12 2 2 4-4"></path></svg
+          >
+        </span>
+        <div>
+          <h2
+            id="esnna-commitment-heading"
+            class="m-0 text-lg font-bold tracking-normal text-slate-800"
+          >
+            {copy.commitmentTitle}
+          </h2>
+          <p class="mb-0 mt-1 max-w-4xl text-sm leading-relaxed text-slate-600">
+            {copy.commitmentText}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label={copy.commitmentsLabel}>
+      <div
+        class="grid grid-cols-1 gap-3 md:grid-cols-2 md:grid-rows-[repeat(6,minmax(7.5rem,1fr))] md:gap-5"
+      >
+        {
+          commitmentColumns.map((column, columnIndex) => (
+            <ol
+              class="m-0 grid list-none auto-rows-fr gap-3 p-0 md:row-span-6 md:grid-rows-[subgrid] md:gap-5"
+              role="list"
+              start={columnIndex === 0 ? undefined : 7}
+            >
+              {column.map((commitment, itemIndex) => {
+                const number =
+                  columnIndex === 0 ? itemIndex + 1 : itemIndex + 7;
+                const isGreen = commitment.tone === "green";
+
+                return (
+                  <li class="group relative flex h-full items-center gap-4 overflow-hidden rounded-xl border border-slate-200/70 bg-slate-50 p-4 shadow-sm transition-[box-shadow,border-color,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-slate-300 hover:bg-white hover:shadow-[0_14px_30px_-22px_rgba(15,23,42,0.22)] motion-reduce:transition-none">
+                    <span
+                      class:list={[
+                        "absolute inset-y-[15%] left-0 w-1 rounded-r-full",
+                        isGreen ? "bg-[#00a43d]" : "bg-[#b71532]",
+                      ]}
+                      aria-hidden="true"
+                    />
+                    <span
+                      class:list={[
+                        "flex size-10 shrink-0 items-center justify-center rounded-full border text-sm font-bold",
+                        isGreen
+                          ? "border-[#00a43d]/10 bg-[#e6f5eb] text-[#00a43d]"
+                          : "border-[#b71532]/10 bg-[#f8e8eb] text-[#b71532]",
+                      ]}
+                      aria-hidden="true"
+                    >
+                      {number}
+                    </span>
+                    <div class="min-w-0">
+                      <h3 class="m-0 text-sm font-semibold tracking-normal text-slate-800">
+                        {commitment.title}
+                      </h3>
+                      <p class="mb-0 mt-1 text-xs leading-relaxed text-slate-500">
+                        {commitment.description}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      class="relative mt-8 overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm sm:p-8"
+      aria-labelledby="esnna-legal-heading"
+    >
+      <span
+        class="absolute inset-y-[15%] left-0 w-1 rounded-r-full bg-[#b71532]"
+        aria-hidden="true"></span>
+      <div
+        class="flex flex-col items-start gap-4 pl-2 sm:flex-row sm:items-center"
+      >
+        <span
+          class="inline-flex shrink-0 rounded-2xl border border-[#b71532]/20 bg-[#b71532]/10 p-3 text-[#b71532]"
+          aria-hidden="true"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><path d="M12 3 2 21h20L12 3Z"></path><path d="M12 9v4"></path><path
+              d="M12 17h.01"></path></svg
+          >
+        </span>
+        <div>
+          <h2
+            id="esnna-legal-heading"
+            class="m-0 text-sm font-semibold tracking-normal text-slate-800"
+          >
+            {copy.legalTitle}
+          </h2>
+          <blockquote
+            class="m-0 mt-1 border-0 bg-transparent p-0 text-sm font-medium leading-relaxed text-[#9e0f2a]"
+          >
+            <p class="m-0">&ldquo;{copy.legalText}&rdquo;</p>
+          </blockquote>
+          <p class="mb-0 mt-2 flex items-center gap-2 text-xs text-slate-400">
+            <span class="size-2 rounded-full bg-[#00a43d]" aria-hidden="true"
+            ></span>{copy.footerText}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-8 text-center">
+      <div
+        class="flex flex-wrap items-center justify-center gap-3 text-xs font-normal text-slate-500"
+      >
+        {
+          copy.badges.map((badge, index) => (
+            <span class="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-4 py-1.5 shadow-sm">
+              <span
+                class:list={[
+                  "size-2 rounded-full",
+                  index === 1 ? "bg-[#b71532]" : "bg-[#00a43d]",
+                ]}
+                aria-hidden="true"
+              />
+              {badge}
+            </span>
+          ))
+        }
+      </div>
+      <div
+        class="mt-6 h-px w-full bg-gradient-to-r from-transparent via-[#00a43d]/30 to-transparent"
+        aria-hidden="true"
+      >
+      </div>
+    </footer>
+
+    <section
+      class="mt-12 border-t border-slate-200/80 pt-10 sm:pt-12"
+      aria-labelledby="esnna-certificates-heading"
+    >
+      <div class="mb-6 text-center">
+        <p
+          class="mb-2 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#008a32]"
+        >
+          {copy.certificatesEyebrow}
+        </p>
+        <h2
+          id="esnna-certificates-heading"
+          class="m-0 text-2xl font-bold tracking-[-0.03em] text-slate-800 sm:text-3xl"
+        >
+          {copy.certificatesTitle}
+        </h2>
+      </div>
+      <CertificatesGallery
+        actionLabel={copy.certificateActionLabel}
+        dialogLabel={copy.certificateDialogLabel}
+        closeLabel={copy.closeCertificatesLabel}
+        certificates={copy.certificates}
+      />
+    </section>
+  </div>
+</div>
