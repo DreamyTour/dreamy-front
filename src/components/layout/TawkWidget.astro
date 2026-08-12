@@ -19,8 +19,15 @@ const triggerLabels = {
   pt: "Abrir o chat da Dreamy Tours",
 } satisfies Record<Lang, string>;
 
+const minimizeLabels = {
+  es: "Minimizar chat",
+  en: "Minimize chat",
+  pt: "Minimizar chat",
+} satisfies Record<Lang, string>;
+
 const statusLabel = statusLabels[lang];
 const triggerLabel = triggerLabels[lang];
+const minimizeLabel = minimizeLabels[lang];
 ---
 
 <aside class="tawk-chat-trigger fixed z-[61]">
@@ -57,29 +64,68 @@ const triggerLabel = triggerLabels[lang];
   </button>
 </aside>
 
+<button
+  id="tawk-chat-minimize"
+  type="button"
+  aria-label={minimizeLabel}
+  title={minimizeLabel}
+  hidden
+  class="tawk-chat-minimize fixed z-[61] flex size-15 items-center justify-center rounded-full bg-[#e03445] text-white shadow-lg shadow-[#8e1023]/30 ring-1 ring-white/25 transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:bg-[#c8243b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e03445] focus-visible:ring-offset-2"
+>
+  <svg viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true">
+    <path d="m7 7 10 10M17 7 7 17"></path>
+  </svg>
+</button>
+
 <script is:inline>
   (() => {
     const badgeId = "tawk-online-badge";
+    const triggerId = "tawk-chat-trigger";
+    const minimizeId = "tawk-chat-minimize";
+
+    const setChatOpen = (isOpen) => {
+      window.__dreamyTawkChatOpen = isOpen;
+
+      const trigger = document.getElementById(triggerId);
+      const minimizeButton = document.getElementById(minimizeId);
+      const badge = document.getElementById(badgeId);
+
+      trigger?.toggleAttribute("hidden", isOpen);
+      minimizeButton?.toggleAttribute("hidden", !isOpen);
+      badge?.toggleAttribute(
+        "hidden",
+        isOpen || window.__dreamyTawkStatus !== "online",
+      );
+    };
 
     const setStatus = (status) => {
       window.__dreamyTawkStatus = status;
 
       const badge = document.getElementById(badgeId);
       if (badge) {
-        badge.toggleAttribute("hidden", status !== "online");
+        badge.toggleAttribute(
+          "hidden",
+          status !== "online" || window.__dreamyTawkChatOpen,
+        );
       }
     };
 
     window.__dreamyTawkSetStatus = setStatus;
+    window.__dreamyTawkSetChatOpen = setChatOpen;
 
     if (window.__dreamyTawkStatus) {
       setStatus(window.__dreamyTawkStatus);
+    }
+
+    if (window.__dreamyTawkChatOpen) {
+      setChatOpen(window.__dreamyTawkChatOpen);
     }
 
     if (!window.__dreamyTawkBadgeNavigationListener) {
       window.__dreamyTawkBadgeNavigationListener = true;
       document.addEventListener("astro:after-swap", () => {
         window.__dreamyTawkSetStatus?.(window.__dreamyTawkStatus);
+        window.__dreamyTawkSetChatOpen?.(window.__dreamyTawkChatOpen);
       });
     }
 
@@ -91,12 +137,20 @@ const triggerLabel = triggerLabels[lang];
 
     const previousOnLoad = window.Tawk_API.onLoad;
     const previousOnStatusChange = window.Tawk_API.onStatusChange;
+    const previousOnChatMaximized = window.Tawk_API.onChatMaximized;
     const previousOnChatMinimized = window.Tawk_API.onChatMinimized;
+    const previousOnChatHidden = window.Tawk_API.onChatHidden;
 
     window.Tawk_API.onLoad = function () {
       previousOnLoad?.();
       setStatus(window.Tawk_API.getStatus?.());
-      window.Tawk_API.hideWidget?.();
+
+      const isChatOpen = Boolean(window.Tawk_API.isChatMaximized?.());
+      setChatOpen(isChatOpen);
+
+      if (!isChatOpen) {
+        window.Tawk_API.hideWidget?.();
+      }
     };
 
     window.Tawk_API.onStatusChange = function (status) {
@@ -104,9 +158,20 @@ const triggerLabel = triggerLabels[lang];
       setStatus(status);
     };
 
+    window.Tawk_API.onChatMaximized = function () {
+      previousOnChatMaximized?.();
+      setChatOpen(true);
+    };
+
     window.Tawk_API.onChatMinimized = function () {
       previousOnChatMinimized?.();
+      setChatOpen(false);
       window.Tawk_API.hideWidget?.();
+    };
+
+    window.Tawk_API.onChatHidden = function () {
+      previousOnChatHidden?.();
+      setChatOpen(false);
     };
 
     if (!window.__dreamyTawkTriggerListener) {
@@ -115,10 +180,16 @@ const triggerLabel = triggerLabels[lang];
       document.addEventListener("click", (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
-        if (!target.closest("#tawk-chat-trigger")) return;
 
-        window.Tawk_API?.showWidget?.();
-        window.Tawk_API?.maximize?.();
+        if (target.closest(`#${triggerId}`)) {
+          window.Tawk_API?.showWidget?.();
+          window.Tawk_API?.maximize?.();
+          return;
+        }
+
+        if (target.closest(`#${minimizeId}`)) {
+          window.Tawk_API?.minimize?.();
+        }
       });
     }
 
@@ -149,6 +220,11 @@ const triggerLabel = triggerLabels[lang];
 
 <style>
   .tawk-chat-trigger {
+    inset-block-end: max(1rem, env(safe-area-inset-bottom));
+    inset-inline-end: max(1rem, env(safe-area-inset-right));
+  }
+
+  .tawk-chat-minimize {
     inset-block-end: max(1rem, env(safe-area-inset-bottom));
     inset-inline-end: max(1rem, env(safe-area-inset-right));
   }
