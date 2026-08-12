@@ -111,6 +111,39 @@ import westernUnionLogoUrl from "@/assets/svg/logos/western-union.svg?url";
 <div class="payment-card">
   <div class="card-header">
     <div class="card-brand">
+      <div class="brand-icon brand-logo brand-wetravel" aria-hidden="true">
+        <span class="wetravel-mark">w</span>
+        <span class="wetravel-wordmark">we travel</span>
+      </div>
+      <div>
+        <h3 class="brand-name">WeTravel</h3>
+        <p class="brand-type">Online payments and bookings</p>
+      </div>
+    </div>
+    <div class="secure-icon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="var(--color-primary)"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    </div>
+  </div>
+  <p class="card-fee">Make your payment securely through the WeTravel platform.</p>
+  <button type="button" class="card-button">Pay with WeTravel</button>
+</div>
+
+<div class="payment-card">
+  <div class="card-header">
+    <div class="card-brand">
       <div class="brand-icon brand-logo brand-paypal">
         <img src={paypalLogoUrl} alt="PayPal" loading="lazy" />
       </div>
@@ -137,7 +170,7 @@ import westernUnionLogoUrl from "@/assets/svg/logos/western-union.svg?url";
     </div>
   </div>
 <p class="card-fee">All payments via PayPal are subject to an additional 8% fee.</p>
-  <button type="button" class="card-button">Pay with PayPal</button>
+  <a href="https://dreamytours.s.gy/paylink" target="_blank" rel="noopener noreferrer" class="card-button">Pay with PayPal</a>
 </div>
 
 <div class="payment-card">

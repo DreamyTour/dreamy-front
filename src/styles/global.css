@@ -461,6 +461,13 @@
       background: var(--secondary);
     }
 
+    &.brand-wetravel {
+      gap: 0.4rem;
+      background: #ffffff;
+      color: #08bed0;
+      padding: 0.5rem 0.65rem;
+    }
+
     &.brand-bank {
       background: var(--white, var(--background));
       border: 1px solid var(--payment-border);
@@ -500,6 +507,34 @@
     font-weight: 600;
     color: var(--payment-text);
     margin: 0;
+  }
+
+  .wetravel-mark {
+    display: grid;
+    width: 2rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 50%;
+    background: #08bed0;
+    color: #ffffff;
+    font-family: var(--font-outfit);
+    font-size: 1.8rem;
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: -0.16em;
+    line-height: 1;
+    padding-inline-end: 0.22rem;
+  }
+
+  .wetravel-wordmark {
+    color: #08bed0;
+    font-family: var(--font-outfit);
+    font-size: 1.25rem;
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: -0.08em;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .brand-type {
@@ -557,6 +592,11 @@
     &:hover {
       opacity: 0.85;
       transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid color-mix(in oklab, var(--primary) 55%, white);
+      outline-offset: 3px;
     }
   }
 
