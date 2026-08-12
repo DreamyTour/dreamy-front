@@ -1,0 +1,130 @@
+---
+import type { Lang } from "@/lib/i18n";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const statusLabels = {
+  es: "En línea",
+  en: "Online",
+  pt: "Online",
+} satisfies Record<Lang, string>;
+
+const statusLabel = statusLabels[lang];
+---
+
+<aside
+  id="tawk-online-badge"
+  aria-label={statusLabel}
+  role="status"
+  hidden
+  class="pointer-events-none fixed bottom-[7.25rem] right-[5rem] z-[61] whitespace-nowrap"
+>
+  <span
+    class="inline-flex items-center gap-2 rounded-full border border-[#e03445]/20 bg-white/95 px-3 py-1.5 text-sm font-bold tracking-tight text-[#b71532] shadow-lg shadow-[#b71532]/15 backdrop-blur"
+  >
+    <span class="relative flex size-2.5" aria-hidden="true">
+      <span class="tawk-online-pulse absolute inset-0 rounded-full bg-[#e03445]"></span>
+      <span class="relative size-2.5 rounded-full bg-[#e03445] ring-2 ring-[#fce5e8]"></span>
+    </span>
+    {statusLabel}
+  </span>
+</aside>
+
+<script is:inline>
+  (() => {
+    const badgeId = "tawk-online-badge";
+
+    const setStatus = (status) => {
+      window.__dreamyTawkStatus = status;
+
+      const badge = document.getElementById(badgeId);
+      if (badge) {
+        badge.toggleAttribute("hidden", status !== "online");
+      }
+    };
+
+    window.__dreamyTawkSetStatus = setStatus;
+
+    if (window.__dreamyTawkStatus) {
+      setStatus(window.__dreamyTawkStatus);
+    }
+
+    if (!window.__dreamyTawkBadgeNavigationListener) {
+      window.__dreamyTawkBadgeNavigationListener = true;
+      document.addEventListener("astro:after-swap", () => {
+        window.__dreamyTawkSetStatus?.(window.__dreamyTawkStatus);
+      });
+    }
+
+    if (window.__dreamyTawkLoaded) return;
+
+    window.__dreamyTawkLoaded = true;
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_LoadStart = new Date();
+
+    const previousOnLoad = window.Tawk_API.onLoad;
+    const previousOnStatusChange = window.Tawk_API.onStatusChange;
+
+    window.Tawk_API.onLoad = function () {
+      previousOnLoad?.();
+      setStatus(window.Tawk_API.getStatus?.());
+    };
+
+    window.Tawk_API.onStatusChange = function (status) {
+      previousOnStatusChange?.(status);
+      setStatus(status);
+    };
+
+    window.Tawk_API.customStyle = {
+      zIndex: "60 !important",
+      visibility: {
+        desktop: {
+          position: "br",
+          xOffset: 16,
+          yOffset: 96,
+        },
+        mobile: {
+          position: "br",
+          xOffset: 16,
+          yOffset: 96,
+        },
+      },
+    };
+
+    const script = document.createElement("script");
+    script.id = "tawk-to-widget";
+    script.async = true;
+    script.src = "https://embed.tawk.to/5e2c76118e78b86ed8ab1025/default";
+    script.setAttribute("crossorigin", "*");
+    document.head.appendChild(script);
+  })();
+</script>
+
+<style>
+  .tawk-online-pulse {
+    animation: tawk-online-pulse 1.7s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  @keyframes tawk-online-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0;
+      transform: scale(2.4);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tawk-online-pulse {
+      animation: none;
+    }
+  }
+</style>

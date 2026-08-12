@@ -1,39 +1,65 @@
 ---
 import { WhatsAppIcon } from "@/components/icons/SocialContactIcons";
+import type { Lang } from "@/lib/i18n";
 
 interface Props {
+  lang?: Lang;
   phoneNumber?: string;
   message?: string;
   label?: string;
 }
 
 const {
+  lang = "es",
   phoneNumber = "51969787221",
-  message = "Hola, quisiera más información sobre sus tours.",
-  label = "Escribinos por WhatsApp",
+  message: messageProp,
+  label: labelProp,
 } = Astro.props;
 
+const copy = {
+  es: {
+    contact: "Contacta a tu agente",
+    label: "Contacta a tu agente por WhatsApp",
+    message: "Hola, quisiera más información sobre sus tours.",
+  },
+  en: {
+    contact: "Contact your agent",
+    label: "Contact your agent on WhatsApp",
+    message: "Hello, I would like more information about your tours.",
+  },
+  pt: {
+    contact: "Fale com seu agente",
+    label: "Fale com seu agente pelo WhatsApp",
+    message: "Olá, gostaria de mais informações sobre seus tours.",
+  },
+} satisfies Record<Lang, { contact: string; label: string; message: string }>;
+
+const localizedCopy = copy[lang];
+const message = messageProp ?? localizedCopy.message;
+const label = labelProp ?? localizedCopy.label;
 const cleanPhone = phoneNumber.replace(/\D/g, "");
 const href = `https://wa.me/${cleanPhone}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 ---
 
-<aside aria-label="Contacto por WhatsApp">
+<aside aria-label={label} class="fixed bottom-4 right-4 z-50">
   <a
     href={href}
     target="_blank"
     rel="noopener noreferrer"
     aria-label={label}
     title={label}
-    class="group fixed bottom-4 right-4 z-50 inline-flex items-center gap-2 rounded-full bg-[#0B6B35] px-4 py-3 text-white shadow-lg shadow-green-950/20 ring-1 ring-white/20 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-[#09582c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B6B35] focus-visible:ring-offset-2 focus-visible:ring-offset-background md:bottom-24 md:right-6"
+    class="group inline-flex items-center gap-3 focus-visible:outline-none"
   >
     <span
-      class="flex size-10 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:rotate-6"
+      class="rounded-full border border-border bg-background/95 px-3 py-2 text-sm font-semibold text-foreground shadow-lg shadow-black/10 backdrop-blur transition-all duration-300 group-hover:-translate-x-0.5 group-hover:border-[#0B6B35]/30"
     >
-      <WhatsAppIcon className="size-5" />
+      {localizedCopy.contact}
     </span>
 
-    <span class="hidden pr-1 text-sm font-semibold tracking-wide sm:inline">
-      WhatsApp
+    <span
+      class="flex size-15 items-center justify-center rounded-full bg-[#0B6B35] text-white shadow-lg shadow-green-950/25 ring-1 ring-white/25 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 group-hover:bg-[#09582c]"
+    >
+      <WhatsAppIcon className="size-7" />
     </span>
   </a>
 </aside>

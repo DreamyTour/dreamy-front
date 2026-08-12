@@ -42,8 +42,8 @@ const { data, lang } = Astro.props;
   <div class="relative z-10">
     <Certification lang={lang} />
 
-    <div class="max-w-8xl mx-auto px-6 pt-14 md:px-10 lg:pt-16">
-      <div class="border-b border-white/10 py-10 lg:py-12">
+    <div class="max-w-8xl mx-auto px-6 pt-8 md:px-10 lg:pt-10">
+      <div class="border-b border-white/10 py-8 lg:py-10">
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           <div
             class="flex flex-col border-b border-white/10 pb-10 lg:col-span-5 lg:border-b-0 lg:border-r lg:pr-12"
@@ -198,7 +198,7 @@ const { data, lang } = Astro.props;
       </div>
 
       <div
-        class="flex flex-col items-center justify-between gap-6 pt-7 md:flex-row"
+        class="flex flex-col items-center justify-between gap-6 pt-6 md:flex-row"
       >
         <p class="text-center text-sm text-white/55 md:text-left">
           &copy; {new Date().getFullYear()} Dreamy Tours. Todos los derechos reservados.
@@ -218,15 +218,22 @@ const { data, lang } = Astro.props;
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Siguenos en ${social.label || "red social"}`}
-                  class="group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.04] transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-50/35 hover:bg-white/10"
+                  class="footer-social-link group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/[0.04] transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-110 hover:border-emerald-200/60 hover:bg-emerald-300/15 hover:shadow-[0_0_0_5px_rgba(110,231,183,0.08),0_14px_28px_rgba(16,185,129,0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-200 active:scale-100 motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100"
                 >
-                  <div class="absolute inset-0 bg-emerald-50/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <span
+                    class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.58),transparent_26%),linear-gradient(135deg,rgba(110,231,183,0.32),rgba(16,185,129,0.08))] opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
+                    aria-hidden="true"
+                  ></span>
+                  <span
+                    class="pointer-events-none absolute inset-1 rounded-full border border-white/35 opacity-0 scale-75 transition-[opacity,scale] duration-300 group-hover:scale-100 group-hover:opacity-100 motion-reduce:transition-none motion-reduce:group-hover:scale-75"
+                    aria-hidden="true"
+                  ></span>
                   {social.imagen?.url && (
                     <img
                       src={getImageUrl(social.imagen)}
                       alt=""
                       aria-hidden="true"
-                      class="relative z-10 h-5 w-auto opacity-85 transition-all duration-300 group-hover:scale-105 group-hover:opacity-100"
+                      class="relative z-10 h-5 w-auto opacity-85 transition-all duration-300 group-hover:scale-110 group-hover:brightness-125 group-hover:opacity-100 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                       width="24"
                       height="24"
                       loading="lazy"

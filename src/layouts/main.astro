@@ -10,6 +10,7 @@ import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
 
 import WhatsAppFloatingButton from "@/components/layout/WhatsAppFloatingButton.astro";
+import TawkWidget from "@/components/layout/TawkWidget.astro";
 import { rewriteMenuUrls } from "@/lib/utils";
 import SEO from "@/components/layout/SEO.astro";
 import type { SEOProps } from "@/components/layout/SEO.astro";
@@ -117,7 +118,8 @@ const seoProps = seo || {
       <slot />
     </main>
     <Footer data={globalData?.footer} lang={currentLang} />
-    <WhatsAppFloatingButton />
+    <WhatsAppFloatingButton lang={currentLang} />
+    <TawkWidget lang={currentLang} />
 
     <!-- GTM se carga tras la primera interacción o cuando el navegador queda libre. -->
     <script is:inline>
