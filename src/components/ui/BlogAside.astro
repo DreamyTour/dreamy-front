@@ -194,9 +194,22 @@ sidebarSocialLinks.splice(
   ) : (
     <aside class="w-full shrink-0 lg:w-80 xl:w-[21rem]">
       <div class="flex flex-col gap-5">
+        <section class="lg:hidden" aria-labelledby="blog-aside-mobile-title">
+          <h2 id="blog-aside-mobile-title" class="sr-only">
+            {copy.categories}
+          </h2>
+
+          <BlogCategoryDropdown
+            client:load
+            label={copy.categories}
+            currentLabel={currentCategoryLabel}
+            options={mobileCategoryOptions}
+          />
+        </section>
+
         <section
           aria-labelledby="blog-aside-title"
-          class="blog-aside-card relative overflow-hidden rounded-xl border border-border bg-card p-4"
+          class="blog-aside-card relative hidden overflow-hidden rounded-xl border border-border bg-card p-4 lg:block"
         >
           <header class="mb-4 border-b border-border px-1 pb-4">
             <h2
@@ -285,7 +298,7 @@ sidebarSocialLinks.splice(
         {showSocial && sidebarSocialLinks.length > 0 && (
           <section
             aria-labelledby="blog-social-title"
-            class="blog-social-card overflow-hidden rounded-xl border border-border bg-card"
+            class="blog-social-card hidden overflow-hidden rounded-xl border border-border bg-card lg:block"
           >
             <header class="border-b border-border px-5 py-4">
               <h2
