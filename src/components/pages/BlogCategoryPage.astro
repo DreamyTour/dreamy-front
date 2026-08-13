@@ -53,10 +53,22 @@ const emptyByLang: Record<Lang, string> = {
   es: "No hay blogs disponibles en esta categoria",
   pt: "Nao ha posts disponiveis nesta categoria",
 };
+const categoryDescriptionFallbackByLang: Record<Lang, (name: string) => string> = {
+	en: (name) =>
+		`Find travel guides, recommendations, and ideas to plan your trip to ${name}.`,
+	es: (name) =>
+		`Encuentra guías, recomendaciones e ideas para planificar tu viaje a ${name}.`,
+	pt: (name) =>
+		`Encontre guias, recomendações e ideias para planejar sua viagem a ${name}.`,
+};
+const categoryDescription = currentCategory?.descripcion?.trim() ||
+  (currentCategory?.nombre
+    ? categoryDescriptionFallbackByLang[lang](currentCategory.nombre)
+    : "");
 const categorySeoProps = buildSEOProps({
   seo: currentCategory?.seo,
   fallbackTitle: currentCategory?.nombre || "Blog",
-  fallbackDescription: currentCategory?.descripcion || "",
+  fallbackDescription: categoryDescription,
   type: "website",
   lang,
   slugMap,
@@ -69,8 +81,7 @@ const categorySeoProps = buildSEOProps({
     title: currentCategory?.seo?.metaTitle || currentCategory?.nombre || "Blog",
     description:
       currentCategory?.seo?.metaDescription ||
-      currentCategory?.descripcion ||
-      "",
+      categoryDescription,
     imageUrl: heroImage || undefined,
     category: currentCategory,
     posts: blogsList,
@@ -182,9 +193,9 @@ const seoProps =
 
           <div class="min-w-0">
             {
-              currentCategory?.descripcion && (
-                <p class="mb-7 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 md:text-lg">
-                  {currentCategory.descripcion}
+              categoryDescription && (
+                <p class="mb-7 max-w-3xl border-l border-secondary/45 pl-5 text-base leading-7 text-foreground/68 [text-wrap:pretty] md:text-lg">
+                  {categoryDescription}
                 </p>
               )
             }
