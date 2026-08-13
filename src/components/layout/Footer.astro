@@ -18,6 +18,31 @@ interface Props {
 }
 
 const { data, lang } = Astro.props;
+
+const complaintsBook = {
+  es: {
+    href: "/es/libro-reclamaciones",
+    label: "Libro de Reclamaciones",
+    eyebrow: "Atención al cliente",
+  },
+  en: {
+    href: "/complaints-book",
+    label: "Complaints Book",
+    eyebrow: "Customer support",
+  },
+  pt: {
+    href: "/pt/livro-de-reclamacoes",
+    label: "Livro de Reclamações",
+    eyebrow: "Atendimento ao cliente",
+  },
+}[lang];
+
+const isComplaintsBookLink = (link: { label?: string; url?: string }) =>
+  /reclam|complaint/i.test(`${link.label || ""} ${link.url || ""}`);
+
+const dreamyAboutLinks = data?.dreamyAbout?.link?.filter(
+  (link) => !isComplaintsBookLink(link),
+);
 ---
 
 <footer
@@ -115,9 +140,9 @@ const { data, lang } = Astro.props;
                 )
               }
               {
-                data?.dreamyAbout?.link && data.dreamyAbout.link.length > 0 && (
+                dreamyAboutLinks && dreamyAboutLinks.length > 0 && (
                   <ul class="flex flex-col gap-3">
-                    {data.dreamyAbout.link.map((link) => (
+                    {dreamyAboutLinks.map((link) => (
                       <li>
                         <a
                           href={rewriteUrl(
@@ -193,15 +218,74 @@ const { data, lang } = Astro.props;
                 </ul>
               )
             }
+
+            <a
+              href={complaintsBook.href}
+              class="group mt-2 inline-flex w-fit items-center gap-3 border-t border-white/12 pt-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-200"
+            >
+              <svg
+                viewBox="0 0 48 40"
+                fill="none"
+                class="h-10 w-12 shrink-0 text-emerald-100/75 transition-transform duration-300 group-hover:-rotate-2 group-hover:scale-105 group-hover:text-emerald-100 motion-reduce:transition-none motion-reduce:group-hover:rotate-0 motion-reduce:group-hover:scale-100"
+                stroke="currentColor"
+                stroke-width="1.45"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M24 10.2C19.2 6.7 12.1 6.1 5 8.7v24.2c7.1-2.6 14.2-2 19 1.5V10.2Z"
+                ></path>
+                <path
+                  d="M24 10.2c4.8-3.5 11.9-4.1 19-1.5v24.2c-7.1-2.6-14.2-2-19 1.5V10.2Z"
+                ></path>
+                <path
+                  d="M9.5 13.2c4.1-1.3 8.3-.9 11.5.8M9.5 18.3c4.1-1.3 8.3-.9 11.5.8M38.5 13.2c-4.1-1.3-8.3-.9-11.5.8M38.5 18.3c-4.1-1.3-8.3-.9-11.5.8"
+                ></path>
+                <path d="M24 10.2v24.2"></path>
+              </svg>
+              <span class="flex flex-col">
+                <span
+                  class="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-emerald-100/55"
+                >
+                  {complaintsBook.eyebrow}
+                </span>
+                <span
+                  class="text-[0.95rem] font-semibold text-white/85 transition-colors duration-300 group-hover:text-emerald-100 motion-reduce:transition-none"
+                >
+                  {complaintsBook.label}
+                </span>
+              </span>
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                class="size-4 shrink-0 text-emerald-100/55 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-emerald-100 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 10h11M11 5.5 15.5 10 11 14.5"></path>
+              </svg>
+            </a>
           </div>
         </div>
       </div>
 
       <div
-        class="flex flex-col items-center justify-between gap-6 pt-6 md:flex-row"
+        class="flex flex-col items-center gap-6 pt-6 md:flex-row md:justify-between"
       >
-        <p class="text-center text-sm text-white/55 md:text-left">
-          &copy; {new Date().getFullYear()} Dreamy Tours. Todos los derechos reservados.
+        <p
+          class="text-center text-sm leading-relaxed text-white/55 xl:text-left"
+        >
+          <span class="font-medium text-white/75">
+            &copy; {new Date().getFullYear()} Inversiones Dreamy Tours E.I.R.L.
+          </span>
+          <span
+            class="mx-2 hidden h-1 w-1 rounded-full bg-emerald-200/55 sm:inline-block"
+          ></span>
+          <span class="block sm:inline">RUC: 20609347318</span>
         </p>
 
         {
@@ -223,11 +307,11 @@ const { data, lang } = Astro.props;
                   <span
                     class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.58),transparent_26%),linear-gradient(135deg,rgba(110,231,183,0.32),rgba(16,185,129,0.08))] opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
                     aria-hidden="true"
-                  ></span>
+                  />
                   <span
                     class="pointer-events-none absolute inset-1 rounded-full border border-white/35 opacity-0 scale-75 transition-[opacity,scale] duration-300 group-hover:scale-100 group-hover:opacity-100 motion-reduce:transition-none motion-reduce:group-hover:scale-75"
                     aria-hidden="true"
-                  ></span>
+                  />
                   {social.imagen?.url && (
                     <img
                       src={getImageUrl(social.imagen)}

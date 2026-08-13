@@ -1,22 +1,21 @@
 ---
 import type { TopBar } from "@/types/global";
 import type { Lang } from "@/lib/i18n";
-import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   data?: TopBar;
   lang: Lang;
 }
 
-const { data, lang } = Astro.props;
+const { data } = Astro.props;
 
 // Si no existe o no está visible, no renderiza nada
 if (!data || !data.isVisible) return;
 
-// Seguridad para links externos
-const isExternal = data.link?.isExternal;
-const target = isExternal ? "_blank" : "_self";
-const rel = isExternal ? "noopener noreferrer" : undefined;
+const availabilityYears = "2026-2027";
+const announcementText = data.text.replace("2026", availabilityYears);
+const announcementLink =
+  "mailto:info@dreamy.tours?subject=Informaci%C3%B3n%20sobre%20el%20Camino%20Inca%204%20D%C3%ADas%202026-2027";
 ---
 
 <aside
@@ -24,21 +23,19 @@ const rel = isExternal ? "noopener noreferrer" : undefined;
   aria-label="Anuncio"
 >
   <p
-    class="max-w-8xl mx-auto px-4 py-1.5 flex items-center justify-center gap-3 text-sm"
+    class="mx-auto flex max-w-8xl flex-wrap items-center justify-center gap-x-3 gap-y-2 px-4 py-2 text-center text-sm"
   >
     <!-- Texto -->
     <span class="font-medium leading-tight tracking-wide">
-      {data.text}
+      {announcementText}
     </span>
 
     <!-- Link / Botón -->
     {
-      data.link?.label && data.link?.url && (
+      data.link?.label && (
         <a
-          href={rewriteUrl(data.link.url, lang)}
-          target={target}
-          rel={rel}
-          class="font-semibold underline underline-offset-4 decoration-white/45 transition-colors duration-200 hover:decoration-white"
+          href={announcementLink}
+          class="inline-flex min-h-8 items-center rounded-full bg-red-700 px-3.5 py-1 text-xs font-bold tracking-[0.01em] text-white shadow-[0_3px_10px_rgba(69,10,10,0.3)] transition-all duration-200 hover:-translate-y-px hover:bg-red-800 hover:shadow-[0_5px_14px_rgba(69,10,10,0.38)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         >
           {data.link.label}
         </a>

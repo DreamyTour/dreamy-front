@@ -23,6 +23,22 @@ import type { StrapiBlock, StrapiBlockChild } from "@/types/page";
 
 type BlogImage = Imagen & { caption?: string };
 
+function getBlockChildText(child: StrapiBlockChild): string {
+  if (typeof child.text === "string") return child.text;
+
+  return child.children?.map(getBlockChildText).join("") || "";
+}
+
+function getSafeLinkHref(url: string | undefined): string | undefined {
+  const href = url?.trim();
+  if (!href) return undefined;
+
+  const scheme = href.match(/^([a-z][a-z\d+.-]*):/i)?.[1]?.toLowerCase();
+  return !scheme || ["http", "https", "mailto", "tel"].includes(scheme)
+    ? href
+    : undefined;
+}
+
 function generateDescription(blocks: unknown, maxLength = 160): string {
   if (!Array.isArray(blocks)) return "";
 
@@ -31,10 +47,10 @@ function generateDescription(blocks: unknown, maxLength = 160): string {
     if (typeof block !== "object" || block === null) continue;
     const currentBlock = block as {
       type?: string;
-      children?: Array<{ text?: string }>;
+      children?: StrapiBlockChild[];
     };
     if (currentBlock.type === "paragraph" && currentBlock.children) {
-      plainText += `${currentBlock.children.map((child) => child.text || "").join(" ")} `;
+      plainText += `${currentBlock.children.map(getBlockChildText).join(" ")} `;
     }
   }
 
@@ -59,9 +75,7 @@ function extractHeadings(blocks: unknown): { id: string; text: string }[] {
   const headings: { id: string; text: string }[] = [];
   for (const block of blocks) {
     if (block.type !== "heading" || block.level !== 2) continue;
-    const text =
-      block.children?.map((child: StrapiBlockChild) => child.text).join("") ||
-      "";
+    const text = block.children?.map(getBlockChildText).join("") || "";
     headings.push({ id: generateSlug(text), text });
   }
 
@@ -271,7 +285,20 @@ const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
                       return (
                         <p class="mb-5 text-base leading-relaxed text-foreground/80">
                           {block.children?.map((child: StrapiBlockChild) => {
-                            const text = child.text;
+                            const text = getBlockChildText(child);
+                            if (child.type === "link") {
+                              const href = getSafeLinkHref(child.url);
+                              return href ? (
+                                <a
+                                  href={href}
+                                  class="font-medium text-primary underline decoration-primary/45 underline-offset-4 transition-colors hover:text-primary/75 hover:decoration-primary focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                                >
+                                  {text}
+                                </a>
+                              ) : (
+                                text
+                              );
+                            }
                             if (child.bold)
                               return (
                                 <strong class="font-semibold text-foreground">
@@ -301,9 +328,7 @@ const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
                     if (block.type === "heading") {
                       const level = block.level as number | undefined;
                       const headingText =
-                        block.children
-                          ?.map((child: StrapiBlockChild) => child.text)
-                          .join("") || "";
+                        block.children?.map(getBlockChildText).join("") || "";
                       const headingId = generateSlug(headingText);
                       if (level === 1 || level === 2)
                         return (
@@ -360,7 +385,20 @@ const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
                           {block.children?.map((item: StrapiBlockChild) => (
                             <li class="pl-1">
                               {item.children?.map((child: StrapiBlockChild) => {
-                                const text = child.text;
+                                const text = getBlockChildText(child);
+                                if (child.type === "link") {
+                                  const href = getSafeLinkHref(child.url);
+                                  return href ? (
+                                    <a
+                                      href={href}
+                                      class="font-medium text-primary underline decoration-primary/45 underline-offset-4 transition-colors hover:text-primary/75 hover:decoration-primary focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                                    >
+                                      {text}
+                                    </a>
+                                  ) : (
+                                    text
+                                  );
+                                }
                                 if (child.bold)
                                   return (
                                     <strong class="font-semibold text-foreground">
