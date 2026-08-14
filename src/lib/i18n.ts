@@ -13,6 +13,15 @@ export function isValidLang(value: string | undefined): value is Lang {
 	return !!value && LANGS.includes(value as Lang);
 }
 
+export function getAvailableLanguages(
+	slugMap?: Partial<Record<Lang, string>>,
+	currentLang?: Lang,
+): readonly Lang[] {
+	if (!slugMap || Object.keys(slugMap).length === 0) return LANGS;
+
+	return LANGS.filter((lang) => lang === currentLang || Boolean(slugMap[lang]));
+}
+
 function splitUrlPath(url: string): { path: string; suffix: string } {
 	const match = url.match(/^([^?#]*)([?#].*)?$/);
 	return {

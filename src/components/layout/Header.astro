@@ -11,9 +11,10 @@ import { localizePath } from "@/lib/i18n";
 interface Props {
   data: Global;
   lang: Lang;
+  availableLangs?: readonly Lang[];
 }
 
-const { data, lang } = Astro.props;
+const { data, lang, availableLangs } = Astro.props;
 const mobileLogoUrl = localizePath("/", lang);
 const isBlogLink = (link: Link) =>
   link.url?.includes("/blog") || link.label?.toLowerCase().includes("blog");
@@ -43,7 +44,11 @@ const mobileQuickActions = [
 
 <header class="w-full shadow-sm">
   <TopBar data={data?.topBar} lang={lang} />
-  <HeaderTop data={data?.headerTop} lang={lang} />
+  <HeaderTop
+    data={data?.headerTop}
+    lang={lang}
+    availableLangs={availableLangs}
+  />
   <hr class="border-t border-primary/20" aria-hidden="true" />
   <DesktopMenu
     menu={data?.menu}
@@ -56,6 +61,6 @@ const mobileQuickActions = [
     quickActions={mobileQuickActions}
     logoUrl={mobileLogoUrl}
     lang={lang}
-    transition:persist
+    availableLangs={availableLangs}
   />
 </header>

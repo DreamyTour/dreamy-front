@@ -3,9 +3,10 @@ import { LANGS, type Lang } from "@/lib/i18n";
 
 interface Props {
   currentLang: Lang;
+  availableLangs?: readonly Lang[];
 }
 
-const { currentLang } = Astro.props;
+const { currentLang, availableLangs = LANGS } = Astro.props;
 
 const languageNames: Record<Lang, string> = {
   en: "English",
@@ -26,6 +27,8 @@ const menuId = "language-menu-desktop";
   class="language-switcher relative"
   data-language-switcher
   data-desktop-language-switcher
+  data-current-lang={currentLang}
+  data-available-langs={availableLangs.join(",")}
 >
   <button
     type="button"
@@ -73,7 +76,7 @@ const menuId = "language-menu-desktop";
     data-language-menu
   >
     {
-      LANGS.map((lang) => {
+      availableLangs.map((lang) => {
         const selected = lang === currentLang;
 
         return (
@@ -125,7 +128,6 @@ const menuId = "language-menu-desktop";
 <script
   is:inline
   define:vars={{
-    currentLang,
     langs: LANGS,
     defaultLang: "en",
   }}
@@ -156,7 +158,12 @@ const menuId = "language-menu-desktop";
       return `/${segments.join("/")}`;
     };
 
-    const resolveLocalizedPath = (nextLang) => {
+    const getAvailableLangs = (switcher) =>
+      switcher?.dataset.availableLangs?.split(",").filter(Boolean) || langs;
+
+    const resolveLocalizedPath = (nextLang, availableLangs) => {
+      if (!availableLangs.includes(nextLang)) return null;
+
       const pathname = window.location.pathname;
       const normalizedPath = stripLangPrefix(pathname);
 
@@ -223,11 +230,16 @@ const menuId = "language-menu-desktop";
       const option = target.closest?.("[data-language-option]");
       if (option) {
         const nextLang = option.getAttribute("data-language-option");
-        if (nextLang === currentLang) {
+        const activeLang = activeSwitcher?.dataset.currentLang;
+        if (nextLang === activeLang) {
           if (activeSwitcher) closeSwitcher(activeSwitcher);
           return;
         }
-        window.location.href = resolveLocalizedPath(nextLang);
+        const targetPath = resolveLocalizedPath(
+          nextLang,
+          getAvailableLangs(activeSwitcher),
+        );
+        if (targetPath) window.location.href = targetPath;
       }
     });
 

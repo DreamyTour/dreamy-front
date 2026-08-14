@@ -5,7 +5,12 @@ import { ClientRouter } from "astro:transitions";
 
 import fetchApi from "@/lib/strapi";
 import type { Global } from "@/types/global";
-import { DEFAULT_LANG, isValidLang, type Lang } from "@/lib/i18n";
+import {
+  DEFAULT_LANG,
+  getAvailableLanguages,
+  isValidLang,
+  type Lang,
+} from "@/lib/i18n";
 import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
 
@@ -67,6 +72,7 @@ const seoProps = seo || {
   type: "website" as const,
   lang: currentLang,
 };
+const availableLangs = getAvailableLanguages(seo?.slugMap, currentLang);
 ---
 
 <html lang={currentLang}>
@@ -113,7 +119,11 @@ const seoProps = seo || {
       Saltar al contenido principal
     </a>
 
-    <Header data={globalData} lang={currentLang} />
+    <Header
+      data={globalData}
+      lang={currentLang}
+      availableLangs={availableLangs}
+    />
     <main id="main-content" tabindex="-1">
       <slot />
     </main>

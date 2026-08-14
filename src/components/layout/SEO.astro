@@ -1,8 +1,8 @@
 ---
 import type { Lang } from "@/lib/i18n";
 import {
-  LANGS,
   DEFAULT_LANG,
+  getAvailableLanguages,
   localizePath,
   stripLangPrefix,
   translatePathForSlug,
@@ -96,28 +96,34 @@ const fullImageUrl = image
   : undefined;
 
 // Get alternate language URLs for hreflang
-const alternateUrls = LANGS.map((alternateLang) => {
-  let urlPath = currentPath;
+const hasSlugMap = Boolean(slugMap && Object.keys(slugMap).length > 0);
+const alternateUrls = getAvailableLanguages(slugMap, lang).map(
+  (alternateLang) => {
+    let urlPath = currentPath;
 
-  // Si hay un slugMap, usarlo para traducir el slug
-  if (slugMap && slugMap[alternateLang]) {
-    urlPath = translatePathForSlug(urlPath, slugMap[alternateLang]);
-  }
+    // Si hay un slugMap, usarlo para traducir el slug
+    if (slugMap && slugMap[alternateLang]) {
+      urlPath = translatePathForSlug(urlPath, slugMap[alternateLang]);
+    }
 
-  return {
-    lang: alternateLang,
-    locale: OG_LOCALE_BY_LANG[alternateLang],
-    hreflang: HREFLANG_BY_LANG[alternateLang] || alternateLang,
-    url: `${siteUrl}${localizePath(urlPath, alternateLang)}`,
-  };
-});
+    return {
+      lang: alternateLang,
+      locale: OG_LOCALE_BY_LANG[alternateLang],
+      hreflang: HREFLANG_BY_LANG[alternateLang] || alternateLang,
+      url: `${siteUrl}${localizePath(urlPath, alternateLang)}`,
+    };
+  },
+);
 
 // Calcular x-default (versión inglés sin prefijo de idioma)
 let xDefaultPath = currentPath;
 if (slugMap && slugMap["en"]) {
   xDefaultPath = translatePathForSlug(xDefaultPath, slugMap["en"]);
 }
-const xDefaultUrl = `${siteUrl}${localizePath(xDefaultPath, DEFAULT_LANG)}`;
+const xDefaultUrl =
+  !hasSlugMap || slugMap?.[DEFAULT_LANG]
+    ? `${siteUrl}${localizePath(xDefaultPath, DEFAULT_LANG)}`
+    : undefined;
 
 const orgDescriptionByLang: Record<Lang, string> = {
   en: "Dreamy Tours is a travel agency in Peru specialized in tours and travel packages to Machu Picchu, Cusco, Lake Titicaca, Bolivia, and other destinations in Latin America.",
@@ -265,7 +271,11 @@ const additionalSchemas = (Array.isArray(schemas) ? schemas : [schemas]).filter(
 }
 
 <!-- Default to English if no hreflang matches -->
-<link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+{
+  xDefaultUrl && (
+    <link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+  )
+}
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>

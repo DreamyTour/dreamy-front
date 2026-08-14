@@ -8,9 +8,16 @@ interface Props {
   quickActions?: Link[];
   logoUrl: string;
   lang: Lang;
+  availableLangs?: readonly Lang[];
 }
 
-const { menu, quickActions = [], logoUrl, lang } = Astro.props;
+const {
+  menu,
+  quickActions = [],
+  logoUrl,
+  lang,
+  availableLangs = LANGS,
+} = Astro.props;
 const languageNames: Record<Lang, string> = {
   en: "English",
   es: "Español",
@@ -27,6 +34,7 @@ const languageFlags: Record<Lang, string> = {
   class="relative xl:hidden"
   data-mobile-menu-root
   data-current-lang={lang}
+  data-available-langs={availableLangs.join(",")}
 >
   <nav
     class="relative z-50 bg-background/95 px-4 py-3 backdrop-blur-md"
@@ -83,7 +91,7 @@ const languageFlags: Record<Lang, string> = {
             class="absolute right-0 z-50 mt-2 min-w-[170px] overflow-hidden rounded-md border border-border bg-white p-1 shadow-lg"
           >
             {
-              LANGS.map((optionLang) => {
+              availableLangs.map((optionLang) => {
                 const selected = optionLang === lang;
                 return (
                   <a
@@ -321,7 +329,10 @@ const languageFlags: Record<Lang, string> = {
     type Lang,
   } from "@/lib/i18n";
 
-  function resolveLocalizedPath(nextLang: Lang) {
+  function resolveLocalizedPath(nextLang: Lang, root: HTMLElement) {
+    if (!root.dataset.availableLangs?.split(",").includes(nextLang))
+      return null;
+
     const normalizedPath = stripLangPrefix(window.location.pathname);
     for (const id of ["tour-slug-map", "page-slug-map"]) {
       const element = document.getElementById(id);
@@ -437,7 +448,8 @@ const languageFlags: Record<Lang, string> = {
                 return;
               }
               event.preventDefault();
-              window.location.href = resolveLocalizedPath(nextLang);
+              const targetPath = resolveLocalizedPath(nextLang, root);
+              if (targetPath) window.location.href = targetPath;
             });
           });
 

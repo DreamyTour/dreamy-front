@@ -9,10 +9,6 @@ export async function getStaticPaths() {
 
 const props = Astro.props as BlogPostProps;
 const lang = isValidLang(Astro.params.lang) ? Astro.params.lang : DEFAULT_LANG;
-
-if (props.isRedirect && props.redirectTo) {
-  return Astro.redirect(props.redirectTo, 301);
-}
 ---
 
 <BlogPostPage

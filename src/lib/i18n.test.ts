@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
 	collapseRepeatedBlogPath,
+	getAvailableLanguages,
 	localizePath,
 	stripLangPrefix,
 	translatePathForSlug,
@@ -33,5 +34,14 @@ describe("i18n path normalization", () => {
 
 		expect(translated).toBe("/blog/peruvian-amazon-guide/");
 		expect(localizePath(translated, "en")).toBe("/blog/peruvian-amazon-guide/");
+	});
+
+	test("only exposes languages with a translation for localized content", () => {
+		expect(
+			getAvailableLanguages(
+				{ en: "inca-trail-permits", es: "permisos-camino-inca" },
+				"en",
+			),
+		).toEqual(["en", "es"]);
 	});
 });

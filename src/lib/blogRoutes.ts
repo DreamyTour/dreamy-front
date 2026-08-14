@@ -1,5 +1,5 @@
 import { getCategoryPostCounts } from "@/lib/blogCategories";
-import { DEFAULT_LANG, LANGS, type Lang } from "@/lib/i18n";
+import { DEFAULT_LANG, LANGS, type Lang, LOCALIZED_LANGS } from "@/lib/i18n";
 import fetchApi from "@/lib/strapi";
 import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
@@ -45,8 +45,6 @@ export type BlogPostProps = {
 	relatedBlogs: Blog[];
 	categoryPostCounts: Record<string, number>;
 	totalPostCount: number;
-	isRedirect?: boolean;
-	redirectTo?: string;
 };
 
 export type BlogCategoryProps = {
@@ -162,7 +160,7 @@ export async function getBlogIndexPaths({
 	localized: boolean;
 }) {
 	const allPaths: unknown[] = [];
-	const langs = localized ? LANGS : [DEFAULT_LANG];
+	const langs = localized ? LOCALIZED_LANGS : [DEFAULT_LANG];
 
 	for (const lang of langs) {
 		const blogsList = await fetchBlogs(lang);
@@ -173,10 +171,10 @@ export async function getBlogIndexPaths({
 			...paginate(blogsList, {
 				params: localized ? { lang } : undefined,
 				pageSize: 9,
-			props: {
-				lang,
-				searchBlogs: blogsList,
-				allCategories,
+				props: {
+					lang,
+					searchBlogs: blogsList,
+					allCategories,
 					socialLogos: getSocialLogos(globalData),
 					categoryPostCounts: getCategoryPostCounts(blogsList),
 					totalPostCount: blogsList.length,
@@ -196,7 +194,7 @@ export async function getBlogPostPaths({ localized }: { localized: boolean }) {
 	const { blogsByLang, categoriesByLang, globalDataByLang } =
 		await loadBlogDataByLang();
 	const slugsByDocId = buildPostSlugMap(blogsByLang);
-	const langs = localized ? LANGS : [DEFAULT_LANG];
+	const langs = localized ? LOCALIZED_LANGS : [DEFAULT_LANG];
 
 	for (const lang of langs) {
 		const blogsList = blogsByLang[lang] || [];
@@ -221,48 +219,6 @@ export async function getBlogPostPaths({ localized }: { localized: boolean }) {
 		}
 	}
 
-	if (!localized) return paths;
-
-	const defaultLangBlogs = blogsByLang[DEFAULT_LANG] || [];
-	const allPathsBySlug: Record<string, string[]> = {};
-
-	for (const path of paths) {
-		const slug = path.params.slug;
-		allPathsBySlug[slug] ??= [];
-		if (path.params.lang) allPathsBySlug[slug].push(path.params.lang);
-	}
-
-	for (const lang of LANGS) {
-		if (lang === DEFAULT_LANG) continue;
-
-		const currentSlugs = new Set(
-			(blogsByLang[lang] || []).map((blog: Blog) => blog.slug),
-		);
-
-		for (const defaultBlog of defaultLangBlogs) {
-			if (currentSlugs.has(defaultBlog.slug)) continue;
-			const slugLanguages = allPathsBySlug[defaultBlog.slug] || [];
-			if (!slugLanguages.includes(DEFAULT_LANG)) continue;
-
-			paths.push({
-				params: { lang, slug: defaultBlog.slug },
-				props: {
-					isRedirect: true,
-					redirectTo: `/${DEFAULT_LANG}/blog/${defaultBlog.slug}`,
-					blog: defaultBlog,
-					lang: lang as Lang,
-					searchBlogs: defaultLangBlogs,
-					allCategories: [],
-					slugMap: slugsByDocId[defaultBlog.documentId] ?? {},
-					globalData: globalDataByLang[lang] || globalDataByLang[DEFAULT_LANG],
-					relatedBlogs: getRelatedBlogs(defaultBlog, defaultLangBlogs),
-					categoryPostCounts: getCategoryPostCounts(defaultLangBlogs),
-					totalPostCount: defaultLangBlogs.length,
-				},
-			});
-		}
-	}
-
 	return paths;
 }
 
@@ -277,7 +233,7 @@ export async function getBlogCategoryPaths({
 	const { blogsByLang, categoriesByLang, globalDataByLang } =
 		await loadBlogDataByLang();
 	const categorySlugsByDocId = buildCategorySlugMap(categoriesByLang);
-	const langs = localized ? LANGS : [DEFAULT_LANG];
+	const langs = localized ? LOCALIZED_LANGS : [DEFAULT_LANG];
 
 	for (const lang of langs) {
 		const blogsList = blogsByLang[lang] || [];
