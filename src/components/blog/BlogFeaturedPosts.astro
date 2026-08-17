@@ -87,13 +87,13 @@ function formatDate(date: string | undefined): string | null {
         const isMain = index === 0;
         const imageUrl = getImageUrl(
           blog.portadaImage,
-          isMain ? "large" : "medium",
+          isMain ? undefined : "medium",
         );
-        const imageSrcSet = getImageSrcSet(blog.portadaImage, [
-          "small",
-          "medium",
-          "large",
-        ]);
+        const imageSrcSet = getImageSrcSet(
+          blog.portadaImage,
+          ["small", "medium", "large"],
+          { includeOriginal: isMain },
+        );
         const imageAlt = getImageAlt(blog.portadaImage, blog.titulo);
         const publishedDate = formatDate(blog.publishedAt || blog.createdAt);
         const category = blog.category_blogs?.[0]?.nombre;
@@ -125,8 +125,8 @@ function formatDate(date: string | undefined): string | null {
                       : "(max-width: 1023px) 100vw, 33vw"
                   }
                   alt={imageAlt}
-                  width="1200"
-                  height="800"
+                  width={blog.portadaImage.width || 1200}
+                  height={blog.portadaImage.height || 800}
                   class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.035] motion-reduce:transform-none"
                   loading="eager"
                   fetchpriority={isMain ? "high" : "auto"}

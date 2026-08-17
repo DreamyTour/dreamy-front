@@ -70,21 +70,43 @@ export function getImageAlt(image: unknown, fallback = ""): string {
 	return normalizeImage(image)?.alternativeText || fallback;
 }
 
-export function getImageSrcSet(image: unknown, formats?: string[]): string {
-	const imgObj = normalizeImage(image);
-	if (!imgObj?.formats) return "";
+interface ImageSrcSetOptions {
+	includeOriginal?: boolean;
+}
 
-	const candidates = Object.entries(imgObj.formats)
+export function getImageSrcSet(
+	image: unknown,
+	formats?: string[],
+	options: ImageSrcSetOptions = {},
+): string {
+	const imgObj = normalizeImage(image);
+	if (!imgObj) return "";
+
+	const candidates = Object.entries(imgObj.formats || {})
 		.filter(([key, format]) => {
 			if (!format?.url || !format?.width) return false;
 			return formats ? formats.includes(key) : true;
 		})
-		.sort(([, a], [, b]) => (a.width || 0) - (b.width || 0));
+		.map(([, format]) => ({
+			url: resolveImageUrl(format.url),
+			width: format.width as number,
+		}));
 
-	return candidates
-		.map(([, format]) => {
-			return `${resolveImageUrl(format.url)} ${format.width}w`;
-		})
+	if (options.includeOriginal && imgObj.url && imgObj.width) {
+		candidates.push({
+			url: resolveImageUrl(imgObj.url),
+			width: imgObj.width,
+		});
+	}
+
+	const candidatesByWidth = new Map<number, string>();
+	for (const candidate of candidates) {
+		candidatesByWidth.set(candidate.width, candidate.url);
+	}
+
+	return [...candidatesByWidth]
+		.sort(([a], [b]) => a - b)
+		.map(([width, url]) => `${url} ${width}w`)
 		.join(", ");
 }
 

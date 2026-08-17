@@ -112,7 +112,7 @@ const {
 const socialLogos =
   globalData?.footer?.socialLogo || globalData?.socialLogo || [];
 
-const heroImage = getImageUrl(blog.portadaImage, "large");
+const heroImage = getImageUrl(blog.portadaImage);
 const heroImageAlt = getImageAlt(blog.portadaImage, blog.titulo);
 const seoProps = buildSEOProps({
   seo: blog.seo,
@@ -126,11 +126,11 @@ const seoProps = buildSEOProps({
   slugMap,
 });
 const tocHeadings = extractHeadings(blog.contenido);
-const heroImageSrcSet = getImageSrcSet(blog.portadaImage, [
-  "small",
-  "medium",
-  "large",
-]);
+const heroImageSrcSet = getImageSrcSet(
+  blog.portadaImage,
+  ["small", "medium", "large"],
+  { includeOriginal: true },
+);
 const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
 ---
 
@@ -139,7 +139,6 @@ const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
   lang={lang}
   lcpImageUrl={blog.portadaImage ? heroImage : undefined}
   lcpImageSrcSet={blog.portadaImage ? heroImageSrcSet : undefined}
-  lcpImageMedia="(max-width: 767px)"
 >
   <div class="blog-post-page">
     {
@@ -162,8 +161,8 @@ const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
             sizes="100vw"
             alt=""
             aria-hidden="true"
-            width="2000"
-            height="600"
+            width={blog.portadaImage.width || 2000}
+            height={blog.portadaImage.height || 600}
             class="absolute inset-0 h-full w-full object-cover"
             loading="eager"
             fetchpriority="high"

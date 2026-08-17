@@ -33,14 +33,14 @@ const {
 const blogsList = page.data;
 const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
 const heroImage = currentCategory?.imagenDestacada
-  ? getImageUrl(currentCategory.imagenDestacada, "large")
+  ? getImageUrl(currentCategory.imagenDestacada)
   : "";
 const heroImageSrcSet = currentCategory?.imagenDestacada
-  ? getImageSrcSet(currentCategory.imagenDestacada, [
-      "small",
-      "medium",
-      "large",
-    ])
+  ? getImageSrcSet(
+      currentCategory.imagenDestacada,
+      ["small", "medium", "large"],
+      { includeOriginal: true },
+    )
   : "";
 
 const pageLabelByLang: Record<Lang, string> = {
@@ -96,7 +96,12 @@ const seoProps =
     : categorySeoProps;
 ---
 
-<Layout seo={seoProps} lang={lang}>
+<Layout
+  seo={seoProps}
+  lang={lang}
+  lcpImageUrl={heroImage || undefined}
+  lcpImageSrcSet={heroImageSrcSet || undefined}
+>
   <section
     class="blog-page-shell relative isolate overflow-hidden"
     aria-labelledby="blog-category-title"
@@ -121,6 +126,8 @@ const seoProps =
             sizes="100vw"
             alt=""
             aria-hidden="true"
+            width={currentCategory.imagenDestacada.width || 2000}
+            height={currentCategory.imagenDestacada.height || 600}
             class="absolute inset-0 h-full w-full object-cover"
             loading="eager"
             fetchpriority="high"
