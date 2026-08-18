@@ -43,6 +43,11 @@ const isComplaintsBookLink = (link: { label?: string; url?: string }) =>
 const dreamyAboutLinks = data?.dreamyAbout?.link?.filter(
   (link) => !isComplaintsBookLink(link),
 );
+
+const footerDescription =
+  lang === "es"
+    ? "Nuestro propósito es que cada viajero pueda descubrir Perú y Bolivia de manera segura, organizada y auténtica, contando con un equipo que lo acompañe durante todo el proceso."
+    : data?.content;
 ---
 
 <footer
@@ -88,9 +93,9 @@ const dreamyAboutLinks = data?.dreamyAbout?.link?.filter(
               />
             </a>
             {
-              data?.content && (
+              footerDescription && (
                 <p class="max-w-md text-base leading-8 text-white/64">
-                  {data.content}
+                  {footerDescription}
                 </p>
               )
             }

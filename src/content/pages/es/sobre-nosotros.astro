@@ -2,15 +2,15 @@
 export const frontmatter = {
   title: "Sobre Nosotros",
   description:
-    "Sobre Nosotros Dreamy Tours - Experiencias turísticas personalizadas",
+    "Agencia de viajes y operador turístico especializado en Perú y Bolivia.",
   lang: "es",
-  heroEyebrow: "Equipo",
+  heroEyebrow: "Conócenos",
   heroImage: "/imagenes/equipo-dreamy.webp",
   heroImageAlt: "Equipo de Dreamy Tours",
   seo: {
     metaTitle: "Sobre Nosotros | Turismo Peru Bolivia",
     metaDescription:
-      "Sobre Nosotros Dreamy Tours - Experiencias turísticas personalizadas",
+      "Conoce Dreamy Tours, agencia de viajes y operador turístico especializado en Perú y Bolivia.",
   },
   slugs: {
     es: "sobre-nosotros",
@@ -20,46 +20,608 @@ export const frontmatter = {
 };
 
 import CertificatesCarousel from "@/components/ui/CertificatesCarousel.tsx";
+import AboutUsTeam from "@/components/pages/AboutUsTeam.astro";
+import { WhatsAppIcon } from "@/components/icons/SocialContactIcons";
+import { WHATSAPP_URL } from "@/lib/socialLinks";
+import {
+  ClipboardCheck,
+  Headset,
+  Landmark,
+  MapPinned,
+  MessagesSquare,
+  MountainSnow,
+  Route,
+  ShieldCheck,
+  UsersRound,
+} from "lucide-react";
+
+type AboutLang = "es" | "en" | "pt";
+
+interface Props {
+  lang?: AboutLang;
+}
+
+const lang = Astro.props.lang ?? "es";
+const copyByLang = {
+  es: {
+    intro: {
+      eyebrow: "Sobre nosotros",
+      titleBefore: "Conocer ",
+      titleAccent: "Perú y Bolivia",
+      titleAfter: " de manera segura, organizada y auténtica.",
+      paragraphs: [
+        "Dreamy Tours es una agencia de viajes y operador turístico especializado en Perú y Bolivia, dedicada a diseñar y operar experiencias de viaje adaptadas a cada viajero. Ofrecemos tours, trekkings, circuitos y programas personalizados, combinando conocimiento local, planificación profesional y atención personalizada en cada etapa del viaje.",
+        "Nuestro propósito es que cada viajero pueda descubrir Perú y Bolivia de manera segura, organizada y auténtica, contando con un equipo que lo acompañe durante todo el proceso.",
+      ],
+      asideLabel: "Experiencias que organizamos",
+      asideTitle: "Diseñamos el viaje contigo",
+      services: [
+        "Tours culturales",
+        "Trekking y aventura",
+        "Programas personalizados",
+        "Circuitos por Perú y Bolivia",
+      ],
+      asideFooter:
+        "Conocimiento local, planificación profesional y acompañamiento en cada etapa.",
+    },
+    history: {
+      eyebrow: "Nuestra historia",
+      titleBefore: "Crecemos sin perder la ",
+      titleAccent: "cercanía",
+      region: "Perú & Bolivia",
+      paragraphs: [
+        "Dreamy Tours nació en Perú con una idea clara: hacer que descubrir Perú y Bolivia sea más fácil, seguro y cercano para viajeros de todo el mundo.",
+        "Con el crecimiento de nuestra compañía, ampliamos nuestra oferta de tours, trekkings, circuitos y viajes personalizados en diferentes destinos de ambos países. Al mismo tiempo, formamos un equipo comprometido y especializado en reservas, operaciones y atención al viajero, trabajando de manera coordinada para brindar un servicio cercano y bien organizado en cada etapa del viaje.",
+        "Hoy continuamos creciendo con la misma filosofía: conocer nuestros destinos, trabajar con profesionales locales y ofrecer un servicio responsable, cercano y en el que nuestros viajeros puedan confiar.",
+      ],
+    },
+    services: {
+      eyebrow: "Experiencias a tu medida",
+      titleAccent: "Lo que",
+      titleRest: " hacemos",
+      description:
+        "En Dreamy Tours nos encargamos de planificar y coordinar diferentes tipos de experiencias para que encuentres una forma de viajar que se ajuste a ti.",
+      cards: [
+        [
+          "Tours culturales",
+          "Recorridos para conocer la historia, cultura y patrimonio de Perú.",
+          "Historia y patrimonio",
+        ],
+        [
+          "Trekking y aventura",
+          "Rutas como Salkantay, Camino Inca y otras alternativas en los Andes.",
+          "Rutas por los Andes",
+        ],
+        [
+          "Programas personalizados",
+          "Itinerarios diseñados de acuerdo con las fechas, intereses y necesidades de cada viajero.",
+          "Itinerarios a tu ritmo",
+        ],
+        [
+          "Circuitos por Perú y Bolivia",
+          "Programas que integran diferentes destinos y servicios en un solo itinerario.",
+          "Un solo recorrido",
+        ],
+      ],
+      footer:
+        "Nuestro trabajo comienza mucho antes del inicio del viaje: asesoramos, organizamos, coordinamos y damos seguimiento a cada servicio para que el viajero tenga una experiencia bien planificada.",
+    },
+    commitment: {
+      eyebrow: "Responsabilidad",
+      title: "Nuestro compromiso",
+      paragraphs: [
+        "Creemos que operar turismo también significa asumir responsabilidad con los destinos que visitamos.",
+        "Por ello, promovemos prácticas basadas en el respeto hacia las comunidades, la cultura y los espacios naturales del Perú.",
+        "Trabajamos para que nuestras operaciones contribuyan positivamente a los destinos y para que nuestros viajeros conozcan el país respetando su patrimonio y entorno.",
+      ],
+    },
+    trust: {
+      titleBefore: "Confianza y ",
+      titleAccent: "respaldo",
+      certificates: "Certificados",
+      paragraphs: [
+        "Dreamy Tours desarrolla sus actividades como agencia de viajes y operador turístico, cumpliendo los requisitos establecidos para la prestación de servicios turísticos en Perú.",
+        "Contamos con los registros, autorizaciones y acreditaciones correspondientes, y trabajamos con proveedores seleccionados para cada servicio.",
+        "Nuestra prioridad es que puedas reservar con la tranquilidad de contar con una empresa formal, un equipo responsable y un servicio organizado.",
+      ],
+      certificateMeta: [
+        ["Gobierno Regional de Cusco", "Autorización vigente"],
+        ["Ministerio de Comercio Exterior", "Registro nacional"],
+        ["RUC: 20609347318", "Registro al día"],
+        ["Documento de inspección", "Documento vigente"],
+      ],
+      inspectionTitle: "Certificado de Inspección",
+      previous: "Acreditación anterior",
+      next: "Siguiente acreditación",
+      dialog: "Vista previa del certificado",
+      close: "Cerrar certificado",
+      instructions:
+        "Usa los botones anterior y siguiente, o desliza los certificados. Selecciona un certificado para verlo en tamaño completo.",
+    },
+    why: {
+      eyebrow: "Nuestra forma de trabajar",
+      titleBefore: "¿Por qué confiar en ",
+      titleAfter: "?",
+      cards: [
+        [
+          "Conocimiento local",
+          "Conocemos los destinos y las rutas que ofrecemos.",
+        ],
+        [
+          "Atención personalizada",
+          "Te acompañamos desde la planificación hasta la finalización de tu viaje.",
+        ],
+        [
+          "Organización",
+          "Coordinamos los diferentes servicios que forman parte de cada itinerario.",
+        ],
+        [
+          "Comunicación clara",
+          "Brindamos información precisa sobre servicios, condiciones y recomendaciones de viaje.",
+        ],
+        [
+          "Equipo profesional",
+          "Contamos con personal dedicado a las diferentes áreas de la operación turística.",
+        ],
+        [
+          "Compromiso con el viajero",
+          "Estamos disponibles para ayudarte y resolver tus dudas durante el proceso.",
+        ],
+      ],
+    },
+    cta: {
+      eyebrow: "Empieza aquí",
+      titleBefore: "Tu viaje comienza con una ",
+      titleAccent: "buena planificación",
+      body: "Ya sea que estés pensando en conocer Machu Picchu, recorrer los Andes, explorar la Amazonía o realizar un circuito por Perú y Bolivia, nuestro equipo puede ayudarte a organizar tu viaje. Cuéntanos qué quieres conocer y nosotros te ayudaremos a planificarlo.",
+      ready: "¿Listo para empezar?",
+      help: "Cuéntanos tus ideas, fechas y destinos. Te ayudaremos a dar forma a un itinerario pensado para ti.",
+      button: "Planea tu viaje con nosotros",
+      whatsapp:
+        "Hola, quiero planear mi viaje con Dreamy Tours. Me gustaría recibir asesoría para crear un itinerario a mi medida.",
+    },
+  },
+  en: {
+    intro: {
+      eyebrow: "About us",
+      titleBefore: "Explore ",
+      titleAccent: "Peru and Bolivia",
+      titleAfter: " safely, seamlessly and authentically.",
+      paragraphs: [
+        "Dreamy Tours is a travel agency and tour operator specializing in Peru and Bolivia. We design and operate travel experiences tailored to each traveler, from tours and treks to multi-destination journeys and custom itineraries, combining local expertise, professional planning and personal support at every stage.",
+        "Our purpose is to help every traveler discover Peru and Bolivia safely, smoothly and authentically, with a team by their side throughout the journey.",
+      ],
+      asideLabel: "Travel experiences we organize",
+      asideTitle: "We design your journey with you",
+      services: [
+        "Cultural tours",
+        "Trekking and adventure",
+        "Custom itineraries",
+        "Peru and Bolivia journeys",
+      ],
+      asideFooter:
+        "Local expertise, professional planning and support every step of the way.",
+    },
+    history: {
+      eyebrow: "Our story",
+      titleBefore: "Growing without losing the ",
+      titleAccent: "personal touch",
+      region: "Peru & Bolivia",
+      paragraphs: [
+        "Dreamy Tours was founded in Peru with a clear idea: to make discovering Peru and Bolivia easier, safer and more personal for travelers from around the world.",
+        "As our company grew, we expanded our range of tours, treks, multi-destination journeys and custom travel experiences across both countries. We also built a committed team specializing in reservations, operations and traveler care, working together to deliver a warm, well-organized service at every stage.",
+        "Today, we continue to grow with the same philosophy: know our destinations firsthand, work with local professionals and provide a responsible, personal service our travelers can trust.",
+      ],
+    },
+    services: {
+      eyebrow: "Travel tailored to you",
+      titleAccent: "What we",
+      titleRest: " do",
+      description:
+        "At Dreamy Tours, we plan and coordinate different kinds of experiences so you can travel in a way that truly suits you.",
+      cards: [
+        [
+          "Cultural tours",
+          "Journeys through Peru's history, culture and heritage.",
+          "History and heritage",
+        ],
+        [
+          "Trekking and adventure",
+          "Routes such as Salkantay, the Inca Trail and other Andean alternatives.",
+          "Across the Andes",
+        ],
+        [
+          "Custom itineraries",
+          "Travel plans designed around your dates, interests and individual needs.",
+          "Travel at your pace",
+        ],
+        [
+          "Peru and Bolivia journeys",
+          "Programs that bring multiple destinations and services together in one itinerary.",
+          "One seamless journey",
+        ],
+      ],
+      footer:
+        "Our work begins long before your trip: we advise, plan, coordinate and follow up on every service so your experience is thoughtfully organized from the start.",
+    },
+    commitment: {
+      eyebrow: "Responsibility",
+      title: "Our commitment",
+      paragraphs: [
+        "We believe operating tourism also means taking responsibility for the destinations we visit.",
+        "That is why we promote practices grounded in respect for Peru's communities, culture and natural environments.",
+        "We work to ensure our operations contribute positively to each destination and help travelers experience the country while respecting its heritage and surroundings.",
+      ],
+    },
+    trust: {
+      titleBefore: "Trust and ",
+      titleAccent: "assurance",
+      certificates: "Certifications",
+      paragraphs: [
+        "Dreamy Tours operates as a travel agency and tour operator in compliance with the requirements established for tourism services in Peru.",
+        "We hold the relevant registrations, permits and accreditations, and work with carefully selected providers for every service.",
+        "Our priority is to give you the confidence of booking with a formal company, a responsible team and a well-organized service.",
+      ],
+      certificateMeta: [
+        ["Cusco Regional Government", "Current authorization"],
+        ["Ministry of Foreign Trade and Tourism", "National registration"],
+        ["Tax ID: 20609347318", "Registration up to date"],
+        ["Inspection document", "Current document"],
+      ],
+      inspectionTitle: "Inspection Certificate",
+      previous: "Previous accreditation",
+      next: "Next accreditation",
+      dialog: "Certificate preview",
+      close: "Close certificate",
+      instructions:
+        "Use the previous and next buttons, or swipe through the certificates. Select one to view it full size.",
+    },
+    why: {
+      eyebrow: "How we work",
+      titleBefore: "Why trust ",
+      titleAfter: "?",
+      cards: [
+        [
+          "Local expertise",
+          "We know the destinations and routes we offer firsthand.",
+        ],
+        [
+          "Personal support",
+          "We are with you from the planning stage through the end of your journey.",
+        ],
+        [
+          "Organization",
+          "We coordinate every service included in your itinerary.",
+        ],
+        [
+          "Clear communication",
+          "We provide accurate information about services, conditions and travel recommendations.",
+        ],
+        [
+          "Professional team",
+          "Our specialists cover every area of tourism operations.",
+        ],
+        [
+          "Traveler-first commitment",
+          "We are available to help and answer your questions throughout the process.",
+        ],
+      ],
+    },
+    cta: {
+      eyebrow: "Start here",
+      titleBefore: "A great journey starts with ",
+      titleAccent: "thoughtful planning",
+      body: "Whether you are dreaming of Machu Picchu, trekking across the Andes, exploring the Amazon or combining Peru and Bolivia in one journey, our team can help you bring it all together. Tell us what you would like to experience and we will help you plan it.",
+      ready: "Ready to get started?",
+      help: "Share your ideas, dates and destinations with us. We will shape them into an itinerary designed around you.",
+      button: "Plan your trip with us",
+      whatsapp:
+        "Hello, I would like to plan my trip with Dreamy Tours. I am interested in personalized advice for an itinerary tailored to me.",
+    },
+  },
+  pt: {
+    intro: {
+      eyebrow: "Sobre nós",
+      titleBefore: "Conheça o ",
+      titleAccent: "Peru e a Bolívia",
+      titleAfter: " com segurança, organização e autenticidade.",
+      paragraphs: [
+        "A Dreamy Tours é uma agência de viagens e operadora de turismo especializada no Peru e na Bolívia. Criamos e operamos experiências sob medida para cada viajante, de passeios e trekkings a circuitos e roteiros personalizados, unindo conhecimento local, planejamento profissional e atendimento próximo em todas as etapas.",
+        "Nosso propósito é ajudar cada viajante a descobrir o Peru e a Bolívia com segurança, organização e autenticidade, contando com uma equipe presente durante toda a jornada.",
+      ],
+      asideLabel: "Experiências que organizamos",
+      asideTitle: "Criamos a viagem junto com você",
+      services: [
+        "Passeios culturais",
+        "Trekking e aventura",
+        "Roteiros personalizados",
+        "Circuitos pelo Peru e pela Bolívia",
+      ],
+      asideFooter:
+        "Conhecimento local, planejamento profissional e acompanhamento em cada etapa.",
+    },
+    history: {
+      eyebrow: "Nossa história",
+      titleBefore: "Crescemos sem perder a ",
+      titleAccent: "proximidade",
+      region: "Peru & Bolívia",
+      paragraphs: [
+        "A Dreamy Tours nasceu no Peru com uma ideia clara: tornar a descoberta do Peru e da Bolívia mais fácil, segura e próxima para viajantes do mundo inteiro.",
+        "Com o crescimento da empresa, ampliamos nossa oferta de passeios, trekkings, circuitos e viagens personalizadas em diferentes destinos dos dois países. Ao mesmo tempo, formamos uma equipe comprometida e especializada em reservas, operações e atendimento ao viajante, trabalhando de forma integrada para oferecer um serviço próximo e bem organizado em cada etapa.",
+        "Hoje, continuamos crescendo com a mesma filosofia: conhecer profundamente nossos destinos, trabalhar com profissionais locais e oferecer um serviço responsável, próximo e confiável.",
+      ],
+    },
+    services: {
+      eyebrow: "Experiências sob medida",
+      titleAccent: "O que",
+      titleRest: " fazemos",
+      description:
+        "Na Dreamy Tours, planejamos e coordenamos diferentes tipos de experiências para que você encontre uma forma de viajar que combine com o seu perfil.",
+      cards: [
+        [
+          "Passeios culturais",
+          "Experiências para conhecer a história, a cultura e o patrimônio do Peru.",
+          "História e patrimônio",
+        ],
+        [
+          "Trekking e aventura",
+          "Rotas como Salkantay, Trilha Inca e outras alternativas nos Andes.",
+          "Rotas pelos Andes",
+        ],
+        [
+          "Roteiros personalizados",
+          "Itinerários criados de acordo com as datas, os interesses e as necessidades de cada viajante.",
+          "No seu ritmo",
+        ],
+        [
+          "Circuitos pelo Peru e pela Bolívia",
+          "Programas que reúnem diferentes destinos e serviços em um único itinerário.",
+          "Uma viagem integrada",
+        ],
+      ],
+      footer:
+        "Nosso trabalho começa muito antes da viagem: orientamos, planejamos, coordenamos e acompanhamos cada serviço para que o viajante tenha uma experiência bem organizada.",
+    },
+    commitment: {
+      eyebrow: "Responsabilidade",
+      title: "Nosso compromisso",
+      paragraphs: [
+        "Acreditamos que operar turismo também significa assumir responsabilidade pelos destinos que visitamos.",
+        "Por isso, promovemos práticas baseadas no respeito às comunidades, à cultura e aos espaços naturais do Peru.",
+        "Trabalhamos para que nossas operações contribuam de forma positiva com os destinos e para que nossos viajantes conheçam o país respeitando seu patrimônio e seu entorno.",
+      ],
+    },
+    trust: {
+      titleBefore: "Confiança e ",
+      titleAccent: "segurança",
+      certificates: "Certificações",
+      paragraphs: [
+        "A Dreamy Tours atua como agência de viagens e operadora de turismo, cumprindo os requisitos estabelecidos para a prestação de serviços turísticos no Peru.",
+        "Contamos com os registros, as autorizações e as acreditações correspondentes e trabalhamos com fornecedores selecionados para cada serviço.",
+        "Nossa prioridade é que você reserve com a tranquilidade de contar com uma empresa formal, uma equipe responsável e um serviço organizado.",
+      ],
+      certificateMeta: [
+        ["Governo Regional de Cusco", "Autorização vigente"],
+        ["Ministério do Comércio Exterior e Turismo", "Registro nacional"],
+        ["RUC: 20609347318", "Registro atualizado"],
+        ["Documento de inspeção", "Documento vigente"],
+      ],
+      inspectionTitle: "Certificado de Inspeção",
+      previous: "Acreditação anterior",
+      next: "Próxima acreditação",
+      dialog: "Visualização do certificado",
+      close: "Fechar certificado",
+      instructions:
+        "Use os botões anterior e próximo ou deslize pelos certificados. Selecione um certificado para visualizá-lo em tamanho completo.",
+    },
+    why: {
+      eyebrow: "Nossa forma de trabalhar",
+      titleBefore: "Por que confiar na ",
+      titleAfter: "?",
+      cards: [
+        [
+          "Conhecimento local",
+          "Conhecemos de perto os destinos e as rotas que oferecemos.",
+        ],
+        [
+          "Atendimento personalizado",
+          "Acompanhamos você desde o planejamento até o fim da viagem.",
+        ],
+        [
+          "Organização",
+          "Coordenamos todos os serviços que fazem parte de cada itinerário.",
+        ],
+        [
+          "Comunicação clara",
+          "Fornecemos informações precisas sobre serviços, condições e recomendações de viagem.",
+        ],
+        [
+          "Equipe profissional",
+          "Contamos com profissionais dedicados às diferentes áreas da operação turística.",
+        ],
+        [
+          "Compromisso com o viajante",
+          "Estamos disponíveis para ajudar e esclarecer suas dúvidas durante todo o processo.",
+        ],
+      ],
+    },
+    cta: {
+      eyebrow: "Comece aqui",
+      titleBefore: "Sua viagem começa com um ",
+      titleAccent: "bom planejamento",
+      body: "Se você sonha em conhecer Machu Picchu, percorrer os Andes, explorar a Amazônia ou combinar Peru e Bolívia em uma única viagem, nossa equipe pode ajudar a organizar cada detalhe. Conte o que deseja conhecer e nós ajudaremos a planejar.",
+      ready: "Pronto para começar?",
+      help: "Compartilhe suas ideias, datas e destinos. Vamos transformá-los em um roteiro pensado para você.",
+      button: "Planeje sua viagem conosco",
+      whatsapp:
+        "Olá, quero planejar minha viagem com a Dreamy Tours. Gostaria de receber uma assessoria personalizada para criar um roteiro sob medida.",
+    },
+  },
+} as const;
+
+const copy = copyByLang[lang];
+const whatsappMessage = copy.cta.whatsapp;
+const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
 ---
 
-<div class="not-prose text-foreground">
-  <section class="mx-auto max-w-5xl px-6 py-16 md:py-20">
-    <div class="rounded-3xl border border-border bg-card p-7 shadow-lg sm:p-10">
-      <p class="m-0 text-lg leading-8 text-muted-foreground md:text-xl">
-        <strong class="text-primary">DREAMY TOURS</strong> se distingue por proporcionar
-        un servicio diferente y fuera de lo tradicional, tanto en la organización
-        como en las excursiones. Operamos con principios éticos y de responsabilidad
-        social, promoviendo el desarrollo y bienestar de nuestro equipo, manteniendo
-        un compromiso continuo con la seguridad y el respeto al medio ambiente.
-      </p>
-      <div class="mt-6 border-t border-border pt-6">
-        <p class="m-0 leading-7 text-muted-foreground">
-          Hoy contamos con un portafolio de profesionales dedicados a la
-          atención al cliente, ayudando a nuestros viajeros a convertir sus
-          sueños de viajar y descubrir otras culturas en experiencias
-          inolvidables.
+<div class="not-prose -mt-8 text-foreground md:-mt-10 lg:-mt-12">
+  <section
+    class="relative isolate overflow-hidden pb-12 pt-8 md:pb-16 md:pt-12"
+    aria-labelledby="about-intro-title"
+  >
+    <div
+      class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_42%,transparent)_1px,transparent_1.25px)] bg-[size:0.95rem_0.95rem] sm:bg-[size:1.1rem_1.1rem] [-webkit-mask-image:radial-gradient(ellipse_34rem_27rem_at_88%_8%,black_0%,black_28%,transparent_78%)] [mask-image:radial-gradient(ellipse_34rem_27rem_at_88%_8%,black_0%,black_28%,transparent_78%)]"
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.72fr)] lg:items-end"
+    >
+      <div>
+        <p
+          class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-primary"
+        >
+          <span class="h-px w-8 bg-primary" aria-hidden="true"></span>{
+            copy.intro.eyebrow
+          }
         </p>
+        <h2
+          id="about-intro-title"
+          class="mt-5 max-w-4xl text-balance text-4xl font-bold tracking-tight md:text-6xl md:leading-[1.02]"
+        >
+          {copy.intro.titleBefore}<span class="text-primary"
+            >{copy.intro.titleAccent}</span
+          >{copy.intro.titleAfter}
+        </h2>
+        <div
+          class="mt-8 max-w-3xl space-y-5 text-pretty text-lg leading-8 text-muted-foreground md:text-xl"
+        >
+          {copy.intro.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+
+      <aside
+        class="relative overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_24px_50px_-38px_color-mix(in_oklab,var(--foreground)_65%,transparent)] sm:p-8"
+        aria-label={copy.intro.asideLabel}
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-10 text-8xl font-bold tracking-tighter text-primary/[0.07]"
+          aria-hidden="true">DT</span
+        >
+        <p
+          class="relative text-xs font-bold uppercase tracking-[0.16em] text-secondary"
+        >
+          {copy.intro.asideTitle}
+        </p>
+        <ul class="relative mt-6 grid list-none gap-4 p-0" role="list">
+          <li class="flex items-center gap-3">
+            <span class="size-2 rounded-full bg-primary" aria-hidden="true"
+            ></span><span class="font-semibold">{copy.intro.services[0]}</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="size-2 rounded-full bg-secondary" aria-hidden="true"
+            ></span><span class="font-semibold">{copy.intro.services[1]}</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="size-2 rounded-full bg-primary" aria-hidden="true"
+            ></span><span class="font-semibold">{copy.intro.services[2]}</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="size-2 rounded-full bg-secondary" aria-hidden="true"
+            ></span><span class="font-semibold">{copy.intro.services[3]}</span>
+          </li>
+        </ul>
+        <div class="relative mt-7 border-t border-border pt-5">
+          <p class="m-0 text-sm leading-6 text-muted-foreground">
+            {copy.intro.asideFooter}
+          </p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section
+    class="mx-auto max-w-7xl px-6 py-12 md:py-16"
+    aria-labelledby="about-history-title"
+  >
+    <div
+      class="grid gap-10 lg:grid-cols-[minmax(15rem,0.65fr)_minmax(0,1.35fr)] lg:gap-16"
+    >
+      <div class="lg:pt-3">
+        <p
+          class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-secondary"
+        >
+          <span class="h-px w-8 bg-secondary" aria-hidden="true"></span>{
+            copy.history.eyebrow
+          }
+        </p>
+        <h2
+          id="about-history-title"
+          class="mt-5 text-balance text-4xl font-bold tracking-tight md:text-5xl"
+        >
+          {copy.history.titleBefore}<span class="text-primary"
+            >{copy.history.titleAccent}</span
+          >.
+        </h2>
+        <div
+          class="mt-8 flex items-center gap-4 text-sm font-bold uppercase tracking-[0.12em] text-muted-foreground"
+        >
+          <span
+            class="grid size-11 place-items-center rounded-full border border-primary/20 bg-primary/10 text-primary"
+            >01</span
+          >
+          {copy.history.region}
+        </div>
+      </div>
+
+      <div
+        class="relative grid gap-6 before:absolute before:inset-y-3 before:left-0 before:w-px before:bg-border"
+      >
+        <article class="relative pl-8">
+          <span
+            class="absolute left-[-0.32rem] top-2 size-2.5 rounded-full bg-primary ring-4 ring-background"
+            aria-hidden="true"></span>
+          <p class="m-0 text-pretty leading-8 text-muted-foreground md:text-lg">
+            {copy.history.paragraphs[0]}
+          </p>
+        </article>
+        <article class="relative pl-8">
+          <span
+            class="absolute left-[-0.32rem] top-2 size-2.5 rounded-full bg-secondary ring-4 ring-background"
+            aria-hidden="true"></span>
+          <p class="m-0 text-pretty leading-8 text-muted-foreground md:text-lg">
+            {copy.history.paragraphs[1]}
+          </p>
+        </article>
+        <article class="relative pl-8">
+          <span
+            class="absolute left-[-0.32rem] top-2 size-2.5 rounded-full bg-primary ring-4 ring-background"
+            aria-hidden="true"></span>
+          <p class="m-0 text-pretty leading-8 text-muted-foreground md:text-lg">
+            {copy.history.paragraphs[2]}
+          </p>
+        </article>
       </div>
     </div>
   </section>
 
   <section
-    class="mx-auto max-w-7xl px-6 py-20 md:py-24"
+    class="mx-auto max-w-7xl px-6 py-12 md:py-16"
     aria-labelledby="about-essence-title"
   >
     <div class="text-center">
       <p
         class="mx-auto w-fit rounded-full bg-muted px-4 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-foreground"
       >
-        Nuestra esencia
+        {copy.services.eyebrow}
       </p>
       <h2
         id="about-essence-title"
         class="mt-4 text-4xl font-bold tracking-tight md:text-6xl"
       >
-        <span class="text-primary">Misión</span>, <span class="text-secondary"
-          >Visión</span
-        > & <span class="text-primary">Valores</span>
+        <span class="text-primary">{copy.services.titleAccent}</span>{
+          copy.services.titleRest
+        }
       </h2>
       <div class="mx-auto mt-5 flex w-fit items-center" aria-hidden="true">
         <span class="h-0.5 w-7 bg-primary"></span><span
@@ -68,661 +630,460 @@ import CertificatesCarousel from "@/components/ui/CertificatesCarousel.tsx";
       <p
         class="mx-auto mt-7 max-w-2xl leading-7 text-muted-foreground md:text-lg"
       >
-        Conectamos tradición, confianza y tecnología para que descubras el Perú
-        más auténtico.
+        {copy.services.description}
       </p>
     </div>
 
-    <div class="mt-12 grid gap-6 lg:grid-cols-3 lg:gap-7">
+    <div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4 xl:gap-7">
       <article
-        class="relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] md:p-8"
+        class="group relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 text-center shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_24px_48px_-30px_color-mix(in_oklab,var(--primary)_45%,transparent)] md:p-8"
       >
         <span
           class="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full bg-primary/[0.07]"
           aria-hidden="true"></span>
-        <div class="relative flex items-center gap-4">
+        <div class="relative flex flex-col items-center">
           <span
-            class="grid size-12 shrink-0 place-items-center rounded-2xl border border-primary/15 bg-primary/10 text-primary"
+            class="grid size-16 shrink-0 place-items-center rounded-[1.35rem] border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-background text-primary shadow-[0_18px_34px_-22px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
             aria-hidden="true"
-            ><svg
-              class="size-6 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.8]"
-              viewBox="0 0 24 24"
-              ><path
-                d="M9 20 3.55 17.28A1 1 0 0 1 3 16.38V5.62a1 1 0 0 1 1.45-.89L9 7m0 13 6-3m-6 3V7m6 10 4.55 2.28A1 1 0 0 0 21 18.38V7.62a1 1 0 0 0-.55-.89L15 4m0 13V4m0 0L9 7"
-              ></path></svg
-            ></span
           >
-          <h3 class="text-2xl font-bold tracking-tight">Misión</h3>
+            <Landmark className="size-8" strokeWidth={1.7} />
+          </span>
+          <h3 class="mt-6 text-2xl font-bold tracking-tight">
+            {copy.services.cards[0][0]}
+          </h3>
         </div>
-        <div class="relative mt-6 space-y-4 leading-7 text-muted-foreground">
-          <p>
-            Brindar un servicio de calidad y confiabilidad, superando la
-            satisfacción de nuestros clientes con paquetes turísticos que les
-            permitan conocer y disfrutar las maravillas del Perú.
-          </p>
-          <p>
-            Contamos con un equipo especializado y tecnología para ofrecer una
-            experiencia personalizada que supere expectativas.
-          </p>
-        </div>
+        <p class="relative mt-4 leading-7 text-muted-foreground">
+          {copy.services.cards[0][1]}
+        </p>
         <div
-          class="relative mt-auto flex items-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-primary"
+          class="relative mt-auto flex items-center justify-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-primary"
         >
-          <span class="h-px w-6 bg-primary" aria-hidden="true"></span>Compromiso
-          continuo
+          <span class="h-px w-6 bg-primary" aria-hidden="true"></span>{
+            copy.services.cards[0][2]
+          }
         </div>
       </article>
 
       <article
-        class="relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] md:p-8"
+        class="group relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 text-center shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-secondary/25 hover:shadow-[0_24px_48px_-30px_color-mix(in_oklab,var(--secondary)_42%,transparent)] md:p-8"
       >
         <span
           class="pointer-events-none absolute -bottom-10 -left-10 size-28 rounded-full bg-secondary/[0.07]"
           aria-hidden="true"></span>
-        <div class="relative flex items-center gap-4">
+        <div class="relative flex flex-col items-center">
           <span
-            class="grid size-12 shrink-0 place-items-center rounded-2xl border border-secondary/15 bg-secondary/10 text-secondary"
+            class="grid size-16 shrink-0 place-items-center rounded-[1.35rem] border border-secondary/20 bg-gradient-to-br from-secondary/20 via-secondary/10 to-background text-secondary shadow-[0_18px_34px_-22px_color-mix(in_oklab,var(--secondary)_75%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
             aria-hidden="true"
-            ><svg
-              class="size-6 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.8]"
-              viewBox="0 0 24 24"
-              ><circle cx="12" cy="12" r="8.5"></circle><path
-                d="M3.5 12h17M12 3.5c2.2 2.35 3.3 5.18 3.3 8.5S14.2 18.15 12 20.5C9.8 18.15 8.7 15.32 8.7 12S9.8 5.85 12 3.5Z"
-              ></path></svg
-            ></span
           >
-          <h3 class="text-2xl font-bold tracking-tight">Visión</h3>
+            <MountainSnow className="size-8" strokeWidth={1.7} />
+          </span>
+          <h3 class="mt-6 text-2xl font-bold tracking-tight">
+            {copy.services.cards[1][0]}
+          </h3>
         </div>
-        <div class="relative mt-6 space-y-4 leading-7 text-muted-foreground">
-          <p>
-            Ser una agencia de viajes líder en el mercado turístico de Cusco, a
-            nivel nacional e internacional, ofreciendo productos innovadores que
-            se adapten a las necesidades de nuestros clientes.
-          </p>
-          <p>
-            Como operador turístico, contribuimos junto con las comunidades al
-            desarrollo socioeconómico y a la preservación cultural.
-          </p>
-        </div>
+        <p class="relative mt-4 leading-7 text-muted-foreground">
+          {copy.services.cards[1][1]}
+        </p>
         <div
-          class="relative mt-auto flex items-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-secondary"
+          class="relative mt-auto flex items-center justify-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-secondary"
         >
-          <span class="h-px w-6 bg-secondary" aria-hidden="true"
-          ></span>Innovación & impacto
+          <span class="h-px w-6 bg-secondary" aria-hidden="true"></span>{
+            copy.services.cards[1][2]
+          }
         </div>
       </article>
 
       <article
-        class="relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] md:p-8"
+        class="group relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 text-center shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_24px_48px_-30px_color-mix(in_oklab,var(--primary)_45%,transparent)] md:p-8"
       >
         <span
-          class="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full bg-accent-warm/15"
+          class="pointer-events-none absolute -right-10 -top-10 size-28 rounded-full bg-primary/[0.07]"
           aria-hidden="true"></span>
-        <div class="relative flex items-center gap-4">
+        <div class="relative flex flex-col items-center">
           <span
-            class="grid size-12 shrink-0 place-items-center rounded-2xl border border-primary/15 bg-primary/10 text-primary"
+            class="grid size-16 shrink-0 place-items-center rounded-[1.35rem] border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-background text-primary shadow-[0_18px_34px_-22px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
             aria-hidden="true"
-            ><svg
-              class="size-6 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.8]"
-              viewBox="0 0 24 24"
-              ><path d="m3 18 5.5-7 3.5 4 3-3 6 6"></path><path d="M3 20h18"
-              ></path><path d="M15.5 7.5h.01"></path></svg
-            ></span
           >
-          <h3 class="text-2xl font-bold tracking-tight">Valores</h3>
+            <Route className="size-8" strokeWidth={1.7} />
+          </span>
+          <h3 class="mt-6 text-2xl font-bold tracking-tight">
+            {copy.services.cards[2][0]}
+          </h3>
         </div>
-        <div class="relative mt-6 leading-7 text-muted-foreground">
-          <p>
-            Transmisión cultural: valoramos las costumbres y tradiciones de
-            nuestros ancestros.
-          </p>
-          <p class="mt-4">
-            Capacitación integral: entrenamos a nuestro equipo en:
-          </p>
-          <ul
-            class="mt-3 grid list-disc gap-2 pl-5 text-sm leading-6 marker:text-secondary"
-            role="list"
-          >
-            <li>Primeros auxilios y respuesta ante emergencias.</li>
-            <li>Manejo apropiado de alimentos.</li>
-            <li>Seguridad en conducción y traslado.</li>
-          </ul>
-        </div>
+        <p class="relative mt-4 leading-7 text-muted-foreground">
+          {copy.services.cards[2][1]}
+        </p>
         <div
-          class="relative mt-auto flex items-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-primary"
+          class="relative mt-auto flex items-center justify-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-primary"
         >
           <span class="flex" aria-hidden="true"
             ><span class="h-px w-3 bg-primary"></span><span
               class="h-px w-3 bg-secondary"></span></span
-          >Tradición + preparación
+          >{copy.services.cards[2][2]}
+        </div>
+      </article>
+
+      <article
+        class="group relative flex min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-border bg-card p-7 text-center shadow-[0_18px_40px_-34px_color-mix(in_oklab,var(--foreground)_55%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-secondary/25 hover:shadow-[0_24px_48px_-30px_color-mix(in_oklab,var(--secondary)_42%,transparent)] md:p-8"
+      >
+        <span
+          class="pointer-events-none absolute -bottom-10 -right-10 size-28 rounded-full bg-secondary/[0.08]"
+          aria-hidden="true"></span>
+        <div class="relative flex flex-col items-center">
+          <span
+            class="grid size-16 shrink-0 place-items-center rounded-[1.35rem] border border-secondary/20 bg-gradient-to-br from-secondary/20 via-secondary/10 to-background text-secondary shadow-[0_18px_34px_-22px_color-mix(in_oklab,var(--secondary)_75%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+            aria-hidden="true"
+          >
+            <MapPinned className="size-8" strokeWidth={1.7} />
+          </span>
+          <h3 class="mt-6 text-2xl font-bold tracking-tight">
+            {copy.services.cards[3][0]}
+          </h3>
+        </div>
+        <p class="relative mt-4 leading-7 text-muted-foreground">
+          {copy.services.cards[3][1]}
+        </p>
+        <div
+          class="relative mt-auto flex items-center justify-center gap-3 pt-7 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-secondary"
+        >
+          <span class="h-px w-6 bg-secondary" aria-hidden="true"></span>{
+            copy.services.cards[3][2]
+          }
         </div>
       </article>
     </div>
+
+    <div
+      class="mx-auto mt-10 max-w-5xl rounded-[1.5rem] border border-primary/15 bg-primary/[0.045] px-7 py-7 text-center md:px-10"
+    >
+      <p class="m-0 text-pretty leading-8 text-muted-foreground md:text-lg">
+        {copy.services.footer}
+      </p>
+    </div>
   </section>
 
+  <AboutUsTeam lang={lang} />
+
   <section
-    class="relative left-1/2 w-[100dvw] -translate-x-1/2 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_18%,transparent)_1px,transparent_0)] bg-[size:1rem_1rem] py-20 md:py-24"
+    class="relative left-1/2 w-[100dvw] -translate-x-1/2 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_18%,transparent)_1px,transparent_0)] bg-[size:1rem_1rem] py-12 md:py-16"
     aria-labelledby="about-philosophy-title"
   >
     <div class="mx-auto max-w-5xl px-6 text-center">
       <p
         class="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-accent-warm-foreground"
       >
-        <span aria-hidden="true"> Filosofía </span>
+        <span aria-hidden="true"> {copy.commitment.eyebrow} </span>
       </p>
       <h2
         id="about-philosophy-title"
         class="mt-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl"
       >
-        Nuestro Compromiso
+        {copy.commitment.title}
       </h2>
       <div
-        class="relative mt-8 rounded-[1.5rem] border border-border border-l-4 border-l-accent-warm bg-card px-7 py-10 shadow-[0_20px_42px_-32px_color-mix(in_oklab,var(--foreground)_55%,transparent)] md:px-12 md:py-12"
+        class="relative mt-8 rounded-[1.5rem] border border-border border-l-4 border-l-accent-warm bg-card px-7 py-10 text-left shadow-[0_20px_42px_-32px_color-mix(in_oklab,var(--foreground)_55%,transparent)] md:px-12 md:py-12"
       >
-        <p
-          class="mx-auto max-w-4xl text-balance text-xl italic leading-8 text-muted-foreground md:text-2xl md:leading-9"
+        <div
+          class="mx-auto grid max-w-4xl gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:gap-8"
         >
-          “Dreamy Tours promueve un turismo responsable, basado en el respeto
-          por las personas y destinos, buscando una interacción auténtica con la
-          Vida Real de las comunidades que visitamos, evitando ser cómplices de
-          su destrucción y explotación.”
-        </p>
-        <div class="mt-6 flex justify-center gap-2" aria-hidden="true">
-          <span class="size-2 rounded-full bg-primary"></span><span
-            class="size-2 rounded-full bg-primary"></span><span
-            class="size-2 rounded-full bg-primary"></span>
+          <span
+            class="grid size-14 place-items-center rounded-2xl bg-secondary/10 text-secondary"
+            aria-hidden="true"
+            ><svg
+              class="size-7 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.7]"
+              viewBox="0 0 24 24"
+              ><path d="M12 21s8-3.5 8-10V5l-8-3-8 3v6c0 6.5 8 10 8 10Z"
+              ></path><path d="m8.5 12 2.2 2.2 4.8-4.8"></path></svg
+            ></span
+          >
+          <div
+            class="space-y-5 text-pretty leading-8 text-muted-foreground md:text-lg"
+          >
+            <p>{copy.commitment.paragraphs[0]}</p>
+            <p>{copy.commitment.paragraphs[1]}</p>
+            <p>{copy.commitment.paragraphs[2]}</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="bg-background px-6 py-20">
-    <div class="mx-auto max-w-6xl">
-      <div class="text-center">
-        <p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-          Licencias
-        </p>
+  <section
+    class="mx-auto max-w-7xl px-6 py-12 md:py-16"
+    aria-labelledby="about-trust-title"
+  >
+    <div class="grid gap-0 lg:grid-cols-[minmax(15rem,0.7fr)_minmax(0,1.3fr)]">
+      <div class="mb-8 md:mb-10 lg:mb-0 lg:pr-12 lg:pt-1">
         <h2
-          id="about-licenses-title"
-          class="mt-3 text-3xl font-bold tracking-tight md:text-5xl"
+          id="about-trust-title"
+          class="text-balance text-4xl font-bold tracking-tight md:text-5xl"
         >
-          Autorizaciones y Certificaciones
+          {copy.trust.titleBefore}<span class="text-secondary"
+            >{copy.trust.titleAccent}</span
+          >
         </h2>
-        <span
-          class="mx-auto mt-5 block h-1 w-20 rounded-full bg-secondary"
-          aria-hidden="true"></span>
       </div>
-
       <div
-        class="mt-10 rounded-3xl border border-border bg-card p-7 shadow-lg sm:p-10"
+        class="min-w-0 border-t border-primary/20 pt-8 lg:border-t-0 lg:border-l lg:pl-12 lg:pt-0"
       >
-        <p class="m-0 leading-7 text-muted-foreground">
-          <strong class="text-primary"
-            >Dreamy Tours - Agencia de Viajes y Operador Turístico</strong
-          >, cumple con todos los requisitos y licencias principales para operar
-          y ofrecer los diversos servicios del sector turístico en todo el
-          territorio peruano.
-        </p>
-        <p class="mb-0 mt-4 leading-7 text-muted-foreground">
-          Las instituciones mencionadas a continuación están a cargo de regular
-          la industria turística en Perú y estamos suscritos a ellas de la
-          siguiente manera:
-        </p>
+        <div
+          class="max-w-3xl space-y-5 text-pretty leading-8 text-muted-foreground md:text-lg"
+        >
+          <p>{copy.trust.paragraphs[0]}</p>
+          <p>{copy.trust.paragraphs[1]}</p>
+          <p>{copy.trust.paragraphs[2]}</p>
+        </div>
+
+        <div class="mt-10 border-t border-primary/20 pt-8 md:mt-12">
+          <div class="flex items-center justify-end gap-3 text-right">
+            <span class="h-px w-8 bg-primary" aria-hidden="true"></span>
+            <h3
+              id="about-certifications-title"
+              class="text-balance text-3xl font-bold tracking-tight md:text-4xl"
+            >
+              {copy.trust.certificates}
+            </h3>
+          </div>
+        </div>
       </div>
 
-      <ul class="mt-10 grid list-none gap-6 p-0 md:grid-cols-3" role="list">
-        <li
-          class="rounded-2xl border border-border border-l-4 border-l-primary bg-card p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          <div class="flex items-center gap-3">
-            <span
-              class="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"
-              aria-hidden="true"
-              ><svg
-                class="size-6 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.7]"
-                viewBox="0 0 24 24"
-                ><path
-                  d="M3 21h18M5 21V5h14v16M9 9h1m4 0h1M9 13h1m4 0h1M9 17h1m4 0h1"
-                ></path></svg
-              ></span
-            ><div>
-              <h3 class="m-0 text-lg font-bold">DIRCETUR</h3><p
-                class="mt-1 text-xs leading-4 text-muted-foreground"
-              >
-                Dirección Regional de Comercio Exterior y Turismo
-              </p>
-            </div>
-          </div>
-          <p class="mt-5 text-sm leading-6 text-muted-foreground">
-            Contamos con la autorización de DIRCETUR de Cusco, organización
-            gubernamental que promueve la competencia, sostenibilidad y
-            diversificación de los productos exportables peruanos, el turismo y
-            la artesanía.
-          </p>
-          <p
-            class="mb-0 mt-5 flex items-center gap-2 text-xs font-bold text-primary"
-          >
-            <span class="size-2 rounded-full bg-primary"></span>Autorización
-            Vigente
-          </p>
-        </li>
-        <li
-          class="rounded-2xl border border-border border-l-4 border-l-primary bg-card p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          <div class="flex items-center gap-3">
-            <span
-              class="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"
-              aria-hidden="true"
-              ><svg
-                class="size-6 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.7]"
-                viewBox="0 0 24 24"
-                ><circle cx="12" cy="12" r="9"></circle><path
-                  d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"
-                ></path></svg
-              ></span
-            ><div>
-              <h3 class="m-0 text-lg font-bold">PROMPERÚ</h3><p
-                class="mt-1 text-xs leading-4 text-muted-foreground"
-              >
-                Comisión de Promoción del Perú
-              </p>
-            </div>
-          </div>
-          <p class="mt-5 text-sm leading-6 text-muted-foreground">
-            Estamos suscritos a PROMPERÚ, institución perteneciente al
-            Ministerio de Comercio Exterior y Turismo de nuestro país.
-          </p>
-          <p
-            class="mb-0 mt-5 flex items-center gap-2 text-xs font-bold text-primary"
-          >
-            <span class="size-2 rounded-full bg-primary"></span>Miembro Activo
-          </p>
-        </li>
-        <li
-          class="rounded-2xl border border-border border-l-4 border-l-primary bg-card p-6 shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          <div class="flex items-center gap-3">
-            <span
-              class="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"
-              aria-hidden="true"
-              ><svg
-                class="size-6 fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.7]"
-                viewBox="0 0 24 24"
-                ><path
-                  d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2Z"
-                ></path></svg
-              ></span
-            ><div>
-              <h3 class="m-0 text-lg font-bold">SUNAT</h3><p
-                class="mt-1 text-xs leading-4 text-muted-foreground"
-              >
-                Superintendencia Nacional de Administración Tributaria
-              </p>
-            </div>
-          </div>
-          <p class="mt-5 text-sm leading-6 text-muted-foreground">
-            Estamos registrados en SUNAT, institución adscrita al Ministerio de
-            Economía y Finanzas del Perú.
-          </p>
-          <code
-            class="mt-4 block rounded-md bg-muted p-2 text-center text-xs text-foreground"
-            >RUC: 20609347318</code
-          >
-          <p
-            class="mb-0 mt-5 flex items-center gap-2 text-xs font-bold text-primary"
-          >
-            <span class="size-2 rounded-full bg-primary"></span>Registro al día
-          </p>
-        </li>
-      </ul>
-
-      <p
-        class="mx-auto mt-10 flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm text-foreground"
-      >
-        <svg
-          class="size-5 fill-none stroke-primary [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.7]"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-          ><path d="m9 12 2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-          ></path></svg
-        >Institución adscrita al Ministerio de Comercio Exterior y Turismo
-      </p>
+      <div class="mt-6 lg:col-span-2">
+        <CertificatesCarousel
+          client:load
+          certificates={[
+            {
+              src: "/imagenes/certificados/gercetur.webp",
+              title: "DIRCETUR",
+              subtitle: copy.trust.certificateMeta[0][0],
+              status: copy.trust.certificateMeta[0][1],
+            },
+            {
+              src: "/imagenes/certificados/mincetur-dreamy.webp",
+              title: "MINCETUR",
+              subtitle: copy.trust.certificateMeta[1][0],
+              status: copy.trust.certificateMeta[1][1],
+            },
+            {
+              src: "/imagenes/certificados/ficha-ruc.webp",
+              title: "SUNAT",
+              subtitle: copy.trust.certificateMeta[2][0],
+              status: copy.trust.certificateMeta[2][1],
+            },
+            {
+              src: "/imagenes/certificados/fertificado-inspeccion.webp",
+              title: copy.trust.inspectionTitle,
+              subtitle: copy.trust.certificateMeta[3][0],
+              status: copy.trust.certificateMeta[3][1],
+            },
+          ]}
+          previousLabel={copy.trust.previous}
+          nextLabel={copy.trust.next}
+          dialogLabel={copy.trust.dialog}
+          closeLabel={copy.trust.close}
+          instructions={copy.trust.instructions}
+        />
+      </div>
     </div>
   </section>
 
-  <section class="border-y border-border px-6 py-20">
-    <div class="mx-auto max-w-6xl text-center">
-      <p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-        Certificados
+  <section
+    class="mx-auto max-w-7xl px-6 py-12 md:py-16"
+    aria-labelledby="about-why-trust-title"
+  >
+    <div class="mx-auto max-w-3xl text-center">
+      <p class="text-xs font-bold uppercase tracking-[0.16em] text-secondary">
+        {copy.why.eyebrow}
       </p>
       <h2
-        id="about-certifications-title"
-        class="mt-3 text-3xl font-bold tracking-tight md:text-5xl"
+        id="about-why-trust-title"
+        class="mt-3 text-balance text-3xl font-bold tracking-tight md:text-5xl"
       >
-        Nuestras Acreditaciones
+        {copy.why.titleBefore}<span class="text-primary">Dreamy Tours</span>{
+          copy.why.titleAfter
+        }
       </h2>
-      <p class="mx-auto mt-4 max-w-2xl leading-7 text-muted-foreground">
-        Dreamy Tours cumple con todos los requisitos y licencias principales
-        para operar en el sector turístico en todo el territorio peruano.
-      </p>
-
-      <CertificatesCarousel
-        client:load
-        certificates={[
-          {
-            src: "/imagenes/certificados/gercetur.webp",
-            title: "DIRCETUR",
-            subtitle: "Gobierno Regional de Cusco",
-            status: "Autorización vigente",
-          },
-          {
-            src: "/imagenes/certificados/mincetur-dreamy.webp",
-            title: "MINCETUR",
-            subtitle: "Ministerio de Comercio Exterior",
-            status: "Registro nacional",
-          },
-          {
-            src: "/imagenes/certificados/ficha-ruc.webp",
-            title: "SUNAT",
-            subtitle: "RUC: 20609347318",
-            status: "Registro al día",
-          },
-          {
-            src: "/imagenes/certificados/licencia-dreamy.webp",
-            title: "Licencia de Operación",
-            subtitle: "Licencia de funcionamiento",
-            status: "Documento vigente",
-          },
-          {
-            src: "/imagenes/certificados/fertificado-inspeccion.webp",
-            title: "Certificado de Inspección",
-            subtitle: "Documento de inspección",
-            status: "Documento vigente",
-          },
-        ]}
-        previousLabel="Acreditación anterior"
-        nextLabel="Siguiente acreditación"
-        dialogLabel="Vista previa del certificado"
-        closeLabel="Cerrar certificado"
-        instructions="Usa los botones anterior y siguiente, o desliza los certificados. Selecciona un certificado para verlo en tamaño completo."
-      />
-    </div>
-  </section>
-
-  <section class="mx-auto max-w-7xl px-6 py-20">
-    <div class="mx-auto max-w-2xl text-center">
-      <p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-        Profesionales
-      </p>
-      <h2
-        id="about-team-title"
-        class="mt-3 text-3xl font-bold tracking-tight md:text-5xl"
-      >
-        El equipo detrás de cada viaje
-      </h2>
-      <p class="mt-4 leading-7 text-muted-foreground">
-        Un equipo dedicado a hacer que cada itinerario se sienta personal,
-        organizado e inolvidable.
-      </p>
       <span
         class="mx-auto mt-5 block h-1 w-20 rounded-full bg-secondary"
         aria-hidden="true"></span>
     </div>
 
-    <section class="mt-14" aria-labelledby="department-tecnologia">
-      <div class="mb-6 flex items-center gap-3">
-        <span class="h-8 w-1 rounded-full bg-secondary" aria-hidden="true"
-        ></span><h3 id="department-tecnologia" class="text-xl font-bold">
-          Tecnología & IT
-        </h3>
-      </div>
-      <ul class="grid list-none gap-6 p-0 md:grid-cols-3" role="list">
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          <img
-            class="!my-0 block h-auto min-h-0 w-full object-contain object-top"
-            src="/imagenes/personal/erian.webp"
-            alt="Erian, Web Developer"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="min-w-0 p-6 text-center">
-            <h4 class="m-0 text-xl font-bold">Erian</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Web Developer
-            </p><div
-              class="mt-4 flex flex-wrap justify-center gap-2"
-              aria-label="Herramientas de desarrollo"
-            >
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Astro</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >React</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >TypeScript</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Tailwind CSS</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Git</span>
-            </div>
-          </div>
-        </li>
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          <img
-            class="!my-0 block h-auto min-h-0 w-full object-contain object-top"
-            src="/imagenes/personal/jack.webp"
-            alt="Jack, Web Master y SEO"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="min-w-0 p-6 text-center">
-            <h4 class="m-0 text-xl font-bold">Jack</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Web Master & SEO
-            </p><div
-              class="mt-4 flex flex-wrap justify-center gap-2"
-              aria-label="Herramientas de SEO"
-            >
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Semrush</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Cloudflare</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Ahrefs</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Google Analytics</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Search Console</span>
-            </div>
-          </div>
-        </li>
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-        >
-          <img
-            class="!my-0 block h-auto min-h-0 w-full object-contain object-top"
-            src="/imagenes/personal/junior.webp"
-            alt="Junior, Social Manager"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="min-w-0 p-6 text-center">
-            <h4 class="m-0 text-xl font-bold">Junior</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Social Manager
-            </p><div
-              class="mt-4 flex flex-wrap justify-center gap-2"
-              aria-label="Funciones de Social Manager"
-            >
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Gestión de redes</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Community management</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Calendario editorial</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Métricas y reportes</span>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </section>
+    <div class="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <article
+        class="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-7 text-center shadow-[0_16px_34px_-30px_color-mix(in_oklab,var(--foreground)_65%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-primary/[0.06] transition-transform duration-300 group-hover:scale-125"
+          aria-hidden="true"></span>
+        <span
+          class="relative mx-auto grid size-16 place-items-center rounded-[1.35rem] border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-background text-primary shadow-[0_16px_30px_-18px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+          aria-hidden="true"
+          ><MapPinned className="size-8" strokeWidth={1.8} />
+        </span>
+        <h3 class="relative mt-6 text-xl font-bold">{copy.why.cards[0][0]}</h3>
+        <p class="relative mt-3 leading-7 text-muted-foreground">
+          {copy.why.cards[0][1]}
+        </p>
+      </article>
 
-    <section class="mt-14" aria-labelledby="department-operaciones">
-      <div class="mb-6 flex items-center gap-3">
-        <span class="h-8 w-1 rounded-full bg-secondary" aria-hidden="true"
-        ></span><h3 id="department-operaciones" class="text-xl font-bold">
-          Operaciones
-        </h3>
-      </div>
-      <ul class="grid list-none gap-6 p-0 md:grid-cols-2" role="list">
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:flex"
-        >
-          <img
-            class="!my-0 min-h-48 w-full self-stretch object-cover sm:w-2/5"
-            src="/imagenes/personal/zaida.webp"
-            alt="Zayda, Operaciones"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="p-6">
-            <h4 class="m-0 text-xl font-bold">Zayda</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Operaciones
-            </p><small class="mt-3 block leading-5 text-muted-foreground"
-              >Coordinación de excursiones y logística en campo.</small
-            ><div class="mt-4 flex flex-wrap gap-2">
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Guía</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Logística</span>
-            </div>
-          </div>
-        </li>
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:flex"
-        >
-          <img
-            class="!my-0 min-h-48 w-full self-stretch object-cover sm:w-2/5"
-            src="/imagenes/personal/juliana.webp"
-            alt="Juliana, Operaciones"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="p-6">
-            <h4 class="m-0 text-xl font-bold">Juliana</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Operaciones
-            </p><small class="mt-3 block leading-5 text-muted-foreground"
-              >Atención al cliente y gestión de reservas.</small
-            ><div class="mt-4 flex flex-wrap gap-2">
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Atención</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Reservas</span>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </section>
+      <article
+        class="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-7 text-center shadow-[0_16px_34px_-30px_color-mix(in_oklab,var(--foreground)_65%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-lg"
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-secondary/[0.08] transition-transform duration-300 group-hover:scale-125"
+          aria-hidden="true"></span>
+        <span
+          class="relative mx-auto grid size-16 place-items-center rounded-[1.35rem] border border-secondary/20 bg-gradient-to-br from-secondary/20 via-secondary/10 to-background text-secondary shadow-[0_16px_30px_-18px_color-mix(in_oklab,var(--secondary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+          aria-hidden="true"
+          ><Headset className="size-8" strokeWidth={1.8} />
+        </span>
+        <h3 class="relative mt-6 text-xl font-bold">{copy.why.cards[1][0]}</h3>
+        <p class="relative mt-3 leading-7 text-muted-foreground">
+          {copy.why.cards[1][1]}
+        </p>
+      </article>
 
-    <section class="mt-14" aria-labelledby="department-contabilidad">
-      <div class="mb-6 flex items-center gap-3">
-        <span class="h-8 w-1 rounded-full bg-secondary" aria-hidden="true"
-        ></span><h3 id="department-contabilidad" class="text-xl font-bold">
-          Contabilidad
-        </h3>
+      <article
+        class="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-7 text-center shadow-[0_16px_34px_-30px_color-mix(in_oklab,var(--foreground)_65%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-primary/[0.06] transition-transform duration-300 group-hover:scale-125"
+          aria-hidden="true"></span>
+        <span
+          class="relative mx-auto grid size-16 place-items-center rounded-[1.35rem] border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-background text-primary shadow-[0_16px_30px_-18px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+          aria-hidden="true"
+          ><ClipboardCheck className="size-8" strokeWidth={1.8} />
+        </span>
+        <h3 class="relative mt-6 text-xl font-bold">{copy.why.cards[2][0]}</h3>
+        <p class="relative mt-3 leading-7 text-muted-foreground">
+          {copy.why.cards[2][1]}
+        </p>
+      </article>
+
+      <article
+        class="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-7 text-center shadow-[0_16px_34px_-30px_color-mix(in_oklab,var(--foreground)_65%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-lg"
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-secondary/[0.08] transition-transform duration-300 group-hover:scale-125"
+          aria-hidden="true"></span>
+        <span
+          class="relative mx-auto grid size-16 place-items-center rounded-[1.35rem] border border-secondary/20 bg-gradient-to-br from-secondary/20 via-secondary/10 to-background text-secondary shadow-[0_16px_30px_-18px_color-mix(in_oklab,var(--secondary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+          aria-hidden="true"
+          ><MessagesSquare className="size-8" strokeWidth={1.8} />
+        </span>
+        <h3 class="relative mt-6 text-xl font-bold">{copy.why.cards[3][0]}</h3>
+        <p class="relative mt-3 leading-7 text-muted-foreground">
+          {copy.why.cards[3][1]}
+        </p>
+      </article>
+
+      <article
+        class="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-7 text-center shadow-[0_16px_34px_-30px_color-mix(in_oklab,var(--foreground)_65%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-primary/[0.06] transition-transform duration-300 group-hover:scale-125"
+          aria-hidden="true"></span>
+        <span
+          class="relative mx-auto grid size-16 place-items-center rounded-[1.35rem] border border-primary/20 bg-gradient-to-br from-primary/20 via-primary/10 to-background text-primary shadow-[0_16px_30px_-18px_color-mix(in_oklab,var(--primary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+          aria-hidden="true"
+          ><UsersRound className="size-8" strokeWidth={1.8} />
+        </span>
+        <h3 class="relative mt-6 text-xl font-bold">{copy.why.cards[4][0]}</h3>
+        <p class="relative mt-3 leading-7 text-muted-foreground">
+          {copy.why.cards[4][1]}
+        </p>
+      </article>
+
+      <article
+        class="group relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-7 text-center shadow-[0_16px_34px_-30px_color-mix(in_oklab,var(--foreground)_65%,transparent)] transition duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-lg"
+      >
+        <span
+          class="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-secondary/[0.08] transition-transform duration-300 group-hover:scale-125"
+          aria-hidden="true"></span>
+        <span
+          class="relative mx-auto grid size-16 place-items-center rounded-[1.35rem] border border-secondary/20 bg-gradient-to-br from-secondary/20 via-secondary/10 to-background text-secondary shadow-[0_16px_30px_-18px_color-mix(in_oklab,var(--secondary)_80%,transparent)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-105"
+          aria-hidden="true"
+          ><ShieldCheck className="size-8" strokeWidth={1.8} />
+        </span>
+        <h3 class="relative mt-6 text-xl font-bold">{copy.why.cards[5][0]}</h3>
+        <p class="relative mt-3 leading-7 text-muted-foreground">
+          {copy.why.cards[5][1]}
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="px-6 pb-12 pt-2 md:pb-16" aria-labelledby="about-cta-title">
+    <div
+      class="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_26%,transparent)_1px,transparent_0)] bg-[size:1.1rem_1.1rem] px-7 py-12 shadow-[0_28px_64px_-44px_color-mix(in_oklab,var(--primary)_55%,transparent)] sm:px-10 md:px-14 md:py-14"
+    >
+      <span
+        class="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full border border-secondary/20"
+        aria-hidden="true"></span>
+      <div
+        class="relative grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(17rem,0.8fr)] lg:items-end lg:gap-14"
+      >
+        <div>
+          <p
+            class="text-xs font-bold uppercase tracking-[0.18em] text-secondary"
+          >
+            {copy.cta.eyebrow}
+          </p>
+          <h2
+            id="about-cta-title"
+            class="mt-4 max-w-3xl text-balance text-4xl font-bold tracking-tight md:text-5xl"
+          >
+            {copy.cta.titleBefore}<span class="text-secondary"
+              >{copy.cta.titleAccent}</span
+            >
+          </h2>
+          <p
+            class="mt-6 max-w-3xl text-pretty text-lg leading-8 text-muted-foreground md:text-xl"
+          >
+            {copy.cta.body}
+          </p>
+          <div
+            class="mt-8 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.12em] text-secondary"
+          >
+            <span class="h-px w-9 bg-secondary" aria-hidden="true"></span>Dreamy
+            Tours
+          </div>
+        </div>
+
+        <div
+          class="w-full max-w-sm justify-self-end rounded-[1.5rem] border border-secondary/20 bg-background/90 p-6 sm:p-7"
+        >
+          <span
+            class="grid size-11 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-[0_10px_22px_-14px_color-mix(in_oklab,var(--primary)_90%,transparent)]"
+            aria-hidden="true"
+          >
+            <WhatsAppIcon className="size-5" />
+          </span>
+          <p class="mt-5 text-lg font-bold tracking-tight">
+            {copy.cta.ready}
+          </p>
+          <p class="mt-2 text-sm leading-6 text-muted-foreground">
+            {copy.cta.help}
+          </p>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-center text-sm font-bold text-primary-foreground shadow-[0_14px_28px_-16px_color-mix(in_oklab,var(--primary)_95%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_18px_32px_-16px_color-mix(in_oklab,var(--primary)_90%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98]"
+          >
+            <WhatsAppIcon className="size-5" />
+            {copy.cta.button}
+            <svg
+              class="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+              ><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg
+            >
+          </a>
+        </div>
       </div>
-      <ul class="grid list-none gap-6 p-0 md:grid-cols-2" role="list">
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:flex"
-        >
-          <img
-            class="!my-0 min-h-48 w-full self-stretch object-cover sm:w-2/5"
-            src="/imagenes/personal/susana.webp"
-            alt="Susana, Contabilidad"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="p-6">
-            <h4 class="m-0 text-xl font-bold">Susana</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Contabilidad
-            </p><small class="mt-3 block leading-5 text-muted-foreground"
-              >Gestión financiera y contabilidad general.</small
-            ><div class="mt-4 flex flex-wrap gap-2">
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Finanzas</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Tributos</span>
-            </div>
-          </div>
-        </li>
-        <li
-          class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:flex"
-        >
-          <img
-            class="!my-0 min-h-48 w-full self-stretch object-cover sm:w-2/5"
-            src="/imagenes/personal/liz.webp"
-            alt="Lizbeth, Asistente Contabilidad"
-            width="640"
-            height="480"
-            loading="lazy"
-            decoding="async"
-          /><div class="p-6">
-            <h4 class="m-0 text-xl font-bold">Lizbeth</h4><p
-              class="mt-1 font-bold text-primary"
-            >
-              Asistente Contabilidad
-            </p><small class="mt-3 block leading-5 text-muted-foreground"
-              >Soporte contable y facturación.</small
-            ><div class="mt-4 flex flex-wrap gap-2">
-              <span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Facturación</span
-              ><span
-                class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
-                >Soporte</span>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </section>
+    </div>
   </section>
 </div>

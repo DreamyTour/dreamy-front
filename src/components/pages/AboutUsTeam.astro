@@ -1,0 +1,338 @@
+---
+type AboutLang = "es" | "en" | "pt";
+
+interface Props {
+  lang?: AboutLang;
+}
+
+const lang = Astro.props.lang ?? "es";
+
+const copyByLang = {
+  es: {
+    eyebrow: "Profesionales",
+    title: "Un equipo detrás de cada viaje",
+    paragraphs: [
+      "Una buena experiencia de viaje comienza con un buen equipo.",
+      "En Dreamy Tours contamos con profesionales dedicados a la atención al cliente, reservas, operaciones y coordinación de servicios turísticos.",
+      "Trabajamos de manera conjunta para que cada detalle del itinerario esté correctamente organizado y para poder brindar asistencia cuando nuestros viajeros la necesiten.",
+    ],
+    technology: "Tecnología & IT",
+    technologyRoles: ["Web Developer", "Web Master & SEO", "Social Manager"],
+    operations: "Operaciones",
+    accounting: "Contabilidad",
+    operationsRole: "Operaciones",
+    accountingRole: "Contabilidad",
+    accountingAssistantRole: "Asistente de Contabilidad",
+    operationsSummary:
+      "Gestión de reservas, operaciones y atención al cliente.",
+    accountingSummary: "Gestión financiera y contabilidad general.",
+    accountingAssistantSummary: "Soporte contable y facturación.",
+    operationsTags: ["Operación", "Reservas", "Atención"],
+    accountingTags: ["Finanzas", "Tributos"],
+    accountingAssistantTags: ["Facturación", "Soporte"],
+    devTools: "Herramientas de desarrollo",
+    seoTools: "SEO técnico, rendimiento web y desarrollo WordPress",
+    socialTools: "Funciones de Social Manager",
+    socialTags: [
+      "Redes",
+      "Comunidad",
+      "Contenido",
+      "Fotografía",
+      "Storytelling",
+      "Reels",
+      "Analítica",
+      "Planificación",
+      "Copywriting",
+    ],
+  },
+  en: {
+    eyebrow: "Travel professionals",
+    title: "A team behind every journey",
+    paragraphs: [
+      "A great travel experience starts with a great team.",
+      "At Dreamy Tours, our specialists work across traveler care, reservations, operations and tourism service coordination.",
+      "We work as one team to keep every itinerary detail organized and provide support whenever our travelers need it.",
+    ],
+    technology: "Technology & IT",
+    technologyRoles: [
+      "Web Developer",
+      "Webmaster & SEO Specialist",
+      "Social Media Manager",
+    ],
+    operations: "Operations",
+    accounting: "Accounting",
+    operationsRole: "Operations",
+    accountingRole: "Accounting",
+    accountingAssistantRole: "Accounting Assistant",
+    operationsSummary: "Reservations, operations and traveler support.",
+    accountingSummary: "Financial management and general accounting.",
+    accountingAssistantSummary: "Accounting and invoicing support.",
+    operationsTags: ["Operations", "Reservations", "Support"],
+    accountingTags: ["Finance", "Taxes"],
+    accountingAssistantTags: ["Invoicing", "Support"],
+    devTools: "Development tools",
+    seoTools: "Technical SEO, web performance and WordPress development",
+    socialTools: "Social media responsibilities",
+    socialTags: [
+      "Social media",
+      "Community",
+      "Content",
+      "Photography",
+      "Storytelling",
+      "Reels",
+      "Analytics",
+      "Planning",
+      "Copywriting",
+    ],
+  },
+  pt: {
+    eyebrow: "Profissionais",
+    title: "Uma equipe por trás de cada viagem",
+    paragraphs: [
+      "Uma boa experiência de viagem começa com uma boa equipe.",
+      "Na Dreamy Tours, contamos com profissionais dedicados ao atendimento, às reservas, às operações e à coordenação dos serviços turísticos.",
+      "Trabalhamos de forma integrada para organizar corretamente cada detalhe do roteiro e oferecer assistência sempre que nossos viajantes precisarem.",
+    ],
+    technology: "Tecnologia e TI",
+    technologyRoles: [
+      "Desenvolvedor Web",
+      "Webmaster e SEO",
+      "Gestor de Redes Sociais",
+    ],
+    operations: "Operações",
+    accounting: "Contabilidade",
+    operationsRole: "Operações",
+    accountingRole: "Contabilidade",
+    accountingAssistantRole: "Assistente de Contabilidade",
+    operationsSummary:
+      "Gestão de reservas, operações e atendimento ao viajante.",
+    accountingSummary: "Gestão financeira e contabilidade geral.",
+    accountingAssistantSummary: "Suporte contábil e faturamento.",
+    operationsTags: ["Operações", "Reservas", "Atendimento"],
+    accountingTags: ["Finanças", "Tributos"],
+    accountingAssistantTags: ["Faturamento", "Suporte"],
+    devTools: "Ferramentas de desenvolvimento",
+    seoTools: "SEO técnico, performance web e desenvolvimento WordPress",
+    socialTools: "Atividades de Social Media",
+    socialTags: [
+      "Redes sociais",
+      "Comunidade",
+      "Conteúdo",
+      "Fotografia",
+      "Storytelling",
+      "Reels",
+      "Análise",
+      "Planejamento",
+      "Copywriting",
+    ],
+  },
+} as const;
+
+const copy = copyByLang[lang];
+
+const technologyTeam = [
+  {
+    name: "Erian Bejar",
+    role: copy.technologyRoles[0],
+    image: "/imagenes/personal/erian.webp",
+    alt: `Erian Bejar, ${copy.technologyRoles[0]}`,
+    tags: [
+      "Astro",
+      "React",
+      "TypeScript",
+      "Sys Arch",
+      "Node/Bun",
+      "Docker",
+      "CI/CD",
+      "PostgreS",
+      "Linux",
+    ],
+    tagLabel: copy.devTools,
+  },
+  {
+    name: "Yuri Alata",
+    role: copy.technologyRoles[1],
+    image: "/imagenes/personal/jack.webp",
+    alt: `Yuri Alata, ${copy.technologyRoles[1]}`,
+    tags: [
+      "Semrush",
+      "Cloudflare",
+      "Ahrefs",
+      "WordPress",
+      "Search Console",
+      "Php",
+      "Nginx",
+      "tailwindcss",
+      "Astro",
+    ],
+    tagLabel: copy.seoTools,
+  },
+  {
+    name: "Junior",
+    role: copy.technologyRoles[2],
+    image: "/imagenes/personal/junior.webp",
+    alt: `Junior, ${copy.technologyRoles[2]}`,
+    tags: copy.socialTags,
+    tagLabel: copy.socialTools,
+  },
+];
+
+const operatingDepartments = [
+  {
+    id: "department-operaciones",
+    title: copy.operations,
+    members: [
+      {
+        name: "Zaida",
+        role: copy.operationsRole,
+        image: "/imagenes/personal/zaida.webp",
+        alt: `Zaida, ${copy.operationsRole}`,
+        summary: copy.operationsSummary,
+        tags: copy.operationsTags,
+      },
+      {
+        name: "Yuliana",
+        role: copy.operationsRole,
+        image: "/imagenes/personal/juliana.webp",
+        alt: `Yuliana, ${copy.operationsRole}`,
+        summary: copy.operationsSummary,
+        tags: copy.operationsTags,
+      },
+    ],
+  },
+  {
+    id: "department-contabilidad",
+    title: copy.accounting,
+    members: [
+      {
+        name: "Susana",
+        role: copy.accountingRole,
+        image: "/imagenes/personal/susana.webp",
+        alt: `Susana, ${copy.accountingRole}`,
+        summary: copy.accountingSummary,
+        tags: copy.accountingTags,
+      },
+      {
+        name: "Lizbeth",
+        role: copy.accountingAssistantRole,
+        image: "/imagenes/personal/liz.webp",
+        alt: `Lizbeth, ${copy.accountingAssistantRole}`,
+        summary: copy.accountingAssistantSummary,
+        tags: copy.accountingAssistantTags,
+      },
+    ],
+  },
+];
+---
+
+<section
+  class="mx-auto max-w-7xl px-6 py-12 md:py-16"
+  aria-labelledby="about-team-title"
+>
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+      {copy.eyebrow}
+    </p>
+    <h2
+      id="about-team-title"
+      class="mt-3 text-3xl font-bold tracking-tight md:text-5xl"
+    >
+      {copy.title}
+    </h2>
+    <div class="mt-4 space-y-4 leading-7 text-muted-foreground">
+      <p class="m-0">{copy.paragraphs[0]}</p>
+      <p class="m-0">{copy.paragraphs[1]}</p>
+      <p class="m-0">{copy.paragraphs[2]}</p>
+    </div>
+    <span
+      class="mx-auto mt-5 block h-1 w-20 rounded-full bg-secondary"
+      aria-hidden="true"></span>
+  </div>
+
+  <section class="mt-10" aria-labelledby="department-tecnologia">
+    <div class="mb-6 flex items-center gap-3">
+      <span class="h-8 w-1 rounded-full bg-secondary" aria-hidden="true"
+      ></span><h3 id="department-tecnologia" class="text-xl font-bold">
+        {copy.technology}
+      </h3>
+    </div>
+    <ul class="grid list-none gap-6 p-0 md:grid-cols-3" role="list">
+      {
+        technologyTeam.map((member) => (
+          <li class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <img
+              class="!my-0 block h-auto min-h-0 w-full object-contain object-top"
+              src={member.image}
+              alt={member.alt}
+              width="640"
+              height="480"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="min-w-0 p-6 text-center">
+              <h4 class="m-0 text-xl font-bold">{member.name}</h4>
+              <p class="mt-1 font-bold text-primary">{member.role}</p>
+              <div
+                class="mt-4 flex flex-wrap justify-center gap-2"
+                aria-label={member.tagLabel}
+              >
+                {member.tags.map((tag) => (
+                  <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  {
+    operatingDepartments.map((department) => (
+      <section class="mt-10" aria-labelledby={department.id}>
+        <div class="mb-6 flex items-center gap-3">
+          <>
+            <span
+              class="h-8 w-1 rounded-full bg-secondary"
+              aria-hidden="true"
+            />
+            <h3 id={department.id} class="text-xl font-bold">
+              {department.title}
+            </h3>
+          </>
+        </div>
+        <ul class="grid list-none gap-6 p-0 md:grid-cols-2" role="list">
+          {department.members.map((member) => (
+            <li class="overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:flex">
+              <img
+                class="!my-0 min-h-48 w-full self-stretch object-cover sm:w-2/5"
+                src={member.image}
+                alt={member.alt}
+                width="640"
+                height="480"
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="p-6">
+                <h4 class="m-0 text-xl font-bold">{member.name}</h4>
+                <p class="mt-1 font-bold text-primary">{member.role}</p>
+                <small class="mt-3 block leading-5 text-muted-foreground">
+                  {member.summary}
+                </small>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {member.tags.map((tag) => (
+                    <span class="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</section>
