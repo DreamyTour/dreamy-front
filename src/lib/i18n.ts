@@ -53,6 +53,13 @@ export function stripLangPrefix(path: string): string {
 	return `${stripped}${suffix}`;
 }
 
+export function stripDefaultLangPrefix(path: string): string {
+	const { path: pathname, suffix } = splitUrlPath(normalizePath(path));
+	const defaultLangPrefix = new RegExp(`^/${DEFAULT_LANG}(?=/|$)`);
+	const stripped = pathname.replace(defaultLangPrefix, "") || "/";
+	return `${stripped}${suffix}`;
+}
+
 export function localizePath(path: string, lang: Lang): string {
 	const normalized = stripLangPrefix(path);
 	const { path: pathname, suffix } = splitUrlPath(normalized);

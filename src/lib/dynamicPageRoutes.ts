@@ -343,13 +343,16 @@ export async function getLocalizedDynamicPaths(): Promise<
 
 			const slugLanguages = allTourPathsBySlug[defaultTour.slug] || [];
 			if (!slugLanguages.includes(DEFAULT_LANG)) continue;
+			const localizedSlug = slugsByDocId[defaultTour.documentId]?.[lang];
 
 			paths.push({
 				params: { lang, slug: defaultTour.slug },
 				props: {
 					type: "tour",
 					isRedirect: true,
-					redirectTo: `/${DEFAULT_LANG}/${defaultTour.slug}`,
+					redirectTo: localizedSlug
+						? `/${lang}/${localizedSlug}`
+						: `/${defaultTour.slug}`,
 					tour: defaultTour,
 					slugMap: slugsByDocId[defaultTour.documentId] ?? {},
 				},

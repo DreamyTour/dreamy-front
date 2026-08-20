@@ -3,6 +3,7 @@ import {
 	collapseRepeatedBlogPath,
 	getAvailableLanguages,
 	localizePath,
+	stripDefaultLangPrefix,
 	stripLangPrefix,
 	translatePathForSlug,
 } from "./i18n";
@@ -24,6 +25,16 @@ describe("i18n path normalization", () => {
 		expect(localizePath(repeatedPath, "es")).toBe(
 			"/es/blog/peruvian-amazon-guide",
 		);
+	});
+
+	test("removes only the default-language prefix and preserves the leading slash", () => {
+		expect(
+			stripDefaultLangPrefix(
+				"/en/lares-trek-machu-picchu-4-days/lares-trek-machu-picchu-4-days",
+			),
+		).toBe("/lares-trek-machu-picchu-4-days/lares-trek-machu-picchu-4-days");
+		expect(stripDefaultLangPrefix("/en")).toBe("/");
+		expect(stripDefaultLangPrefix("/enquiry")).toBe("/enquiry");
 	});
 
 	test("translates blog slugs when production URLs include trailing slash", () => {
