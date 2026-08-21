@@ -9,6 +9,19 @@ const lang = Astro.props.lang ?? "es";
 
 const copyByLang = {
   es: {
+    manager: {
+      eyebrow: "Mensaje del Gerente General",
+      title: "Cada experiencia cuenta una historia",
+      quote:
+        "Cada experiencia cuenta una historia, y en Dreamy Tours queremos ser parte de la tuya.",
+      paragraphs: [
+        "Soy Mark Luna, director comercial, y junto a mi equipo nos dedicamos a organizar experiencias por Perú y Bolivia cuidando esos detalles que muchas veces marcan la diferencia entre un viaje bueno y uno inolvidable.",
+        "Agradecemos la confianza que depositan en nosotros y la oportunidad de acompañarlos a descubrir nuestros destinos.",
+      ],
+      name: "Mark Luna",
+      role: "Director comercial",
+      imageAlt: "Mark Luna, director comercial de Dreamy Tours",
+    },
     eyebrow: "Profesionales",
     title: "Un equipo detrás de cada viaje",
     paragraphs: [
@@ -46,6 +59,19 @@ const copyByLang = {
     ],
   },
   en: {
+    manager: {
+      eyebrow: "A message from our leadership",
+      title: "Every experience tells a story",
+      quote:
+        "Every experience tells a story, and at Dreamy Tours we want to be part of yours.",
+      paragraphs: [
+        "I am Mark Luna, Commercial Director, and together with my team, we create experiences across Peru and Bolivia, caring for the details that so often make the difference between a good trip and an unforgettable one.",
+        "We are grateful for the trust you place in us and for the opportunity to accompany you as you discover our destinations.",
+      ],
+      name: "Mark Luna",
+      role: "Commercial Director",
+      imageAlt: "Mark Luna, Commercial Director of Dreamy Tours",
+    },
     eyebrow: "Travel professionals",
     title: "A team behind every journey",
     paragraphs: [
@@ -86,12 +112,25 @@ const copyByLang = {
     ],
   },
   pt: {
+    manager: {
+      eyebrow: "Mensagem do Gerente Geral",
+      title: "Cada experiência conta uma história",
+      quote:
+        "Cada experiência conta uma história, e na Dreamy Tours queremos fazer parte da sua.",
+      paragraphs: [
+        "Sou Mark Luna, diretor comercial, e junto com minha equipe nos dedicamos a organizar experiências pelo Peru e pela Bolívia, cuidando daqueles detalhes que muitas vezes fazem toda a diferença entre uma boa viagem e uma viagem inesquecível.",
+        "Agradecemos a confiança que vocês depositam em nós e a oportunidade de acompanhá-los na descoberta dos nossos destinos.",
+      ],
+      name: "Mark Luna",
+      role: "Diretor comercial",
+      imageAlt: "Mark Luna, diretor comercial da Dreamy Tours",
+    },
     eyebrow: "Profissionais",
     title: "Uma equipe por trás de cada viagem",
     paragraphs: [
       "Uma boa experiência de viagem começa com uma boa equipe.",
-      "Na Dreamy Tours, contamos com profissionais dedicados ao atendimento, às reservas, às operações e à coordenação dos serviços turísticos.",
-      "Trabalhamos de forma integrada para organizar corretamente cada detalhe do roteiro e oferecer assistência sempre que nossos viajantes precisarem.",
+      "Na Dreamy Tours, contamos com profissionais dedicados ao atendimento ao cliente, reservas, operações e coordenação de serviços turísticos.",
+      "Trabalhamos de forma integrada para garantir que cada detalhe do roteiro esteja devidamente organizado e para oferecer assistência sempre que nossos viajantes precisarem.",
     ],
     technology: "Tecnologia e TI",
     technologyRoles: [
@@ -224,6 +263,90 @@ const operatingDepartments = [
   },
 ];
 ---
+
+<section
+  class="mx-auto max-w-7xl px-6 pb-4 pt-12 md:pt-16"
+  aria-labelledby="manager-message-title"
+>
+  <div
+    class="relative isolate overflow-hidden rounded-[2rem] border border-primary/15 bg-white px-5 py-5 shadow-[0_30px_70px_-42px_color-mix(in_oklab,var(--primary)_42%,transparent)] sm:px-8 sm:py-8 lg:px-10 lg:py-10"
+  >
+    <span
+      class="pointer-events-none absolute -right-24 -top-28 size-80 rounded-full border border-primary/20"
+      aria-hidden="true"></span
+    >
+    <span
+      class="pointer-events-none absolute -bottom-32 left-[38%] size-80 rounded-full bg-primary/10 blur-3xl"
+      aria-hidden="true"></span
+    >
+    <span
+      class="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_42%,transparent)_1px,transparent_1.25px)] [background-size:0.95rem_0.95rem] [-webkit-mask-image:radial-gradient(ellipse_42rem_28rem_at_84%_6%,black_0%,black_34%,transparent_78%)] [mask-image:radial-gradient(ellipse_42rem_28rem_at_84%_6%,black_0%,black_34%,transparent_78%)]"
+      aria-hidden="true"></span
+    >
+
+    <div class="relative grid gap-9 lg:grid-cols-[minmax(17rem,0.76fr)_minmax(0,1.24fr)] lg:items-center lg:gap-14">
+      <figure class="group relative mx-auto w-full max-w-md lg:max-w-none">
+        <div
+          class="absolute -inset-3 rounded-[1.75rem] border border-primary/20 [transform:rotate(-2.5deg)]"
+          aria-hidden="true"></div>
+        <div class="relative overflow-hidden rounded-[1.5rem] bg-white shadow-[0_24px_42px_-24px_color-mix(in_oklab,black_75%,transparent)]">
+          <img
+            class="block aspect-[4/5] w-full scale-100 object-cover object-[52%_center] transition-transform duration-500 ease-out group-hover:scale-[1.035] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            src="/imagenes/personal/mark.webp"
+            alt={copy.manager.imageAlt}
+            width="1440"
+            height="1080"
+            loading="lazy"
+            decoding="async"
+            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 28rem, calc(100vw - 4rem)"
+          />
+          <figcaption
+            class="absolute inset-x-4 bottom-4 rounded-xl border border-secondary/80 bg-secondary/95 px-4 py-3 text-white shadow-[0_18px_30px_-18px_color-mix(in_oklab,var(--secondary)_90%,transparent)] backdrop-blur-sm"
+          >
+            <span class="block text-base font-bold leading-none">{copy.manager.name}</span>
+            <span class="mt-1 block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white">{copy.manager.role}</span>
+          </figcaption>
+        </div>
+      </figure>
+
+      <div class="py-1 text-foreground lg:py-4">
+        <p class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
+          <span class="h-px w-9 bg-primary" aria-hidden="true"></span>
+          {copy.manager.eyebrow}
+        </p>
+        <h2
+          id="manager-message-title"
+          class="mt-5 max-w-2xl text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl"
+        >
+          {copy.manager.title}
+        </h2>
+
+        <blockquote class="relative mt-7 border-l-2 border-secondary pl-5 md:pl-6">
+          <span
+            class="pointer-events-none absolute -left-1 top-[-1.3rem] font-serif text-6xl leading-none text-secondary"
+            aria-hidden="true">“</span
+          >
+          <p class="m-0 max-w-2xl text-balance text-xl font-semibold leading-8 text-foreground md:text-2xl md:leading-9">
+            {copy.manager.quote}
+          </p>
+        </blockquote>
+
+        <div class="mt-7 max-w-2xl space-y-4 text-pretty leading-7 text-muted-foreground md:text-lg md:leading-8">
+          <p class="m-0">{copy.manager.paragraphs[0]}</p>
+          <p class="m-0">{copy.manager.paragraphs[1]}</p>
+        </div>
+
+        <div class="mt-8 flex items-center gap-4">
+          <span class="h-px w-12 bg-secondary" aria-hidden="true"></span>
+          <div>
+            <p class="m-0 font-bold tracking-tight text-foreground">{copy.manager.name}</p>
+            <p class="m-0 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{copy.manager.role}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section
   class="mx-auto max-w-7xl px-6 py-12 md:py-16"

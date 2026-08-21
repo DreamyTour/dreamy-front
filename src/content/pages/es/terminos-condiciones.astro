@@ -1,14 +1,14 @@
 ---
 export const frontmatter = {
-  title: "Términos y Condiciones",
-  description: "Políticas, Términos y Condiciones - Dreamy Tours",
+  title: "Política de Términos y Condiciones",
+  description: "Política de Términos y Condiciones - Dreamy Tours",
   lang: "es",
   heroEyebrow: "Legal",
   heroImage: "/imagenes/terminos.webp",
-  heroImageAlt: "Términos y Condiciones - Dreamy Tours",
+  heroImageAlt: "Política de Términos y Condiciones - Dreamy Tours",
   seo: {
-    metaTitle: "Términos y Condiciones | Turismo Perú Bolivia",
-    metaDescription: "Políticas, Términos y Condiciones - Dreamy Tours",
+    metaTitle: "Política de Términos y Condiciones | Dreamy Tours",
+    metaDescription: "Política de Términos y Condiciones - Dreamy Tours",
   },
   slugs: {
     es: "terminos-condiciones",
@@ -17,435 +17,293 @@ export const frontmatter = {
   },
 };
 
-const copy = {
-  labels: ["Legal", "Condiciones del servicio"],
-  noticeTitle: "Aviso importante",
-  noticeText:
-    "El sistema de servicios turísticos en Perú puede diferir del de tu país. Te recomendamos leer detenidamente las condiciones antes de reservar.",
-  itinerary: {
-    title: "Itinerarios",
-    text: "Los programas de actividades se planifican con mucho cuidado. Sin embargo, por razones operativas, puede ser necesario cambiar el orden de las actividades del itinerario o la ruta específica, con conocimiento previo del cliente.",
-    highlight:
-      "El itinerario debe considerarse únicamente como una guía básica.",
-  },
-  responsibility: {
-    title: "Responsabilidad",
-    intro:
-      "Dreamy Tours actúa en nombre de sus clientes al organizar el transporte, alojamiento u otros servicios turísticos necesarios. No asumimos responsabilidad por accidentes, pérdidas, retrasos o interferencias ocasionados por fuerza mayor u otros hechos ajenos a nuestra responsabilidad.",
-    requirementsTitle: "Requisitos del pasajero",
-    requirementsText:
-      "El pasajero debe contar con todos los requisitos necesarios para su viaje. La falta de documentación puede causar retrasos, cancelaciones de servicios, pago de impuestos u otros contratiempos.",
-    requirements: [
-      "Visas, pasaportes y tarjeta de inmigración andina (TAM).",
-      "Tarjeta ISIC actualizada para estudiantes, cuando corresponda.",
-      "Vacunas y autorizaciones para menores de edad, cuando corresponda.",
-    ],
-    restrictions: [
-      [
-        "Modificaciones de itinerario",
-        "Dreamy Tours puede alterar, modificar o cancelar un itinerario por razones de seguridad, como fenómenos naturales, problemas políticos, epidemias o circunstancias ajenas a nuestra organización. En estos casos no habrá reembolso.",
-      ],
-      [
-        "Limitaciones físicas",
-        "Infórmanos antes de contratar sobre cualquier limitación para recomendar servicios adecuados. Podemos limitar la participación en actividades cuando la seguridad del grupo lo requiera.",
-      ],
-      [
-        "Pasajeros enfermos",
-        "No podemos llevar a una excursión a un pasajero enfermo que represente un riesgo potencial para sí mismo o para la integridad del grupo. El guía puede evaluarlo al inicio del tour.",
-      ],
-      [
-        "Estado peligroso",
-        "No podemos llevar pasajeros ebrios o en un estado que amenace el desarrollo del tour, la salud del grupo o la del propio pasajero.",
-      ],
-      [
-        "Enfermedades y discapacidades",
-        "La empresa no se responsabiliza de enfermedades contraídas o de condiciones físicas o mentales que pongan en riesgo al pasajero o a terceros, o que impidan la prestación del servicio. No procederán reclamaciones ni devoluciones por estos conceptos.",
-      ],
+type TermsBlock =
+  | { type: "paragraph"; text: string }
+  | { type: "list"; items: string[] }
+  | { type: "ordered-list"; items: string[] };
+
+interface TermsSection {
+  number: string;
+  id: string;
+  title: string;
+  blocks: TermsBlock[];
+}
+
+const termsSections: TermsSection[] = [
+  {
+    number: "1",
+    id: "informacion-general",
+    title: "Información general",
+    blocks: [
+      { type: "paragraph", text: "Dreamy Tours organiza y comercializa servicios turísticos propios y de terceros, incluyendo, entre otros:" },
+      { type: "list", items: ["Camino Inca Clásico y Camino Inca Corto a Machu Picchu.", "Trekking Salkantay a Machu Picchu.", "Otros trekkings y rutas de aventura en Perú.", "Tours culturales y excursiones.", "Visitas a Machu Picchu y otros atractivos turísticos.", "Paquetes de viaje por Perú y Bolivia.", "Programas personalizados de acuerdo con las necesidades del viajero.", "Servicios de transporte, alojamiento, alimentación, entradas y otros servicios relacionados con el viaje."] },
+      { type: "paragraph", text: "Los servicios incluidos en cada reserva dependerán del programa, itinerario y cotización previamente confirmados por Dreamy Tours." },
     ],
   },
-  insurance: {
-    title: "Seguro de viaje",
-    text: "Recomendamos encarecidamente contratar un seguro de viaje y enviar una copia por correo electrónico, WhatsApp o a nuestra oficina.",
-    coverTitle: "Cobertura recomendada",
-    coverage: [
-      "Accidentes, gastos médicos y repatriación de emergencia, incluidas ambulancias aéreas y rescate.",
-      "Cancelaciones y pérdida de equipaje.",
+  {
+    number: "2",
+    id: "reservas-confirmacion",
+    title: "Reservas y confirmación del viaje",
+    blocks: [
+      { type: "paragraph", text: "Una reserva se considera confirmada cuando:" },
+      { type: "ordered-list", items: ["El viajero acepta la propuesta o cotización enviada por Dreamy Tours.", "Se proporciona la información necesaria de los pasajeros.", "Se realiza el pago del adelanto o importe establecido para el servicio.", "Dreamy Tours confirma la reserva y los servicios contratados."] },
+      { type: "paragraph", text: "Para determinados servicios, especialmente Camino Inca, Machu Picchu y otros servicios sujetos a disponibilidad limitada, la reserva estará condicionada a la disponibilidad de permisos, entradas o cupos oficiales." },
+      { type: "paragraph", text: "La realización de un pago significa que todos los servicios están confirmados por parte de Dreamy Tours" },
     ],
   },
-  prices: {
+  {
+    number: "3",
+    id: "datos-reserva",
+    title: "Datos necesarios para realizar una reserva",
+    blocks: [
+      { type: "paragraph", text: "Para gestionar correctamente una reserva, Dreamy Tours podrá solicitar información de los viajeros, como:" },
+      { type: "list", items: ["Nombre completo.", "Nacionalidad.", "Fecha de nacimiento.", "Número de pasaporte o documento de identidad.", "Fecha de viaje.", "Datos de contacto.", "Información adicional necesaria para determinados servicios."] },
+      { type: "paragraph", text: "El viajero es responsable de proporcionar información correcta, completa y actualizada." },
+      { type: "paragraph", text: "Cualquier error en los datos proporcionados por el pasajero que genere costos adicionales, cambios o imposibilidad de utilizar un servicio será responsabilidad del viajero." },
+    ],
+  },
+  {
+    number: "4",
+    id: "camino-inca",
+    title: "Camino Inca a Machu Picchu",
+    blocks: [
+      { type: "paragraph", text: "El Camino Inca es una ruta turística con acceso regulado y disponibilidad limitada." },
+      { type: "paragraph", text: "La confirmación del Camino Inca depende de la disponibilidad de permisos y espacios autorizados por el estado peruano." },
+      { type: "paragraph", text: "Por este motivo:" },
+      { type: "list", items: ["Los espacios no pueden garantizarse sin realizar la reserva correspondiente.", "Los permisos son personales y están sujetos a las condiciones establecidas por el estado peruano", "Una vez emitidos determinados permisos, entradas o servicios asociados, pueden existir restricciones para cambios, transferencias o reembolsos."] },
+      { type: "paragraph", text: "Dreamy Tours no puede garantizar la disponibilidad de una fecha específica hasta contar con la confirmación oficial correspondiente." },
+    ],
+  },
+  {
+    number: "5",
+    id: "trekking-aventura",
+    title: "Trekking y rutas de aventura",
+    blocks: [
+      { type: "paragraph", text: "Los trekkings, incluyendo Salkantay Trek, Camino Inca y otras rutas de montaña, se desarrollan en entornos naturales donde pueden presentarse cambios climáticos, variaciones de ruta, restricciones de acceso u otras circunstancias fuera del control de Dreamy Tours." },
+      { type: "paragraph", text: "Por razones de seguridad, operación o condiciones del destino, Dreamy Tours podrá modificar el orden de determinadas actividades, horarios, rutas o servicios incluidos en el itinerario." },
+      { type: "paragraph", text: "Cualquier modificación buscará mantener la seguridad del viajero y la correcta prestación del servicio." },
+    ],
+  },
+  {
+    number: "6",
+    id: "paquetes-viaje",
+    title: "Paquetes de viaje",
+    blocks: [
+      { type: "paragraph", text: "Los paquetes de viaje pueden incluir diferentes servicios, como:" },
+      { type: "list", items: ["Alojamiento.", "Transporte turístico.", "Trenes.", "Entradas.", "Tours.", "Guías.", "Alimentación.", "Traslados.", "Excursiones.", "Actividades de aventura."] },
+      { type: "paragraph", text: "Cada paquete tendrá sus propias condiciones, las cuales serán informadas antes de realizar la reserva." },
+      { type: "paragraph", text: "Los horarios, hoteles, trenes, transportes y otros servicios podrán estar sujetos a disponibilidad." },
+      { type: "paragraph", text: "Cuando sea necesario realizar un cambio operativo, Dreamy Tours podrá ofrecer una alternativa de categoría y características similares, procurando mantener el valor y la calidad del servicio contratado." },
+    ],
+  },
+  {
+    number: "7",
+    id: "pagos",
+    title: "Pagos",
+    blocks: [
+      { type: "paragraph", text: "Las condiciones de pago serán comunicadas al viajero antes de confirmar la reserva." },
+      { type: "paragraph", text: "Dependiendo del servicio contratado, Dreamy Tours podrá solicitar:" },
+      { type: "list", items: ["Un adelanto para confirmar la reserva.", "El pago total antes de la fecha del viaje.", "El saldo restante antes o durante la prestación del servicio."] },
+      { type: "paragraph", text: "Los métodos de pago disponibles serán informados al momento de realizar la reserva." },
+      { type: "paragraph", text: "Los gastos, comisiones bancarias, cargos de plataformas de pago o diferencias generadas por determinados métodos de pago podrán ser comunicados previamente al viajero." },
+    ],
+  },
+  {
+    number: "8",
+    id: "precios",
     title: "Precios",
-    details: [
-      "Todas las tarifas están expresadas en dólares estadounidenses y se calculan por persona.",
-      "Las tarifas están sujetas a disponibilidad y cambios.",
-      "Las tarifas no aplican para feriados, Semana Santa, fines de semana largos, feriados nacionales, Navidad o Año Nuevo.",
+    blocks: [
+      { type: "paragraph", text: "Los precios publicados o cotizados por Dreamy Tours corresponden a las condiciones indicadas en cada programa." },
+      { type: "paragraph", text: "El precio puede variar dependiendo de:" },
+      { type: "list", items: ["Tipo de alojamiento.", "Categoría de tren.", "Servicios adicionales.", "Cambios solicitados por el viajero."] },
+      { type: "paragraph", text: "La cotización enviada al cliente tendrá una vigencia determinada, especialmente cuando incluya servicios con disponibilidad limitada o precios sujetos a cambios." },
     ],
-    cards: [
-      ["Moneda", "USD ($)", "Dólar estadounidense"],
-      ["Bebés", "0–2 años", "Gratis; sin comida, cama ni asiento"],
-      ["Niños", "3–10 años", "Tarifa especial; comparten habitación"],
-      ["Adultos", "11+ años", "Tarifa completa"],
+  },
+  {
+    number: "9",
+    id: "cancelaciones-reembolsos",
+    title: "Cancelaciones y reembolsos",
+    blocks: [
+      { type: "paragraph", text: "Las condiciones de cancelación dependerán del servicio contratado." },
+      { type: "paragraph", text: "Algunos servicios turísticos tienen condiciones de no reembolso debido a que requieren la compra anticipada de permisos, entradas, boletos o reservas." },
+      { type: "paragraph", text: "Esto puede aplicarse especialmente a:" },
+      { type: "list", items: ["Camino Inca.", "Entradas a Machu Picchu.", "Boletos de tren.", "Servicios de transporte.", "Alojamientos con tarifa no reembolsable.", "Otros servicios contratados bajo condiciones especiales."] },
+      { type: "paragraph", text: "En caso de cancelación por parte del viajero, Dreamy Tours revisará los servicios contratados y aplicará las condiciones de cancelación comunicadas al momento de la reserva." },
     ],
-    note: "Los menores deben viajar con un documento de identidad.",
   },
-  bookings: {
-    title: "Reservas",
-    text: "Una reserva se considera válida únicamente con confirmación escrita y el pago acordado. En casos especiales, incluso después del depósito, puede requerirse una reconfirmación por restricciones o condiciones regulatorias del proveedor.",
-    details:
-      "Al reservar, envíanos nombres, apellidos, números de pasaporte, nacionalidad y fecha de nacimiento. El valor final se acuerda con nuestro departamento de reservas.",
-    emailLabel: "Reservas",
+  {
+    number: "10",
+    id: "cambios-viajero",
+    title: "Cambios solicitados por el viajero",
+    blocks: [
+      { type: "paragraph", text: "Cualquier modificación solicitada después de confirmar una reserva estará sujeta a disponibilidad y a las condiciones del proveedor correspondiente." },
+      { type: "paragraph", text: "Los cambios pueden generar costos adicionales, especialmente cuando involucren:" },
+      { type: "list", items: ["Cambio de fecha.", "Cambio de horario.", "Cambio de categoría.", "Cambio de hotel.", "Cambio de tren.", "Cambio de ruta.", "Servicios adicionales."] },
+      { type: "paragraph", text: "Dreamy Tours informará al viajero sobre cualquier costo adicional antes de realizar el cambio, siempre que sea posible." },
+    ],
   },
-  changes: {
-    title: "Cambios de reserva",
-    text: "Los cambios de reserva, itinerario, fechas o participantes se aceptarán según disponibilidad y el pago correspondiente de multas y gastos administrativos.",
+  {
+    number: "11",
+    id: "causas-externas",
+    title: "Cambios por causas externas",
+    blocks: [
+      { type: "paragraph", text: "Los itinerarios pueden verse afectados por circunstancias fuera del control de Dreamy Tours, como:" },
+      { type: "list", items: ["Condiciones climáticas.", "Desastres naturales.", "Bloqueos o protestas.", "Huelgas.", "Restricciones gubernamentales.", "Cierres de rutas.", "Restricciones de acceso a atractivos turísticos.", "Cambios en horarios de vuelos.", "Situaciones de fuerza mayor."] },
+      { type: "paragraph", text: "En estos casos, Dreamy Tours trabajará para ofrecer alternativas razonables y mantener la continuidad del viaje en la medida de lo posible." },
+      { type: "paragraph", text: "Los costos adicionales derivados de cambios solicitados por el viajero o de circunstancias ajenas a Dreamy Tours podrán ser asumidos por el viajero cuando corresponda." },
+    ],
   },
-};
+  {
+    number: "12",
+    id: "machu-picchu-disponibilidad",
+    title: "Machu Picchu y servicios sujetos a disponibilidad",
+    blocks: [
+      { type: "paragraph", text: "El acceso a Machu Picchu, sus diferentes circuitos, montañas, horarios y modalidades de ingreso está sujeto a las disposiciones y disponibilidad establecidas por el estado peruano." },
+      { type: "paragraph", text: "Dreamy Tours no controla la disponibilidad ni las modificaciones que puedan realizar las autoridades competentes." },
+      { type: "paragraph", text: "Por ello, los servicios relacionados con Machu Picchu se gestionarán de acuerdo con las condiciones vigentes al momento de la reserva." },
+    ],
+  },
+  {
+    number: "13",
+    id: "responsabilidad-viajero",
+    title: "Responsabilidad del viajero",
+    blocks: [
+      { type: "paragraph", text: "El viajero se compromete a:" },
+      { type: "list", items: ["Proporcionar información correcta.", "Respetar los horarios establecidos.", "Seguir las instrucciones del guía y personal encargado.", "Cumplir las normas de los atractivos turísticos.", "Respetar las comunidades locales y el medio ambiente.", "Contar con la documentación necesaria para viajar.", "Informar cualquier necesidad especial antes de la reserva.", "Mantener una conducta adecuada durante el viaje."] },
+      { type: "paragraph", text: "La falta de presentación del viajero en el lugar y horario establecido podrá considerarse no presentación (no-show) y podrá generar la pérdida del servicio contratado sin derecho a reembolso." },
+    ],
+  },
+  {
+    number: "14",
+    id: "documentacion-requisitos",
+    title: "Documentación y requisitos de viaje",
+    blocks: [
+      { type: "paragraph", text: "El viajero es responsable de contar con:" },
+      { type: "list", items: ["Pasaporte o documento de identidad válido, según corresponda.", "Documentación migratoria requerida.", "Seguro de viaje, cuando sea recomendable o requerido.", "Documentación adicional solicitada para determinados servicios."] },
+      { type: "paragraph", text: "Dreamy Tours podrá orientar al viajero sobre los requisitos disponibles, pero la responsabilidad final de contar con documentación válida corresponde al pasajero." },
+    ],
+  },
+  {
+    number: "15",
+    id: "seguro-viaje",
+    title: "Seguro de viaje",
+    blocks: [
+      { type: "paragraph", text: "Dreamy Tours recomienda contratar un seguro de viaje con cobertura adecuada, especialmente para trekkings, actividades de aventura y viajes de varios días." },
+      { type: "paragraph", text: "El seguro puede incluir, según la póliza contratada, cobertura para asistencia médica, accidentes, equipaje, cancelaciones y otras eventualidades." },
+      { type: "paragraph", text: "Salvo que se indique expresamente en el programa contratado, el seguro de viaje no está incluido en el precio." },
+    ],
+  },
+  {
+    number: "16",
+    id: "equipaje",
+    title: "Equipaje",
+    blocks: [
+      { type: "paragraph", text: "Cada servicio puede tener condiciones específicas respecto al equipaje permitido." },
+      { type: "paragraph", text: "En los trekkings, el viajero deberá respetar las recomendaciones de peso y tipo de equipaje proporcionadas por Dreamy Tours." },
+      { type: "paragraph", text: "Los objetos personales son responsabilidad del viajero durante todo el viaje." },
+      { type: "paragraph", text: "Dreamy Tours no será responsable por pérdidas, daños o robos de objetos personales cuando estos sean consecuencia de la negligencia del propio viajero o de circunstancias ajenas a la empresa." },
+    ],
+  },
+  {
+    number: "19",
+    id: "proteccion-datos",
+    title: "Protección de datos personales",
+    blocks: [
+      { type: "paragraph", text: "Dreamy Tours se compromete a tratar los datos personales proporcionados por sus clientes de acuerdo con la legislación peruana aplicable en materia de protección de datos personales." },
+      { type: "paragraph", text: "Los datos proporcionados durante el proceso de reserva podrán utilizarse para:" },
+      { type: "list", items: ["Gestionar reservas.", "Emitir boletos y entradas.", "Coordinar servicios turísticos.", "Contactar al viajero.", "Brindar asistencia durante el viaje.", "Cumplir obligaciones legales y administrativas."] },
+      { type: "paragraph", text: "La información será gestionada de acuerdo con nuestra Política de Privacidad." },
+    ],
+  },
+  {
+    number: "20",
+    id: "atencion-comunicacion",
+    title: "Atención y comunicación con el viajero",
+    blocks: [
+      { type: "paragraph", text: "Dreamy Tours mantiene canales de comunicación para atender consultas, solicitudes y necesidades relacionadas con las reservas." },
+      { type: "paragraph", text: "El viajero debe proporcionar un número de teléfono, correo electrónico o medio de contacto válido para recibir información importante sobre su viaje." },
+      { type: "paragraph", text: "En caso de cambios operativos, Dreamy Tours utilizará los datos de contacto proporcionados por el cliente." },
+    ],
+  },
+  {
+    number: "21",
+    id: "aceptacion-terminos",
+    title: "Aceptación de los términos",
+    blocks: [
+      { type: "paragraph", text: "Al realizar una reserva o efectuar un pago por cualquiera de los servicios de Dreamy Tours, el viajero confirma que:" },
+      { type: "list", items: ["Ha leído los presentes Términos y Condiciones.", "Comprende las condiciones del servicio contratado.", "Ha recibido información sobre los servicios incluidos y no incluidos.", "Acepta las condiciones de pago, modificación y cancelación aplicables.", "Ha proporcionado información correcta para gestionar su reserva."] },
+    ],
+  },
+  {
+    number: "22",
+    id: "contacto",
+    title: "Contacto",
+    blocks: [
+      { type: "paragraph", text: "Para consultas sobre reservas, Camino Inca, trekking Salkantay, Machu Picchu, paquetes de viaje por Perú y Bolivia o cualquier otro servicio turístico, puedes comunicarte con nuestro equipo." },
+      { type: "paragraph", text: "Dreamy Tours" },
+      { type: "paragraph", text: "Agencia de viajes y operadora de turismo" },
+      { type: "paragraph", text: "Perú | Bolivia" },
+      { type: "paragraph", text: "Planifica tu viaje con nosotros y descubre Perú y Bolivia con el respaldo de un equipo local." },
+    ],
+  },
+];
 ---
 
-<div class="legal-page mx-auto max-w-5xl space-y-9">
-  <div
-    class="flex flex-wrap items-center gap-2"
-    aria-label={copy.labels.join(", ")}
-  >
-    {
-      copy.labels.map((label, index) => (
-        <span
-          class:list={[
-            "rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-[0.14em]",
-            index === 0
-              ? "border-primary/20 bg-primary/10 text-primary"
-              : "border-secondary/20 bg-secondary/10 text-secondary",
-          ]}
-        >
-          {label}
-        </span>
-      ))
-    }
-  </div>
-
-  <aside
-    class="relative overflow-hidden rounded-2xl border border-border border-l-4 border-l-secondary bg-card p-6 shadow-sm sm:p-8"
-    aria-labelledby="terms-notice"
-  >
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-      <div
-        class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-secondary/20 bg-secondary/10 text-secondary"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="size-6"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-          ><path
-            d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
-          ></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg
-        >
+<div class="not-prose mx-auto max-w-7xl">
+  <header class="relative isolate overflow-hidden rounded-[2rem] border border-primary/15 bg-card px-6 py-9 shadow-[0_24px_55px_-42px_color-mix(in_oklab,var(--foreground)_62%,transparent)] sm:px-9 sm:py-11">
+    <span class="pointer-events-none absolute inset-0 -z-10 [background-image:radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_32%,transparent)_1px,transparent_1.25px)] [background-size:1rem_1rem] [-webkit-mask-image:radial-gradient(ellipse_42rem_25rem_at_94%_6%,black_0%,black_34%,transparent_78%)] [mask-image:radial-gradient(ellipse_42rem_25rem_at_94%_6%,black_0%,black_34%,transparent_78%)]" aria-hidden="true"></span>
+    <span class="pointer-events-none absolute -right-24 -top-32 -z-10 size-96 rounded-full border border-primary/15" aria-hidden="true"></span>
+    <div class="relative mx-auto max-w-5xl text-center">
+      <h1 class="text-balance text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"><span class="text-primary">Bienvenido a</span> <span class="text-secondary">Dreamy Tours</span>.</h1>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <span class="rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary-foreground">Legal</span>
+        <time datetime="2026-08" class="text-sm font-semibold text-muted-foreground">Última actualización: agosto de 2026</time>
       </div>
-      <div>
-        <h2 id="terms-notice" class="text-xl font-bold tracking-tight">
-          {copy.noticeTitle}
-        </h2><p class="mt-2 max-w-3xl leading-7 text-muted-foreground">
-          {copy.noticeText}
-        </p>
-      </div>
+      <p class="mt-7 text-pretty text-lg leading-8 text-foreground md:text-xl md:leading-9">Somos una agencia de viajes y operador turístico especializado en experiencias de viaje en Perú y Bolivia, incluyendo Camino Inca a Machu Picchu, trekking Salkantay, otros trekkings en los Andes, tours culturales y paquetes de viaje personalizados.</p>
+      <p class="mx-auto mt-5 max-w-4xl text-pretty leading-8 text-muted-foreground md:text-lg">Al realizar una consulta, reserva o compra de cualquiera de nuestros servicios, el viajero declara haber leído y aceptado los presentes Términos y Condiciones.</p>
     </div>
-  </aside>
+  </header>
 
-  <section aria-labelledby="terms-itineraries">
-    <div class="mb-4 flex items-center gap-3">
-      <span
-        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
-        >01</span
-      ><h2 id="terms-itineraries" class="text-2xl font-bold tracking-tight">
-        {copy.itinerary.title}
-      </h2>
-    </div>
-    <article
-      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none sm:p-7"
-    >
-      <span
-        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
-        aria-hidden="true"></span><div class="pl-3">
-        <p class="max-w-4xl leading-7 text-muted-foreground">
-          {copy.itinerary.text}
-        </p><p class="mt-4 font-semibold leading-7 text-primary">
-          {copy.itinerary.highlight}
-        </p>
-      </div>
-    </article>
-  </section>
-
-  <section aria-labelledby="terms-responsibility">
-    <div class="mb-4 flex items-center gap-3">
-      <span
-        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground"
-        >02</span
-      ><h2 id="terms-responsibility" class="text-2xl font-bold tracking-tight">
-        {copy.responsibility.title}
-      </h2>
-    </div>
-    <div class="space-y-5">
-      <article
-        class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
-      >
-        <span
-          class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-secondary"
-          aria-hidden="true"></span><p
-          class="max-w-4xl pl-3 leading-7 text-muted-foreground"
-        >
-          {copy.responsibility.intro}
-        </p>
-      </article>
-      <article
-        class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
-      >
-        <span
-          class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
-          aria-hidden="true"></span><div class="pl-3">
-          <h3 class="text-lg font-bold">
-            {copy.responsibility.requirementsTitle}
-          </h3><p class="mt-2 max-w-4xl leading-7 text-muted-foreground">
-            {copy.responsibility.requirementsText}
-          </p><ul
-            class="mt-4 grid list-none gap-2 p-0 text-sm leading-6 text-muted-foreground sm:grid-cols-2"
-            role="list"
-          >
-            {
-              copy.responsibility.requirements.map((requirement) => (
-                <li class="flex gap-2">
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="mt-0.5 size-4 shrink-0 text-primary"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="m5 12 4 4L19 6" />
-                    </svg>
-                    <span>{requirement}</span>
-                  </>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </article>
-      <ul class="grid list-none gap-4 p-0 md:grid-cols-2" role="list">
-        {
-          copy.responsibility.restrictions.map(([title, text], index) => (
-            <li
-              class:list={[
-                "relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none",
-                index === 4 && "md:col-span-2",
-              ]}
-            >
-              <>
-                <span
-                  class:list={[
-                    "absolute inset-y-4 left-0 w-1 rounded-r-full",
-                    index % 2 === 0 ? "bg-secondary" : "bg-primary",
-                  ]}
-                  aria-hidden="true"
-                />
-                <div class="pl-3">
-                  <>
-                    <h3
-                      class:list={[
-                        "font-bold",
-                        index % 2 === 0 ? "text-secondary" : "text-primary",
-                      ]}
-                    >
-                      {title}
-                    </h3>
-                    <p class="mt-2 text-sm leading-6 text-muted-foreground">
-                      {text}
-                    </p>
-                  </>
-                </div>
-              </>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  <section aria-labelledby="terms-insurance">
-    <div class="mb-4 flex items-center gap-3">
-      <span
-        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
-        >03</span
-      ><h2 id="terms-insurance" class="text-2xl font-bold tracking-tight">
-        {copy.insurance.title}
-      </h2>
-    </div>
-    <article
-      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
-    >
-      <span
-        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
-        aria-hidden="true"></span><div class="pl-3">
-        <p class="max-w-4xl leading-7 text-muted-foreground">
-          {copy.insurance.text}
-        </p><div
-          class="mt-5 rounded-xl border border-primary/15 bg-primary/5 p-4"
-        >
-          <h3 class="font-bold text-primary">{copy.insurance.coverTitle}</h3><ul
-            class="mt-3 space-y-2 text-sm leading-6 text-muted-foreground"
-          >
-            {
-              copy.insurance.coverage.map((item) => (
-                <li class="flex gap-2">
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="mt-0.5 size-4 shrink-0 text-primary"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="m5 12 4 4L19 6" />
-                    </svg>
-                    <span>{item}</span>
-                  </>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </div>
-    </article>
-  </section>
-
-  <section aria-labelledby="terms-prices">
-    <div class="mb-4 flex items-center gap-3">
-      <span
-        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground"
-        >04</span
-      ><h2 id="terms-prices" class="text-2xl font-bold tracking-tight">
-        {copy.prices.title}
-      </h2>
-    </div>
-    <article
-      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
-    >
-      <span
-        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-secondary"
-        aria-hidden="true"></span><div class="pl-3">
-        <ul class="space-y-3 leading-7 text-muted-foreground">
-          {
-            copy.prices.details.map((detail) => (
-              <li class="flex gap-3">
-                <>
-                  <span
-                    class="mt-2 size-2 shrink-0 rounded-full bg-secondary"
-                    aria-hidden="true"
-                  />
-                  <span>{detail}</span>
-                </>
-              </li>
-            ))
-          }
-        </ul><dl class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {
-            copy.prices.cards.map(([label, value, detail], index) => (
-              <div
-                class:list={[
-                  "rounded-xl border p-4",
-                  index % 2 === 0
-                    ? "border-primary/15 bg-primary/5"
-                    : "border-secondary/15 bg-secondary/5",
-                ]}
-              >
-                <>
-                  <dt class="text-sm font-semibold text-muted-foreground">
-                    {label}
-                  </dt>
-                  <dd
-                    class:list={[
-                      "mt-1 text-lg font-bold",
-                      index % 2 === 0 ? "text-primary" : "text-secondary",
-                    ]}
-                  >
-                    {value}
-                  </dd>
-                  <dd class="mt-1 text-xs leading-5 text-muted-foreground">
-                    {detail}
-                  </dd>
-                </>
+  <div class="mt-8 space-y-6">
+      {termsSections.map((section, sectionIndex) => (
+        <section class="relative" aria-labelledby={`terms-${section.id}-title`}>
+          <article class:list={["relative overflow-hidden rounded-[1.5rem] border bg-card px-6 py-7 shadow-[0_20px_44px_-38px_color-mix(in_oklab,var(--foreground)_65%,transparent)] sm:px-8 sm:py-8", sectionIndex === termsSections.length - 1 ? "border-primary/20" : "border-border"]}>
+            <span class:list={["absolute inset-y-6 left-0 w-1 rounded-r-full", sectionIndex % 2 === 0 ? "bg-primary" : "bg-secondary"]} aria-hidden="true"></span>
+            <header class="relative flex items-start gap-4">
+              <span class:list={["grid size-10 shrink-0 place-items-center rounded-xl text-sm font-bold shadow-sm", sectionIndex % 2 === 0 ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"]}>{section.number}</span>
+              <div class="min-w-0 pt-1">
+                <p class="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Cláusula {section.number}</p>
+                <h2 id={`terms-${section.id}-title`} class="mt-1 text-balance text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{section.title}</h2>
               </div>
-            ))
-          }
-        </dl><p class="mt-4 text-sm font-medium text-secondary">
-          {copy.prices.note}
-        </p>
-      </div>
-    </article>
-  </section>
+            </header>
 
-  <section aria-labelledby="terms-bookings">
-    <div class="mb-4 flex items-center gap-3">
-      <span
-        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
-        >05</span
-      ><h2 id="terms-bookings" class="text-2xl font-bold tracking-tight">
-        {copy.bookings.title}
-      </h2>
-    </div>
-    <article
-      class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-7"
-    >
-      <span
-        class="absolute inset-y-5 left-0 w-1 rounded-r-full bg-primary"
-        aria-hidden="true"></span><div class="pl-3">
-        <p class="max-w-4xl leading-7 text-muted-foreground">
-          {copy.bookings.text}
-        </p><p class="mt-4 max-w-4xl leading-7 text-muted-foreground">
-          {copy.bookings.details}
-        </p><div
-          class="mt-5 flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <span class="text-sm font-bold">{copy.bookings.emailLabel}</span><a
-            href="mailto:info@dreamy.tours"
-            class="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
-            >info@dreamy.tours</a>
-        </div>
-      </div>
-    </article>
-  </section>
-
-  <section aria-labelledby="terms-changes">
-    <div class="mb-4 flex items-center gap-3">
-      <span
-        class="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground"
-        >06</span
-      ><h2 id="terms-changes" class="text-2xl font-bold tracking-tight">
-        {copy.changes.title}
-      </h2>
-    </div>
-    <article
-      class="relative overflow-hidden rounded-2xl border border-secondary/20 bg-secondary/5 p-6 shadow-sm sm:p-7"
-    >
-      <div
-        class="absolute -right-16 -top-16 size-40 rounded-full bg-secondary/10 blur-3xl"
-        aria-hidden="true"
-      >
-      </div><p class="relative max-w-4xl leading-7 text-muted-foreground">
-        {copy.changes.text}
-      </p>
-    </article>
-  </section>
+            <div class="relative mt-6 max-w-[78ch] space-y-5 text-pretty leading-8 text-muted-foreground md:text-lg">
+              {section.blocks.map((block) =>
+                block.type === "paragraph" ? (
+                  <p class="m-0">{block.text}</p>
+                ) : block.type === "ordered-list" ? (
+                  <ol class="grid list-none gap-3 p-0" role="list">
+                    {block.items.map((item, itemIndex) => (
+                      <li class="flex items-start gap-3">
+                        <span class="mt-1 grid size-6 shrink-0 place-items-center rounded-full border border-primary/20 bg-primary/10 text-xs font-bold text-primary">{itemIndex + 1}</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <ul class="grid list-none gap-3 p-0 sm:grid-cols-2" role="list">
+                    {block.items.map((item) => (
+                      <li class="flex items-start gap-3">
+                        <span class:list={["mt-2.5 size-2 shrink-0 rounded-full", sectionIndex % 2 === 0 ? "bg-primary" : "bg-secondary"]} aria-hidden="true"></span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ),
+              )}
+            </div>
+          </article>
+        </section>
+      ))}
+  </div>
 </div>
