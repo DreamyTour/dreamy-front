@@ -34,6 +34,7 @@ interface ContentFrontmatter {
   seo?: ManualSEO;
   heroEyebrow?: string;
   heroImage?: string;
+  heroMobileImage?: string;
   heroImageAlt?: string;
 }
 
@@ -197,6 +198,7 @@ const contentEyebrow =
 const heroImage =
   (contentFrontmatter?.heroImage as string | undefined) ||
   "/imagenes/sobre_nosotros.avif";
+const heroMobileImage = contentFrontmatter?.heroMobileImage as string | undefined;
 const heroImageAlt =
   (contentFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
 const ContentComponent = contentComponent?.default;
@@ -213,13 +215,22 @@ const ContentComponent = contentComponent?.default;
       />
       <div class="content-shell content-shell--static mx-auto w-full">
         <section class="content-hero content-hero--static relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
-          <img
-            src={heroImage}
-            alt={heroImageAlt}
-            class="hero-bg-img"
-            loading="eager"
-            fetchpriority="high"
-          />
+          <picture class="absolute inset-0 block">
+            {
+              heroMobileImage && (
+                <source media="(max-width: 767px)" srcset={heroMobileImage} />
+              )
+            }
+            <img
+              src={heroImage}
+              alt={heroImageAlt}
+              class="h-full w-full object-cover object-top"
+              loading="eager"
+              fetchpriority="high"
+              width="2172"
+              height="724"
+            />
+          </picture>
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"
             aria-hidden="true"

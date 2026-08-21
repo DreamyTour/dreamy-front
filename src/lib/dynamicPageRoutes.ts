@@ -12,6 +12,7 @@ export interface ContentFrontmatter {
 	lang: Lang;
 	seo?: ManualSEO;
 	heroImage?: string;
+	heroMobileImage?: string;
 	heroImageAlt?: string;
 }
 
