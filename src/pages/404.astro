@@ -1,13 +1,10 @@
 ---
 export const prerender = false;
 
+import { ArrowLeft, ArrowRight, Compass, House, MapPinned } from "lucide-react";
+
 import Layout from "@/layouts/main.astro";
 import { DEFAULT_LANG, type Lang } from "@/lib/i18n";
-
-/**
- * 404 Page (SSR)
- * Detectamos el idioma desde la URL en el servidor y renderizamos los textos correspondientes.
- */
 
 const pathname = Astro.url.pathname;
 const firstSegment = pathname.split("/").filter(Boolean)[0];
@@ -18,133 +15,244 @@ if (firstSegment && ["es", "en", "pt"].includes(firstSegment)) {
 }
 
 type ContentShape = {
-  badge: string;
-  title: string;
+  eyebrow: string;
+  titleBefore: string;
+  titleAccent: string;
   description: string;
-  primaryCta: string;
-  countdownLabel: string;
+  goBackCta: string;
+  packagesCta: string;
+  homeCta: string;
+  routeNote: string;
+  imageAlt: string;
+  imageLabel: string;
+  imageCaption: string;
 };
 
 const contentByLang: Record<Lang, ContentShape> = {
   en: {
-    badge: "Detour in the Andes",
-    title: "Lost in the mountains?",
+    eyebrow: "Route 404",
+    titleBefore: "This route is ",
+    titleAccent: "off the map.",
     description:
-      "The page you're looking for doesn't exist or has moved. Let's get you back on the right path.",
-    primaryCta: "Go back home",
-    countdownLabel: "Redirect in",
+      "The page you were looking for may have moved, changed its name or never existed. Let’s find a new direction for your journey.",
+    goBackCta: "Go back",
+    packagesCta: "View Peru packages",
+    homeCta: "Go to home",
+    routeNote: "Every great adventure starts by finding the right path.",
+    imageAlt: "Illustration of a traveler checking a map after getting lost",
+    imageLabel: "Recalculating route",
+    imageCaption: "Your next adventure is still waiting for you.",
   },
   es: {
-    badge: "Desvío en los Andes",
-    title: "¿Te perdiste en la montaña?",
+    eyebrow: "Ruta 404",
+    titleBefore: "Esta ruta no está ",
+    titleAccent: "en el mapa.",
     description:
-      "La página que buscas no existe o se mudó. Te llevamos de vuelta al camino correcto.",
-    primaryCta: "Volver al inicio",
-    countdownLabel: "Redirección en",
+      "La página que buscabas pudo cambiar de lugar, de nombre o quizá nunca existió. Busquemos una nueva dirección para tu viaje.",
+    goBackCta: "Regresar",
+    packagesCta: "Ver paquetes de Perú",
+    homeCta: "Ir al inicio",
+    routeNote: "Toda gran aventura comienza al encontrar el camino correcto.",
+    imageAlt: "Ilustración de un viajero consultando un mapa tras perderse",
+    imageLabel: "Recalculando ruta",
+    imageCaption: "Tu próxima aventura todavía te está esperando.",
   },
   pt: {
-    badge: "Desvio nos Andes",
-    title: "Perdido nas montanhas?",
+    eyebrow: "Rota 404",
+    titleBefore: "Esta rota não está ",
+    titleAccent: "no mapa.",
     description:
-      "A página que você procura não existe ou mudou de lugar. Vamos te colocar de volta no caminho certo.",
-    primaryCta: "Voltar ao início",
-    countdownLabel: "Redirecionamento em",
+      "A página que você procurava pode ter mudado de lugar, de nome ou talvez nunca tenha existido. Vamos encontrar uma nova direção para a sua viagem.",
+    goBackCta: "Voltar",
+    packagesCta: "Ver pacotes do Peru",
+    homeCta: "Ir ao início",
+    routeNote: "Toda grande aventura começa ao encontrar o caminho certo.",
+    imageAlt: "Ilustração de um viajante consultando um mapa depois de se perder",
+    imageLabel: "Recalculando rota",
+    imageCaption: "Sua próxima aventura ainda está esperando por você.",
   },
 };
 
 const content = contentByLang[lang];
 const homeUrl = lang === DEFAULT_LANG ? "/" : `/${lang}/`;
+const packagesUrlByLang: Record<Lang, string> = {
+  en: "/peru-packages",
+  es: "/es/paquetes-peru",
+  pt: "/pt/pacotes-peru",
+};
+const packagesUrl = packagesUrlByLang[lang];
 
 const seoProps = {
-  title: `404 - ${content.title}`,
+  title: `404 - ${content.titleBefore}${content.titleAccent}`,
   description: content.description,
   type: "website" as const,
-  lang: lang,
+  lang,
   robots: "noindex, nofollow",
 };
 ---
 
-<Layout seo={seoProps} lang={lang}>
-  <section
-    class="relative min-h-[calc(100vh-220px)] flex items-center justify-center px-6 py-16"
-  >
-    <div class="max-w-2xl w-full text-center">
-      <!-- Badge -->
-      <span
-        class="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-primary shadow-sm backdrop-blur"
-      >
-        <span class="h-2 w-2 rounded-full bg-secondary"></span>
-        <span>{content.badge}</span>
-      </span>
+<Layout seo={seoProps} lang={lang} lcpImageUrl="/imagenes/404.webp">
+  <section class="relative isolate overflow-hidden bg-background px-6 py-12 md:py-16 lg:py-20">
+    <span
+      class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_28%,transparent)_1px,transparent_1.25px)] bg-[size:1.1rem_1.1rem] [mask-image:radial-gradient(ellipse_48rem_30rem_at_88%_42%,black,transparent_74%)]"
+      aria-hidden="true"></span>
+    <span
+      class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--secondary)_22%,transparent)_1px,transparent_1.25px)] bg-[position:0.55rem_0.55rem] bg-[size:1.1rem_1.1rem] [mask-image:radial-gradient(ellipse_38rem_24rem_at_10%_72%,black,transparent_72%)]"
+      aria-hidden="true"></span>
 
-      <!-- Copy principal -->
-      <div class="mt-12 space-y-6">
+    <div class="mx-auto grid min-h-[calc(100svh-13rem)] max-w-7xl items-center gap-12 lg:grid-cols-[minmax(0,0.96fr)_minmax(25rem,0.84fr)] lg:gap-20">
+      <div class="relative max-w-2xl py-4 lg:col-start-2 lg:row-start-1 lg:py-8">
+        <p class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-primary shadow-[0_12px_26px_-22px_color-mix(in_oklab,var(--primary)_80%,transparent)] backdrop-blur-sm">
+          <Compass className="size-4" strokeWidth={2} aria-hidden="true" />
+          {content.eyebrow}
+        </p>
+
         <p
-          class="text-sm font-semibold uppercase tracking-[0.45em] text-foreground/70"
+          class="pointer-events-none mt-7 select-none text-[clamp(10rem,25vw,17.5rem)] font-black leading-[0.76] tracking-[-0.1em] text-primary"
+          aria-hidden="true">404</p
         >
-          Error 404
-        </p>
-        <h1
-          class="text-6xl md:text-8xl font-black tracking-[-0.04em] text-foreground"
-        >
-          {content.title}
-        </h1>
-        <p class="text-lg text-foreground/70 max-w-md mx-auto">
-          {content.description}
-        </p>
+
+        <div class="relative mt-5">
+          <p class="text-sm font-bold uppercase tracking-[0.22em] text-secondary">
+            Dreamy Tours · Perú & Bolivia
+          </p>
+          <h1 class="mt-4 max-w-xl text-balance text-4xl font-black leading-[0.98] tracking-[-0.055em] text-primary sm:text-5xl md:text-6xl">
+            {content.titleBefore}<span class="text-secondary"
+              >{content.titleAccent}</span
+            >
+          </h1>
+          <p class="mt-6 max-w-xl text-pretty text-lg leading-8 text-muted-foreground md:text-xl md:leading-9">
+            {content.description}
+          </p>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <button
+              type="button"
+              data-404-go-back
+              data-home-url={homeUrl}
+              class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary/30 bg-background/80 px-6 py-3 text-sm font-bold text-primary shadow-[0_16px_28px_-24px_color-mix(in_oklab,var(--primary)_85%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" strokeWidth={2.25} aria-hidden="true" />
+              {content.goBackCta}
+            </button>
+            <a
+              href={packagesUrl}
+              class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-secondary/30 bg-background/80 px-6 py-3 text-sm font-bold text-secondary shadow-[0_16px_28px_-24px_color-mix(in_oklab,var(--secondary)_85%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:border-secondary/50 hover:bg-secondary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+            >
+              <MapPinned className="size-4" strokeWidth={2.25} aria-hidden="true" />
+              {content.packagesCta}
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.25} aria-hidden="true" />
+            </a>
+            <a
+              href={homeUrl}
+              class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[0_18px_30px_-18px_color-mix(in_oklab,var(--primary)_90%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_22px_34px_-18px_color-mix(in_oklab,var(--primary)_95%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              <House className="size-4" strokeWidth={2.25} aria-hidden="true" />
+              {content.homeCta}
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.25} aria-hidden="true" />
+            </a>
+          </div>
+
+          <p class="mt-8 flex max-w-lg items-start gap-3 text-sm leading-6 text-muted-foreground">
+            <span class="mt-2 h-px w-9 shrink-0 bg-secondary" aria-hidden="true"></span>
+            {content.routeNote}
+          </p>
+        </div>
       </div>
 
-      <!-- CTA -->
-      <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-        <a
-          href={homeUrl}
-          class="inline-flex items-center justify-center gap-3 rounded-full bg-secondary px-7 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary/90"
-        >
-          <span>{content.primaryCta}</span>
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
-
-      <!-- Countdown -->
-      <div
-        class="mt-8 inline-flex items-center gap-3 rounded-full border border-primary/10 bg-white/75 px-4 py-3 text-sm text-foreground/70 shadow-sm backdrop-blur"
-      >
+      <figure class="relative mx-auto w-full max-w-xl lg:col-start-1 lg:row-start-1 lg:justify-self-start">
         <span
-          class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary"
-          >⏳</span
-        >
-        <span>
-          <span>{content.countdownLabel}</span>
-          <strong class="ml-1 font-semibold text-foreground"
-            ><span id="redirect-countdown">5</span>s</strong
-          >
-        </span>
-      </div>
+          class="pointer-events-none absolute -left-4 top-[17%] size-16 rounded-full border border-secondary/35 bg-background/80"
+          aria-hidden="true"></span>
+        <span
+          class="pointer-events-none absolute -right-5 bottom-[22%] size-20 rounded-full border border-primary/25 bg-background/75"
+          aria-hidden="true"></span>
+        <div class="relative aspect-square overflow-hidden rounded-[2.4rem] border border-primary/20 bg-background p-5 shadow-[0_32px_70px_-40px_rgb(15_23_42_/_0.35)] sm:p-8">
+          <span
+            class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_35%,transparent)_1px,transparent_1.2px)] bg-[size:1rem_1rem] opacity-50 [mask-image:radial-gradient(circle_at_52%_42%,black,transparent_68%)]"
+            aria-hidden="true"></span>
+          <span
+            class="pointer-events-none absolute left-[14%] top-[15%] h-px w-[24%] bg-secondary/70"
+            aria-hidden="true"></span>
+          <span
+            class="pointer-events-none absolute right-[13%] top-[15%] grid size-12 place-items-center rounded-full border border-secondary/25 bg-background/90 text-secondary shadow-sm"
+            aria-hidden="true">
+            <Compass className="size-5" strokeWidth={1.7} />
+          </span>
+          <img
+            src="/imagenes/404.webp"
+            alt={content.imageAlt}
+            width="1080"
+            height="1080"
+            fetchpriority="high"
+            decoding="async"
+            sizes="(min-width: 1024px) 40vw, (min-width: 640px) 32rem, calc(100vw - 3rem)"
+            class="traveler-motion relative z-10 size-full object-contain object-center drop-shadow-[0_24px_22px_rgba(46,43,34,0.22)]"
+          />
+        </div>
+        <figcaption class="relative z-20 -mt-8 ml-5 max-w-[18rem] rounded-2xl border border-secondary/20 bg-background px-5 py-4 shadow-[0_20px_38px_-26px_rgb(15_23_42_/_0.3)] sm:ml-8">
+          <p class="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.15em] text-secondary">
+            <span class="size-1.5 rounded-full bg-secondary" aria-hidden="true"></span>
+            {content.imageLabel}
+          </p>
+          <p class="mt-1.5 text-sm font-semibold leading-5 text-foreground">
+            {content.imageCaption}
+          </p>
+        </figcaption>
+      </figure>
     </div>
   </section>
-
-  <!-- Countdown + redirect -->
-  <script is:inline define:vars={{ homeUrl }}>
-    (function () {
-      let countdown = 5;
-      const node = document.getElementById("redirect-countdown");
-
-      const id = window.setInterval(function () {
-        countdown -= 1;
-        if (node && countdown >= 0) node.textContent = String(countdown);
-        if (countdown <= 0) {
-          window.clearInterval(id);
-          window.location.href = homeUrl;
-        }
-      }, 1000);
-
-      // Limpieza oficial de Astro View Transitions: si el usuario hace clic
-      // en un enlace (ej: logo) se aborta el intervalo de inmediato.
-      const cleanup = function () {
-        window.clearInterval(id);
-        document.removeEventListener("astro:before-preparation", cleanup);
-      };
-      document.addEventListener("astro:before-preparation", cleanup);
-    })();
-  </script>
 </Layout>
+
+<script>
+  const setupGoBack = () => {
+    const goBackButton = document.querySelector("[data-404-go-back]");
+
+    if (!(goBackButton instanceof HTMLButtonElement) || goBackButton.dataset.ready) {
+      return;
+    }
+
+    goBackButton.dataset.ready = "true";
+    goBackButton.addEventListener("click", () => {
+      const fallbackUrl = goBackButton.dataset.homeUrl || "/";
+
+      if (window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+
+      window.location.assign(fallbackUrl);
+    });
+  };
+
+  setupGoBack();
+  document.addEventListener("astro:page-load", setupGoBack);
+</script>
+
+<style>
+  .traveler-motion {
+    translate: 0 0;
+    rotate: 0deg;
+    animation: traveler-float 4.8s ease-in-out infinite;
+    will-change: translate, rotate;
+  }
+
+  @keyframes traveler-float {
+    0%,
+    100% {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+
+    50% {
+      translate: 0 -0.625rem;
+      rotate: -0.5deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .traveler-motion {
+      animation: none;
+    }
+  }
+</style>

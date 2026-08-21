@@ -170,7 +170,7 @@ export async function getBlogIndexPaths({
 		allPaths.push(
 			...paginate(blogsList, {
 				params: localized ? { lang } : undefined,
-				pageSize: 9,
+				pageSize: 12,
 				props: {
 					lang,
 					searchBlogs: blogsList,

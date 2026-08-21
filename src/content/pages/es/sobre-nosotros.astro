@@ -46,11 +46,11 @@ const copyByLang = {
   es: {
     intro: {
       eyebrow: "Sobre nosotros",
-      titleBefore: "Conocer ",
+      titleBefore: "Dreamy Tours | Agencia de viajes y operador turístico en ",
       titleAccent: "Perú y Bolivia",
-      titleAfter: " de manera segura, organizada y auténtica.",
+      titleAfter: "",
       paragraphs: [
-        "Dreamy Tours es una agencia de viajes y operador turístico especializado en Perú y Bolivia, dedicada a diseñar y operar experiencias de viaje adaptadas a cada viajero. Ofrecemos tours, trekkings, circuitos y programas personalizados, combinando conocimiento local, planificación profesional y atención personalizada en cada etapa del viaje.",
+        "Dedicada a diseñar y operar experiencias de viaje adaptadas a cada viajero. Ofrecemos tours, trekkings, circuitos y programas personalizados, combinando conocimiento local, planificación profesional y atención personalizada en cada etapa del viaje.",
         "Nuestro propósito es que cada viajero pueda descubrir Perú y Bolivia de manera segura, organizada y auténtica, contando con un equipo que lo acompañe durante todo el proceso.",
       ],
       asideLabel: "Experiencias que organizamos",
@@ -184,11 +184,11 @@ const copyByLang = {
   en: {
     intro: {
       eyebrow: "About us",
-      titleBefore: "Explore ",
+      titleBefore: "Dreamy Tours | Travel agency and tour operator in ",
       titleAccent: "Peru and Bolivia",
-      titleAfter: " safely, seamlessly and authentically.",
+      titleAfter: "",
       paragraphs: [
-        "Dreamy Tours is a travel agency and tour operator specializing in Peru and Bolivia. We design and operate travel experiences tailored to each traveler, from tours and treks to multi-destination journeys and custom itineraries, combining local expertise, professional planning and personal support at every stage.",
+        "We design and operate travel experiences tailored to each traveler, from tours and treks to multi-destination journeys and custom itineraries, combining local expertise, professional planning and personal support at every stage.",
         "Our purpose is to help every traveler discover Peru and Bolivia safely, smoothly and authentically, with a team by their side throughout the journey.",
       ],
       asideLabel: "Travel experiences we organize",
@@ -322,11 +322,12 @@ const copyByLang = {
   pt: {
     intro: {
       eyebrow: "Sobre nós",
-      titleBefore: "Conheça o ",
-      titleAccent: "Peru e a Bolívia",
-      titleAfter: " com segurança, organização e autenticidade.",
+      titleBefore:
+        "Dreamy Tours | Agência de viagens e operadora de turismo no ",
+      titleAccent: "Peru e na Bolívia",
+      titleAfter: "",
       paragraphs: [
-        "A Dreamy Tours é uma agência de viagens e operadora de turismo especializada em Peru e Bolívia, dedicada a planejar e oferecer experiências de viagem pensadas de acordo com o perfil de cada viajante. Trabalhamos com tours, trekkings, circuitos e roteiros personalizados, unindo conhecimento local, planejamento profissional e atendimento personalizado em todas as etapas da viagem.",
+        "Dedicada a planejar e oferecer experiências de viagem pensadas de acordo com o perfil de cada viajante. Trabalhamos com tours, trekkings, circuitos e roteiros personalizados, unindo conhecimento local, planejamento profissional e atendimento personalizado em todas as etapas da viagem.",
         "Nosso propósito é tornar possível que cada viajante conheça o Peru e a Bolívia de forma segura, organizada e autêntica, contando com uma equipe preparada para orientar e acompanhar cada etapa da sua viagem.",
       ],
       asideLabel: "Experiências que organizamos",
@@ -489,8 +490,8 @@ const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)
           id="about-intro-title"
           class="mt-5 max-w-4xl text-balance text-4xl font-bold tracking-tight md:text-6xl md:leading-[1.02]"
         >
-          {copy.intro.titleBefore}<span class="text-primary"
-            >{copy.intro.titleAccent}</span
+          <span class="text-primary">{copy.intro.titleBefore}</span><span
+            class="text-secondary">{copy.intro.titleAccent}</span
           >{copy.intro.titleAfter}
         </h2>
         <div
