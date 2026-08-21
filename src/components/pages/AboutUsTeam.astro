@@ -10,8 +10,8 @@ const lang = Astro.props.lang ?? "es";
 const copyByLang = {
   es: {
     manager: {
-      eyebrow: "Mensaje del Gerente General",
-      title: "Cada experiencia cuenta una historia",
+      titleBefore: "Tu viaje comienza con una ",
+      titleAccent: "buena planificación",
       quote:
         "Cada experiencia cuenta una historia, y en Dreamy Tours queremos ser parte de la tuya.",
       paragraphs: [
@@ -60,8 +60,8 @@ const copyByLang = {
   },
   en: {
     manager: {
-      eyebrow: "A message from our leadership",
-      title: "Every experience tells a story",
+      titleBefore: "Your journey begins with ",
+      titleAccent: "thoughtful planning",
       quote:
         "Every experience tells a story, and at Dreamy Tours we want to be part of yours.",
       paragraphs: [
@@ -113,8 +113,8 @@ const copyByLang = {
   },
   pt: {
     manager: {
-      eyebrow: "Mensagem do Gerente Geral",
-      title: "Cada experiência conta uma história",
+      titleBefore: "Sua viagem começa com um ",
+      titleAccent: "bom planejamento",
       quote:
         "Cada experiência conta uma história, e na Dreamy Tours queremos fazer parte da sua.",
       paragraphs: [
@@ -310,15 +310,13 @@ const operatingDepartments = [
       </figure>
 
       <div class="py-1 text-foreground lg:py-4">
-        <p class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
-          <span class="h-px w-9 bg-primary" aria-hidden="true"></span>
-          {copy.manager.eyebrow}
-        </p>
         <h2
           id="manager-message-title"
-          class="mt-5 max-w-2xl text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl"
+          class="max-w-2xl text-balance text-4xl font-bold tracking-tight text-primary md:text-5xl"
         >
-          {copy.manager.title}
+          {copy.manager.titleBefore}<span class="text-secondary"
+            >{copy.manager.titleAccent}</span
+          >
         </h2>
 
         <blockquote class="relative mt-7 border-l-2 border-secondary pl-5 md:pl-6">
@@ -326,7 +324,7 @@ const operatingDepartments = [
             class="pointer-events-none absolute -left-1 top-[-1.3rem] font-serif text-6xl leading-none text-secondary"
             aria-hidden="true">“</span
           >
-          <p class="m-0 max-w-2xl text-balance text-xl font-semibold leading-8 text-foreground md:text-2xl md:leading-9">
+          <p class="m-0 max-w-2xl text-balance text-xl font-semibold italic leading-8 text-foreground md:text-2xl md:leading-9">
             {copy.manager.quote}
           </p>
         </blockquote>
@@ -334,14 +332,6 @@ const operatingDepartments = [
         <div class="mt-7 max-w-2xl space-y-4 text-pretty leading-7 text-muted-foreground md:text-lg md:leading-8">
           <p class="m-0">{copy.manager.paragraphs[0]}</p>
           <p class="m-0">{copy.manager.paragraphs[1]}</p>
-        </div>
-
-        <div class="mt-8 flex items-center gap-4">
-          <span class="h-px w-12 bg-secondary" aria-hidden="true"></span>
-          <div>
-            <p class="m-0 font-bold tracking-tight text-foreground">{copy.manager.name}</p>
-            <p class="m-0 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{copy.manager.role}</p>
-          </div>
         </div>
       </div>
     </div>
