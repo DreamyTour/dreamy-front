@@ -1,4 +1,5 @@
 import * as React from "react";
+import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import { normalizeLists } from "@/lib/strapiBlocks";
 import type { StrapiBlock, StrapiBlockChild } from "@/types/tours";
 
@@ -15,24 +16,7 @@ interface Props {
 }
 
 function renderTextNodes(children: StrapiBlockChild[]) {
-	return children.map((child) => {
-		if (!child.text) return null;
-
-		let textElement: React.ReactNode = child.text;
-		if (child.bold) textElement = <strong>{textElement}</strong>;
-		if (child.italic) textElement = <em>{textElement}</em>;
-		if (child.underline) textElement = <u>{textElement}</u>;
-		if (child.strikethrough) textElement = <s>{textElement}</s>;
-		if (child.code) {
-			textElement = (
-				<code className="rounded bg-gray-100 px-1 text-sm">{textElement}</code>
-			);
-		}
-
-		return (
-			<React.Fragment key={JSON.stringify(child)}>{textElement}</React.Fragment>
-		);
-	});
+	return <StrapiRichTextInline nodes={children} />;
 }
 
 function getIncludedListStyle(

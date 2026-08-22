@@ -149,6 +149,12 @@ export function getYouTubeVideoId(
 /**
  * Extract plain text from Strapi blocks
  */
+function extractBlockChildText(child: StrapiBlockChild): string {
+	if (typeof child.text === "string") return child.text;
+
+	return child.children?.map(extractBlockChildText).join("") || "";
+}
+
 export function extractTextFromBlocks(blocks: unknown): string {
 	if (!Array.isArray(blocks)) return typeof blocks === "string" ? blocks : "";
 	return blocks
@@ -156,7 +162,7 @@ export function extractTextFromBlocks(blocks: unknown): string {
 			const maybeBlock = block as Partial<StrapiBlock>;
 			if (Array.isArray(maybeBlock.children)) {
 				return maybeBlock.children
-					.map((child: StrapiBlockChild) => child.text || "")
+					.map(extractBlockChildText)
 					.join("");
 			}
 			return "";

@@ -2,11 +2,11 @@
 import type { Tour, Badge } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
+import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import {
   getImageAlt,
   getImageSrcSet,
   getImageUrl,
-  extractTextFromBlocks,
 } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
@@ -54,7 +54,6 @@ if (images.length === 0) {
 const heroImage = images[images.length - 1];
 const categoryName = tour.categories?.[0]?.nombre;
 const hasBadges = badges && badges.length > 0;
-const description = extractTextFromBlocks(tour.content);
 const breadcrumbCategory = pageCategory;
 
 const breadcrumbCopy = {
@@ -244,7 +243,7 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
       class="h-full rounded-sm border border-primary/30 bg-background p-4 lg:p-5"
     >
       <p class="text-base leading-relaxed text-slate-800 md:text-[1.05rem]">
-        {description}
+        <StrapiRichTextInline nodes={tour.content || []} />
       </p>
     </div>
 

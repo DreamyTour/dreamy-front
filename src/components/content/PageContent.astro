@@ -2,12 +2,12 @@
 import PageLayout from "@/layouts/PageLayout.astro";
 import TourCard from "@/components/ui/TourCard.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
+import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import type { SEOProps } from "@/components/layout/SEO.astro";
 import type {
   Page,
   Pregunta,
   StrapiBlock,
-  StrapiBlockChild,
 } from "@/types/page";
 import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
@@ -154,40 +154,29 @@ const pageContent = page.content?.trim() || "";
                                 if (block.type === "paragraph") {
                                   return (
                                     <p class="text-base leading-7 text-muted-foreground">
-                                      {(block.children || [])
-                                        .map(
-                                          (child: StrapiBlockChild) =>
-                                            child.text || "",
-                                        )
-                                        .join("")}
+                                      <StrapiRichTextInline nodes={block.children || []} />
                                     </p>
                                   );
                                 }
                                 if (block.type === "heading") {
                                   const level = block.level;
-                                  const headingText = (block.children || [])
-                                    .map(
-                                      (child: StrapiBlockChild) =>
-                                        child.text || "",
-                                    )
-                                    .join("");
                                   if (level === 1) {
                                     return (
                                       <h2 class="text-xl font-bold text-foreground">
-                                        {headingText}
+                                        <StrapiRichTextInline nodes={block.children || []} />
                                       </h2>
                                     );
                                   }
                                   if (level === 2) {
                                     return (
                                       <h2 class="text-lg font-bold text-foreground">
-                                        {headingText}
+                                        <StrapiRichTextInline nodes={block.children || []} />
                                       </h2>
                                     );
                                   }
                                   return (
                                     <h3 class="text-base font-semibold text-foreground">
-                                      {headingText}
+                                      <StrapiRichTextInline nodes={block.children || []} />
                                     </h3>
                                   );
                                 }
@@ -200,14 +189,9 @@ const pageContent = page.content?.trim() || "";
                                       class={`${format === "ordered" ? "list-decimal" : "list-disc"} ml-4 space-y-1 text-muted-foreground`}
                                     >
                                       {(block.children || []).map(
-                                        (listItem: StrapiBlockChild) => (
+                                        (listItem) => (
                                           <li class="text-muted-foreground">
-                                            {(listItem.children || [])
-                                              .map(
-                                                (child: StrapiBlockChild) =>
-                                                  child.text || "",
-                                              )
-                                              .join("")}
+                                            <StrapiRichTextInline nodes={listItem.children || []} />
                                           </li>
                                         ),
                                       )}
