@@ -61,6 +61,7 @@ export interface MapStop {
 	id: number;
 	order: number;
 	title: string;
+	imagen?: Imagen | null;
 	description: string;
 	duration?: string;
 	routeText?: string;

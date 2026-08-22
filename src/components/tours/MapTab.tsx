@@ -13,6 +13,7 @@ import {
 	useMap,
 } from "@/components/ui/map";
 import type { Lang } from "@/lib/i18n";
+import { getImageAlt, getImageUrl } from "@/lib/helpers";
 import { cn } from "@/lib/utils";
 import type { MapStop } from "@/types/tours";
 
@@ -45,6 +46,9 @@ const dayPrefixes: Record<Lang, string> = {
 const glassPanelClass =
 	"bg-white/72 text-slate-900 shadow-[0_28px_90px_-42px_rgba(15,23,42,0.72)] backdrop-blur-2xl ring-0";
 
+const mapPopupClass =
+	"w-[22rem] max-w-[calc(100vw-2rem)] rounded-none border border-border/80 bg-background p-4 text-foreground shadow-[0_18px_38px_-28px_color-mix(in_oklab,var(--foreground)_42%,transparent)]";
+
 function FitTourBounds({
 	bounds,
 }: {
@@ -67,10 +71,14 @@ function FitTourBounds({
 
 function Pin({
 	active,
+	image,
+	imageAlt,
 	number,
 	label,
 }: {
 	active: boolean;
+	image: string | null;
+	imageAlt: string;
 	number: string;
 	label: string;
 }) {
@@ -79,13 +87,28 @@ function Pin({
 			type="button"
 			aria-label={label}
 			className={cn(
-				"flex items-center justify-center rounded-full text-sm font-extrabold text-white shadow-[0_18px_34px_-20px_rgba(15,23,42,0.85)] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-green-500/70",
+				"relative grid h-11 w-11 place-items-center rounded-full border-2 border-background bg-primary text-sm font-extrabold text-primary-foreground shadow-[0_12px_24px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)] transition-[transform,box-shadow] duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-secondary/55 sm:h-12 sm:w-12",
 				active
-					? "h-10 w-10 scale-110 bg-green-700 ring-4 ring-green-500/35"
-					: "h-8 w-8 bg-black ring-4 ring-white/90 hover:bg-green-700",
+					? "scale-105 ring-4 ring-primary/25"
+					: "hover:scale-105 hover:shadow-[0_16px_28px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)]",
 			)}
 		>
-			{number}
+			{image ? (
+				<img
+					src={image}
+					alt={imageAlt}
+					loading="lazy"
+					decoding="async"
+					className="absolute inset-0 h-full w-full rounded-full object-cover"
+				/>
+			) : (
+				<span aria-hidden="true">{number}</span>
+			)}
+			{image && (
+				<span className="absolute -left-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-secondary px-1 text-[0.62rem] font-extrabold leading-none text-secondary-foreground ring-2 ring-background">
+					{number}
+				</span>
+			)}
 		</button>
 	);
 }
@@ -99,6 +122,7 @@ function normalizeMapStops(mapStops: MapStop[]): TourMapStopSource[] {
 			description: stop.description?.trim() || "",
 			duration: stop.duration?.trim() || "",
 			routeText: stop.routeText?.trim() || "",
+			imagen: stop.imagen ?? null,
 			latitude: Number(stop.latitude),
 			longitude: Number(stop.longitude),
 		}))
@@ -182,6 +206,9 @@ export default function MapTab({
 		null,
 	);
 	const selectedStop = tourMapStops.find((stop) => stop.id === selectedId);
+	const selectedStopImage = selectedStop?.imagen
+		? getImageUrl(selectedStop.imagen, "small")
+		: null;
 	const selectStop = React.useCallback(
 		(stop: TourMapStop) => {
 			const relatedSegment = routeSegments.find(
@@ -308,6 +335,10 @@ export default function MapTab({
 							<MarkerContent>
 								<Pin
 									active={stop.id === selectedId}
+									image={
+										stop.imagen ? getImageUrl(stop.imagen, "thumbnail") : null
+									}
+									imageAlt={getImageAlt(stop.imagen, stop.title)}
 									number={stop.dayNumber}
 									label={`Ver detalles de ${stop.day}`}
 								/>
@@ -332,18 +363,40 @@ export default function MapTab({
 							closeButton
 							closeOnClick={false}
 							onClose={() => setSelectedId(null)}
-							className={cn("min-w-64 rounded-sm p-4", glassPanelClass)}
+							className={mapPopupClass}
 							focusAfterOpen={false}
 						>
-							<p className="pr-6 text-sm font-extrabold text-slate-950">
-								{selectedStop.day}
-							</p>
-							<p className="mt-1 text-sm leading-snug text-slate-700">
-								{selectedStop.title}
-							</p>
-							<p className="mt-3 text-xs leading-relaxed text-slate-500">
-								{selectedStop.description}
-							</p>
+							<div
+								className={cn(
+									"grid gap-4 pr-7",
+									selectedStopImage && "grid-cols-[minmax(0,1fr)_6.75rem]",
+								)}
+							>
+								<div className="min-w-0">
+									<p className="text-sm font-extrabold text-foreground">
+										{selectedStop.day}
+									</p>
+									<p className="mt-1 text-sm leading-snug text-foreground/80">
+										{selectedStop.title}
+									</p>
+									<p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+										{selectedStop.description}
+									</p>
+								</div>
+								{selectedStopImage && (
+									<div className="border-l border-dashed border-border pl-3">
+										<img
+											src={selectedStopImage}
+											alt={getImageAlt(selectedStop.imagen, selectedStop.title)}
+											width={96}
+											height={96}
+											loading="lazy"
+											decoding="async"
+											className="h-24 w-24 object-cover"
+										/>
+									</div>
+								)}
+							</div>
 						</MapPopup>
 					)}
 				</TourMap>

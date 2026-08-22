@@ -80,7 +80,8 @@ async function loadStrapiPagesByLang() {
 				populate: "*",
 				"sort[0]": "orden:asc",
 				"sort[1]": "titulo:asc",
-				"populate[tab][populate][maps][populate][mapstops]": true,
+				"populate[tab][populate][maps][populate][mapstops][populate][imagen]":
+					true,
 			},
 		});
 
