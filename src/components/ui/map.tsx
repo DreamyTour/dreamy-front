@@ -10,6 +10,7 @@ import { Loader2, Locate, Maximize, Minus, Plus, X } from "lucide-react";
 import {
 	createContext,
 	forwardRef,
+	type CSSProperties,
 	type ReactNode,
 	useCallback,
 	useContext,
@@ -486,7 +487,10 @@ function MapMarker({
 			draggable,
 		}).setLngLat([longitude, latitude]);
 
-		const handleClick = (e: MouseEvent) => callbacksRef.current.onClick?.(e);
+		const handleClick = (e: MouseEvent) => {
+			e.stopPropagation();
+			callbacksRef.current.onClick?.(e);
+		};
 		const handleMouseEnter = (e: MouseEvent) =>
 			callbacksRef.current.onMouseEnter?.(e);
 		const handleMouseLeave = (e: MouseEvent) =>
@@ -612,9 +616,9 @@ function PopupCloseButton({ onClick }: { onClick: () => void }) {
 			type="button"
 			onClick={onClick}
 			aria-label="Close popup"
-			className="focus-visible:ring-ring hover:bg-muted text-foreground absolute top-1 right-1 z-10 inline-flex size-5 cursor-pointer items-center justify-center rounded-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset"
+			className="absolute top-2 right-2 z-10 inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-rose-600 text-white shadow-md transition-colors hover:bg-rose-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-300"
 		>
-			<X className="size-3.5" />
+			<X className="size-4" strokeWidth={2.5} />
 		</button>
 	);
 }
@@ -1024,6 +1028,8 @@ type MapPopupProps = {
 	children: ReactNode;
 	/** Additional CSS classes for the popup container */
 	className?: string;
+	/** Inline styles for the popup container */
+	contentStyle?: CSSProperties;
 	/** Show a close button in the popup (default: false) */
 	closeButton?: boolean;
 } & Omit<PopupOptions, "className" | "closeButton">;
@@ -1034,6 +1040,7 @@ function MapPopup({
 	onClose,
 	children,
 	className,
+	contentStyle,
 	closeButton = false,
 	...popupOptions
 }: MapPopupProps) {
@@ -1102,6 +1109,7 @@ function MapPopup({
 
 	return createPortal(
 		<div
+			style={contentStyle}
 			className={cn(
 				"bg-popover text-popover-foreground relative max-w-62 rounded-md p-3 shadow-md",
 				"animate-in fade-in-0 zoom-in-95 duration-200 ease-out",
