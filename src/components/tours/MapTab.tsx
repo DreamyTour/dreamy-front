@@ -23,7 +23,6 @@ type TourMapStopSource = Omit<MapStop, "id"> & {
 
 type TourMapStop = TourMapStopSource & {
 	day: string;
-	dayNumber: string;
 };
 
 interface TourRouteSegment extends MapArcDatum {
@@ -147,44 +146,33 @@ function FitTourBounds({
 
 function Pin({
 	active,
-	image,
-	imageAlt,
-	number,
+	day,
 	label,
 }: {
 	active: boolean;
-	image: string | null;
-	imageAlt: string;
-	number: string;
+	day: string;
 	label: string;
 }) {
+	const [dayLabel, dayNumber = day] = day.split(": ");
+
 	return (
 		<button
 			type="button"
 			aria-label={label}
 			className={cn(
-				"relative grid h-[3.25rem] w-[3.25rem] place-items-center rounded-full border-2 border-background bg-primary text-base font-extrabold text-primary-foreground shadow-[0_12px_24px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)] transition-[transform,box-shadow] duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-secondary/55 sm:h-14 sm:w-14",
+				"relative flex h-12 w-12 flex-col items-center justify-center rounded-full border-2 border-white bg-primary text-primary-foreground shadow-[0_12px_24px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)] transition-[transform,box-shadow] duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-secondary/55 sm:h-[3.25rem] sm:w-[3.25rem]",
 				active
 					? "scale-105 ring-4 ring-primary/25"
 					: "hover:scale-105 hover:shadow-[0_16px_28px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)]",
 			)}
 		>
-			{image ? (
-				<img
-					src={image}
-					alt={imageAlt}
-					loading="lazy"
-					decoding="async"
-					className="absolute inset-0 h-full w-full rounded-full object-cover"
-				/>
-			) : (
-				<span aria-hidden="true">{number}</span>
-			)}
-			{image && (
-				<span className="absolute -left-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full bg-secondary px-1 text-xs font-extrabold leading-none text-secondary-foreground ring-2 ring-background">
-					{number}
-				</span>
-			)}
+			<span className="absolute top-[calc(100%-0.28rem)] left-1/2 z-0 h-3 w-3 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-white bg-primary" />
+			<span className="relative z-10 text-[0.58rem] font-extrabold leading-none tracking-[0.06em]" aria-hidden="true">
+				{dayLabel}:
+			</span>
+			<span className="relative z-10 mt-0.5 text-base font-extrabold leading-none" aria-hidden="true">
+				{dayNumber}
+			</span>
 		</button>
 	);
 }
@@ -230,7 +218,6 @@ export default function MapTab({
 
 		return tourMapStopsSource.map((stop, index) => ({
 			...stop,
-			dayNumber: String(index + 1).padStart(2, "0"),
 			day: `${prefix}: ${String(index + 1).padStart(2, "0")}`,
 		}));
 	}, [lang, tourMapStopsSource]);
@@ -418,11 +405,7 @@ export default function MapTab({
 							<MarkerContent>
 								<Pin
 									active={stop.id === selectedId}
-									image={
-										stop.imagen ? getImageUrl(stop.imagen, "thumbnail") : null
-									}
-									imageAlt={getImageAlt(stop.imagen, stop.title)}
-									number={stop.dayNumber}
+									day={stop.day}
 									label={`${labels.viewDetails} ${stop.day}`}
 								/>
 							</MarkerContent>
