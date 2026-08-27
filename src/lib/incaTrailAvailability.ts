@@ -3,6 +3,16 @@ export type TicketsByDate = Record<string, number | undefined>;
 export const INCA_TRAIL_PLACE_ID = 2;
 export const INCA_TRAIL_ROUTES = ["1", "5"] as const;
 
+export function shiftDateKey(dateKey: string, daysToAdd: number) {
+	const [year, month, day] = dateKey.split("-").map(Number);
+	const date = new Date(Date.UTC(year, month - 1, day + daysToAdd));
+
+	return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
+		2,
+		"0",
+	)}-${String(date.getUTCDate()).padStart(2, "0")}`;
+}
+
 interface FetchTicketsParams {
 	place?: number;
 	road: string;

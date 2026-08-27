@@ -277,7 +277,11 @@ const bookingToursByRoad = new Map<string, AvailabilityBookingTour>();
 for (const tour of tours) {
   const bookingConfig = getIncaTrailBookingConfig(tour.slug);
 
-  if (!bookingConfig || bookingToursByRoad.has(bookingConfig.road)) continue;
+  if (
+    !bookingConfig?.isPrimaryAvailabilityTour ||
+    bookingToursByRoad.has(bookingConfig.road)
+  )
+    continue;
 
   bookingToursByRoad.set(bookingConfig.road, {
     road: bookingConfig.road,

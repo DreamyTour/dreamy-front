@@ -23,6 +23,7 @@ const bookingConfig = getIncaTrailBookingConfig(tourSlug);
 const initialRoad = bookingConfig?.road ?? "1";
 const lockedRoads = bookingConfig ? [bookingConfig.road] : undefined;
 const selectionDurationDays = bookingConfig?.durationDays ?? 1;
+const permitStartOffsetDays = bookingConfig?.permitStartOffsetDays ?? 0;
 
 let initialTickets: TicketsByDate = {};
 
@@ -48,5 +49,6 @@ try {
   initialRoad={initialRoad}
   allowedRoads={lockedRoads}
   selectionDurationDays={selectionDurationDays}
+  permitStartOffsetDays={permitStartOffsetDays}
   initialTickets={initialTickets}
 />

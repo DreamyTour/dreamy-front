@@ -289,10 +289,13 @@ Para tours que no estan incluidos en la configuracion especial del Camino Inca, 
 
 Los slugs definidos en src/lib/incaTrailBooking.ts activan el calendario de disponibilidad:
 
-| Ruta | Duracion | Slugs configurados |
-| --- | ---: | --- |
-| 1 | 4 dias | inca-trail-4-days, camino-inca-4-dias, trilha-inca-4-dias |
-| 5 | 2 dias | short-inca-trail-2-days, camino-inca-corto-2-dias, trilha-inca-2-dias |
+| Ruta | Duracion | Ingreso al permiso | Slugs configurados                                                                                            |
+| ---- | -------: | -----------------: | ------------------------------------------------------------------------------------------------------------- |
+| 1    |   4 dias |              Dia 1 | inca-trail-4-days, camino-inca-4-dias, trilha-inca-4-dias                                                     |
+| 5    |   2 dias |              Dia 1 | short-inca-trail-2-days, camino-inca-corto-2-dias, trilha-inca-2-dias                                         |
+| 5    |    1 dia |              Dia 1 | private-full-day-inca-trail, camino-inca-full-day-privado, trilha-inca-full-day-privado                       |
+| 5    |   4 dias |              Dia 3 | lares-trek-short-inca-trail-4-days, lares-trek-camino-inca-corto-4-dias, lares-trek-caminho-inca-curto-4-dias |
+| 1    |   6 dias |              Dia 3 | salkantay-inca-trail-to-6-days, salkantay-camino-inca-6-dias, salkantay-caminho-inca-6-dias                   |
 
 Si se crea un nuevo slug para estos productos, hay que registrarlo en incaTrailBooking.ts.
 

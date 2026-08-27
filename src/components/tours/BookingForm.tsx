@@ -2,7 +2,7 @@ import { Minus, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
 import type { Lang } from "@/lib/i18n";
-import type { TicketsByDate } from "@/lib/incaTrailAvailability";
+import { shiftDateKey, type TicketsByDate } from "@/lib/incaTrailAvailability";
 import { rewriteUrl } from "@/lib/utils";
 
 interface BookingFormProps {
@@ -15,6 +15,7 @@ interface BookingFormProps {
 	initialRoad?: string;
 	allowedRoads?: string[];
 	selectionDurationDays?: number;
+	permitStartOffsetDays?: number;
 	initialTickets?: TicketsByDate;
 }
 
@@ -73,10 +74,12 @@ export default function BookingForm({
 	initialRoad = "1",
 	allowedRoads,
 	selectionDurationDays = 1,
+	permitStartOffsetDays = 0,
 	initialTickets,
 }: BookingFormProps) {
 	const copy = bookingFormCopy[lang] ?? bookingFormCopy.en;
 	const [date, setDate] = useState<string>("");
+	const [permitDate, setPermitDate] = useState<string>("");
 	const [selectedAvailability, setSelectedAvailability] = useState<
 		number | null
 	>(null);
@@ -93,6 +96,7 @@ export default function BookingForm({
 		({ road }: { road: string; month: number }) => {
 			setRoad(road);
 			setDate("");
+			setPermitDate("");
 			setSelectedAvailability(null);
 			setPassengers(1);
 		},
@@ -120,6 +124,7 @@ export default function BookingForm({
 			totalPrice,
 			passengers,
 			date,
+			permitDate,
 			durationDays: selectionDurationDays,
 			road,
 			availability: selectedAvailability,
@@ -170,12 +175,14 @@ export default function BookingForm({
 						initialRoad={initialRoad}
 						allowedRoads={allowedRoads}
 						selectionDurationDays={selectionDurationDays}
+						permitStartOffsetDays={permitStartOffsetDays}
 						initialTickets={initialTickets}
-						selectedDate={date}
+						selectedDate={permitDate}
 						compact
 						onViewChange={handleCalendarViewChange}
 						onDateSelect={({ date, availability, road }) => {
-							setDate(date);
+							setPermitDate(date);
+							setDate(shiftDateKey(date, -Math.max(0, permitStartOffsetDays)));
 							setSelectedAvailability(availability);
 							setRoad(road);
 							setPassengers(1);

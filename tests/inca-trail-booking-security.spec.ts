@@ -45,17 +45,111 @@ function formatDateRange(dateKey: string, durationDays: number) {
 }
 
 const bookingCalendarTours = [
-	{ path: "/inca-trail-4-days", road: "1", durationDays: 4, spaces: 12 },
-	{ path: "/es/camino-inca-4-dias", road: "1", durationDays: 4, spaces: 11 },
-	{ path: "/pt/trilha-inca-4-dias", road: "1", durationDays: 4, spaces: 10 },
-	{ path: "/short-inca-trail-2-days", road: "5", durationDays: 2, spaces: 8 },
+	{
+		path: "/inca-trail-4-days",
+		road: "1",
+		durationDays: 4,
+		permitStartOffsetDays: 0,
+		spaces: 12,
+	},
+	{
+		path: "/es/camino-inca-4-dias",
+		road: "1",
+		durationDays: 4,
+		permitStartOffsetDays: 0,
+		spaces: 11,
+	},
+	{
+		path: "/pt/trilha-inca-4-dias",
+		road: "1",
+		durationDays: 4,
+		permitStartOffsetDays: 0,
+		spaces: 10,
+	},
+	{
+		path: "/short-inca-trail-2-days",
+		road: "5",
+		durationDays: 2,
+		permitStartOffsetDays: 0,
+		spaces: 8,
+	},
 	{
 		path: "/es/camino-inca-corto-2-dias",
 		road: "5",
 		durationDays: 2,
+		permitStartOffsetDays: 0,
 		spaces: 7,
 	},
-	{ path: "/pt/trilha-inca-2-dias", road: "5", durationDays: 2, spaces: 6 },
+	{
+		path: "/pt/trilha-inca-2-dias",
+		road: "5",
+		durationDays: 2,
+		permitStartOffsetDays: 0,
+		spaces: 6,
+	},
+	{
+		path: "/private-full-day-inca-trail",
+		road: "5",
+		durationDays: 1,
+		permitStartOffsetDays: 0,
+		spaces: 9,
+	},
+	{
+		path: "/es/camino-inca-full-day-privado",
+		road: "5",
+		durationDays: 1,
+		permitStartOffsetDays: 0,
+		spaces: 9,
+	},
+	{
+		path: "/pt/trilha-inca-full-day-privado",
+		road: "5",
+		durationDays: 1,
+		permitStartOffsetDays: 0,
+		spaces: 9,
+	},
+	{
+		path: "/lares-trek-short-inca-trail-4-days",
+		road: "5",
+		durationDays: 4,
+		permitStartOffsetDays: 2,
+		spaces: 7,
+	},
+	{
+		path: "/es/lares-trek-camino-inca-corto-4-dias",
+		road: "5",
+		durationDays: 4,
+		permitStartOffsetDays: 2,
+		spaces: 7,
+	},
+	{
+		path: "/pt/lares-trek-caminho-inca-curto-4-dias",
+		road: "5",
+		durationDays: 4,
+		permitStartOffsetDays: 2,
+		spaces: 7,
+	},
+	{
+		path: "/salkantay-inca-trail-to-6-days",
+		road: "1",
+		durationDays: 6,
+		permitStartOffsetDays: 2,
+		spaces: 5,
+	},
+	{
+		path: "/es/salkantay-camino-inca-6-dias",
+		road: "1",
+		durationDays: 6,
+		permitStartOffsetDays: 2,
+		spaces: 5,
+	},
+	{
+		path: "/pt/salkantay-caminho-inca-6-dias",
+		road: "1",
+		durationDays: 6,
+		permitStartOffsetDays: 2,
+		spaces: 5,
+	},
 ] as const;
 
 function checkoutPayload(overrides = {}) {
@@ -240,8 +334,14 @@ test("Booking calendar island hydrates with the locked route on every allowed In
 			tour.durationDays,
 		);
 		await expect(
-			form.getByText(formatDateRange(testDate, tour.durationDays)),
+			form.getByText(
+				formatDateRange(
+					addDaysToDateKey(testDate, -tour.permitStartOffsetDays),
+					tour.durationDays,
+				),
+			),
 		).toBeVisible();
+		await expect(form.getByText(/US\$\d+\.\d{2}/).first()).toBeVisible();
 		expect(requestedRoads.length).toBeGreaterThan(0);
 		expect(new Set(requestedRoads)).toEqual(new Set([tour.road]));
 	}
@@ -316,10 +416,10 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 	expect(new Set(requestedRoads)).toEqual(new Set(["5"]));
 });
 
-test("Unlisted Inca Trail tours use the default contact form instead of the calendar", async ({
+test("Tours outside the Inca Trail booking configuration use the default contact form", async ({
 	page,
 }) => {
-	await page.goto("/private-full-day-inca-trail", {
+	await page.goto("/es/inca-jungle-4-dias", {
 		waitUntil: "domcontentloaded",
 	});
 	await page

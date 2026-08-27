@@ -8,10 +8,11 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { Lang } from "@/lib/i18n";
-import type { TicketsByDate } from "@/lib/incaTrailAvailability";
 import {
 	INCA_TRAIL_PLACE_ID,
 	INCA_TRAIL_ROUTES,
+	shiftDateKey,
+	type TicketsByDate,
 } from "@/lib/incaTrailAvailability";
 
 type LoadState = "idle" | "loading" | "error";
@@ -30,6 +31,7 @@ interface IncaTrailAvailabilityCalendarProps {
 	allowedRoads?: readonly string[];
 	roadLabels?: Record<string, string>;
 	selectionDurationDays?: number;
+	permitStartOffsetDays?: number;
 	initialTickets?: TicketsByDate;
 	selectedDate?: string;
 	onDateSelect?: (selection: CalendarSelection) => void;
@@ -180,17 +182,6 @@ function getCacheKey(year: number, month: number, road: string) {
 	return `${year}-${month}-${road}`;
 }
 
-function addDaysToDateKey(dateKey: string, daysToAdd: number) {
-	const [year, month, day] = dateKey.split("-").map(Number);
-	const date = new Date(Date.UTC(year, month - 1, day + daysToAdd));
-
-	return formatDateKey(
-		date.getUTCFullYear(),
-		date.getUTCMonth() + 1,
-		date.getUTCDate(),
-	);
-}
-
 function formatDisplayDate(dateKey: string) {
 	const [year, month, day] = dateKey.split("-");
 	return `${day}/${month}/${year}`;
@@ -208,7 +199,7 @@ function formatSelectedDateRange(dateKey: string, durationDays: number) {
 	if (normalizedDuration === 1) return startDate;
 
 	const endDate = formatDisplayDate(
-		addDaysToDateKey(dateKey, normalizedDuration - 1),
+		shiftDateKey(dateKey, normalizedDuration - 1),
 	);
 
 	return `${startDate} a ${endDate}`;
@@ -242,6 +233,7 @@ export default function IncaTrailAvailabilityCalendar({
 	allowedRoads,
 	roadLabels = {},
 	selectionDurationDays = 1,
+	permitStartOffsetDays = 0,
 	initialTickets = EMPTY_TICKETS,
 	selectedDate = "",
 	onDateSelect,
@@ -267,25 +259,30 @@ export default function IncaTrailAvailabilityCalendar({
 	const [loadState, setLoadState] = useState<LoadState>("idle");
 	const monthNames = monthNamesByLang[lang] ?? monthNamesByLang.es;
 	const copy = copyByLang[lang] ?? copyByLang.es;
-	const selectedDateRange = selectedDate
-		? formatSelectedDateRange(selectedDate, selectionDurationDays)
+	const selectedStartDate = selectedDate
+		? shiftDateKey(selectedDate, -Math.max(0, permitStartOffsetDays))
 		: "";
-	const selectedEndDate = selectedDate
-		? addDaysToDateKey(selectedDate, Math.max(1, selectionDurationDays) - 1)
+	const selectedDateRange = selectedStartDate
+		? formatSelectedDateRange(selectedStartDate, selectionDurationDays)
 		: "";
-	const selectedStartParts = selectedDate ? getDateParts(selectedDate) : null;
+	const selectedEndDate = selectedStartDate
+		? shiftDateKey(selectedStartDate, Math.max(1, selectionDurationDays) - 1)
+		: "";
+	const selectedStartParts = selectedStartDate
+		? getDateParts(selectedStartDate)
+		: null;
 	const selectedEndParts = selectedEndDate
 		? getDateParts(selectedEndDate)
 		: null;
 	const selectedDateKeys = useMemo(() => {
-		if (!selectedDate) return new Set<string>();
+		if (!selectedStartDate) return new Set<string>();
 
 		return new Set(
 			Array.from({ length: Math.max(1, selectionDurationDays) }, (_, index) =>
-				addDaysToDateKey(selectedDate, index),
+				shiftDateKey(selectedStartDate, index),
 			),
 		);
-	}, [selectedDate, selectionDurationDays]);
+	}, [selectedStartDate, selectionDurationDays]);
 
 	useEffect(() => {
 		if (roadOptions.includes(road)) return;
