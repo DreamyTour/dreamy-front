@@ -16,8 +16,6 @@ const completePassenger = {
 };
 
 const completeContact = {
-	firstname: "Maria",
-	lastname: "Lopez",
 	email: "maria@example.com",
 	phoneCode: "+51",
 	phone: "999888777",
@@ -38,6 +36,7 @@ function formatDateRange(dateKey: string, durationDays: number) {
 		const [year, month, day] = value.split("-");
 		return `${day}/${month}/${year}`;
 	};
+	if (durationDays <= 1) return formatDate(dateKey);
 
 	return `${formatDate(dateKey)} a ${formatDate(
 		addDaysToDateKey(dateKey, durationDays - 1),
@@ -157,12 +156,12 @@ function checkoutPayload(overrides = {}) {
 		passengersInfo: [completePassenger, completePassenger],
 		contactInfo: completeContact,
 		cart: {
+			quoteRequestId: "123e4567-e89b-42d3-a456-426614174000",
 			tourName: "Inca Trail 4 Days",
 			date: testDate,
 			passengers: 2,
 			totalPrice: 1240,
-			amountPaid: 1,
-			amountToPayLabel: "minimum",
+			paymentPreference: "minimum",
 			lang: "en",
 		},
 		...overrides,
@@ -210,7 +209,9 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 		.click();
 	const form = page.locator("#tour-contact-form");
 	await form.scrollIntoViewIfNeeded();
-	await expect(form.getByRole("heading", { name: "Reserva" })).toBeVisible({
+	await expect(
+		form.getByRole("heading", { name: /^(Reserva|Booking)$/ }),
+	).toBeVisible({
 		timeout: 20000,
 	});
 	await waitForBookingIslandHydration(page);
@@ -254,10 +255,10 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 	await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(4);
 	await expect(form.getByText(formatDateRange(testDate, 4))).toBeVisible();
 
-	await form.getByRole("button", { name: /aumentar/i }).click();
+	await form.getByRole("button", { name: /increase|aumentar/i }).click();
 	await form.getByRole("button", { name: /book now/i }).click();
 
-	await expect(page).toHaveURL(/\/checkout$/);
+	await expect(page).toHaveURL(/\/checkout\/?$/);
 
 	const cart = await page.evaluate(() => {
 		const rawCart = window.localStorage.getItem("bookingCart");
@@ -271,7 +272,7 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 		availability: 12,
 		passengers: 2,
 		lang: "en",
-		tourPath: "/inca-trail-4-days",
+		tourPath: expect.stringMatching(/^\/inca-trail-4-days\/?$/),
 	});
 	expect(requestedRoads.length).toBeGreaterThan(0);
 	expect(new Set(requestedRoads)).toEqual(new Set(["1"]));
@@ -306,7 +307,9 @@ test("Booking calendar island hydrates with the locked route on every allowed In
 
 		const form = page.locator("#tour-contact-form");
 		await form.scrollIntoViewIfNeeded();
-		await expect(form.getByRole("heading", { name: "Reserva" })).toBeVisible({
+		await expect(
+			form.getByRole("heading", { name: /^(Reserva|Booking)$/ }),
+		).toBeVisible({
 			timeout: 20000,
 		});
 		await waitForBookingIslandHydration(page);
@@ -378,7 +381,9 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 
 	const form = page.locator("#tour-contact-form");
 	await form.scrollIntoViewIfNeeded();
-	await expect(form.getByRole("heading", { name: "Reserva" })).toBeVisible({
+	await expect(
+		form.getByRole("heading", { name: /^(Reserva|Booking)$/ }),
+	).toBeVisible({
 		timeout: 20000,
 	});
 	await expect(
@@ -398,7 +403,7 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 	await expect(form.getByText(formatDateRange(testDate, 2))).toBeVisible();
 
 	await form.getByRole("button", { name: /book now/i }).click();
-	await expect(page).toHaveURL(/\/checkout$/);
+	await expect(page).toHaveURL(/\/checkout\/?$/);
 
 	const cart = await page.evaluate(() => {
 		const rawCart = window.localStorage.getItem("bookingCart");
@@ -410,7 +415,7 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 		durationDays: 2,
 		road: "5",
 		availability: 8,
-		tourPath: "/short-inca-trail-2-days",
+		tourPath: expect.stringMatching(/^\/short-inca-trail-2-days\/?$/),
 	});
 	expect(requestedRoads.length).toBeGreaterThan(0);
 	expect(new Set(requestedRoads)).toEqual(new Set(["5"]));
@@ -500,17 +505,43 @@ test("checkout API rejects client prices without an authoritative Strapi tour id
 	expect(body.error).toBe("Missing cart data");
 });
 
+test("checkout API rejects a child as the pre-booking holder", async ({
+	request,
+}) => {
+	const response = await request.post("/api/checkout", {
+		data: checkoutPayload({
+			passengersInfo: [
+				{ ...completePassenger, dob: "2020-01-10" },
+				completePassenger,
+			],
+			cart: {
+				quoteRequestId: "123e4567-e89b-42d3-a456-426614174000",
+				tourId: "test-inca-trail",
+				date: testDate,
+				passengers: 2,
+				paymentPreference: "minimum",
+				lang: "en",
+			},
+		}),
+	});
+
+	expect(response.status()).toBe(400);
+	const body = await response.json();
+	expect(body.error).toContain("at least 18 years old");
+});
+
 test("checkout API rejects risky or incomplete booking payloads", async ({
 	request,
 }) => {
 	const invalidPayloads = [
 		checkoutPayload({
 			cart: {
+				quoteRequestId: "123e4567-e89b-42d3-a456-426614174000",
 				tourName: "Inca Trail 4 Days",
 				date: testDate,
 				passengers: 2,
 				totalPrice: -1240,
-				amountToPayLabel: "minimum",
+				paymentPreference: "minimum",
 				lang: "en",
 			},
 		}),

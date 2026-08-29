@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
 import type { Lang } from "@/lib/i18n";
 import type { TicketsByDate } from "@/lib/incaTrailAvailability";
+import { MAX_PASSENGERS_PER_BOOKING } from "@/lib/prebooking";
 import { rewriteUrl } from "@/lib/utils";
 
 interface AvailabilityBookingTour {
@@ -37,7 +38,7 @@ const copyByLang = {
 		selectDate: "Selecciona una fecha para continuar",
 		selectedDate: "Fecha elegida",
 		route: "Ruta",
-		days: "dias",
+		days: "días",
 		alertDate: "Por favor seleccione una fecha antes de reservar.",
 		decreasePassengers: "Reducir cantidad de pasajeros",
 		increasePassengers: "Aumentar cantidad de pasajeros",
@@ -99,7 +100,10 @@ export default function IncaTrailAvailabilityBooking({
 	const tourPath = selectedTour
 		? rewriteUrl(`/${selectedTour.slug}`, lang)
 		: "";
-	const maxPassengers = availability && availability > 0 ? availability : null;
+	const maxPassengers =
+		availability && availability > 0
+			? Math.min(availability, MAX_PASSENGERS_PER_BOOKING)
+			: MAX_PASSENGERS_PER_BOOKING;
 
 	const handleViewChange = useCallback(
 		({ road: nextRoad }: { road: string; month: number }) => {
@@ -123,9 +127,7 @@ export default function IncaTrailAvailabilityBooking({
 	};
 
 	const handlePlus = () => {
-		setPassengers((current) =>
-			maxPassengers ? Math.min(maxPassengers, current + 1) : current + 1,
-		);
+		setPassengers((current) => Math.min(maxPassengers, current + 1));
 	};
 
 	const handleBookNow = () => {
@@ -135,6 +137,7 @@ export default function IncaTrailAvailabilityBooking({
 		}
 
 		const cartItem = {
+			quoteRequestId: crypto.randomUUID(),
 			tourId: selectedTour.tourId,
 			tourName: selectedTour.tourName,
 			pricePerPerson,
@@ -192,10 +195,7 @@ export default function IncaTrailAvailabilityBooking({
 							<button
 								type="button"
 								onClick={handlePlus}
-								disabled={
-									!date ||
-									(maxPassengers !== null && passengers >= maxPassengers)
-								}
+								disabled={!date || passengers >= maxPassengers}
 								aria-label={copy.increasePassengers}
 								className="flex size-9 shrink-0 items-center justify-center p-0 text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 							>

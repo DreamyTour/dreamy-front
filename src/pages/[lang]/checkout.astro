@@ -16,8 +16,8 @@ if (lang === DEFAULT_LANG) {
 }
 
 const seoProps = {
-  title: "Checkout - Booking",
-  description: "Complete your booking securely.",
+  title: "Pre-booking request - Dreamy Tours",
+  description: "Send your traveler details and payment preference for review.",
   type: "website" as "website",
   lang: lang,
   robots: "noindex, nofollow",
@@ -26,7 +26,7 @@ const seoProps = {
 
 <PageLayout seo={seoProps} lang={lang}>
   <div class="bg-gray-50 min-h-[70vh] pt-8 pb-16 border-t border-gray-200">
-    <h1 class="sr-only">Checkout - Booking</h1>
+    <h1 class="sr-only">Pre-booking request</h1>
     <CheckoutSummary initialLang={lang} client:only="react" />
   </div>
 </PageLayout>

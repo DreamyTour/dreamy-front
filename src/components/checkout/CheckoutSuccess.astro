@@ -9,22 +9,25 @@ const lang = Astro.props.lang ?? "en";
 
 const copy = {
   en: {
-    title: "Payment request sent",
-    text: "If PayPal confirmed your payment, our team will review your booking details and contact you shortly.",
+    title: "Pre-booking sent",
+    text: "We sent your request and PDF quote to our reservations team. No payment was made. An agent will review the details and contact you with the next steps.",
+    reference: "Reference",
     tour: "Return to tour",
     home: "Go to home",
     fallbackTour: "your tour",
   },
   es: {
-    title: "Solicitud de pago enviada",
-    text: "Si PayPal confirmó tu pago, nuestro equipo revisará los datos de la reserva y te contactará pronto.",
+    title: "Pre-reserva enviada",
+    text: "Enviamos tu solicitud y la cotización PDF a nuestro equipo de reservas. No se realizó ningún pago. Un agente revisará los datos y se comunicará contigo para indicarte los siguientes pasos.",
+    reference: "Referencia",
     tour: "Volver al tour",
     home: "Ir al inicio",
     fallbackTour: "tu tour",
   },
   pt: {
-    title: "Solicitação de pagamento enviada",
-    text: "Se o PayPal confirmou o seu pagamento, nossa equipe revisará os dados da reserva e entrará em contato em breve.",
+    title: "Pré-reserva enviada",
+    text: "Enviamos sua solicitação e a cotação PDF para nossa equipe de reservas. Nenhum pagamento foi realizado. Um agente revisará os dados e entrará em contato com os próximos passos.",
+    reference: "Referência",
     tour: "Voltar ao tour",
     home: "Ir ao início",
     fallbackTour: "seu tour",
@@ -52,6 +55,9 @@ const homeHref = lang === "en" ? "/" : `/${lang}`;
     {copy.title}
   </h1>
   <p class="mb-3 max-w-2xl text-base leading-7 text-gray-600">{copy.text}</p>
+  <p class="mb-3 hidden text-sm font-bold text-primary" data-reference-wrap>
+    {copy.reference}: <span data-reference></span>
+  </p>
   <p class="mb-8 text-sm font-semibold text-gray-800" data-tour-name>
     {copy.fallbackTour}
   </p>
@@ -79,6 +85,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}`;
     const homeHref = root.dataset.homeHref || "/";
     const savedCart = window.localStorage.getItem("bookingCart");
     const previousTourPath = window.localStorage.getItem("lastBookingTourPath");
+    const reference = window.sessionStorage.getItem("lastPrebookingReference");
     let tourName = "";
     let tourPath = previousTourPath || homeHref;
 
@@ -93,6 +100,7 @@ const homeHref = lang === "en" ? "/" : `/${lang}`;
     }
 
     window.localStorage.removeItem("bookingCart");
+    window.sessionStorage.removeItem("lastPrebookingReference");
     window.localStorage.setItem("lastBookingTourPath", tourPath);
 
     const tourNameEl = root.querySelector("[data-tour-name]");
@@ -101,6 +109,13 @@ const homeHref = lang === "en" ? "/" : `/${lang}`;
     const tourLink = root.querySelector("[data-tour-link]");
     if (tourLink instanceof HTMLAnchorElement) {
       tourLink.href = tourPath || homeHref;
+    }
+
+    const referenceWrap = root.querySelector("[data-reference-wrap]");
+    const referenceEl = root.querySelector("[data-reference]");
+    if (referenceWrap instanceof HTMLElement && referenceEl && reference) {
+      referenceEl.textContent = reference;
+      referenceWrap.classList.remove("hidden");
     }
   }
 </script>

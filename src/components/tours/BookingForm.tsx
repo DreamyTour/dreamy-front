@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabilityCalendar";
 import type { Lang } from "@/lib/i18n";
 import { shiftDateKey, type TicketsByDate } from "@/lib/incaTrailAvailability";
+import { MAX_PASSENGERS_PER_BOOKING } from "@/lib/prebooking";
 import { rewriteUrl } from "@/lib/utils";
 
 interface BookingFormProps {
@@ -54,11 +55,11 @@ const bookingFormCopy = {
 		passengers: "Passageiros",
 		selectDateFirst: "Primeiro selecione uma data",
 		pax: "Pax",
-		peopleForDeparture: "Pessoas para esta saida",
+		peopleForDeparture: "Pessoas para esta saída",
 		decreasePassengers: "Reduzir quantidade de passageiros",
 		increasePassengers: "Aumentar quantidade de passageiros",
-		pricePerPerson: "Preco por pessoa",
-		totalPrice: "Preco total",
+		pricePerPerson: "Preço por pessoa",
+		totalPrice: "Preço total",
 		bookNow: "Reservar agora",
 		alertDate: "Selecione uma data antes de reservar.",
 	},
@@ -108,7 +109,11 @@ export default function BookingForm({
 	};
 
 	const handlePlus = () => {
-		setPassengers(passengers + 1);
+		const availabilityLimit =
+			selectedAvailability ?? MAX_PASSENGERS_PER_BOOKING;
+		setPassengers(
+			Math.min(passengers + 1, availabilityLimit, MAX_PASSENGERS_PER_BOOKING),
+		);
 	};
 
 	const handleBookNow = () => {
@@ -118,6 +123,7 @@ export default function BookingForm({
 		}
 
 		const cartItem = {
+			quoteRequestId: crypto.randomUUID(),
 			tourId,
 			tourName,
 			pricePerPerson: basePrice,
@@ -230,7 +236,12 @@ export default function BookingForm({
 							<button
 								type="button"
 								onClick={handlePlus}
-								disabled={!date}
+								disabled={
+									!date ||
+									passengers >= MAX_PASSENGERS_PER_BOOKING ||
+									(selectedAvailability !== null &&
+										passengers >= selectedAvailability)
+								}
 								aria-label={copy.increasePassengers}
 								className="flex h-11 w-11 items-center justify-center text-[#244237] transition-colors hover:bg-secondary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary disabled:cursor-not-allowed disabled:opacity-35"
 							>

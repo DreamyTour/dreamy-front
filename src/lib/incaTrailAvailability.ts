@@ -18,6 +18,7 @@ interface FetchTicketsParams {
 	road: string;
 	year: number;
 	month: number;
+	signal?: AbortSignal;
 }
 
 export async function fetchIncaTrailTickets({
@@ -25,6 +26,7 @@ export async function fetchIncaTrailTickets({
 	road,
 	year,
 	month,
+	signal,
 }: FetchTicketsParams): Promise<TicketsByDate> {
 	const url = new URL("https://calendar.dreamy.tours/v1/tickets");
 	url.searchParams.set("place", String(place));
@@ -32,7 +34,7 @@ export async function fetchIncaTrailTickets({
 	url.searchParams.set("year", String(year));
 	url.searchParams.set("month", String(month));
 
-	const response = await fetch(url.toString());
+	const response = await fetch(url.toString(), { signal });
 
 	if (!response.ok) {
 		throw new Error(`Calendar request failed (${response.status})`);

@@ -1,7 +1,6 @@
 /// <reference types="astro/client" />
 
 interface ImportMetaEnv {
-	readonly PAYPAL_BUSINESS_EMAIL?: string;
 	readonly RESEND_API_KEY?: string;
 	readonly RESEND_FROM_EMAIL?: string;
 	readonly RESEND_TO_EMAIL?: string;

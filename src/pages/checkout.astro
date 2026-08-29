@@ -4,8 +4,8 @@ import CheckoutSummary from "@/components/checkout/CheckoutSummary";
 import { DEFAULT_LANG } from "@/lib/i18n";
 
 const seoProps = {
-  title: "Checkout - Booking",
-  description: "Complete your booking securely.",
+  title: "Pre-booking request - Dreamy Tours",
+  description: "Send your traveler details and payment preference for review.",
   type: "website" as "website",
   lang: DEFAULT_LANG,
   robots: "noindex, nofollow",
@@ -14,7 +14,7 @@ const seoProps = {
 
 <PageLayout seo={seoProps}>
   <div class="bg-gray-50 min-h-[70vh] pt-8 pb-16 border-t border-gray-200">
-    <h1 class="sr-only">Checkout - Booking</h1>
+    <h1 class="sr-only">Pre-booking request</h1>
     <CheckoutSummary initialLang={DEFAULT_LANG} client:only="react" />
   </div>
 </PageLayout>

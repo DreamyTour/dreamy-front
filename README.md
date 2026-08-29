@@ -10,7 +10,7 @@ Frontend de Dreamy Tours construido con Astro, React y Tailwind CSS. Publica la 
 - MDX para paginas editoriales locales.
 - Strapi como CMS remoto para home, contenido global, tours, blog y paginas dinamicas.
 - `@astrojs/cloudflare` para produccion y APIs.
-- Resend para emails y PayPal para solicitudes de pago.
+- Resend para emails de pre-reserva y `pdf-lib` para adjuntar la cotizacion.
 - Biome, Prettier, TypeScript y Playwright para calidad y pruebas.
 - shadcn/ui, Radix UI, Base UI y Lucide para UI e iconos.
 
@@ -45,14 +45,12 @@ VITE_STRAPI_URL=
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
 RESEND_TO_EMAIL=
-PAYPAL_BUSINESS_EMAIL=
 ```
 
 - `VITE_STRAPI_URL`: URL base de Strapi; necesaria para cargar contenido del CMS.
-- `RESEND_API_KEY`: habilita el envio real de emails. Sin ella, los formularios pueden simular el envio.
+- `RESEND_API_KEY`: habilita el envio real de emails. Es obligatoria para recibir solicitudes de pre-reserva.
 - `RESEND_FROM_EMAIL`: remitente verificado. Por defecto: `Dreamy Tours <info@dreamy.tours>`.
 - `RESEND_TO_EMAIL`: destinatarios separados por coma. Por defecto: `info@dreamy.tours`.
-- `PAYPAL_BUSINESS_EMAIL`: cuenta PayPal receptora. Por defecto: `info@turismoperu.com.pe`.
 
 No subas secretos al repositorio.
 
@@ -133,12 +131,12 @@ La seleccion de fecha y pasajeros se guarda en `localStorage.bookingCart` y redi
 
 Endpoints en `src/pages/api`:
 
-- `POST /api/checkout`: valida pasajeros, contacto y carrito; consulta Strapi para validar el precio; envia email y genera la URL de PayPal.
+- `POST /api/checkout`: revalida pasajeros, contacto, precio y cupos; genera un PDF y lo envia a los agentes como solicitud de pre-reserva.
 - `POST /api/planea-tu-viaje`: formulario de viaje personalizado.
 - `POST /api/libro-reclamaciones`: libro de reclamaciones.
 - `GET /api/calendar-tickets`: proxy de disponibilidad.
 
-El checkout usa `bookingCart` y `lastBookingTourPath` en `localStorage`. La pagina de exito limpia el carrito. Resend se usa cuando existe `RESEND_API_KEY`.
+El checkout usa `bookingCart` y `lastBookingTourPath` en `localStorage`. La pagina de exito limpia el carrito y muestra la referencia guardada temporalmente. El checkout requiere Resend configurado porque el email con el PDF es su canal de entrega.
 
 ## Internacionalizacion y UI
 
@@ -392,7 +390,7 @@ El ano publico esta fijado actualmente en 2026. Para cambiar de temporada:
 4. Actualizar las pruebas E2E dependientes del ano.
 5. Revisar public/llms.txt si cambia la pagina publica.
 
-## 9. Checkout y flujo de pago
+## 9. Checkout y flujo de pre-reserva
 
 El flujo del cliente es:
 
@@ -401,12 +399,14 @@ El flujo del cliente es:
 3. Abre /checkout en el idioma correspondiente.
 4. Completa la informacion de cada pasajero.
 5. Completa los datos de contacto.
-6. Acepta terminos y selecciona pago minimo o total.
+6. Acepta terminos y elige si mas adelante desea pagar el 50% o el total.
 7. El frontend envia el payload a POST /api/checkout.
-8. El servidor consulta el precio oficial del tour en Strapi.
-9. Se envia una notificacion por Resend si esta configurado.
-10. Se devuelve una URL de PayPal.
-11. Se redirige a la pagina de exito localizada.
+8. El servidor consulta el precio oficial en Strapi y vuelve a comprobar los cupos del calendario.
+9. Se genera en memoria un PDF con la cotizacion y todos los datos ingresados.
+10. Resend envia el PDF a los agentes, con el email del cliente como respuesta.
+11. Se devuelve una referencia y se redirige a la pagina de exito localizada.
+
+Este flujo no cobra ni confirma una reserva. Un agente revisa la solicitud, se comunica con el cliente y genera el enlace de pago por un canal separado.
 
 El servidor no confia en el precio enviado por el navegador. Consulta documentId, titulo y priceTour en Strapi y recalcula el total.
 
@@ -416,12 +416,13 @@ Validaciones relevantes:
 - Entre 1 y 20 pasajeros.
 - passengersInfo debe coincidir con la cantidad declarada.
 - Cada pasajero requiere nombre, apellido, fecha de nacimiento y documento.
+- El Viajero 1 es el titular y debe tener 18 anos o mas; los demas viajeros pueden ser menores.
 - El email debe tener formato valido.
-- amountToPayLabel solo admite minimum o total.
+- paymentPreference solo admite minimum (50%) o total.
+- La fecha del itinerario debe seguir disponible y tener cupos suficientes al enviar.
 - El body maximo es 64 KiB.
-- La consulta a Strapi tiene timeout de 8 segundos.
-- El recargo PayPal actual es del 8%.
-- El pago minimo se calcula sobre el 50% y luego aplica el recargo.
+- Las consultas a Strapi y al calendario tienen timeout de 8 segundos.
+- La preferencia del 50% se calcula sin recargos; es informativa y no realiza un cobro.
 
 Payload conceptual:
 
@@ -429,7 +430,8 @@ Payload conceptual:
       passengersInfo: [{ name, lastname, gender, dob, country,
         documentType, documentNumber }],
       contactInfo: { firstname, lastname, email, phoneCode, phone },
-      cart: { tourId, date, passengers, amountToPayLabel, lang }
+      cart: { quoteRequestId, tourId, date, passengers,
+        paymentPreference, lang }
     }
 
 ## 10. Formularios comerciales
@@ -595,7 +597,7 @@ Revisar /api/calendar-tickets, proxy de Vite, endpoint externo y parametros plac
 
 ### Checkout rechazado
 
-Revisar tourId, cantidad de pasajeros, datos de identidad, email, amountToPayLabel, precio de Strapi y URL del CMS.
+Revisar quoteRequestId, tourId, cantidad de pasajeros, edad del titular, datos de identidad, email, paymentPreference, precio de Strapi, cupos del calendario y configuracion de Resend.
 
 ### Email no llega
 
