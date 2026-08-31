@@ -57,6 +57,12 @@ test("checkout passenger and holder contact fields keep focus while typing", asy
 		'input[name="passenger-1-document-number"]',
 		"P123456",
 	);
+	await page
+		.locator('select[name="passenger-1-issuing-country"]')
+		.selectOption("PE");
+	await expect(page.locator("[data-holder-phone-country]")).toContainText(
+		"Peru (+51)",
+	);
 
 	await typeAndKeepFocus(page, 'input[name="passenger-2-given-name"]', "Luis");
 	await typeAndKeepFocus(

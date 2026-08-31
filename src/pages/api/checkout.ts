@@ -44,7 +44,6 @@ interface CheckoutPayload {
 	passengersInfo?: CheckoutPassenger[];
 	contactInfo?: {
 		email?: string;
-		phoneCode?: string;
 		phone?: string;
 	};
 	cart?: {
@@ -192,8 +191,6 @@ function isValidContact(contactInfo: CheckoutPayload["contactInfo"]) {
 	return (
 		typeof contactInfo.email === "string" &&
 		isValidEmail(contactInfo.email.trim()) &&
-		typeof contactInfo.phoneCode === "string" &&
-		/^\+\d{1,4}$/.test(contactInfo.phoneCode) &&
 		typeof contactInfo.phone === "string" &&
 		/^[\d\s()+-]{6,25}$/.test(contactInfo.phone.trim())
 	);
@@ -434,11 +431,16 @@ export const POST: APIRoute = async ({ request }) => {
 			documentNumber: normalizePrebookingText(passenger.documentNumber?.trim()),
 		}));
 		const bookingHolder = normalizedPassengers[0];
+		const bookingHolderCountry = countries.find(
+			(country) => country.iso2 === passengers[0]?.country,
+		);
 		const normalizedContact = {
 			firstname: bookingHolder.name,
 			lastname: bookingHolder.lastname,
 			email: contactInfo?.email?.trim() || "",
-			phoneCode: contactInfo?.phoneCode || "",
+			phoneCode: bookingHolderCountry
+				? `+${bookingHolderCountry.phoneCode}`
+				: "",
 			phone: contactInfo?.phone?.trim() || "",
 		};
 

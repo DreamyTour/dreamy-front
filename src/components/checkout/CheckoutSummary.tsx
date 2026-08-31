@@ -95,6 +95,7 @@ const checkoutCopy = {
 		pendingContactName: "Completa los nombres y apellidos del Viajero 1",
 		emailAddress: "Correo electrónico",
 		countryCode: "Código de país",
+		countryFromHolder: "Tomado del país del Viajero 1",
 		phone: "Teléfono",
 		termsPrefix: "He leído y acepto los",
 		terms: "Términos y condiciones",
@@ -175,6 +176,7 @@ const checkoutCopy = {
 		pendingContactName: "Complete Traveler 1's first and last name",
 		emailAddress: "Email address",
 		countryCode: "Country code",
+		countryFromHolder: "Taken from Traveler 1's country",
 		phone: "Phone",
 		termsPrefix: "I have read and accept the",
 		terms: "Terms and Conditions",
@@ -256,6 +258,7 @@ const checkoutCopy = {
 		pendingContactName: "Preencha o nome e sobrenome do Viajante 1",
 		emailAddress: "E-mail",
 		countryCode: "Código do país",
+		countryFromHolder: "Obtido do país do Viajante 1",
 		phone: "Telefone",
 		termsPrefix: "Li e aceito os",
 		terms: "Termos e condições",
@@ -313,7 +316,6 @@ export default function CheckoutSummary({
 	const [passengers, setPassengers] = useState<Passenger[]>([]);
 	const [contact, setContact] = useState({
 		email: "",
-		phoneCode: "+1",
 		phone: "",
 	});
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -509,7 +511,6 @@ export default function CheckoutSummary({
 					passengersInfo: passengers,
 					contactInfo: {
 						email: contact.email,
-						phoneCode: contact.phoneCode,
 						phone: contact.phone,
 					},
 				}),
@@ -604,6 +605,17 @@ export default function CheckoutSummary({
 		.map((namePart) => namePart?.trim())
 		.filter(Boolean)
 		.join(" ");
+	const bookingHolderCountry = countries.find(
+		(country) => country.iso2 === passengers[0]?.country,
+	);
+	const bookingHolderCountryName = bookingHolderCountry
+		? lang === "en"
+			? bookingHolderCountry.nameEN
+			: bookingHolderCountry.nameES
+		: "—";
+	const bookingHolderPhoneCode = bookingHolderCountry
+		? `+${bookingHolderCountry.phoneCode}`
+		: "—";
 	const fieldClass =
 		"min-h-12 rounded-sm border border-[#d8cec2] bg-white px-4 py-3 text-base text-[#1f2d29] outline-none transition focus:border-[#1f6c43] focus:ring-2 focus:ring-[#1f6c43]/15";
 	const labelClass = "text-xs font-bold uppercase tracking-wide text-[#5f5349]";
@@ -989,6 +1001,7 @@ export default function CheckoutSummary({
 												{copy.issuingCountry} *
 											</span>
 											<select
+												id={`passenger-${i + 1}-issuing-country`}
 												name={`passenger-${i + 1}-issuing-country`}
 												autoComplete="country"
 												required
@@ -1050,32 +1063,19 @@ export default function CheckoutSummary({
 										className={fieldClass}
 									/>
 								</label>
-								<div className="flex flex-col md:flex-row gap-4">
-									<label className="flex flex-col gap-1 w-full md:w-5/12">
-										<span className={labelClass}>{copy.countryCode} *</span>
-										<select
-											name="contact-phone-code"
-											autoComplete="tel-country-code"
-											required
-											value={contact.phoneCode}
-											onChange={(e) =>
-												setContact({ ...contact, phoneCode: e.target.value })
-											}
-											className={fieldClass}
+								<div className="flex flex-col gap-4 md:flex-row">
+									<div className="flex w-full flex-col gap-1 md:w-5/12">
+										<span className={labelClass}>{copy.countryCode}</span>
+										<div
+											data-holder-phone-country
+											className="flex min-h-12 items-center rounded-sm border border-[#b9ddc6] bg-[#edf8f1] px-4 py-3 text-base font-semibold text-[#244237]"
 										>
-											{countries
-												.filter((c) => c.phoneCode)
-												.map((c) => (
-													<option
-														key={`phone-${c.iso2}`}
-														value={`+${c.phoneCode}`}
-													>
-														{lang === "en" ? c.nameEN : c.nameES} (+
-														{c.phoneCode})
-													</option>
-												))}
-										</select>
-									</label>
+											{bookingHolderCountryName} ({bookingHolderPhoneCode})
+										</div>
+										<span className="text-xs font-medium text-[#6f6258]">
+											{copy.countryFromHolder}
+										</span>
+									</div>
 									<label className="flex flex-col gap-1 flex-1">
 										<span className={labelClass}>{copy.phone} *</span>
 										<input

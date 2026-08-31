@@ -643,16 +643,9 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			`${formatPrebookingDate(data.travelDate)} – ${formatPrebookingDate(data.travelEndDate)}`,
 			44,
 			fieldTop,
-			120,
+			190,
 		);
-		drawField(
-			"PERMISO",
-			formatPrebookingDate(data.permitDate),
-			176,
-			fieldTop,
-			92,
-		);
-		drawField("PASAJEROS", String(data.passengerCount), 284, fieldTop, 65);
+		drawField("PASAJEROS", String(data.passengerCount), 260, fieldTop, 75);
 		page.drawText("CUPOS", {
 			x: 366,
 			y: fieldTop - 7,
@@ -840,7 +833,7 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 		const top = beginSection(
 			"04",
 			"DATOS DE PASAJEROS",
-			`${data.passengerCount} en total`,
+			`X ${data.passengerCount} PAX`,
 			passengerHeight,
 		);
 		let passengerTop = top - 43;
@@ -871,12 +864,28 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 				`${passenger.name} ${passenger.lastname}`,
 				boldFont,
 			);
+			page.drawCircle({
+				x: 65,
+				y: passengerTop - 13,
+				size: 7,
+				color: brandRedSoft,
+				borderColor: brandRed,
+				borderWidth: 0.5,
+			});
+			const passengerNumber = String(index + 1);
+			page.drawText(passengerNumber, {
+				x: 65 - boldFont.widthOfTextAtSize(passengerNumber, 6.2) / 2,
+				y: passengerTop - 15.2,
+				size: 6.2,
+				font: boldFont,
+				color: brandRedDark,
+			});
 			drawFittedText(
 				page,
 				passengerName,
-				58,
+				78,
 				passengerTop - 15,
-				210,
+				345,
 				8.6,
 				boldFont,
 				ink,

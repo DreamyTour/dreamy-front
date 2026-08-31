@@ -17,7 +17,6 @@ const completePassenger = {
 
 const completeContact = {
 	email: "maria@example.com",
-	phoneCode: "+51",
 	phone: "999888777",
 };
 
