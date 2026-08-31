@@ -26,6 +26,8 @@ const isContactLink = (link: Link) => {
     content.includes("contato")
   );
 };
+const isRemovedHeaderPhone = (link: Link) =>
+  /51953005373/i.test(`${link.label ?? ""} ${link.url ?? ""}`);
 const blogLink = data?.headerTop?.headerLink?.find(isBlogLink) ?? {
   id: -1,
   label: "Blog",
@@ -37,7 +39,10 @@ const blogLink = data?.headerTop?.headerLink?.find(isBlogLink) ?? {
 const mobileQuickActions = [
   blogLink,
   ...(data?.headerTop?.button ?? []).filter(
-    (link) => !isContactLink(link) && !isBlogLink(link),
+    (link) =>
+      !isContactLink(link) &&
+      !isBlogLink(link) &&
+      !isRemovedHeaderPhone(link),
   ),
 ];
 ---
