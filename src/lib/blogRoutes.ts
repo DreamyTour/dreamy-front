@@ -1,6 +1,6 @@
 import { getCategoryPostCounts } from "@/lib/blogCategories";
 import { DEFAULT_LANG, LANGS, type Lang, LOCALIZED_LANGS } from "@/lib/i18n";
-import fetchApi from "@/lib/strapi";
+import fetchApi, { fetchAllStrapi } from "@/lib/strapi";
 import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
 
@@ -61,21 +61,20 @@ export type BlogCategoryProps = {
 };
 
 async function fetchBlogs(lang: string) {
-	const blogs = await fetchApi<Blog[]>({
+	const blogs = await fetchAllStrapi<Blog>({
 		endpoint: "posts",
-		wrappedByKey: "data",
 		locale: lang,
-		query: { sort: "publishedAt:desc" },
+		query: { sort: "publishedAt:desc,id:desc" },
 	});
 
 	return blogs && Array.isArray(blogs) ? blogs : [];
 }
 
 async function fetchCategories(lang: string) {
-	const categories = await fetchApi<CategoryBlog[]>({
+	const categories = await fetchAllStrapi<CategoryBlog>({
 		endpoint: "category-blogs",
-		wrappedByKey: "data",
 		locale: lang,
+		query: { sort: "id:asc" },
 	});
 
 	return categories && Array.isArray(categories) ? categories : [];

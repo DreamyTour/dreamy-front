@@ -138,7 +138,7 @@ export async function fetchAllStrapi<T>({
 		const concurrencyLimit = 5;
 
 		for (let i = 2; i <= pageCount; i += concurrencyLimit) {
-			const batchPromises: Promise<void>[] = [];
+			const batchPromises: Promise<StrapiListResponse<T>>[] = [];
 
 			for (
 				let page = i;
@@ -154,15 +154,16 @@ export async function fetchAllStrapi<T>({
 							"pagination[page]": page,
 							"pagination[pageSize]": pageSize,
 						},
-					}).then((res) => {
-						if (Array.isArray(res.data)) {
-							allData.push(...res.data);
-						}
 					}),
 				);
 			}
 
-			await Promise.all(batchPromises);
+			const batchResults = await Promise.all(batchPromises);
+			for (const res of batchResults) {
+				if (Array.isArray(res.data)) {
+					allData.push(...res.data);
+				}
+			}
 		}
 	}
 
