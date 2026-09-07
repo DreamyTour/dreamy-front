@@ -1,5 +1,5 @@
 ---
-import type { Lang } from "@/lib/i18n";
+import { localizePath, type Lang } from "@/lib/i18n";
 import type { PaginatedBlogPage } from "@/lib/blogRoutes";
 
 interface Props {
@@ -25,7 +25,7 @@ const disabledClass =
       aria-label="Blog pagination"
     >
       {page.url.prev ? (
-        <a href={page.url.prev} class={linkClass}>
+        <a href={localizePath(page.url.prev, lang)} class={linkClass}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -71,7 +71,7 @@ const disabledClass =
       </span>
 
       {page.url.next ? (
-        <a href={page.url.next} class={linkClass}>
+        <a href={localizePath(page.url.next, lang)} class={linkClass}>
           {nextLabel}
           <svg
             xmlns="http://www.w3.org/2000/svg"

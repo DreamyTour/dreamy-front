@@ -61,15 +61,21 @@ export function stripDefaultLangPrefix(path: string): string {
 }
 
 export function localizePath(path: string, lang: Lang): string {
+	// These targets are not localized HTML pages.
+	if (/^(?:[a-z][a-z\d+.-]*:|\/\/|#|\?)/i.test(path)) return path;
+	const originalPath = splitUrlPath(normalizePath(path)).path;
+	if (
+		/\/[^/]*\.[^/]+\/?$/.test(originalPath) ||
+		/^\/(?:api|_astro|_server-islands|cdn-cgi)(?:\/|$)/.test(originalPath)
+	)
+		return path;
+
 	const normalized = stripLangPrefix(path);
 	const { path: pathname, suffix } = splitUrlPath(normalized);
-
-	if (lang === DEFAULT_LANG) {
-		return `${pathname}${suffix}` || "/";
-	}
-
-	const localizedPath = pathname === "/" ? `/${lang}` : `/${lang}${pathname}`;
-	return `${localizedPath}${suffix}`;
+	const localizedPath =
+		lang === DEFAULT_LANG ? pathname : `/${lang}${pathname}`;
+	// Cloudflare serves prerendered directory pages with a trailing slash.
+	return `${localizedPath.replace(/\/+$/, "")}/${suffix}`;
 }
 
 export function rewriteUrl(url: string | undefined, currentLang: Lang): string {
