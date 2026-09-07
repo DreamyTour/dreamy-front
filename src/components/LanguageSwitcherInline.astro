@@ -146,15 +146,18 @@ const menuId = "language-menu-desktop";
 
     const localizePath = (path, lang) => {
       const normalized = stripLangPrefix(path);
-      if (lang === defaultLang) return normalized;
-      return normalized === "/" ? `/${lang}` : `/${lang}${normalized}`;
+      const localized =
+        lang === defaultLang ? normalized : `/${lang}${normalized}`;
+      return `${localized.replace(/\/+$/, "")}/`;
     };
 
     const translatePathForSlug = (path, slug) => {
       const normalized = stripLangPrefix(path);
       const segments = normalized.split("/").filter(Boolean);
       if (segments.length === 0) return `/${slug}`;
-      segments[segments.length - 1] = slug;
+      // /blog/:slug/:page: translate the category, never the page number.
+      const slugIndex = segments[0] === "blog" ? 1 : 0;
+      segments[slugIndex] = slug;
       return `/${segments.join("/")}`;
     };
 
