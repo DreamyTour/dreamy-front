@@ -75,7 +75,7 @@ const navigationMenuItemStyle = "static";
 /* -------------------------------------------------------------------------- */
 
 const navigationMenuTriggerStyle = cva(
-	"group relative uppercase inline-flex h-full min-h-[60px] items-center justify-center gap-2 whitespace-nowrap bg-transparent px-4 text-[14px] font-normal text-[#16241d] transition-colors duration-200 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white data-[state=open]:bg-[#f4f5f5] data-[state=open]:text-primary data-[state=open]:after:scale-x-100 xl:px-5",
+	"group relative inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-transparent bg-transparent px-4 text-[11px] font-semibold uppercase tracking-[0.13em] text-[#16241d] transition-[background-color,color,border-color,box-shadow] duration-200 hover:border-primary/10 hover:bg-primary/[0.055] hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white data-[state=open]:border-primary/10 data-[state=open]:bg-primary/[0.07] data-[state=open]:text-primary xl:px-5",
 );
 
 function NavigationMenuTrigger({
@@ -91,7 +91,7 @@ function NavigationMenuTrigger({
 		>
 			{children}
 			<ChevronDownIcon
-				className="ml-1 size-3 text-current opacity-60 transition-all duration-200 group-hover:opacity-85 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-85"
+				className="ml-0.5 size-3.5 text-current opacity-55 transition-all duration-200 group-hover:translate-y-0.5 group-hover:opacity-90 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-90"
 				aria-hidden="true"
 			/>
 		</NavigationMenuPrimitive.Trigger>
@@ -126,7 +126,7 @@ function NavigationMenuContent({
 }
 
 const navigationMenuContentStyle =
-	"absolute left-0 right-0 top-full z-50 w-full overflow-hidden rounded-b-md border border-[#d8d1c6] border-t-0 bg-white p-0 shadow-[0_28px_76px_-54px_rgba(8,23,17,0.85)]";
+	"absolute left-0 right-0 top-full z-50 w-full overflow-hidden rounded-2xl border border-[#dce8df] bg-white p-0 shadow-[0_28px_76px_-54px_rgba(8,23,17,0.85)]";
 
 /* -------------------------------------------------------------------------- */
 /* LINK                                                                       */
@@ -154,9 +154,9 @@ const navigationMenuLinkStyle = cva(
 		variants: {
 			variant: {
 				default:
-					"relative inline-flex h-full min-h-[60px] items-center gap-2 whitespace-nowrap px-4 text-[14px] font-normal uppercase after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-center after:scale-x-0 after:bg-secondary after:transition-transform after:duration-300 hover:bg-[#f4f5f5] hover:text-primary hover:after:scale-x-100 focus-visible:ring-2 focus-visible:ring-secondary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white xl:px-5",
+					"relative inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-xl border border-transparent px-4 text-[11px] font-semibold uppercase tracking-[0.13em] transition-[background-color,color,border-color,box-shadow] duration-200 hover:border-primary/10 hover:bg-primary/[0.055] hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white xl:px-5",
 				dropdown:
-					"group relative flex min-w-0 items-center justify-start gap-2 rounded-none px-0 py-0 text-sm font-medium text-[#24362d]/72 transition-colors duration-200 hover:text-[#081711] focus:text-[#081711]",
+					"group relative flex min-w-0 items-center justify-start gap-2 rounded-xl px-0 py-0 text-sm font-medium text-[#24362d]/72 transition-[background-color,color,transform] duration-200 hover:text-[#081711] focus:text-[#081711]",
 			},
 		},
 		defaultVariants: {

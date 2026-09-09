@@ -16,6 +16,7 @@ interface Props {
 
 const { data, lang, availableLangs } = Astro.props;
 const mobileLogoUrl = localizePath("/", lang);
+const overlayMenu = Astro.url.pathname.replace(/\/+$/, "") === mobileLogoUrl.replace(/\/+$/, "");
 const isBlogLink = (link: Link) =>
   link.url?.includes("/blog") || link.label?.toLowerCase().includes("blog");
 const isContactLink = (link: Link) => {
@@ -54,11 +55,11 @@ const mobileQuickActions = [
     lang={lang}
     availableLangs={availableLangs}
   />
-  <hr class="border-t border-primary/20" aria-hidden="true" />
   <DesktopMenu
     menu={data?.menu}
     lang={lang}
     client:media="(min-width: 1280px)"
+    overlay={overlayMenu}
     transition:persist
   />
   <MobileMenu

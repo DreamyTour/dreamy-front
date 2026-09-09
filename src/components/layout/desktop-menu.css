@@ -1,0 +1,73 @@
+/* The home hero starts beneath the navigation, including its video/poster. */
+@media (min-width: 1280px) {
+	.desktop-nav-shell[data-overlay="true"] {
+		margin-bottom: -60px;
+	}
+}
+
+.desktop-nav-shell[data-overlay="true"] .desktop-nav-bar[data-mode="static"] {
+	border-top: 1px solid rgb(255 255 255 / 20%);
+	border-bottom: 1px solid rgb(255 255 255 / 20%);
+	color: white;
+}
+
+.desktop-nav-shell[data-overlay="true"] .desktop-nav-bar[data-mode="static"] {
+	background: linear-gradient(110deg, rgb(6 27 22 / 76%), rgb(6 27 22 / 48%));
+	box-shadow: 0 12px 32px -24px rgb(0 0 0 / 45%);
+}
+
+.desktop-nav-shell[data-overlay="true"] .desktop-nav-bar[data-mode="static"] .desktop-nav-item {
+	border-radius: 0.6rem;
+	color: white;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	letter-spacing: 0.055em;
+	text-shadow: 0 1px 8px rgb(0 0 0 / 25%);
+	--tw-ring-color: rgb(255 255 255 / 80%);
+	--tw-ring-offset-color: #062019;
+}
+
+.desktop-nav-shell .desktop-nav-bar[data-mode="static"] .desktop-nav-item::before {
+	top: 0.75rem;
+	bottom: 0.75rem;
+	left: 0;
+	width: 2px;
+	border-radius: 2px;
+	background: var(--secondary);
+	opacity: 1;
+	transition: opacity 200ms ease;
+}
+
+.desktop-nav-shell .desktop-nav-bar[data-mode="static"] .desktop-nav-item:is(:hover, :focus-visible, [data-state="open"]) {
+	background: var(--secondary);
+	color: white;
+	text-shadow: none;
+}
+
+.desktop-nav-shell .desktop-nav-bar[data-mode="static"] .desktop-nav-item:is(:hover, :focus-visible, [data-state="open"])::before {
+	opacity: 0;
+}
+
+.desktop-nav-shell[data-overlay="true"] .desktop-nav-bar[data-mode="static"] .desktop-nav-item > svg {
+	opacity: 0.85;
+}
+
+.desktop-nav-shell .desktop-submenu-link {
+	transition-property: background-color, color, box-shadow, transform;
+}
+
+.desktop-nav-shell .desktop-submenu-link:is(:hover, :focus-visible) {
+	background: white;
+	color: var(--secondary);
+	box-shadow: 0 8px 22px -8px color-mix(in oklab, var(--secondary) 28%, transparent);
+}
+
+.desktop-nav-shell .desktop-submenu-link:is(:hover, :focus-visible) > svg {
+	color: var(--secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.desktop-nav-shell .desktop-nav-bar[data-mode="static"] .desktop-nav-item::before {
+		transition: none;
+	}
+}
