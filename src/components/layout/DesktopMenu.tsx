@@ -235,6 +235,22 @@ function MegaMenuFeatureCard({
 
 export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 	const [navMode, setNavMode] = useState<NavMode>("static");
+	const [openMenu, setOpenMenu] = useState("");
+	const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+		undefined,
+	);
+	const cancelClose = () => clearTimeout(closeTimer.current);
+
+	useEffect(() => {
+		const closeMenu = () => setOpenMenu("");
+		window.addEventListener("pagehide", closeMenu);
+		window.addEventListener("pageshow", closeMenu);
+		return () => {
+			clearTimeout(closeTimer.current);
+			window.removeEventListener("pagehide", closeMenu);
+			window.removeEventListener("pageshow", closeMenu);
+		};
+	}, []);
 	const shellRef = useRef<HTMLDivElement>(null);
 	const navModeRef = useRef<NavMode>("static");
 	const lastScrollYRef = useRef(0);
@@ -260,7 +276,8 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 			const shell = shellRef.current;
 			if (!shell) return;
 			const currentY = Math.max(0, window.scrollY);
-			if (currentY <= shell.offsetTop) {
+			const shellTop = shell.getBoundingClientRect().top + currentY;
+			if (currentY <= shellTop) {
 				setMode("static");
 				lastScrollYRef.current = currentY;
 				return;
@@ -268,7 +285,7 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 			const delta = currentY - lastScrollYRef.current;
 			if (Math.abs(delta) < SCROLL_DELTA) return;
 			setMode(
-				delta < 0 || currentY <= shell.offsetTop + shell.offsetHeight
+				delta < 0 || currentY <= shellTop + shell.offsetHeight
 					? "visible"
 					: "hidden",
 			);
@@ -296,6 +313,7 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 		>
 			<div
 				data-mode={navMode}
+				inert={navMode === "hidden"}
 				className={`desktop-nav-bar z-40 isolate border-t-2 border-primary transition-[transform,box-shadow,background-color] duration-300 ease-out motion-reduce:transition-none ${
 					navMode === "static"
 						? "relative bg-white text-black"
@@ -306,6 +324,14 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 			>
 				<div className="relative z-10 mx-auto w-full max-w-[var(--max-width-8xl)]">
 					<NavigationMenu
+						value={openMenu}
+						onValueChange={setOpenMenu}
+						onPointerEnter={cancelClose}
+						onPointerLeave={(event) => {
+							if (event.pointerType !== "mouse") return;
+							cancelClose();
+							closeTimer.current = setTimeout(() => setOpenMenu(""), 180);
+						}}
 						className="mx-auto w-full max-w-none px-0 [&>div]:w-full"
 						aria-label={copy.navigation}
 					>
@@ -340,16 +366,50 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 								return (
 									<NavigationMenuItem
 										key={item.id}
+										value={String(item.id)}
 										className="flex h-full items-center justify-center"
 									>
 										{hasChildren ? (
 											<>
-												<NavigationMenuTrigger className={navItemClass}>
-													<Label
-														label={item.link.label}
-														badge={item.link.badge}
-													/>
-												</NavigationMenuTrigger>
+												{hasCategoryPage ? (
+													<div
+														className="desktop-category-controls flex items-center"
+														onPointerEnter={(event) => {
+															if (event.pointerType !== "mouse") return;
+															cancelClose();
+															setOpenMenu(String(item.id));
+														}}
+													>
+														<NavigationMenuLink
+															asChild
+															className={cn(
+																navItemClass,
+																"desktop-category-link",
+															)}
+														>
+															<a href={categoryHref}>
+																<Label
+																	label={item.link.label}
+																	badge={item.link.badge}
+																/>
+															</a>
+														</NavigationMenuLink>
+														<NavigationMenuTrigger
+															className={cn(
+																navItemClass,
+																"desktop-category-toggle",
+															)}
+															aria-label={`${copy.navigation}: ${item.link.label}`}
+														/>
+													</div>
+												) : (
+													<NavigationMenuTrigger className={navItemClass}>
+														<Label
+															label={item.link.label}
+															badge={item.link.badge}
+														/>
+													</NavigationMenuTrigger>
+												)}
 												<NavigationMenuContent className="left-0 right-0 mt-3 max-h-[calc(100dvh-16rem)] w-auto overflow-x-hidden overflow-y-auto overscroll-contain rounded-[1.4rem] border-white/80 bg-[#f5f9f6]/[0.98] shadow-[0_36px_100px_-44px_rgba(2,18,10,0.78),0_12px_30px_-22px_rgba(2,18,10,0.42)] backdrop-blur-xl [scrollbar-gutter:stable]">
 													<div
 														className={cn(

@@ -12,11 +12,14 @@ interface Props {
   data: Global;
   lang: Lang;
   availableLangs?: readonly Lang[];
+  overlayMenu?: boolean;
 }
 
-const { data, lang, availableLangs } = Astro.props;
+const { data, lang, availableLangs, overlayMenu: overlayMenuProp } = Astro.props;
 const mobileLogoUrl = localizePath("/", lang);
-const overlayMenu = Astro.url.pathname.replace(/\/+$/, "") === mobileLogoUrl.replace(/\/+$/, "");
+const overlayMenu = overlayMenuProp ?? (
+  Astro.url.pathname.replace(/\/+$/, "") === mobileLogoUrl.replace(/\/+$/, "")
+);
 const isBlogLink = (link: Link) =>
   link.url?.includes("/blog") || link.label?.toLowerCase().includes("blog");
 const isContactLink = (link: Link) => {
@@ -48,7 +51,7 @@ const mobileQuickActions = [
 ];
 ---
 
-<header class="w-full shadow-sm">
+<header class="site-header w-full shadow-sm">
   <TopBar data={data?.topBar} lang={lang} />
   <HeaderTop
     data={data?.headerTop}
@@ -60,7 +63,6 @@ const mobileQuickActions = [
     lang={lang}
     client:media="(min-width: 1280px)"
     overlay={overlayMenu}
-    transition:persist
   />
   <MobileMenu
     menu={data?.menu}

@@ -1,0 +1,64 @@
+/* Native document navigation keeps metadata and scripts page-specific.
+   Unsupported browsers use normal navigation, with no JavaScript fallback. */
+.site-header {
+  position: relative;
+  z-index: 40;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header {
+    view-transition-name: site-header;
+  }
+  .dreamy-footer {
+    view-transition-name: site-footer;
+  }
+  #main-content {
+    view-transition-name: page-content;
+  }
+
+  ::view-transition {
+    pointer-events: none;
+  }
+  ::view-transition-group(*) {
+    animation: none;
+  }
+  ::view-transition-group(site-header) {
+    z-index: 2;
+  }
+  ::view-transition-group(page-content) {
+    z-index: 1;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-old(site-header),
+  ::view-transition-old(site-footer) {
+    display: none;
+  }
+
+  ::view-transition-new(root),
+  ::view-transition-new(site-header),
+  ::view-transition-new(site-footer) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(page-content) {
+    animation: page-content-out 160ms ease-out both;
+    mix-blend-mode: normal;
+  }
+  ::view-transition-new(page-content) {
+    animation: page-content-in 160ms ease-out both;
+    mix-blend-mode: normal;
+  }
+}
+
+@keyframes page-content-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-content-in {
+  from {
+    opacity: 0;
+  }
+}
