@@ -1,5 +1,41 @@
 import { expect, test } from "@playwright/test";
 
+test("paginates search results in groups of nine and resets for a new search", async ({
+	page,
+}) => {
+	await page.goto("/es/blog/");
+	const input = page.getByRole("searchbox", { name: "Buscar en el blog" });
+	await input.fill("a");
+	await input.press("Enter");
+	const results = page.locator("#blog-index-search-results");
+	const cards = results.locator("article");
+	const nav = results.getByRole("navigation", { name: "Paginación del blog" });
+	await expect(cards).toHaveCount(9);
+	const firstTitle = await cards.first().locator("h3").innerText();
+	const firstLinks = await cards
+		.locator("h3 a")
+		.evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+	const url = page.url();
+	await nav.getByRole("button", { name: "Página 2", exact: true }).click();
+	await expect(nav.locator('[aria-current="page"]')).toHaveText("2");
+	await expect(cards).toHaveCount(9);
+	const secondLinks = await cards
+		.locator("h3 a")
+		.evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+	expect(secondLinks.some((link) => firstLinks.includes(link))).toBe(false);
+	expect(page.url()).toBe(url);
+	await input.fill(firstTitle);
+	await input.press("Enter");
+	await expect(nav).toHaveCount(0);
+	await expect(cards.first().locator("h3")).toHaveText(firstTitle);
+	await input.fill("zzzz-no-results-987654321");
+	await input.press("Enter");
+	await expect(cards).toHaveCount(0);
+	await expect(nav).toHaveCount(0);
+	await page.getByRole("button", { name: "Limpiar búsqueda" }).click();
+	await expect(page.locator("#blog-index-default-posts")).toBeVisible();
+});
+
 test("searches blog cards without changing the URL", async ({ page }) => {
 	await page.goto("/es/blog/");
 

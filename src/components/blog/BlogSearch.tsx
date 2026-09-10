@@ -1,7 +1,8 @@
-import { createPortal } from "react-dom";
 import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { BlogSearchItem } from "@/lib/blogSearch";
 import type { Lang } from "@/lib/i18n";
+import Pagination from "./Pagination";
 
 interface Props {
 	items: BlogSearchItem[];
@@ -202,6 +203,20 @@ export default function BlogSearch({
 	const [error, setError] = useState("");
 	const [hasSearched, setHasSearched] = useState(false);
 	const [results, setResults] = useState<BlogSearchItem[]>([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [submittedQuery, setSubmittedQuery] = useState("");
+	const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
+	const totalPages = Math.ceil(results.length / 9);
+	const visibleResults = results.slice((currentPage - 1) * 9, currentPage * 9);
+
+	function changePage(page: number) {
+		setCurrentPage(page);
+		resultsHeadingRef.current?.focus({ preventScroll: true });
+		resultsHeadingRef.current?.scrollIntoView({
+			block: "start",
+			behavior: "instant",
+		});
+	}
 
 	useEffect(() => {
 		setTarget(document.getElementById(targetId));
@@ -254,12 +269,16 @@ export default function BlogSearch({
 		});
 
 		setResults(matches);
+		setCurrentPage(1);
+		setSubmittedQuery(cleanQuery);
 		setHasSearched(true);
 	}
 
 	function clearSearch() {
 		setQuery("");
 		setResults([]);
+		setCurrentPage(1);
+		setSubmittedQuery("");
 		setHasSearched(false);
 		clearFieldError();
 		inputRef.current?.focus();
@@ -273,10 +292,12 @@ export default function BlogSearch({
 						{t.results}
 					</p>
 					<h2
+						ref={resultsHeadingRef}
+						tabIndex={-1}
 						id={`${targetId}-title`}
-						className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground sm:text-3xl"
+						className="mt-2 scroll-mt-28 text-2xl font-semibold tracking-[-0.03em] text-foreground sm:text-3xl"
 					>
-						{t.resultFor} “{query.trim()}”
+						{t.resultFor} “{submittedQuery}”
 					</h2>
 					<p className="mt-2 text-sm text-muted-foreground" role="status">
 						{results.length} {results.length === 1 ? t.result : t.resultsPlural}
@@ -293,7 +314,7 @@ export default function BlogSearch({
 
 			{results.length > 0 ? (
 				<div className={resultGridClassName} aria-live="polite">
-					{results.map((item) => (
+					{visibleResults.map((item) => (
 						<BlogSearchCard key={item.id} item={item} lang={lang} />
 					))}
 				</div>
@@ -301,6 +322,14 @@ export default function BlogSearch({
 				<p className="rounded-xl border border-border bg-card px-6 py-12 text-center text-muted-foreground">
 					{t.noResults}
 				</p>
+			)}
+			{results.length > 0 && (
+				<Pagination
+					currentPage={currentPage}
+					totalPages={totalPages}
+					lang={lang}
+					onPageChange={changePage}
+				/>
 			)}
 		</section>
 	) : null;
