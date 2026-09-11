@@ -6,6 +6,8 @@ import CardPost from "@/components/ui/CardPost.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
 import TableOfContents from "@/components/ui/TableOfContents.astro";
 import Layout from "@/layouts/main.astro";
+import HeroImage from "@/components/ui/HeroImage.astro";
+import { getHeroImage } from "@/lib/heroImage";
 import {
   getImageAlt,
   getImageSrcSet,
@@ -126,19 +128,16 @@ const seoProps = buildSEOProps({
   slugMap,
 });
 const tocHeadings = extractHeadings(blog.contenido);
-const heroImageSrcSet = getImageSrcSet(
-  blog.portadaImage,
-  ["small", "medium", "large"],
-  { includeOriginal: true },
-);
+const hero = getHeroImage(blog.portadaImage, blog.titulo);
 const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
 ---
 
 <Layout
   seo={seoProps}
   lang={lang}
-  lcpImageUrl={blog.portadaImage ? heroImage : undefined}
-  lcpImageSrcSet={blog.portadaImage ? heroImageSrcSet : undefined}
+  lcpImageUrl={blog.portadaImage ? hero.src : undefined}
+  lcpImageSrcSet={blog.portadaImage ? hero.srcset : undefined}
+  lcpImageSizes={hero.sizes}
 >
   <div class="blog-post-page">
     {
@@ -155,18 +154,10 @@ const blogSearchItems = buildBlogSearchItems(searchBlogs, lang);
     {
       blog.portadaImage ? (
         <header class="relative h-[420px] w-full overflow-hidden sm:h-[500px] lg:h-[600px]">
-          <img
-            src={heroImage}
-            srcset={heroImageSrcSet || undefined}
-            sizes="100vw"
-            alt=""
-            aria-hidden="true"
-            width={blog.portadaImage.width || 2000}
-            height={blog.portadaImage.height || 600}
+          <HeroImage
+            image={hero}
+            decorative
             class="absolute inset-0 h-full w-full object-cover"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
           />
           <div
             class="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.14)_0%,rgba(214,238,224,0.06)_27%,rgba(8,23,17,0.18)_53%,rgba(5,14,10,0.92)_100%)]"

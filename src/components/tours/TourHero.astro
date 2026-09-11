@@ -3,55 +3,20 @@ import type { Tour, Badge } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
-import {
-  getImageAlt,
-  getImageSrcSet,
-  getImageUrl,
-} from "@/lib/helpers";
+import HeroImage from "@/components/ui/HeroImage.astro";
+import type { HeroImageData } from "@/lib/heroImage";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   tour: Tour;
+  heroImage: HeroImageData;
   lang: Lang;
   badges?: Badge[];
   pageCategory?: { title: string; slug: string };
 }
 
-const { tour, lang, badges, pageCategory } = Astro.props;
+const { tour, heroImage, lang, badges, pageCategory } = Astro.props;
 if (!tour) return;
-
-const featuredImages = Array.isArray(tour.imagenDestacada)
-  ? tour.imagenDestacada
-  : tour.imagenDestacada
-    ? [tour.imagenDestacada]
-    : [];
-
-const images = featuredImages
-  .map((img) => {
-    const originalUrl = getImageUrl(img);
-    const responsiveSrcSet = getImageSrcSet(img, ["small", "medium", "large"]);
-    const originalSrcSet = img.width ? `${originalUrl} ${img.width}w` : "";
-    const heroSrcSet = [responsiveSrcSet, originalSrcSet]
-      .filter(Boolean)
-      .join(", ");
-
-    return {
-      heroUrl: originalUrl,
-      heroSrcSet,
-      alt: getImageAlt(img, tour.titulo),
-    };
-  })
-  .filter((img) => img.heroUrl && img.heroUrl !== "/og-default.jpg");
-
-if (images.length === 0) {
-  images.push({
-    heroUrl: "/og-default.jpg",
-    heroSrcSet: "",
-    alt: tour.titulo,
-  });
-}
-
-const heroImage = images[images.length - 1];
 const categoryName = tour.categories?.[0]?.nombre;
 const hasBadges = badges && badges.length > 0;
 const breadcrumbCategory = pageCategory;
@@ -119,17 +84,9 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
   <div
     class="tour-hero-shell relative left-1/2 isolate min-h-[500px] w-screen -translate-x-1/2 overflow-hidden bg-slate-950 text-white shadow-[0_28px_80px_-48px_rgba(2,6,23,0.85)] md:min-h-[560px] lg:min-h-[700px]"
   >
-    <img
-      src={heroImage.heroUrl}
-      srcset={heroImage.heroSrcSet || undefined}
-      sizes="100vw"
-      alt={heroImage.alt}
+    <HeroImage
+      image={heroImage}
       class="tour-hero-image absolute inset-0 -z-20 h-full w-full object-cover"
-      width="1440"
-      height="760"
-      loading="eager"
-      fetchpriority="high"
-      decoding="async"
     />
     <div
       class="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-slate-950/90 via-slate-950/46 to-transparent"

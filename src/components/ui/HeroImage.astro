@@ -1,0 +1,25 @@
+---
+import type { HeroImageData } from "@/lib/heroImage";
+
+interface Props {
+  image: HeroImageData;
+  class?: string;
+  decorative?: boolean;
+}
+
+const { image, class: className, decorative = false } = Astro.props;
+---
+
+<img
+  src={image.src}
+  srcset={image.srcset}
+  sizes={image.srcset ? image.sizes : undefined}
+  width={image.width}
+  height={image.height}
+  alt={decorative ? "" : image.alt}
+  aria-hidden={decorative ? "true" : undefined}
+  class={className}
+  loading="eager"
+  fetchpriority="high"
+  decoding="async"
+/>

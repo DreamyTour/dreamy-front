@@ -25,6 +25,7 @@ interface Props {
   lang?: Lang;
   lcpImageUrl?: string;
   lcpImageSrcSet?: string;
+  lcpImageSizes?: string;
   lcpImageMedia?: string;
   enableViewTransitions?: boolean;
   overlayMenu?: boolean;
@@ -35,6 +36,7 @@ const {
   lang: langProp,
   lcpImageUrl,
   lcpImageSrcSet,
+  lcpImageSizes = "100vw",
   lcpImageMedia,
   enableViewTransitions = true,
   overlayMenu,
@@ -87,9 +89,8 @@ const transitionEnabled = enableViewTransitions &&
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://cdn.dreamy.tours" />
     {
-      /* LCP image preload — emitted only on pages that have a known hero image (e.g. tour pages)
-        This hint is placed before Font so the browser fetches it at highest priority
-        during initial HTML parse, cutting ~1-2s from LCP. */
+      /* Preload only the known LCP image, before fonts. Its URL, candidate set and
+         sizes must match the rendered image to avoid an unused download. */
     }
     {
       lcpImageUrl && (
@@ -99,7 +100,7 @@ const transitionEnabled = enableViewTransitions &&
           href={lcpImageUrl}
           {...(lcpImageMedia ? { media: lcpImageMedia } : {})}
           {...(lcpImageSrcSet
-            ? { imagesrcset: lcpImageSrcSet, imagesizes: "100vw" }
+            ? { imagesrcset: lcpImageSrcSet, imagesizes: lcpImageSizes }
             : {})}
           fetchpriority="high"
         />

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 // Exercise normal navigation and the reduced-motion fallback in Chromium.
 // Native cross-document animation is also checked against the production build.
-test.use({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+test.use({ viewport: { width: 1440, height: 900 } });
 
 test.beforeEach(async ({ page }) => {
 	await page.emulateMedia({ reducedMotion: "reduce" });

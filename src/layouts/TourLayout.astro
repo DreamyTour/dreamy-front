@@ -10,9 +10,10 @@ interface Props {
   lang?: Lang;
   lcpImageUrl?: string;
   lcpImageSrcSet?: string;
+  lcpImageSizes?: string;
 }
 
-const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet } = Astro.props;
+const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet, lcpImageSizes } = Astro.props;
 ---
 
 <Layout
@@ -20,6 +21,7 @@ const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet } = Astro.props;
   lang={lang}
   lcpImageUrl={lcpImageUrl}
   lcpImageSrcSet={lcpImageSrcSet}
+  lcpImageSizes={lcpImageSizes}
   overlayMenu={true}
 >
   <slot />
