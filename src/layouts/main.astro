@@ -28,7 +28,6 @@ interface Props {
   lcpImageSizes?: string;
   lcpImageMedia?: string;
   enableViewTransitions?: boolean;
-  overlayMenu?: boolean;
 }
 
 const {
@@ -39,7 +38,6 @@ const {
   lcpImageSizes = "100vw",
   lcpImageMedia,
   enableViewTransitions = true,
-  overlayMenu,
 } = Astro.props;
 
 // 1. Detectamos el idioma desde los params de la vista de forma automática
@@ -135,7 +133,6 @@ const transitionEnabled = enableViewTransitions &&
       data={globalData}
       lang={currentLang}
       availableLangs={availableLangs}
-      overlayMenu={overlayMenu}
     />
     <main id="main-content" tabindex="-1">
       <slot />
