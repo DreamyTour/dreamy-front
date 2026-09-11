@@ -140,7 +140,11 @@ async function measure(browser, target, viewport, cacheState) {
   }
 }
 
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+// Set CDP_ENDPOINT to attach to an externally started Chrome when this host
+// cannot create Playwright's named debugging pipe.
+const browser = process.env.CDP_ENDPOINT
+  ? await chromium.connectOverCDP(process.env.CDP_ENDPOINT)
+  : await chromium.launch({ channel: "chrome", headless: true });
 const output = [];
 try {
   for (const target of pages) {
