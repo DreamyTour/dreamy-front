@@ -65,7 +65,7 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
           )}
         </header>
 
-        <ul class="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[minmax(20rem,auto)_minmax(16.25rem,auto)]">
+        <ul class="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[minmax(20rem,auto)_minmax(18.5rem,auto)]">
           {postsList.slice(0, 1).map((blog: Blog) => (
             <li class="min-w-0 sm:col-span-2 lg:row-start-1">
               <CardPostHome blog={blog} lang={lang} variant="wide" />
