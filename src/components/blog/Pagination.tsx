@@ -52,7 +52,7 @@ export default function Pagination({
 	) => {
 		const active = !direction && page === currentPage;
 		const disabled = page < 1 || page > totalPages;
-		const className = `inline-flex min-h-11 min-w-9 sm:min-w-11 items-center justify-center gap-2 rounded-md border px-2 sm:px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transition-none ${active ? "border-primary bg-primary text-primary-foreground" : disabled ? "border-transparent text-muted-foreground/50" : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-primary"}`;
+		const className = `inline-flex min-h-11 min-w-9 sm:min-w-11 items-center justify-center gap-2 rounded-full border px-2 sm:px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transition-none ${direction ? "px-4 sm:px-5 " : ""}${active ? "border-primary bg-primary text-primary-foreground shadow-sm" : disabled ? "cursor-default border-transparent text-muted-foreground/40" : direction ? "border-border/70 bg-card text-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-primary" : "border-transparent text-muted-foreground hover:bg-primary/10 hover:text-primary"}`;
 		if (disabled)
 			return (
 				<span className={className} aria-disabled="true">
@@ -86,19 +86,16 @@ export default function Pagination({
 	return (
 		<nav
 			aria-label={t.label}
-			className="mt-10 flex flex-col items-center gap-4 border-t border-border pt-6"
+			className="mt-10 flex flex-col items-center border-t border-border/60 pt-8"
 		>
-			<p
-				className="text-sm tabular-nums text-muted-foreground"
-				aria-live={onPageChange ? "polite" : undefined}
-			>
+			<p className="sr-only" aria-live={onPageChange ? "polite" : undefined}>
 				{t.page}{" "}
 				<strong className="font-semibold text-foreground">{currentPage}</strong>{" "}
 				{t.of} {totalPages}
 			</p>
 			{totalPages > 1 && (
-				<div className="flex w-full flex-wrap items-center justify-center gap-2">
-					<div className="order-2 mr-auto sm:order-none sm:mr-1">
+				<div className="grid grid-cols-2 items-center justify-items-center gap-x-3 gap-y-4 sm:flex sm:justify-center sm:gap-x-5">
+					<div className="order-2 justify-self-end sm:order-none">
 						{control(
 							currentPage - 1,
 							<>
@@ -109,7 +106,7 @@ export default function Pagination({
 							"prev",
 						)}
 					</div>
-					<ul className="order-1 flex w-full items-center justify-center gap-1 sm:order-none sm:w-auto">
+					<ul className="order-1 col-span-2 flex max-w-full items-center justify-center gap-1 rounded-full border border-border/60 bg-card p-1.5 shadow-sm sm:order-none">
 						{getPaginationItems(currentPage, totalPages).map((item) => (
 							<li key={item}>
 								{typeof item === "number" ? (
@@ -125,7 +122,7 @@ export default function Pagination({
 							</li>
 						))}
 					</ul>
-					<div className="order-3 ml-auto sm:order-none sm:ml-1">
+					<div className="order-3 justify-self-start sm:order-none">
 						{control(
 							currentPage + 1,
 							<>

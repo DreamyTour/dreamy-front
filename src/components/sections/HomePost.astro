@@ -24,7 +24,7 @@ const posts = await fetchApi<Blog[]>({
   locale: lang,
   query: {
     sort: "publishedAt:desc",
-    "pagination[limit]": 5,
+    "pagination[limit]": 4,
     populate: "*",
   },
 });
@@ -36,7 +36,7 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
   postsList.length > 0 && (
     <section
       aria-labelledby="home-posts-title"
-      class="content-deferred content-deferred--tall w-full bg-primary/5 py-16"
+      class="content-deferred content-deferred--tall w-full bg-primary/5 py-16 md:py-20"
     >
       <div class="max-w-8xl mx-auto px-6">
         <header class="mb-12 max-w-4xl mx-auto text-center md:mb-16">
@@ -65,27 +65,26 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
           )}
         </header>
 
-        <ul class="m-0 grid list-none grid-cols-1 gap-1.5 p-0 md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(15.625rem,1fr))]">
+        <ul class="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[minmax(20rem,auto)_minmax(16.25rem,auto)]">
           {postsList.slice(0, 1).map((blog: Blog) => (
-            <li class="flex flex-col md:col-span-2 lg:col-span-2 lg:row-start-1">
+            <li class="min-w-0 sm:col-span-2 lg:row-start-1">
+              <CardPostHome blog={blog} lang={lang} variant="wide" />
+            </li>
+          ))}
+          {postsList.slice(2, 4).map((blog: Blog, index: number) => (
+            <li
+              class:list={[
+                "min-w-0 lg:row-start-2",
+                index === 0 && "lg:col-start-1",
+                index === 1 && "lg:col-start-2",
+              ]}
+            >
               <CardPostHome blog={blog} lang={lang} />
             </li>
           ))}
           {postsList.slice(1, 2).map((blog: Blog) => (
-            <li class="flex flex-col lg:col-span-2 lg:col-start-3 lg:row-span-2 lg:row-start-1">
+            <li class="min-w-0 sm:col-span-2 lg:col-start-3 lg:row-span-2 lg:row-start-1">
               <CardPostHome blog={blog} lang={lang} variant="tall" />
-            </li>
-          ))}
-          {postsList.slice(2, 5).map((blog: Blog, index: number) => (
-            <li
-              class:list={[
-                "flex flex-col lg:row-start-2",
-                index === 0 && "lg:col-start-1",
-                index === 1 && "lg:col-start-2",
-                index === 2 && "md:col-span-2 lg:hidden",
-              ]}
-            >
-              <CardPostHome blog={blog} lang={lang} />
             </li>
           ))}
         </ul>

@@ -2,13 +2,13 @@
 import type { Blog } from "@/types/blog";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
-import { getImageUrl } from "@/lib/helpers";
+import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   blog: Blog;
   lang: Lang;
-  variant?: "standard" | "tall";
+  variant?: "standard" | "wide" | "tall";
 }
 
 const { blog, lang, variant = "standard" } = Astro.props;
@@ -16,7 +16,10 @@ const { blog, lang, variant = "standard" } = Astro.props;
 if (!blog) return null;
 
 const t = useTranslations(lang);
-const mainImage = getImageUrl(blog.portadaImage, "medium");
+const mainImage = getImageUrl(
+  blog.portadaImage,
+  variant === "standard" ? "medium" : "large",
+);
 const category = blog.category_blogs?.[0]?.nombre || null;
 const hasImage = mainImage && mainImage !== "/og-default.jpg";
 ---
@@ -24,9 +27,9 @@ const hasImage = mainImage && mainImage !== "/og-default.jpg";
 <article class="h-full">
   <a
     class:list={[
-      "group relative isolate flex h-full min-h-80 transform-[translateY(0)] overflow-hidden rounded-xl bg-neutral-950 text-white no-underline shadow-[0_14px_32px_-24px_rgba(8,23,17,0.75)] ring-1 ring-black/10 transition-[transform_.3s_cubic-bezier(.2,_0,_0,_1),box-shadow_.3s,ring-color_.3s] hover:transform-[translateY(-0.25rem)] hover:shadow-[0_28px_48px_-20px_rgba(7,49,28,0.5)] hover:ring-primary/35 focus-visible:transform-[translateY(-0.25rem)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none",
-      variant === "tall" && "min-h-[26.25rem]",
-      variant === "standard" && "lg:min-h-[15.625rem]",
+      "group relative isolate flex h-full min-h-[16.25rem] transform-[translateY(0)] overflow-hidden rounded-3xl bg-neutral-950 text-white no-underline shadow-[0_14px_32px_-24px_rgba(8,23,17,0.75)] ring-1 ring-black/10 transition-[transform_.3s_cubic-bezier(.2,_0,_0,_1),box-shadow_.3s,ring-color_.3s] hover:transform-[translateY(-0.25rem)] hover:shadow-[0_28px_48px_-20px_rgba(7,49,28,0.5)] hover:ring-primary/35 focus-visible:transform-[translateY(-0.25rem)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none",
+      variant === "tall" && "min-h-[25rem] lg:min-h-full",
+      variant === "wide" && "min-h-80",
     ]}
     href={rewriteUrl(`/blog/${blog.slug}`, lang)}
     aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
@@ -35,9 +38,19 @@ const hasImage = mainImage && mainImage !== "/og-default.jpg";
       hasImage ? (
         <img
           src={mainImage}
+          srcset={
+            getImageSrcSet(blog.portadaImage, ["small", "medium", "large"], {
+              includeOriginal: true,
+            }) || undefined
+          }
+          sizes={
+            variant === "standard"
+              ? "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              : "(min-width: 1024px) 50vw, 100vw"
+          }
           alt=""
           aria-hidden="true"
-          class="absolute inset-0 size-full scale-[1.005] object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.025] group-focus-visible:scale-[1.025] motion-reduce:transform-none"
+          class="absolute inset-0 size-full scale-[1.005] object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
           loading="lazy"
           decoding="async"
         />
@@ -53,27 +66,34 @@ const hasImage = mainImage && mainImage !== "/og-default.jpg";
 
     <span
       class="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgb(0_0_0_/_0.08)_0%,rgb(0_0_0_/_0.22)_42%,rgb(0_0_0_/_0.82)_100%),linear-gradient(90deg,rgb(0_0_0_/_0.35),transparent_48%)]"
-      aria-hidden="true"
-    ></span>
-
-    {
-      category && (
-        <span class="absolute left-4 top-4 z-20 max-w-[calc(100%-2rem)] truncate rounded-full border border-white/20 bg-primary px-3 py-2 text-[0.68rem] font-extrabold uppercase leading-none tracking-[0.1em] text-white shadow-lg shadow-primary/35 backdrop-blur-sm">
-          {category}
-        </span>
-      )
-    }
+      aria-hidden="true"></span>
 
     <div
       class:list={[
-        "relative z-20 flex w-full flex-col items-center justify-end gap-5 px-5 pb-8 pt-[4.5rem] text-center md:px-7",
-        variant === "tall" && "lg:pb-16",
+        "relative z-20 flex w-full flex-col items-start justify-end gap-4 p-5 text-left",
+        variant === "wide" && "sm:p-6",
+        variant === "tall" && "sm:gap-6 sm:p-8",
       ]}
     >
-      <h3 class="max-w-[34rem] text-balance text-[1.08rem] font-bold leading-[1.16] tracking-[-0.015em] text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.35)] md:text-[1.24rem]">
+      {
+        category && (
+          <span class="max-w-full rounded-full border border-white/20 bg-primary px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
+            {category}
+          </span>
+        )
+      }
+      <h3
+        class:list={[
+          "max-w-xl text-pretty text-xl font-bold leading-tight tracking-tight text-white",
+          variant === "wide" && "sm:text-2xl",
+          variant === "tall" && "sm:text-3xl",
+        ]}
+      >
         {blog.titulo}
       </h3>
-      <span class="inline-flex items-center gap-2 rounded-md border border-white/85 bg-black/20 px-4 py-[0.68rem] text-[0.72rem] font-extrabold leading-none text-white backdrop-blur-sm transition-[background-color,border-color,transform] duration-300 group-hover:border-secondary group-hover:bg-secondary group-hover:text-white group-hover:shadow-lg group-hover:shadow-secondary/30 group-focus-visible:border-secondary group-focus-visible:bg-secondary group-focus-visible:text-white motion-reduce:transition-none">
+      <span
+        class="inline-flex items-center gap-2 min-h-11 rounded-full border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-semibold leading-none text-white backdrop-blur-sm transition-[background-color,border-color,transform] duration-300 group-hover:border-secondary group-hover:bg-secondary group-hover:text-white group-hover:shadow-lg group-hover:shadow-secondary/30 group-focus-visible:border-secondary group-focus-visible:bg-secondary group-focus-visible:text-white motion-reduce:transition-none"
+      >
         <span>{t("blog.leerMas")}</span>
         <svg
           class="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 motion-reduce:transition-none"
@@ -85,7 +105,7 @@ const hasImage = mainImage && mainImage !== "/og-default.jpg";
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path d="M5 12h14M13 6l6 6-6 6" />
+          <path d="M5 12h14M13 6l6 6-6 6"></path>
         </svg>
       </span>
     </div>
