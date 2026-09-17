@@ -186,14 +186,61 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	const tabTriggerClass =
 		"tour-tab-trigger group relative flex-1 flex flex-col items-center justify-center gap-2 rounded-sm bg-transparent px-4 pb-5 pt-4 text-[0.65rem] md:text-sm font-bold uppercase tracking-[0.12em] text-[#333] transition-colors duration-300 whitespace-nowrap outline-none border-none !shadow-none ring-0 focus-visible:ring-0";
 	const mobileAccordionClass =
-		"group overflow-hidden rounded-sm border border-border/80 bg-background shadow-[0_22px_50px_-38px_color-mix(in_oklab,var(--foreground)_24%,transparent)]";
+		"group/mobile overflow-hidden rounded-2xl border border-border/80 bg-background shadow-sm transition-[border-color,box-shadow] duration-200 open:border-primary/35 open:shadow-[0_6px_24px_-12px_color-mix(in_oklab,var(--primary)_25%,transparent)] motion-reduce:transition-none";
 	const mobileSummaryClass =
-		"flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 transition-colors duration-200 hover:bg-primary/[0.03] [&::-webkit-details-marker]:hidden";
-	const mobileIconClass =
-		"flex h-10 w-10 shrink-0 items-center justify-center rounded-sm border border-primary/10 bg-primary/[0.06] text-primary";
+		"flex min-h-24 w-full cursor-pointer list-none items-center gap-3 px-4 py-4 text-left transition-colors duration-200 hover:bg-primary/[0.03] group-open/mobile:bg-primary/[0.05] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none [&::-webkit-details-marker]:hidden";
 	const mobileContentClass =
-		"border-t border-primary/10 px-4 py-4 bg-background";
+		"border-t border-primary/10 bg-background px-4 py-5";
 	const tabPanelTitleClass = "sr-only";
+	const mobileDescriptions = {
+		en: {
+			overview: "Your adventure at a glance",
+			itinerary: "Explore the journey, day by day",
+			included: "What's included in your trip",
+			information: "Good to know before you go",
+			price: "Find your travel option",
+			maps: "Discover the route and stops",
+		},
+		es: {
+			overview: "Tu aventura de un vistazo",
+			itinerary: "Explora el viaje, día a día",
+			included: "Qué incluye tu experiencia",
+			information: "Lo que debes saber antes de viajar",
+			price: "Encuentra tu opción de viaje",
+			maps: "Descubre la ruta y sus paradas",
+		},
+		pt: {
+			overview: "Sua aventura em resumo",
+			itinerary: "Explore a viagem, dia a dia",
+			included: "O que está incluído na viagem",
+			information: "O que saber antes de viajar",
+			price: "Encontre sua opção de viagem",
+			maps: "Descubra a rota e as paradas",
+		},
+	}[lang];
+	const renderMobileSummary = (
+		type: keyof typeof mobileDescriptions,
+		title: string,
+		Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>,
+	) => (
+		<summary className={mobileSummaryClass}>
+			<span
+				aria-hidden="true"
+				className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.08] text-primary transition-colors duration-200 group-open/mobile:bg-primary group-open/mobile:text-primary-foreground motion-reduce:transition-none"
+			>
+				<Icon className="size-5" />
+			</span>
+			<span className="flex min-w-0 flex-1 flex-col gap-1">
+				<span className="text-base font-semibold leading-tight tracking-tight text-foreground">
+					{title}
+				</span>
+				<span className="text-xs leading-relaxed text-muted-foreground">
+					{mobileDescriptions[type]}
+				</span>
+			</span>
+			<ChevronIcon className="size-4 shrink-0 text-primary transition-transform duration-200 group-open/mobile:rotate-180 motion-reduce:transition-none" />
+		</summary>
+	);
 
 	return (
 		<div className="w-full" ref={tabsRef}>
@@ -399,18 +446,15 @@ export default function TourTabs({ tour, lang, children }: Props) {
 				</div>
 
 				{/* Mobile Layout */}
-				<div className="space-y-4 lg:hidden">
+				<div className="flex min-w-0 flex-col gap-3 lg:hidden">
 					{/* Summary */}
 					{hasOverview && tab.overview.titulo && (
 						<details open className={mobileAccordionClass}>
-							<summary className={mobileSummaryClass}>
-								<span className="text-left text-base font-semibold text-foreground">
-									{tab.overview.titulo}
-								</span>
-								<span className={mobileIconClass}>
-									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-								</span>
-							</summary>
+							{renderMobileSummary(
+								"overview",
+								tab.overview.titulo,
+								OverviewIcon,
+							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.overview.titulo}</h2>
 								<OverviewTab timeline={tab.overview.timeline} />
@@ -421,14 +465,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{/* Itinerary */}
 					{hasItinerary && tab.itinerary.titulo && (
 						<details open={!hasOverview} className={mobileAccordionClass}>
-							<summary className={mobileSummaryClass}>
-								<span className="text-left text-base font-semibold text-foreground">
-									{tab.itinerary.titulo}
-								</span>
-								<span className={mobileIconClass}>
-									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-								</span>
-							</summary>
+							{renderMobileSummary(
+								"itinerary",
+								tab.itinerary.titulo,
+								ItineraryIcon,
+							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.itinerary.titulo}</h2>
 								<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
@@ -439,14 +480,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{/* Included */}
 					{hasIncluded && tab.included.titulo && (
 						<details className={mobileAccordionClass}>
-							<summary className={mobileSummaryClass}>
-								<span className="text-left text-base font-semibold text-foreground">
-									{tab.included.titulo}
-								</span>
-								<span className={mobileIconClass}>
-									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-								</span>
-							</summary>
+							{renderMobileSummary(
+								"included",
+								tab.included.titulo,
+								IncludedIcon,
+							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.included.titulo}</h2>
 								<IncludedTab contenido={tab.included.contenido} />
@@ -457,14 +495,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{/* Information */}
 					{hasInformation && tab.information.titulo && (
 						<details className={mobileAccordionClass}>
-							<summary className={mobileSummaryClass}>
-								<span className="text-left text-base font-semibold text-foreground">
-									{tab.information.titulo}
-								</span>
-								<span className={mobileIconClass}>
-									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-								</span>
-							</summary>
+							{renderMobileSummary(
+								"information",
+								tab.information.titulo,
+								InformationIcon,
+							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.information.titulo}</h2>
 								<InformationTab items={tab.information.acordeon} />
@@ -475,14 +510,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					{/* Price */}
 					{hasPrice && tab.price.titulo && (
 						<details className={mobileAccordionClass}>
-							<summary className={mobileSummaryClass}>
-								<span className="text-left text-base font-semibold text-foreground">
-									{tab.price.titulo}
-								</span>
-								<span className={mobileIconClass}>
-									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-								</span>
-							</summary>
+							{renderMobileSummary("price", tab.price.titulo, PriceIcon)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.price.titulo}</h2>
 								<PriceTab contenido={tab.price.contenido} />
@@ -495,14 +523,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							className={mobileAccordionClass}
 							onToggle={(event) => setIsMapOpenMobile(event.currentTarget.open)}
 						>
-							<summary className={mobileSummaryClass}>
-								<span className="text-left text-base font-semibold text-foreground">
-									{mapsTitle}
-								</span>
-								<span className={mobileIconClass}>
-									<ChevronIcon className="h-5 w-5 transition-transform duration-200 group-open:rotate-180" />
-								</span>
-							</summary>
+							{renderMobileSummary("maps", mapsTitle, MapIcon)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{mapsTitle}</h2>
 								<DeferredMapTab
