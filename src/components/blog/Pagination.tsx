@@ -1,4 +1,8 @@
 import type { ReactNode } from "react";
+import {
+	ArrowLeftIcon,
+	ArrowRightIcon,
+} from "@/components/icons/NavigationIcons";
 import type { Lang } from "@/lib/i18n";
 import { getPaginationHref, getPaginationItems } from "@/lib/pagination";
 
@@ -52,7 +56,7 @@ export default function Pagination({
 	) => {
 		const active = !direction && page === currentPage;
 		const disabled = page < 1 || page > totalPages;
-		const className = `inline-flex min-h-11 min-w-9 sm:min-w-11 items-center justify-center gap-2 rounded-full border px-2 sm:px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transition-none ${direction ? "px-4 sm:px-5 " : ""}${active ? "border-primary bg-primary text-primary-foreground shadow-sm" : disabled ? "cursor-default border-transparent text-muted-foreground/40" : direction ? "border-border/70 bg-card text-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-primary" : "border-transparent text-muted-foreground hover:bg-primary/10 hover:text-primary"}`;
+		const className = `group relative inline-flex min-h-11 min-w-8 items-center justify-center gap-2 rounded-lg border px-2 text-sm font-medium tabular-nums transition-[color,background-color,border-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card motion-reduce:transition-none sm:min-w-11 ${direction ? "px-3 " : ""}${active ? "border-foreground bg-foreground text-background shadow-[0_3px_10px_-3px_color-mix(in_oklab,var(--foreground)_35%,transparent)] after:absolute after:bottom-1 after:h-0.5 after:w-3 after:rounded-full after:bg-primary-foreground" : disabled ? "cursor-default border-transparent text-muted-foreground/40" : direction ? "border-transparent text-foreground hover:border-primary/15 hover:bg-primary/5 hover:text-primary" : "border-transparent text-muted-foreground hover:border-primary/15 hover:bg-primary/5 hover:text-primary"}`;
 		if (disabled)
 			return (
 				<span className={className} aria-disabled="true">
@@ -86,34 +90,29 @@ export default function Pagination({
 	return (
 		<nav
 			aria-label={t.label}
-			className="mt-10 flex flex-col items-center border-t border-border/60 pt-8"
+			className="mt-10 flex min-w-0 flex-col items-center gap-4 border-t border-border/60 pt-8"
 		>
-			<p className="sr-only" aria-live={onPageChange ? "polite" : undefined}>
-				{t.page}{" "}
-				<strong className="font-semibold text-foreground">{currentPage}</strong>{" "}
-				{t.of} {totalPages}
-			</p>
 			{totalPages > 1 && (
-				<div className="grid grid-cols-2 items-center justify-items-center gap-x-3 gap-y-4 sm:flex sm:justify-center sm:gap-x-5">
-					<div className="order-2 justify-self-end sm:order-none">
+				<div className="grid max-w-full grid-cols-2 items-center gap-x-2 gap-y-1 rounded-2xl border border-border/80 bg-card p-1.5 shadow-[0_8px_30px_-16px_color-mix(in_oklab,var(--foreground)_22%,transparent)] ring-4 ring-primary/[0.025] sm:flex sm:justify-center">
+					<div className="order-2 justify-self-start sm:order-none">
 						{control(
 							currentPage - 1,
 							<>
-								<span aria-hidden="true">←</span>
-								<span>{t.previous}</span>
+								<ArrowLeftIcon className="size-4" />
+								<span className="sm:sr-only xl:not-sr-only">{t.previous}</span>
 							</>,
 							t.previous,
 							"prev",
 						)}
 					</div>
-					<ul className="order-1 col-span-2 flex max-w-full items-center justify-center gap-1 rounded-full border border-border/60 bg-card p-1.5 shadow-sm sm:order-none">
+					<ul className="order-1 col-span-2 flex min-w-0 items-center justify-center gap-1 border-b border-border/60 pb-1.5 sm:order-none sm:border-x sm:border-b-0 sm:px-2 sm:pb-0">
 						{getPaginationItems(currentPage, totalPages).map((item) => (
 							<li key={item}>
 								{typeof item === "number" ? (
 									control(item, item, `${t.page} ${item}`)
 								) : (
 									<span
-										className="inline-flex min-h-11 w-5 items-center justify-center text-muted-foreground"
+										className="inline-flex min-h-11 w-4 items-center justify-center text-muted-foreground/60"
 										aria-hidden="true"
 									>
 										…
@@ -122,12 +121,12 @@ export default function Pagination({
 							</li>
 						))}
 					</ul>
-					<div className="order-3 justify-self-start sm:order-none">
+					<div className="order-3 justify-self-end sm:order-none">
 						{control(
 							currentPage + 1,
 							<>
-								<span>{t.next}</span>
-								<span aria-hidden="true">→</span>
+								<span className="sm:sr-only xl:not-sr-only">{t.next}</span>
+								<ArrowRightIcon className="size-4" />
 							</>,
 							t.next,
 							"next",
@@ -135,6 +134,19 @@ export default function Pagination({
 					</div>
 				</div>
 			)}
+			<p
+				className="flex items-center gap-2 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-muted-foreground"
+				aria-live={onPageChange ? "polite" : undefined}
+			>
+				<span aria-hidden="true" className="size-1 rounded-full bg-primary" />
+				<span>
+					{t.page}{" "}
+					<strong className="font-semibold text-foreground">
+						{currentPage}
+					</strong>{" "}
+					{t.of} {totalPages}
+				</span>
+			</p>
 		</nav>
 	);
 }
