@@ -34,7 +34,7 @@ interface Props {
 const SCROLL_DELTA = 8;
 const MEGA_MENU_FALLBACK_IMAGE = "/imagenes/circuitos.webp";
 const topLevelClass =
-	"h-11 rounded-none border-0 px-3 text-[14px] font-normal tracking-normal text-black hover:bg-transparent hover:text-primary focus-visible:ring-primary/40 focus-visible:ring-offset-white before:pointer-events-none before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:bg-secondary data-[state=open]:bg-transparent data-[state=open]:text-primary xl:px-3 2xl:px-4 [&_svg]:text-current";
+	"h-11 rounded-[0.6rem] border-0 px-3 text-[14px] font-normal tracking-normal text-black hover:bg-transparent hover:text-primary focus-visible:ring-primary/40 focus-visible:ring-offset-white before:pointer-events-none before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:bg-secondary data-[state=open]:bg-transparent data-[state=open]:text-primary xl:px-3 2xl:px-4 [&_svg]:text-current";
 
 const megaMenuCopy: Record<
 	Lang,
@@ -543,7 +543,7 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 																			size={29}
 																			strokeWidth={1.65}
 																			aria-hidden="true"
-																			className="shrink-0"
+																			className="shrink-0 text-primary"
 																		/>
 																		<div className="min-w-0">
 																			<p className="text-[0.625rem] font-bold uppercase leading-relaxed tracking-[0.13em]">
