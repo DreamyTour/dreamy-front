@@ -11,21 +11,18 @@ const copy = {
 		previous: "Anterior",
 		next: "Siguiente",
 		page: "Página",
-		of: "de",
 		label: "Paginación del blog",
 	},
 	en: {
 		previous: "Previous",
 		next: "Next",
 		page: "Page",
-		of: "of",
 		label: "Blog pagination",
 	},
 	pt: {
 		previous: "Anterior",
 		next: "Próxima",
 		page: "Página",
-		of: "de",
 		label: "Paginação do blog",
 	},
 };
@@ -56,7 +53,7 @@ export default function Pagination({
 	) => {
 		const active = !direction && page === currentPage;
 		const disabled = page < 1 || page > totalPages;
-		const className = `group relative inline-flex min-h-11 min-w-8 items-center justify-center gap-2 rounded-lg border px-2 text-sm font-medium tabular-nums transition-[color,background-color,border-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card motion-reduce:transition-none sm:min-w-11 ${direction ? "px-3 " : ""}${active ? "border-foreground bg-foreground text-background shadow-[0_3px_10px_-3px_color-mix(in_oklab,var(--foreground)_35%,transparent)] after:absolute after:bottom-1 after:h-0.5 after:w-3 after:rounded-full after:bg-primary-foreground" : disabled ? "cursor-default border-transparent text-muted-foreground/40" : direction ? "border-transparent text-foreground hover:border-primary/15 hover:bg-primary/5 hover:text-primary" : "border-transparent text-muted-foreground hover:border-primary/15 hover:bg-primary/5 hover:text-primary"}`;
+		const className = `group relative inline-flex min-h-11 min-w-8 items-center justify-center gap-2 rounded-lg border px-2 text-sm font-medium tabular-nums transition-[color,background-color,border-color,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card motion-reduce:transition-none sm:min-w-11 ${direction ? "px-3 " : ""}${active ? "border-primary bg-primary text-primary-foreground shadow-[0_3px_10px_-3px_color-mix(in_oklab,var(--primary)_35%,transparent)] after:absolute after:bottom-1 after:h-0.5 after:w-3 after:rounded-full after:bg-primary-foreground" : disabled ? "cursor-default border-transparent text-muted-foreground/40" : direction ? "border-transparent text-foreground hover:border-primary/15 hover:bg-primary/5 hover:text-primary" : "border-transparent text-muted-foreground hover:border-primary/15 hover:bg-primary/5 hover:text-primary"}`;
 		if (disabled)
 			return (
 				<span className={className} aria-disabled="true">
@@ -90,7 +87,7 @@ export default function Pagination({
 	return (
 		<nav
 			aria-label={t.label}
-			className="mt-10 flex min-w-0 flex-col items-center gap-4 border-t border-border/60 pt-8"
+			className="mt-10 flex min-w-0 flex-col items-center border-t border-border/60 pt-8"
 		>
 			{totalPages > 1 && (
 				<div className="grid max-w-full grid-cols-2 items-center gap-x-2 gap-y-1 rounded-2xl border border-border/80 bg-card p-1.5 shadow-[0_8px_30px_-16px_color-mix(in_oklab,var(--foreground)_22%,transparent)] ring-4 ring-primary/[0.025] sm:flex sm:justify-center">
@@ -134,19 +131,6 @@ export default function Pagination({
 					</div>
 				</div>
 			)}
-			<p
-				className="flex items-center gap-2 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-muted-foreground"
-				aria-live={onPageChange ? "polite" : undefined}
-			>
-				<span aria-hidden="true" className="size-1 rounded-full bg-primary" />
-				<span>
-					{t.page}{" "}
-					<strong className="font-semibold text-foreground">
-						{currentPage}
-					</strong>{" "}
-					{t.of} {totalPages}
-				</span>
-			</p>
 		</nav>
 	);
 }
