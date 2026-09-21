@@ -1,36 +1,69 @@
 ---
 export const prerender = false;
 
+import "../styles/global.css";
+
 Astro.response.status = 404;
 
-// This page must remain independent of the CMS and the shared site layout.
+// Keep this route independent from the shared layout and the CMS.
 const firstSegment = Astro.url.pathname.split("/")[1];
-const lang =
+const lang: "en" | "es" | "pt" =
   firstSegment === "es" || firstSegment === "pt" ? firstSegment : "en";
+
 const contentByLang = {
   en: {
-    title: "This route is off the map.",
+    eyebrow: "Route 404",
+    titleBefore: "This route is ",
+    titleAccent: "off the map.",
     description:
-      "The page you are looking for may have moved or no longer exists.",
+      "The page you were looking for may have moved, changed its name or never existed. Let's find a new direction for your journey.",
+    packages: "View Peru packages",
     home: "Go to home",
     blog: "Explore the blog",
+    routeNote: "Every great adventure starts by finding the right path.",
+    imageAlt: "Illustration of a traveler checking a map after getting lost",
+    imageLabel: "Recalculating route",
+    imageCaption: "Your next adventure is still waiting for you.",
   },
   es: {
-    title: "Esta ruta no está en el mapa.",
-    description: "La página que buscas pudo cambiar de lugar o ya no existe.",
+    eyebrow: "Ruta 404",
+    titleBefore: "Esta ruta no está ",
+    titleAccent: "en el mapa.",
+    description:
+      "La página que buscabas pudo cambiar de lugar, de nombre o quizá nunca existió. Busquemos una nueva dirección para tu viaje.",
+    packages: "Ver paquetes de Perú",
     home: "Ir al inicio",
     blog: "Explorar el blog",
+    routeNote: "Toda gran aventura comienza al encontrar el camino correcto.",
+    imageAlt: "Ilustración de un viajero consultando un mapa tras perderse",
+    imageLabel: "Recalculando ruta",
+    imageCaption: "Tu próxima aventura todavía te está esperando.",
   },
   pt: {
-    title: "Esta rota não está no mapa.",
+    eyebrow: "Rota 404",
+    titleBefore: "Esta rota não está ",
+    titleAccent: "no mapa.",
     description:
-      "A página que você procura pode ter mudado de lugar ou não existir mais.",
+      "A página que você procurava pode ter mudado de lugar, de nome ou talvez nunca existido. Vamos encontrar uma nova direção para a sua viagem.",
+    packages: "Ver pacotes do Peru",
     home: "Ir ao início",
     blog: "Explorar o blog",
+    routeNote: "Toda grande aventura começa ao encontrar o caminho certo.",
+    imageAlt:
+      "Ilustração de um viajante consultando um mapa depois de se perder",
+    imageLabel: "Recalculando rota",
+    imageCaption: "Sua próxima aventura ainda está esperando por você.",
   },
 };
+
 const content = contentByLang[lang];
 const homeUrl = lang === "en" ? "/" : `/${lang}/`;
+const blogUrl = `${homeUrl}blog/`;
+const packagesUrlByLang = {
+  en: "/peru-packages/",
+  es: "/es/paquetes-peru/",
+  pt: "/pt/pacotes-peru/",
+};
 ---
 
 <!doctype html>
@@ -39,78 +72,210 @@ const homeUrl = lang === "en" ? "/" : `/${lang}/`;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>404 - {content.title}</title>
-    <style is:inline>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        background: #f7f8f4;
-        color: #173c30;
-        font:
-          1rem/1.6 system-ui,
-          sans-serif;
-      }
-      main {
-        max-width: 42rem;
-        margin: 0 auto;
-        padding: clamp(3rem, 12vh, 8rem) 1.5rem;
-      }
-      .brand {
-        font-weight: 700;
-        letter-spacing: 0.08em;
-      }
-      .code {
-        margin: 2rem 0 0;
-        font-size: clamp(5rem, 20vw, 9rem);
-        font-weight: 800;
-        line-height: 1;
-      }
-      h1 {
-        font-size: clamp(1.75rem, 5vw, 2.75rem);
-        line-height: 1.2;
-      }
-      p {
-        max-width: 34rem;
-      }
-      .links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-top: 2rem;
-      }
-      a {
-        display: inline-block;
-        padding: 0.75rem 1.25rem;
-        border: 1px solid #173c30;
-        border-radius: 0.5rem;
-        color: inherit;
-        font-weight: 600;
-        text-underline-offset: 0.2em;
-      }
-      a:first-child {
-        background: #173c30;
-        color: #fff;
-      }
-      a:hover {
-        text-decoration-thickness: 0.15em;
-      }
-      a:focus-visible {
-        outline: 3px solid #986000;
-        outline-offset: 4px;
-      }
-    </style>
+    <title>404 - {content.titleBefore}{content.titleAccent}</title>
   </head>
   <body>
-    <main>
-      <p class="brand">DREAMY TOURS</p>
-      <p class="code">404</p>
-      <h1>{content.title}</h1>
-      <p>{content.description}</p>
-      <div class="links">
-        <a href={homeUrl}>{content.home}</a>
-        <a href={`${homeUrl}blog/`}>{content.blog}</a>
+    <main
+      class="relative isolate overflow-hidden bg-background px-6 py-12 md:py-16 lg:py-20"
+    >
+      <span
+        class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_28%,transparent)_1px,transparent_1.25px)] bg-[size:1.1rem_1.1rem] [mask-image:radial-gradient(ellipse_48rem_30rem_at_88%_42%,black,transparent_74%)]"
+        aria-hidden="true"></span>
+      <span
+        class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--secondary)_22%,transparent)_1px,transparent_1.25px)] bg-[position:0.55rem_0.55rem] bg-[size:1.1rem_1.1rem] [mask-image:radial-gradient(ellipse_38rem_24rem_at_10%_72%,black,transparent_72%)]"
+        aria-hidden="true"></span>
+
+      <div
+        class="mx-auto grid min-h-[calc(100svh-13rem)] max-w-7xl items-center gap-12 lg:grid-cols-[minmax(0,0.96fr)_minmax(25rem,0.84fr)] lg:gap-20"
+      >
+        <div
+          class="relative max-w-2xl py-4 lg:col-start-2 lg:row-start-1 lg:py-8"
+        >
+          <p
+            class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-primary shadow-[0_12px_26px_-22px_color-mix(in_oklab,var(--primary)_80%,transparent)] backdrop-blur-sm"
+          >
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+              ><circle
+                cx="12"
+                cy="12"
+                r="8"
+                stroke="currentColor"
+                stroke-width="2"></circle><path
+                d="m15 9-2.4 4.8L9 15l2.4-4.8L15 9Z"
+                fill="currentColor"></path></svg
+            >
+            {content.eyebrow}
+          </p>
+
+          <p
+            class="pointer-events-none mt-7 select-none text-[clamp(10rem,25vw,17.5rem)] font-black leading-[0.76] tracking-[-0.1em] text-primary"
+            aria-hidden="true"
+          >
+            404
+          </p>
+
+          <div class="relative mt-5">
+            <p
+              class="text-sm font-bold uppercase tracking-[0.22em] text-secondary"
+            >
+              Dreamy Tours · Perú & Bolivia
+            </p>
+            <h1
+              class="mt-4 max-w-xl text-balance text-4xl font-black leading-[0.98] tracking-[-0.055em] text-primary sm:text-5xl md:text-6xl"
+            >
+              {content.titleBefore}<span class="text-secondary"
+                >{content.titleAccent}</span>
+            </h1>
+            <p
+              class="mt-6 max-w-xl text-pretty text-lg leading-8 text-muted-foreground md:text-xl md:leading-9"
+            >
+              {content.description}
+            </p>
+
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a
+                href={homeUrl}
+                class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary/30 bg-background/80 px-6 py-3 text-sm font-bold text-primary shadow-[0_16px_28px_-24px_color-mix(in_oklab,var(--primary)_85%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              >
+                <svg
+                  class="size-4 transition-transform duration-300 group-hover:-translate-x-0.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  ><path
+                    d="m15 18-6-6 6-6"
+                    stroke="currentColor"
+                    stroke-width="2.25"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path></svg
+                >
+                {content.home}
+              </a>
+              <a
+                href={packagesUrlByLang[lang]}
+                class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-secondary/30 bg-background/80 px-6 py-3 text-sm font-bold text-secondary shadow-[0_16px_28px_-24px_color-mix(in_oklab,var(--secondary)_85%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:border-secondary/50 hover:bg-secondary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+              >
+                <svg
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  ><path
+                    d="M3 6.5 12 3l9 3.5v11L12 21l-9-3.5v-11Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"></path><path
+                    d="M3 6.5 12 10l9-3.5M12 10v11"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"></path></svg
+                >
+                {content.packages}
+                <svg
+                  class="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  ><path
+                    d="m9 18 6-6-6-6"
+                    stroke="currentColor"
+                    stroke-width="2.25"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path></svg
+                >
+              </a>
+              <a
+                href={blogUrl}
+                class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[0_18px_30px_-18px_color-mix(in_oklab,var(--primary)_90%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_22px_34px_-18px_color-mix(in_oklab,var(--primary)_95%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              >
+                {content.blog}
+                <svg
+                  class="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  ><path
+                    d="m9 18 6-6-6-6"
+                    stroke="currentColor"
+                    stroke-width="2.25"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path></svg
+                >
+              </a>
+            </div>
+
+            <p
+              class="mt-8 flex max-w-lg items-start gap-3 text-sm leading-6 text-muted-foreground"
+            >
+              <span
+                class="mt-2 h-px w-9 shrink-0 bg-secondary"
+                aria-hidden="true"></span>{content.routeNote}
+            </p>
+          </div>
+        </div>
+
+        <figure
+          class="relative mx-auto w-full max-w-xl lg:col-start-1 lg:row-start-1 lg:justify-self-start"
+        >
+          <span
+            class="pointer-events-none absolute -left-4 top-[17%] size-16 rounded-full border border-secondary/35 bg-background/80"
+            aria-hidden="true"></span>
+          <span
+            class="pointer-events-none absolute -right-5 bottom-[22%] size-20 rounded-full border border-primary/25 bg-background/80"
+            aria-hidden="true"></span>
+          <div
+            class="relative aspect-square overflow-hidden rounded-[2.4rem] border border-primary/20 bg-background p-5 shadow-[0_32px_70px_-40px_rgb(15_23_42_/_0.35)] sm:p-8"
+          >
+            <span
+              class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary)_35%,transparent)_1px,transparent_1.2px)] bg-[size:1rem_1rem] opacity-50 [mask-image:radial-gradient(circle_at_52%_42%,black,transparent_68%)]"
+              aria-hidden="true"></span>
+            <span
+              class="pointer-events-none absolute left-[14%] top-[15%] h-px w-[24%] bg-secondary/70"
+              aria-hidden="true"></span>
+            <span
+              class="pointer-events-none absolute right-[13%] top-[15%] grid size-12 place-items-center rounded-full border border-secondary/25 bg-background/90 text-secondary shadow-sm"
+              aria-hidden="true"
+              ><svg class="size-5" viewBox="0 0 24 24" fill="none"
+                ><circle
+                  cx="12"
+                  cy="12"
+                  r="8"
+                  stroke="currentColor"
+                  stroke-width="1.7"></circle><path
+                  d="m15 9-2.4 4.8L9 15l2.4-4.8L15 9Z"
+                  fill="currentColor"></path></svg
+              ></span
+            >
+            <img
+              src="/imagenes/404.webp"
+              alt={content.imageAlt}
+              width="1080"
+              height="1080"
+              fetchpriority="high"
+              decoding="async"
+              sizes="(min-width: 1024px) 40vw, (min-width: 640px) 32rem, calc(100vw - 3rem)"
+              class="relative z-10 size-full object-contain object-center drop-shadow-[0_24px_22px_rgba(46,43,34,0.22)]"
+            />
+          </div>
+          <figcaption
+            class="relative z-20 -mt-8 ml-5 max-w-[18rem] rounded-2xl border border-secondary/20 bg-background px-5 py-4 shadow-[0_20px_38px_-26px_rgb(15_23_42_/_0.3)] sm:ml-8"
+          >
+            <p
+              class="flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.15em] text-secondary"
+            >
+              <span
+                class="size-1.5 rounded-full bg-secondary"
+                aria-hidden="true"></span>{content.imageLabel}
+            </p>
+            <p class="mt-1.5 text-sm font-semibold leading-5 text-foreground">
+              {content.imageCaption}
+            </p>
+          </figcaption>
+        </figure>
       </div>
     </main>
   </body>
