@@ -54,16 +54,13 @@ for (const notFound of cases) {
 			"noindex",
 		);
 		await expect(page.locator("h1")).toHaveText(notFound.title);
-		await expect(page.locator(`a[href="${notFound.home}"]`)).toBeVisible();
-		await expect(page.locator(`a[href="${notFound.blog}"]`)).toBeVisible();
+		await expect(page.locator(`a[href="${notFound.home}"]`).first()).toBeVisible();
+		await expect(page.locator(`a[href="${notFound.blog}"]`).first()).toBeVisible();
 
-		await expect(page.locator("header, footer, nav")).toHaveCount(0);
-		await expect(page.locator('[data-slot="navigation-menu"]')).toHaveCount(0);
-		await expect(page.locator("script[src]")).toHaveCount(0);
+		await expect(page.locator("header.site-header")).toHaveCount(1);
+		await expect(page.locator("footer.dreamy-footer")).toHaveCount(1);
+		await expect(page.getByRole("link", { name: "Dreamy Tours - inicio" })).toBeVisible();
 		expect(requests.some((url) => /strapi|localhost:1337/i.test(url))).toBe(
-			false,
-		);
-		expect(requests.some((url) => /react(?:-dom)?(?:\.|\/)/i.test(url))).toBe(
 			false,
 		);
 	});

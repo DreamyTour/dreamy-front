@@ -2,6 +2,9 @@
 export const prerender = false;
 
 import "../styles/global.css";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+import type { Global, Link } from "@/types/global";
 
 Astro.response.status = 404;
 
@@ -17,6 +20,7 @@ const contentByLang = {
     titleAccent: "off the map.",
     description:
       "The page you were looking for may have moved, changed its name or never existed. Let's find a new direction for your journey.",
+    back: "Go back",
     packages: "View Peru packages",
     home: "Go to home",
     blog: "Explore the blog",
@@ -31,6 +35,7 @@ const contentByLang = {
     titleAccent: "en el mapa.",
     description:
       "La página que buscabas pudo cambiar de lugar, de nombre o quizá nunca existió. Busquemos una nueva dirección para tu viaje.",
+    back: "Volver atrás",
     packages: "Ver paquetes de Perú",
     home: "Ir al inicio",
     blog: "Explorar el blog",
@@ -45,6 +50,7 @@ const contentByLang = {
     titleAccent: "no mapa.",
     description:
       "A página que você procurava pode ter mudado de lugar, de nome ou talvez nunca existido. Vamos encontrar uma nova direção para a sua viagem.",
+    back: "Voltar",
     packages: "Ver pacotes do Peru",
     home: "Ir ao início",
     blog: "Explorar o blog",
@@ -58,11 +64,106 @@ const contentByLang = {
 
 const content = contentByLang[lang];
 const homeUrl = lang === "en" ? "/" : `/${lang}/`;
-const blogUrl = `${homeUrl}blog/`;
 const packagesUrlByLang = {
   en: "/peru-packages/",
   es: "/es/paquetes-peru/",
   pt: "/pt/pacotes-peru/",
+};
+
+// The shared components are real site components. Their fallback data is kept
+// here so rendering a missing route never depends on Strapi being available.
+const link = (id: number, label: string, url: string): Link => ({
+  id,
+  label,
+  url,
+  isButton: false,
+  isExternal: /^(?:https?:|mailto:)/.test(url),
+});
+
+const shellData: Global = {
+  id: 0,
+  documentId: "not-found-shell",
+  createdAt: "",
+  updatedAt: "",
+  publishedAt: "",
+  locale: lang,
+  topBar: {
+    id: 1,
+    isVisible: true,
+    text: "Inca Trail 4 Days availability: 2026-2027.",
+    link: link(1, "Book now and don't miss out!", "/inca-trail-availability/"),
+  },
+  headerTop: {
+    id: 1,
+    logo: {
+      id: 1,
+      label: "Dreamy Tours",
+      url: "/",
+      isExternal: false,
+      imagen: {} as never,
+    },
+    headerLink: [
+      link(2, "Blog", "/blog/"),
+      link(3, "info@dreamy.tours", "mailto:info@dreamy.tours"),
+      link(4, "WhatsApp", "https://wa.me/51969787221"),
+    ],
+    button: [link(5, "Inca Trail Availability 2026", "/inca-trail-availability/")],
+  },
+  menu: {
+    id: 1,
+    menuItems: [
+      { id: 1, link: link(10, "Inca Trails Machu Picchu", "/inca-trail/"), item: [] },
+      { id: 2, link: link(11, "Alternative Treks", "/alternative-treks/"), item: [] },
+      { id: 3, link: link(12, "Perú Packages", "/peru-packages/"), item: [] },
+      { id: 4, link: link(13, "Bolivia", "/bolivia/"), item: [] },
+      { id: 5, link: link(14, "Chile", "/chile/"), item: [] },
+      { id: 6, link: link(15, "Plan Your Trip", "/plan-your-trip/"), item: [] },
+    ],
+  },
+  footer: {
+    id: 1,
+    logo: {
+      id: 1,
+      label: "Dreamy Tours",
+      url: "/",
+      isExternal: false,
+      imagen: {} as never,
+    },
+    content:
+      "We provide our clients with unique travel experiences, meeting the highest standards of safety, punctuality, reliability, operational excellence and quality of service.",
+    socialTitle: "Follow us",
+    socialLogo: [],
+    destination: {
+      id: 1,
+      titulo: "Destinations",
+      link: [
+        link(20, "Cusco", "/cusco/"),
+        link(21, "Machu Picchu", "/inca-trail/"),
+        link(22, "Puno", "/puno/"),
+        link(23, "Lima", "/lima/"),
+        link(24, "Arequipa", "/arequipa/"),
+      ],
+    },
+    dreamyAbout: {
+      id: 1,
+      titulo: "Dreamy Tours",
+      link: [
+        link(30, "About Us", "/about-us/"),
+        link(31, "Company Policies", "/privacy-policy/"),
+        link(32, "Payment Methods", "/payment-methods/"),
+        link(33, "Blog", "/blog/"),
+      ],
+    },
+    contact: {
+      id: 1,
+      titulo: "Contact",
+      link: [
+        link(40, "info@dreamy.tours", "mailto:info@dreamy.tours"),
+        link(41, "+51 969 787 221", "https://wa.me/51969787221"),
+        link(42, "Cusco, Peru", "#"),
+      ],
+    },
+  },
 };
 ---
 
@@ -75,6 +176,7 @@ const packagesUrlByLang = {
     <title>404 - {content.titleBefore}{content.titleAccent}</title>
   </head>
   <body>
+    <Header data={shellData} lang={lang} availableLangs={["en", "es", "pt"]} />
     <main
       class="relative isolate overflow-hidden bg-background px-6 py-12 md:py-16 lg:py-20"
     >
@@ -128,7 +230,8 @@ const packagesUrlByLang = {
               class="mt-4 max-w-xl text-balance text-4xl font-black leading-[0.98] tracking-[-0.055em] text-primary sm:text-5xl md:text-6xl"
             >
               {content.titleBefore}<span class="text-secondary"
-                >{content.titleAccent}</span>
+                >{content.titleAccent}</span
+              >
             </h1>
             <p
               class="mt-6 max-w-xl text-pretty text-lg leading-8 text-muted-foreground md:text-xl md:leading-9"
@@ -139,6 +242,7 @@ const packagesUrlByLang = {
             <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
                 href={homeUrl}
+                onclick="if (window.history.length > 1) { window.history.back(); return false; }"
                 class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-primary/30 bg-background/80 px-6 py-3 text-sm font-bold text-primary shadow-[0_16px_28px_-24px_color-mix(in_oklab,var(--primary)_85%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 <svg
@@ -153,7 +257,7 @@ const packagesUrlByLang = {
                     stroke-linecap="round"
                     stroke-linejoin="round"></path></svg
                 >
-                {content.home}
+                {content.back}
               </a>
               <a
                 href={packagesUrlByLang[lang]}
@@ -189,10 +293,10 @@ const packagesUrlByLang = {
                 >
               </a>
               <a
-                href={blogUrl}
+                href={homeUrl}
                 class="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[0_18px_30px_-18px_color-mix(in_oklab,var(--primary)_90%,transparent)] transition duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_22px_34px_-18px_color-mix(in_oklab,var(--primary)_95%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                {content.blog}
+                {content.home}
                 <svg
                   class="size-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   viewBox="0 0 24 24"
@@ -258,7 +362,7 @@ const packagesUrlByLang = {
               fetchpriority="high"
               decoding="async"
               sizes="(min-width: 1024px) 40vw, (min-width: 640px) 32rem, calc(100vw - 3rem)"
-              class="relative z-10 size-full object-contain object-center drop-shadow-[0_24px_22px_rgba(46,43,34,0.22)]"
+              class="absolute inset-0 z-10 m-auto h-[62%] w-[62%] animate-bounce object-contain object-center [animation-duration:8s] [animation-timing-function:cubic-bezier(0.4,0,0.2,1)] drop-shadow-[0_24px_22px_rgba(46,43,34,0.22)] motion-reduce:animate-none"
             />
           </div>
           <figcaption
@@ -278,5 +382,6 @@ const packagesUrlByLang = {
         </figure>
       </div>
     </main>
+    <Footer data={shellData.footer} lang={lang} />
   </body>
 </html>
