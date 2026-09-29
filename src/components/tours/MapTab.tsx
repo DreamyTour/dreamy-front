@@ -313,9 +313,32 @@ export default function MapTab({
 					border-radius: 0;
 					box-shadow: none;
 				}
+
+				.tour-map-stops-scroll {
+					--tour-map-scrollbar-thumb: var(--primary);
+					--tour-map-scrollbar-track: color-mix(in oklab, var(--primary) 14%, transparent);
+					scrollbar-color: var(--tour-map-scrollbar-thumb) var(--tour-map-scrollbar-track);
+					scrollbar-width: thin;
+				}
+
+				@supports not (scrollbar-color: auto) {
+					.tour-map-stops-scroll::-webkit-scrollbar {
+						height: 0.625rem;
+					}
+
+					.tour-map-stops-scroll::-webkit-scrollbar-track {
+						background: var(--tour-map-scrollbar-track);
+						border-radius: 999px;
+					}
+
+					.tour-map-stops-scroll::-webkit-scrollbar-thumb {
+						background: var(--tour-map-scrollbar-thumb);
+						border-radius: 999px;
+					}
+				}
 			`}</style>
-			<aside className="order-1 min-w-0 overflow-hidden rounded-sm bg-background px-1 py-2 shadow-[0_22px_60px_-52px_rgba(15,23,42,0.65)]">
-				<div className="flex gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-1">
+			<aside className="order-1 min-w-0 overflow-hidden rounded-[1.125rem] bg-muted/70 p-2.5 shadow-[0_22px_60px_-52px_rgba(15,23,42,0.65)]">
+				<div className="tour-map-stops-scroll flex gap-2.5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2">
 					{tourMapStops.map((stop) => {
 						const active = stop.id === selectedId;
 
@@ -324,9 +347,9 @@ export default function MapTab({
 								key={stop.id}
 								type="button"
 								className={cn(
-									"relative h-32 min-w-[16rem] overflow-hidden rounded-sm px-4 py-3 text-left transition-all duration-200 after:absolute after:right-[-0.25rem] after:top-3 after:h-[calc(100%-1.5rem)] after:w-px after:bg-border/80 after:content-[''] last:after:hidden hover:-translate-y-0.5 hover:bg-muted/45 hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/45",
+									"relative h-32 min-w-[16rem] overflow-hidden rounded-xl border border-transparent bg-background px-4 py-3 text-left shadow-[0_8px_18px_-14px_rgba(15,23,42,0.28)] transition-[background-color,border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/[0.04] hover:shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)] focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-2 motion-reduce:transition-none",
 									active
-										? "bg-muted/55 shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)]"
+										? "border-primary bg-background text-primary shadow-[0_18px_38px_-26px_rgba(15,23,42,0.62)]"
 										: "",
 								)}
 								onClick={() => {
@@ -334,12 +357,22 @@ export default function MapTab({
 								}}
 							>
 								<span className="flex items-start justify-between gap-3">
-									<span className="text-sm font-extrabold text-foreground">
+									<span
+										className={cn(
+											"text-sm font-extrabold text-foreground",
+											active && "text-primary",
+										)}
+									>
 										{stop.day}
 									</span>
 								</span>
 
-								<span className="mt-2 block overflow-hidden text-sm font-semibold leading-snug text-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+								<span
+									className={cn(
+										"mt-2 block overflow-hidden text-sm font-semibold leading-snug text-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]",
+										active && "text-primary",
+									)}
+								>
 									{stop.title}
 								</span>
 
