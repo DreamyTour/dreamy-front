@@ -10,6 +10,7 @@ import {
 } from "@/components/icons/TourIcons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Lang } from "@/lib/i18n";
+import { isValidTourMapStop } from "@/lib/tour-map";
 import type { MapStop, Tour } from "@/types/tours";
 import IncludedTab from "./IncludedTab";
 import InformationTab from "./InformationTab";
@@ -53,27 +54,50 @@ interface Props {
 
 export default function TourTabs({ tour, lang, children }: Props) {
 	const tab = tour?.tab;
+	const overviewItems = Array.isArray(tab?.overview?.timeline)
+		? tab.overview.timeline.filter(
+				(item) =>
+					typeof item.day === "string" &&
+					item.day.trim().length > 0 &&
+					typeof item.titulo === "string" &&
+					item.titulo.trim().length > 0,
+			)
+		: [];
+	const itineraryItems = Array.isArray(tab?.itinerary?.acordeon)
+		? tab.itinerary.acordeon.filter(
+				(item) =>
+					typeof item.titulo === "string" &&
+					item.titulo.trim().length > 0 &&
+					Array.isArray(item.contenido) &&
+					item.contenido.length > 0,
+			)
+		: [];
+	const informationItems = Array.isArray(tab?.information?.acordeon)
+		? tab.information.acordeon.filter(
+				(item) =>
+					typeof item.titulo === "string" &&
+					item.titulo.trim().length > 0 &&
+					Array.isArray(item.contenido) &&
+					item.contenido.length > 0,
+			)
+		: [];
 
 	const hasOverview = Boolean(
-		tab?.overview?.titulo &&
-			Array.isArray(tab.overview.timeline) &&
-			tab.overview.timeline.length > 0,
+		tab?.overview?.titulo && overviewItems.length > 0,
 	);
 	const hasItinerary = Boolean(
-		tab?.itinerary?.titulo &&
-			Array.isArray(tab.itinerary.acordeon) &&
-			tab.itinerary.acordeon.length > 0,
+		tab?.itinerary?.titulo && itineraryItems.length > 0,
 	);
 	const hasIncluded = Boolean(tab?.included?.titulo);
 	const hasInformation = Boolean(
-		tab?.information?.titulo &&
-			Array.isArray(tab.information.acordeon) &&
-			tab.information.acordeon.length > 0,
+		tab?.information?.titulo && informationItems.length > 0,
 	);
 	const hasPrice = Boolean(
 		tab?.price && (tab.price.titulo || tab.price.contenido),
 	);
-	const mapStops = Array.isArray(tab?.maps?.mapstops) ? tab.maps.mapstops : [];
+	const mapStops = Array.isArray(tab?.maps?.mapstops)
+		? tab.maps.mapstops.filter(isValidTourMapStop)
+		: [];
 	const hasMaps = mapStops.length > 0;
 	const mapsTitle = "Maps";
 	const visibleTabs = React.useMemo(
@@ -184,7 +208,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	};
 
 	const tabTriggerClass =
-		"tour-tab-trigger group relative flex-1 flex flex-col items-center justify-center gap-2 rounded-sm bg-transparent px-4 pb-5 pt-4 text-[0.65rem] md:text-sm font-bold uppercase tracking-[0.12em] text-[#333] transition-colors duration-300 whitespace-nowrap outline-none border-none !shadow-none ring-0 focus-visible:ring-0";
+		"tour-tab-trigger group relative flex min-w-[6.25rem] flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-transparent bg-background px-4 py-3.5 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-foreground/60 shadow-[0_8px_18px_-14px_rgba(15,23,42,0.28)] transition-[background-color,color,transform,box-shadow] duration-200 whitespace-nowrap outline-none focus-visible:border-secondary/45 focus-visible:bg-background focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-secondary/35 focus-visible:ring-offset-2 motion-reduce:transition-none";
 	const mobileAccordionClass =
 		"group/mobile overflow-hidden rounded-2xl border border-border/80 bg-background shadow-sm transition-[border-color,box-shadow] duration-200 open:border-primary/35 open:shadow-[0_6px_24px_-12px_color-mix(in_oklab,var(--primary)_25%,transparent)] motion-reduce:transition-none";
 	const mobileSummaryClass =
@@ -249,11 +273,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
           content: "";
           position: absolute;
           left: 50%;
-          bottom: 0.4rem;
+          bottom: 0.35rem;
           width: 0;
           height: 2px;
           border-radius: 999px;
-          background: var(--secondary);
+          background: var(--primary);
           opacity: 0;
           transform: translateX(-50%);
           transition:
@@ -262,28 +286,36 @@ export default function TourTabs({ tour, lang, children }: Props) {
         }
 
         .tour-tabs-list .tour-tab-trigger:hover {
-          background: var(--background);
-          color: var(--foreground);
+          background: color-mix(in oklab, var(--background) 92%, var(--primary) 8%);
+          border-color: color-mix(in oklab, var(--primary) 38%, transparent);
+          color: var(--primary);
+          transform: translateY(-1px);
         }
 
         .tour-tabs-list .tour-tab-trigger:hover::after {
-          width: min(3.5rem, calc(100% - 2rem));
-          opacity: 1;
+          width: min(2.75rem, calc(100% - 2rem));
+          opacity: 0.5;
         }
 
         .tour-tabs-list .tour-tab-trigger[data-state="active"] {
-          background: transparent !important;
-          color: var(--secondary) !important;
+          background: #fff !important;
+          border: 1px solid var(--primary) !important;
+          color: var(--primary) !important;
+          box-shadow: 0 8px 18px -16px color-mix(in oklab, var(--primary) 75%, transparent);
         }
 
         .tour-tabs-list .tour-tab-trigger[data-state="active"]::after {
-          width: min(4rem, calc(100% - 2rem));
+          width: min(3.25rem, calc(100% - 2rem));
           opacity: 1;
         }
 
         .tour-tabs-list .tour-tab-trigger[data-state="active"]:hover {
-          background: transparent !important;
-          color: var(--secondary) !important;
+          background: #fff !important;
+          color: var(--primary) !important;
+        }
+
+        .tour-tabs-list::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
 			<div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8">
@@ -296,10 +328,10 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					>
 						{/* Sticky container - Full Bleed */}
 						<div
-							className={`sticky top-0 z-30 w-full relative transition-shadow duration-300 bg-[#f8f9fa] lg:col-span-2 ${isStuck ? "shadow-md" : ""}`}
+							className={`sticky top-3 z-30 w-full rounded-[1.5rem] border border-border/60 bg-background p-2.5 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.34)] backdrop-blur-xl transition-shadow duration-300 lg:col-span-2 ${isStuck ? "shadow-[0_18px_38px_-22px_rgba(15,23,42,0.42)]" : ""}`}
 						>
 							<div className="w-full">
-								<TabsList className="tour-tabs-list flex !h-auto w-full items-stretch justify-between gap-1 rounded-sm bg-muted/70 p-1.5 outline-none ring-0">
+								<TabsList className="tour-tabs-list flex !h-auto w-full items-stretch justify-between gap-2.5 overflow-x-auto rounded-[1.125rem] bg-muted/70 p-2.5 [scrollbar-width:none] outline-none ring-0">
 									{hasOverview && tab.overview.titulo && (
 										<TabsTrigger value="overview" className={tabTriggerClass}>
 											{renderIcon("overview")}
@@ -353,7 +385,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 										<h2 id="tour-overview-title" className={tabPanelTitleClass}>
 											{tab.overview.titulo}
 										</h2>
-										<OverviewTab timeline={tab.overview.timeline} />
+										<OverviewTab timeline={overviewItems} />
 									</section>
 								</TabsContent>
 							)}
@@ -370,7 +402,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 										>
 											{tab.itinerary.titulo}
 										</h2>
-										<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
+										<ItineraryTab items={itineraryItems} lang={lang} />
 									</section>
 								</TabsContent>
 							)}
@@ -387,7 +419,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 										>
 											{tab.information.titulo}
 										</h2>
-										<InformationTab items={tab.information.acordeon} />
+										<InformationTab items={informationItems} />
 									</section>
 								</TabsContent>
 							)}
@@ -457,7 +489,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.overview.titulo}</h2>
-								<OverviewTab timeline={tab.overview.timeline} />
+								<OverviewTab timeline={overviewItems} />
 							</div>
 						</details>
 					)}
@@ -472,7 +504,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.itinerary.titulo}</h2>
-								<ItineraryTab items={tab.itinerary.acordeon} lang={lang} />
+								<ItineraryTab items={itineraryItems} lang={lang} />
 							</div>
 						</details>
 					)}
@@ -502,7 +534,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							)}
 							<div className={mobileContentClass}>
 								<h2 className={tabPanelTitleClass}>{tab.information.titulo}</h2>
-								<InformationTab items={tab.information.acordeon} />
+								<InformationTab items={informationItems} />
 							</div>
 						</details>
 					)}

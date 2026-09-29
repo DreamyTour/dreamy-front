@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/map";
 import type { Lang } from "@/lib/i18n";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
+import {
+	isValidTourMapStop,
+	normalizeTourMapCoordinate,
+} from "@/lib/tour-map";
 import { cn } from "@/lib/utils";
 import type { MapStop } from "@/types/tours";
 
@@ -179,24 +183,26 @@ function Pin({
 
 function normalizeMapStops(mapStops: MapStop[]): TourMapStopSource[] {
 	return mapStops
-		.map((stop) => ({
-			id: `map-stop-${stop.id}`,
-			order: Number(stop.order),
-			title: stop.title?.trim() || "",
-			description: stop.description?.trim() || "",
-			duration: stop.duration?.trim() || "",
-			routeText: stop.routeText?.trim() || "",
-			imagen: stop.imagen ?? null,
-			latitude: Number(stop.latitude),
-			longitude: Number(stop.longitude),
-		}))
-		.filter(
-			(stop) =>
-				Number.isFinite(stop.order) &&
-				stop.title &&
-				Number.isFinite(stop.latitude) &&
-				Number.isFinite(stop.longitude),
-		)
+		.filter(isValidTourMapStop)
+		.map((stop) => {
+			const latitude = normalizeTourMapCoordinate(stop.latitude, 90) as number;
+			const longitude = normalizeTourMapCoordinate(
+				stop.longitude,
+				180,
+			) as number;
+
+			return {
+				id: `map-stop-${stop.id}`,
+				order: Number(stop.order),
+				title: stop.title?.trim() || "",
+				description: stop.description?.trim() || "",
+				duration: stop.duration?.trim() || "",
+				routeText: stop.routeText?.trim() || "",
+				imagen: stop.imagen ?? null,
+				latitude,
+				longitude,
+			};
+		})
 		.sort((a, b) => a.order - b.order);
 }
 
