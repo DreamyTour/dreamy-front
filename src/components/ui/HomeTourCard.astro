@@ -1,0 +1,191 @@
+---
+import type { Lang } from "@/lib/i18n";
+import type { Tour } from "@/types/tours";
+import { useTranslations } from "@/i18n/ui";
+import {
+  DifficultyIcon,
+  DurationIcon,
+  GroupIcon,
+} from "@/components/icons/BadgeIcons";
+import { extractTextFromBlocks, getImageUrl } from "@/lib/helpers";
+import { rewriteUrl } from "@/lib/utils";
+
+interface Props {
+  tour: Tour;
+  lang: Lang;
+}
+
+const { tour, lang } = Astro.props;
+const t = useTranslations(lang);
+const href = rewriteUrl(`/${tour.slug}`, lang);
+const featuredImage = Array.isArray(tour.imagenDestacada)
+  ? tour.imagenDestacada[0]
+  : tour.imagenDestacada;
+const imageUrl = getImageUrl(tour.seo?.metaImage ?? featuredImage, "medium");
+const description = tour.content ? extractTextFromBlocks(tour.content) : "";
+const badges = (tour.badge ?? []).filter(
+  (badge) =>
+    typeof badge?.titulo === "string" && typeof badge?.content === "string",
+);
+const normalize = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+const duration = badges.find((badge) =>
+  /duracion|duration|duracao|tiempo/.test(normalize(badge.titulo)),
+);
+const difficulty = badges.find((badge) =>
+  /dificultad|difficulty|dificuldade|nivel|level/.test(normalize(badge.titulo)),
+);
+const service = badges.find((badge) =>
+  /service|servicio|servico/.test(normalize(badge.titulo)),
+);
+const promotion = tour.cardBadge === "promocion";
+const cardBadge = promotion
+  ? t("tour.cardBadge.promotion")
+  : tour.cardBadge === "best_seller"
+    ? t("tour.cardBadge.bestSeller")
+    : null;
+---
+
+<article
+  class="translate-y-0 flex h-full flex-col overflow-hidden rounded-[0.9rem] border border-slate-200/70 bg-white shadow-[0_4px_18px_-10px_rgba(13,43,29,0.2)] hover:shadow-[0_10px_28px_-16px_rgba(13,43,29,0.25)] focus-within:shadow-[0_10px_28px_-16px_rgba(13,43,29,0.25)] motion-safe:hover:-translate-y-1 motion-safe:focus-within:-translate-y-1 motion-safe:transition-[translate,box-shadow] motion-safe:duration-300 motion-safe:ease-out"
+>
+  <div
+    class="relative h-[245px] shrink-0 overflow-hidden bg-emerald-950 text-white sm:h-[275px] xl:h-[300px]"
+  >
+    <a
+      href={href}
+      aria-label={tour.titulo}
+      class="group/image absolute inset-0 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-white"
+    >
+      {
+        imageUrl && imageUrl !== "/og-default.jpg" ? (
+          <img
+            src={imageUrl}
+            alt=""
+            sizes="(max-width: 767px) 88vw, (max-width: 1023px) 47vw, 32vw"
+            loading="lazy"
+            decoding="async"
+            class="absolute inset-0 size-full scale-100 object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-out motion-safe:group-hover/image:scale-[1.025] motion-safe:group-focus-visible/image:scale-[1.025]"
+          />
+        ) : (
+          <div class="absolute inset-0 bg-[linear-gradient(140deg,#165d3b,#08271d)]" />
+        )
+      }
+    </a>
+    <span
+      class="pointer-events-none absolute inset-0 bg-linear-to-t from-[#071b13]/90 via-[#071b13]/10 to-transparent"
+      aria-hidden="true"></span>
+    {
+      cardBadge && (
+        <span class="pointer-events-none absolute left-4 top-3 rounded-full bg-secondary px-3 py-1.5 text-[0.68rem] font-bold text-secondary-foreground shadow-sm">
+          {cardBadge}
+        </span>
+      )
+    }
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-white sm:p-5"
+    >
+      <h3
+        class="line-clamp-3 max-w-[25ch] text-[1.25rem] font-extrabold leading-[1.08] tracking-[-0.035em] text-balance sm:text-[1.38rem] xl:text-[1.45rem]"
+      >
+        <a
+          href={href}
+          class="pointer-events-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+        >
+          {tour.titulo}
+        </a>
+      </h3>
+    </div>
+  </div>
+
+  <div class="flex flex-1 flex-col px-4 pb-4 pt-3.5">
+    {
+      description && (
+        <p class="mb-3 line-clamp-2 text-[0.8rem] leading-[1.4] text-slate-700">
+          {description}
+        </p>
+      )
+    }
+
+    <dl
+      class="mt-auto grid min-h-10 grid-cols-3 items-center divide-x divide-slate-200 border-t border-slate-100 pt-2.5"
+    >
+      {
+        service && (
+          <div class="flex min-w-0 items-center gap-1.5 pr-1.5">
+            <dt class="sr-only">{service.titulo}</dt>
+            <span
+              class="grid size-7 shrink-0 place-items-center rounded-[0.45rem] bg-primary text-white"
+              aria-hidden="true"
+            >
+              <GroupIcon className="size-4" />
+            </span>
+            <dd class="min-w-0 text-[0.72rem] font-bold leading-tight text-slate-900">
+              {service.content.trim()}
+            </dd>
+          </div>
+        )
+      }
+      {
+        difficulty && (
+          <div class="flex min-w-0 items-center gap-1.5 px-1.5">
+            <dt class="sr-only">{difficulty.titulo}</dt>
+            <span
+              class="grid size-7 shrink-0 place-items-center rounded-[0.45rem] bg-primary text-white"
+              aria-hidden="true"
+            >
+              <DifficultyIcon className="size-4" />
+            </span>
+            <dd class="min-w-0 text-[0.72rem] font-bold leading-tight text-slate-900">
+              {difficulty.content.trim()}
+            </dd>
+          </div>
+        )
+      }
+      {
+        duration && (
+          <div class="flex min-w-0 items-center gap-1.5 pl-1.5">
+            <dt class="sr-only">{duration.titulo}</dt>
+            <span
+              class="grid size-7 shrink-0 place-items-center rounded-[0.45rem] bg-primary text-white"
+              aria-hidden="true"
+            >
+              <DurationIcon className="size-4" />
+            </span>
+            <dd class="min-w-0 text-[0.72rem] font-bold leading-tight text-slate-900">
+              {duration.content.trim()}
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="mt-8 flex justify-center">
+      <a
+        href={href}
+        class="group/cta inline-flex min-h-10 items-center gap-2 rounded-[0.55rem] border border-secondary bg-secondary px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-white hover:text-secondary hover:shadow-[0_7px_15px_-10px_rgba(150,22,45,0.4)] focus-visible:bg-white focus-visible:text-secondary focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-secondary motion-safe:transition-[background-color,color,box-shadow] motion-safe:duration-300 motion-safe:ease-out"
+      >
+        {t("tour.verItinerario")}
+        <span
+          class="grid size-5 shrink-0 translate-x-0 place-items-center rounded-full bg-white/25 motion-safe:transition-[translate,background-color] motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover/cta:translate-x-0.5 motion-safe:group-focus-visible/cta:translate-x-0.5 group-hover/cta:bg-secondary/10 group-focus-visible/cta:bg-secondary/10"
+          aria-hidden="true"
+        >
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14m-6-6 6 6-6 6"></path>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</article>

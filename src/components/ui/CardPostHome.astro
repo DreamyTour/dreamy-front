@@ -2,112 +2,319 @@
 import type { Blog } from "@/types/blog";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
-import { getImageSrcSet, getImageUrl } from "@/lib/helpers";
+import {
+  extractTextFromBlocks,
+  getImageSrcSet,
+  getImageUrl,
+} from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   blog: Blog;
   lang: Lang;
-  variant?: "standard" | "wide" | "tall";
+  variant?: "standard" | "featured";
 }
-
 const { blog, lang, variant = "standard" } = Astro.props;
-
-if (!blog) return null;
-
 const t = useTranslations(lang);
-const mainImage = getImageUrl(
-  blog.portadaImage,
-  variant === "standard" ? "medium" : "large",
-);
-const category = blog.category_blogs?.[0]?.nombre || null;
-const hasImage = mainImage && mainImage !== "/og-default.jpg";
+const href = rewriteUrl(`/blog/${blog.slug}`, lang);
+const featured = variant === "featured";
+const image = getImageUrl(blog.portadaImage, featured ? "large" : "medium");
+const category = blog.category_blogs?.[0]?.nombre;
+const dateValue = blog.publishedAt || blog.createdAt;
+const date = dateValue ? new Date(dateValue) : null;
+const validDate = date && !Number.isNaN(date.getTime());
+const locale = { es: "es-PE", en: "en-US", pt: "pt-BR" }[lang];
+const description =
+  typeof blog.contenido === "string"
+    ? blog.contenido
+        .replace(/<[^>]*>/g, " ")
+        .replace(/[#*_`]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+    : extractTextFromBlocks(blog.contenido ?? []);
 ---
 
-<article class="h-full">
-  <a
-    class:list={[
-      "group relative isolate flex h-full min-h-[18.5rem] transform-[translateY(0)] overflow-hidden rounded-3xl bg-neutral-950 text-white no-underline shadow-[0_8px_24px_-12px_rgba(8,23,17,0.2)] ring-1 ring-black/5 transition-[transform_.3s_cubic-bezier(.2,_0,_0,_1),box-shadow_.3s,ring-color_.3s] hover:transform-[translateY(-0.25rem)] hover:shadow-[0_16px_32px_-16px_rgba(7,49,28,0.3)] hover:ring-primary/35 focus-visible:transform-[translateY(-0.25rem)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45 focus-visible:ring-offset-4 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none",
-      variant === "tall" && "min-h-[25rem] lg:min-h-full",
-      variant === "wide" && "min-h-80",
-    ]}
-    href={rewriteUrl(`/blog/${blog.slug}`, lang)}
-    aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
-  >
-    {
-      hasImage ? (
-        <img
-          src={mainImage}
-          srcset={
-            getImageSrcSet(blog.portadaImage, ["small", "medium", "large"], {
-              includeOriginal: true,
-            }) || undefined
-          }
-          sizes={
-            variant === "standard"
-              ? "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-              : "(min-width: 1024px) 50vw, 100vw"
-          }
-          alt=""
-          aria-hidden="true"
-          class="absolute inset-0 size-full scale-[1.005] object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <div
-          class="absolute inset-0 grid place-items-center bg-[linear-gradient(135deg,color-mix(in_oklab,var(--primary)_18%,white),color-mix(in_oklab,var(--secondary)_18%,white))] text-xs font-bold uppercase tracking-[0.14em] text-primary"
-          aria-hidden="true"
-        >
-          No image
-        </div>
-      )
-    }
-
-    <span
-      class="absolute inset-0 z-10 bg-[linear-gradient(180deg,transparent_15%,rgb(0_0_0_/_0.12)_35%,rgb(0_0_0_/_0.6)_65%,rgb(0_0_0_/_0.82)_100%)]"
-      aria-hidden="true"></span>
-
-    <div
-      class:list={[
-        "relative z-20 flex w-full flex-col items-start justify-end gap-5 p-6 text-left",
-        variant === "wide" && "sm:p-6",
-        variant === "tall" && "sm:gap-6 sm:p-8",
-      ]}
+<article
+  class:list={["home-journal-card", featured && "home-journal-card--featured"]}
+>
+  <div class="journal-link">
+    <a
+      class="journal-photo"
+      href={href}
+      aria-label={`${t("aria.leerArticulo")}: ${blog.titulo}`}
     >
       {
-        category && (
-          <span class="max-w-full rounded-full border border-white/20 bg-primary px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.06em] text-primary-foreground">
-            {category}
-          </span>
+        image && image !== "/og-default.jpg" && (
+          <img
+            src={image}
+            srcset={
+              getImageSrcSet(blog.portadaImage, ["small", "medium", "large"], {
+                includeOriginal: true,
+              }) || undefined
+            }
+            sizes={
+              featured
+                ? "(min-width: 1440px) 680px, (min-width: 1024px) 50vw, 100vw"
+                : "(min-width: 1024px) 220px, (min-width: 640px) 30vw, 100vw"
+            }
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         )
       }
-      <h3
-        class:list={[
-          "max-w-xl text-pretty text-xl font-semibold leading-[1.3] tracking-tight text-white",
-          variant === "wide" && "sm:text-2xl",
-          variant === "tall" && "sm:text-3xl",
-        ]}
-      >
-        {blog.titulo}
-      </h3>
-      <span
-        class="inline-flex items-center gap-2 min-h-11 rounded-full border border-white/50 bg-transparent px-5 py-2.5 text-sm font-medium leading-none text-white transition-[background-color,border-color,transform] duration-300 group-hover:border-secondary group-hover:bg-secondary group-hover:text-white group-focus-visible:border-secondary group-focus-visible:bg-secondary group-focus-visible:text-white motion-reduce:transition-none"
-      >
-        <span>{t("blog.leerMas")}</span>
+    </a>
+    <div class="journal-content">
+      <div class="journal-meta">
+        {
+          category && (
+            <span class="journal-category">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <>
+                  <path d="M20 13 13 20a2 2 0 0 1-2.8 0L3 12.8V3h9.8L20 10.2a2 2 0 0 1 0 2.8Z" />
+                  <circle cx="7.5" cy="7.5" r="1" />
+                </>
+              </svg>
+              {category}
+            </span>
+          )
+        }
+        {
+          validDate && (
+            <time datetime={date!.toISOString()}>
+              {date!.toLocaleDateString(locale, {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </time>
+          )
+        }
+      </div>
+      <h3><a class="journal-title" href={href}>{blog.titulo}</a></h3>
+      {
+        featured && description && (
+          <p class="journal-description">{description}</p>
+        )
+      }
+      <a
+        class="journal-read"
+        href={href}
+        aria-label={`${t("blog.leerMas")}: ${blog.titulo}`}
+        >{t("blog.leerMas")}
         <svg
-          class="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 motion-reduce:transition-none"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2.25"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M5 12h14M13 6l6 6-6 6"></path>
-        </svg>
-      </span>
+          stroke-width="2"
+          aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg
+        ></a
+      >
     </div>
-  </a>
+  </div>
 </article>
+
+<style>
+  .home-journal-card {
+    height: 100%;
+    background: white;
+    border: 1px solid #dce7df;
+    border-radius: 1rem;
+    overflow: hidden;
+    translate: 0;
+    box-shadow: 0 5px 20px -15px #123e27;
+  }
+  .journal-link {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr);
+    height: 100%;
+    color: #14251b;
+    text-decoration: none;
+  }
+  .journal-photo:focus-visible,
+  .journal-title:focus-visible,
+  .journal-read:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: -3px;
+  }
+  .journal-photo {
+    min-height: 180px;
+    overflow: hidden;
+    background: #e1ece3;
+  }
+  .journal-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scale: 1;
+  }
+  .journal-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.8rem;
+    min-width: 0;
+  }
+  .journal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    font-size: 0.72rem;
+    color: #6b776e;
+  }
+  .journal-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.45rem;
+    background: var(--secondary);
+    color: white;
+    font-weight: 700;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .journal-title {
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+  }
+  .journal-title:hover,
+  .journal-title:focus-visible {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  h3 {
+    font-size: 1.22rem;
+    font-weight: 700;
+    line-height: 1.22;
+    letter-spacing: -0.025em;
+    text-wrap: pretty;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .journal-read {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    padding: 0.65rem 1rem;
+    border: 1px solid color-mix(in oklab, var(--primary) 30%, white);
+    border-radius: 0.65rem;
+    background: white;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: auto;
+    box-shadow: 0 2px 5px -3px #123e2733;
+  }
+  .home-journal-card--featured .journal-read {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .journal-read:hover,
+  .journal-read:focus-visible {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 5px 12px -6px #123e2766;
+  }
+  .home-journal-card--featured .journal-read:hover,
+  .home-journal-card--featured .journal-read:focus-visible {
+    background: color-mix(in oklab, var(--primary) 85%, black);
+  }
+  .journal-description {
+    color: #647268;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .home-journal-card--featured .journal-link {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(280px, 1fr) auto;
+  }
+  .home-journal-card--featured .journal-content {
+    padding: 1.75rem;
+    gap: 1rem;
+  }
+  .home-journal-card--featured h3 {
+    font-size: clamp(1.6rem, 2vw, 2.15rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .journal-title {
+      transition: color 0.2s ease;
+    }
+    .journal-read {
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+    .home-journal-card {
+      transition:
+        translate 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+    .home-journal-card:hover,
+    .home-journal-card:focus-within {
+      translate: 0 -3px;
+      box-shadow: 0 14px 30px -20px #123e2755;
+    }
+    .journal-photo img {
+      transition: scale 0.65s ease;
+    }
+    .journal-photo:hover img {
+      scale: 1.025;
+    }
+    .journal-read svg {
+      transition: translate 0.3s ease;
+      translate: 0;
+    }
+    .journal-read:hover svg {
+      translate: 3px 0;
+    }
+  }
+  @media (max-width: 639px) {
+    .journal-link {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .journal-photo {
+      height: 210px;
+      min-height: 0;
+    }
+    .home-journal-card--featured .journal-link {
+      grid-template-rows: auto auto;
+    }
+    .home-journal-card--featured .journal-content {
+      padding: 1.25rem;
+    }
+    .journal-content {
+      gap: 0.8rem;
+    }
+  }
+</style>

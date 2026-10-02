@@ -1,6 +1,6 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
-import TourCard from "@/components/ui/TourCard.astro";
+import HomeTourCard from "@/components/ui/HomeTourCard.astro";
 import IncaTrailAvailabilityBookingIsland from "@/components/content/IncaTrailAvailabilityBookingIsland.astro";
 import { fetchAllStrapi } from "@/lib/strapi";
 import { dedupeLocalizedDocuments, sortToursByOrder } from "@/lib/utils";
@@ -496,7 +496,7 @@ const bookingTours = Array.from(bookingToursByRoad.values()).sort(
           tours.length > 0 ? (
             <div class="grid grid-cols-1 gap-x-2 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
               {tours.map((tour) => (
-                <TourCard tour={tour} lang={lang} />
+                <HomeTourCard tour={tour} lang={lang} />
               ))}
             </div>
           ) : (

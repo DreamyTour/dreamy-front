@@ -29,6 +29,11 @@ const posts = await fetchApi<Blog[]>({
   },
 });
 
+const heading = {
+  es: "Ideas y consejos para tu próximo viaje",
+  en: "Ideas and tips for your next adventure",
+  pt: "Ideias e dicas para sua próxima viagem",
+}[lang];
 const postsList = posts && Array.isArray(posts) ? posts : [];
 ---
 
@@ -45,7 +50,7 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
               id="home-posts-title"
               class="relative mb-6 inline-block text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl"
             >
-              <span class="relative z-10">{data.titulo}</span>
+              <span class="relative z-10">{heading}</span>
             </h2>
           )}
           <div
@@ -65,26 +70,14 @@ const postsList = posts && Array.isArray(posts) ? posts : [];
           )}
         </header>
 
-        <ul class="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[minmax(20rem,auto)_minmax(18.5rem,auto)]">
-          {postsList.slice(0, 1).map((blog: Blog) => (
-            <li class="min-w-0 sm:col-span-2 lg:row-start-1">
-              <CardPostHome blog={blog} lang={lang} variant="wide" />
-            </li>
-          ))}
-          {postsList.slice(2, 4).map((blog: Blog, index: number) => (
-            <li
-              class:list={[
-                "min-w-0 lg:row-start-2",
-                index === 0 && "lg:col-start-1",
-                index === 1 && "lg:col-start-2",
-              ]}
-            >
-              <CardPostHome blog={blog} lang={lang} />
-            </li>
-          ))}
-          {postsList.slice(1, 2).map((blog: Blog) => (
-            <li class="min-w-0 sm:col-span-2 lg:col-start-3 lg:row-span-2 lg:row-start-1">
-              <CardPostHome blog={blog} lang={lang} variant="tall" />
+        <ul class="m-0 grid list-none grid-cols-1 gap-5 p-0 lg:grid-cols-2 lg:grid-rows-3">
+          {postsList.map((blog: Blog, index: number) => (
+            <li class:list={["min-w-0", index === 0 && "lg:row-span-3"]}>
+              <CardPostHome
+                blog={blog}
+                lang={lang}
+                variant={index === 0 ? "featured" : "standard"}
+              />
             </li>
           ))}
         </ul>

@@ -1,14 +1,10 @@
 ---
 import PageLayout from "@/layouts/PageLayout.astro";
-import TourCard from "@/components/ui/TourCard.astro";
+import HomeTourCard from "@/components/ui/HomeTourCard.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import type { SEOProps } from "@/components/layout/SEO.astro";
-import type {
-  Page,
-  Pregunta,
-  StrapiBlock,
-} from "@/types/page";
+import type { Page, Pregunta, StrapiBlock } from "@/types/page";
 import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import { getYouTubeVideoId, getThumbnailUrl } from "@/lib/helpers";
@@ -103,7 +99,7 @@ const pageContent = page.content?.trim() || "";
           <section id="category-tours" class="w-full py-10 md:py-12">
             <div class="grid grid-cols-1 gap-x-2 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
               {toursByCategory.map((tour) => (
-                <TourCard tour={tour} lang={lang} />
+                <HomeTourCard tour={tour} lang={lang} />
               ))}
             </div>
           </section>
@@ -154,7 +150,9 @@ const pageContent = page.content?.trim() || "";
                                 if (block.type === "paragraph") {
                                   return (
                                     <p class="text-base leading-7 text-muted-foreground">
-                                      <StrapiRichTextInline nodes={block.children || []} />
+                                      <StrapiRichTextInline
+                                        nodes={block.children || []}
+                                      />
                                     </p>
                                   );
                                 }
@@ -163,20 +161,26 @@ const pageContent = page.content?.trim() || "";
                                   if (level === 1) {
                                     return (
                                       <h2 class="text-xl font-bold text-foreground">
-                                        <StrapiRichTextInline nodes={block.children || []} />
+                                        <StrapiRichTextInline
+                                          nodes={block.children || []}
+                                        />
                                       </h2>
                                     );
                                   }
                                   if (level === 2) {
                                     return (
                                       <h2 class="text-lg font-bold text-foreground">
-                                        <StrapiRichTextInline nodes={block.children || []} />
+                                        <StrapiRichTextInline
+                                          nodes={block.children || []}
+                                        />
                                       </h2>
                                     );
                                   }
                                   return (
                                     <h3 class="text-base font-semibold text-foreground">
-                                      <StrapiRichTextInline nodes={block.children || []} />
+                                      <StrapiRichTextInline
+                                        nodes={block.children || []}
+                                      />
                                     </h3>
                                   );
                                 }
@@ -191,7 +195,9 @@ const pageContent = page.content?.trim() || "";
                                       {(block.children || []).map(
                                         (listItem) => (
                                           <li class="text-muted-foreground">
-                                            <StrapiRichTextInline nodes={listItem.children || []} />
+                                            <StrapiRichTextInline
+                                              nodes={listItem.children || []}
+                                            />
                                           </li>
                                         ),
                                       )}

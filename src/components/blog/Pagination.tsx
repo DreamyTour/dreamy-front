@@ -112,7 +112,7 @@ export default function Pagination({
 										className="inline-flex min-h-11 w-4 items-center justify-center text-muted-foreground/60"
 										aria-hidden="true"
 									>
-										…
+										
 									</span>
 								)}
 							</li>

@@ -102,7 +102,12 @@ const ctaLabel = t(ctaLabelKey);
 
     {
       hasTours ? (
-        <ToursSlider tours={tours} lang={lang} labelledBy={titleId} />
+        <ToursSlider
+          tours={tours}
+          lang={lang}
+          labelledBy={titleId}
+          cardStyle="home"
+        />
       ) : (
         <div class="rounded-2xl border border-dashed border-secondary/30 bg-white/60 px-6 py-12 text-center">
           <svg
@@ -130,7 +135,7 @@ const ctaLabel = t(ctaLabelKey);
       <a
         href={rewriteUrl(href, lang)}
         aria-label={`${ctaLabel}: ${data.titulo}`}
-        class="group inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 rounded-xl border border-secondary bg-secondary px-8 py-3 text-sm font-bold text-white shadow-[0_18px_36px_-18px_color-mix(in_oklab,var(--secondary)_90%,black)] transition duration-200 hover:-translate-y-0.5 hover:bg-secondary/90 hover:shadow-[0_22px_44px_-20px_color-mix(in_oklab,var(--secondary)_95%,black)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary sm:w-auto sm:min-w-56"
+        class="group inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 rounded-xl border border-primary bg-primary px-8 py-3 text-sm font-bold text-white shadow-[0_18px_36px_-18px_color-mix(in_oklab,var(--primary)_90%,black)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_22px_44px_-20px_color-mix(in_oklab,var(--primary)_95%,black)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary sm:w-auto sm:min-w-56"
       >
         <span>{ctaLabel}</span>
         <span

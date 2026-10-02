@@ -9,7 +9,7 @@ import {
 	ShieldCheck,
 	Users,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { type PointerEvent, useEffect, useRef, useState } from "react";
 import { getMenuIcons } from "@/components/layout/menu-icons";
 import "./desktop-menu.css";
 import {
@@ -33,6 +33,10 @@ interface Props {
 
 const SCROLL_DELTA = 8;
 const MEGA_MENU_FALLBACK_IMAGE = "/imagenes/circuitos.webp";
+// The root owns the hover close delay; Radix's separate timer can close a newly hovered category.
+const preventRadixMouseClose = (event: PointerEvent<HTMLElement>) => {
+	if (event.pointerType === "mouse") event.preventDefault();
+};
 const topLevelClass =
 	"h-11 rounded-[0.6rem] border-0 px-3 text-[14px] font-normal tracking-normal text-black hover:bg-transparent hover:text-primary focus-visible:ring-primary/40 focus-visible:ring-offset-white before:pointer-events-none before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:bg-secondary data-[state=open]:bg-transparent data-[state=open]:text-primary xl:px-3 2xl:px-4 [&_svg]:text-current";
 
@@ -368,18 +372,16 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 										key={item.id}
 										value={String(item.id)}
 										className="flex h-full items-center justify-center"
+										onPointerEnter={(event) => {
+											if (event.pointerType !== "mouse") return;
+											cancelClose();
+											setOpenMenu(hasChildren ? String(item.id) : "");
+										}}
 									>
 										{hasChildren ? (
 											<>
 												{hasCategoryPage ? (
-													<div
-														className="desktop-category-controls flex items-center"
-														onPointerEnter={(event) => {
-															if (event.pointerType !== "mouse") return;
-															cancelClose();
-															setOpenMenu(String(item.id));
-														}}
-													>
+													<div className="desktop-category-controls flex items-center">
 														<NavigationMenuLink
 															asChild
 															className={cn(
@@ -400,17 +402,24 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 																"desktop-category-toggle",
 															)}
 															aria-label={`${copy.navigation}: ${item.link.label}`}
+															onPointerLeave={preventRadixMouseClose}
 														/>
 													</div>
 												) : (
-													<NavigationMenuTrigger className={navItemClass}>
+													<NavigationMenuTrigger
+														className={navItemClass}
+														onPointerLeave={preventRadixMouseClose}
+													>
 														<Label
 															label={item.link.label}
 															badge={item.link.badge}
 														/>
 													</NavigationMenuTrigger>
 												)}
-												<NavigationMenuContent className="left-0 right-0 mt-3 max-h-[calc(100dvh-16rem)] w-auto overflow-x-hidden overflow-y-auto overscroll-contain rounded-[1.4rem] border-white/80 bg-[#f5f9f6]/[0.98] shadow-[0_36px_100px_-44px_rgba(2,18,10,0.78),0_12px_30px_-22px_rgba(2,18,10,0.42)] backdrop-blur-xl [scrollbar-gutter:stable]">
+												<NavigationMenuContent
+													onPointerLeave={preventRadixMouseClose}
+													className="left-0 right-0 mt-3 max-h-[calc(100dvh-16rem)] w-auto overflow-x-hidden overflow-y-auto overscroll-contain rounded-[1.4rem] border-white/80 bg-[#f5f9f6]/[0.98] shadow-[0_36px_100px_-44px_rgba(2,18,10,0.78),0_12px_30px_-22px_rgba(2,18,10,0.42)] backdrop-blur-xl [scrollbar-gutter:stable]"
+												>
 													<div
 														className={cn(
 															"relative grid min-h-[340px] grid-rows-[1fr_auto] gap-3.5 p-3.5 before:pointer-events-none before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/35 before:to-transparent",

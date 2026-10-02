@@ -2,6 +2,7 @@
 import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import TourCard from "@/components/ui/TourCard.astro";
+import HomeTourCard from "@/components/ui/HomeTourCard.astro";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -11,9 +12,10 @@ interface Props {
   tours: Tour[];
   lang: Lang;
   labelledBy?: string;
+  cardStyle?: "home" | "default";
 }
 
-const { tours, lang, labelledBy } = Astro.props;
+const { tours, lang, labelledBy, cardStyle = "default" } = Astro.props;
 const shouldLoop = tours.length > 3;
 const sliderId = `slider-${Math.random().toString(36).slice(2, 11)}`;
 const sliderLabels = {
@@ -36,14 +38,18 @@ const sliderLabels = {
 ---
 
 <section
-  class="relative"
+  class:list={["relative", cardStyle === "home" && "pb-16 md:pb-0"]}
   data-tours-slider
+  data-card-style={cardStyle}
   aria-labelledby={labelledBy}
   aria-label={labelledBy ? undefined : sliderLabels.section}
 >
   <div class="overflow-hidden">
     <ul
-      class="flex list-none gap-6 overflow-x-auto px-0 py-4 snap-x snap-mandatory items-stretch scrollbar-hide"
+      class:list={[
+        "flex list-none gap-6 overflow-x-auto px-0 py-4 snap-x snap-mandatory items-stretch scrollbar-hide",
+        cardStyle === "home" && tours.length <= 3 && "lg:justify-center",
+      ]}
       id={sliderId}
       data-slider-track
       data-original-count={tours.length}
@@ -51,8 +57,17 @@ const sliderLabels = {
     >
       {
         tours.map((tour) => (
-          <li class="flex-shrink-0 w-full md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)] snap-start">
-            <TourCard tour={tour} lang={lang} />
+          <li
+            class:list={[
+              "flex-shrink-0 w-full md:w-[calc((100%-24px)/2)] snap-start",
+              "lg:w-[calc((100%-48px)/3)]",
+            ]}
+          >
+            {cardStyle === "home" ? (
+              <HomeTourCard tour={tour} lang={lang} />
+            ) : (
+              <TourCard tour={tour} lang={lang} />
+            )}
           </li>
         ))
       }
@@ -60,19 +75,45 @@ const sliderLabels = {
   </div>
 
   <button
-    class="slider-prev absolute -left-3 top-[calc((100vw-3rem)*0.75+1rem)] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:-left-7 md:top-1/2 md:h-14 md:w-14"
+    class:list={[
+      "slider-prev absolute z-20 flex h-11 w-11 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:h-14 md:w-14",
+      cardStyle === "home" &&
+        "group/slider-arrow motion-safe:transition-shadow motion-safe:duration-300 motion-safe:ease-out",
+      cardStyle === "home"
+        ? "bottom-0 left-[calc(50%-3.25rem)] md:bottom-auto md:-left-7 md:top-[var(--home-slider-arrow-top,calc(275px/2+1rem))] md:-translate-y-1/2"
+        : "-left-3 top-[calc((100vw-3rem)*0.75+1rem)] -translate-y-1/2 md:-left-7 md:top-1/2",
+      cardStyle === "home" && tours.length <= 3 && "lg:hidden",
+    ]}
     aria-label={sliderLabels.previous}
     aria-controls={sliderId}
   >
-    <ArrowLeftIcon className="w-6 h-6 text-current" aria-hidden="true" />
+    <ArrowLeftIcon
+      className={cardStyle === "home"
+        ? "w-6 h-6 translate-x-0 text-current motion-safe:transition-[translate] motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover/slider-arrow:-translate-x-px motion-safe:group-focus-visible/slider-arrow:-translate-x-px"
+        : "w-6 h-6 text-current"}
+      aria-hidden="true"
+    />
   </button>
 
   <button
-    class="slider-next absolute -right-3 top-[calc((100vw-3rem)*0.75+1rem)] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:-right-7 md:top-1/2 md:h-14 md:w-14"
+    class:list={[
+      "slider-next absolute z-20 flex h-11 w-11 items-center justify-center rounded-full border-4 border-background bg-primary text-primary-foreground shadow-[0_18px_40px_-18px_color-mix(in_oklab,var(--primary)_72%,transparent)] transition-shadow duration-200 hover:shadow-[0_22px_48px_-18px_color-mix(in_oklab,var(--primary)_82%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:h-14 md:w-14",
+      cardStyle === "home" &&
+        "group/slider-arrow motion-safe:transition-shadow motion-safe:duration-300 motion-safe:ease-out",
+      cardStyle === "home"
+        ? "bottom-0 right-[calc(50%-3.25rem)] md:bottom-auto md:-right-7 md:top-[var(--home-slider-arrow-top,calc(275px/2+1rem))] md:-translate-y-1/2"
+        : "-right-3 top-[calc((100vw-3rem)*0.75+1rem)] -translate-y-1/2 md:-right-7 md:top-1/2",
+      cardStyle === "home" && tours.length <= 3 && "lg:hidden",
+    ]}
     aria-label={sliderLabels.next}
     aria-controls={sliderId}
   >
-    <ArrowRightIcon className="w-6 h-6 text-current" aria-hidden="true" />
+    <ArrowRightIcon
+      className={cardStyle === "home"
+        ? "w-6 h-6 translate-x-0 text-current motion-safe:transition-[translate] motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover/slider-arrow:translate-x-px motion-safe:group-focus-visible/slider-arrow:translate-x-px"
+        : "w-6 h-6 text-current"}
+      aria-hidden="true"
+    />
   </button>
 </section>
 
@@ -127,6 +168,26 @@ const sliderLabels = {
         const gap = Number.parseFloat(gapValue);
 
         scrollAmount = slideWidth + gap;
+
+        if (sliderRoot.dataset.cardStyle === "home") {
+          const titles = slides.flatMap((slide) => {
+            const title = slide.querySelector("h3");
+            return title ? [title] : [];
+          });
+          if (titles.length) {
+            const rootTop = sliderRoot.getBoundingClientRect().top;
+            const titleTop = Math.min(
+              ...titles.map(
+                (title) => title.getBoundingClientRect().top - rootTop,
+              ),
+            );
+            const arrowHeight = prevBtn.getBoundingClientRect().height;
+            sliderRoot.style.setProperty(
+              "--home-slider-arrow-top",
+              `${titleTop - arrowHeight / 2 - 12}px`,
+            );
+          }
+        }
       };
 
       const setScrollPosition = (left: number) => {
@@ -178,6 +239,7 @@ const sliderLabels = {
       };
 
       requestAnimationFrame(calculateMetrics);
+      void document.fonts.ready.then(calculateMetrics);
 
       prevBtn.addEventListener("click", () => {
         if (scrollAmount === 0) calculateMetrics();

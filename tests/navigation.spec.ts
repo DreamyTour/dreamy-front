@@ -34,6 +34,33 @@ test("category labels open submenus on hover and arrows support the keyboard", a
 	await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 
+test("switching repeatedly between category labels keeps the matching submenu open", async ({
+	page,
+}) => {
+	await page.goto("/");
+	const categories = page.locator(".desktop-category-controls");
+	const first = categories.first();
+	const second = categories.nth(1);
+
+	for (const category of [first, second, first, second]) {
+		await category.locator(".desktop-category-link").hover();
+		await expect(category.locator(".desktop-category-toggle")).toHaveAttribute(
+			"aria-expanded",
+			"true",
+		);
+		await page.waitForTimeout(220);
+		await expect(category.locator(".desktop-category-toggle")).toHaveAttribute(
+			"aria-expanded",
+			"true",
+		);
+	}
+
+	await page.mouse.move(2, 850);
+	await expect(
+		page.locator('[data-slot="navigation-menu-content"]:visible'),
+	).toHaveCount(0);
+});
+
 test("navigation updates metadata, supports Back and excludes checkout", async ({
 	page,
 }) => {
