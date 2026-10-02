@@ -191,12 +191,16 @@ const description =
     letter-spacing: 0.06em;
   }
   .journal-title {
+    border-radius: 0.2rem;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
     cursor: pointer;
     color: inherit;
     text-decoration: none;
   }
   .journal-title:hover,
   .journal-title:focus-visible {
+    background-color: color-mix(in oklab, var(--primary) 10%, white);
     color: var(--primary);
     text-decoration: none;
   }
@@ -266,7 +270,9 @@ const description =
   }
   @media (prefers-reduced-motion: no-preference) {
     .journal-title {
-      transition: color 0.2s ease;
+      transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
     }
     .journal-read {
       transition:
