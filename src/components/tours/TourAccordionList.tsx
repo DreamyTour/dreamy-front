@@ -1,5 +1,6 @@
 import * as React from "react";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
+import StrapiRichTextTable from "@/components/content/StrapiRichTextTable";
 import { ChevronIcon } from "@/components/icons/NavigationIcons";
 import type { Lang } from "@/lib/i18n";
 import { normalizeLists } from "@/lib/strapiBlocks";
@@ -37,6 +38,8 @@ function AccordionContent({ content }: { content: StrapiBlock[] }) {
 			{normalized.map((block) => {
 				const blockKey = JSON.stringify(block);
 
+				if (block.type === "table")
+					return <StrapiRichTextTable key={blockKey} block={block} />;
 				if (block.type === "paragraph") {
 					return (
 						<p
@@ -179,9 +182,7 @@ function AccordionItem({
 							<span
 								className={cn(
 									"grid h-9 w-9 shrink-0 place-items-center text-secondary transition-[color,transform] duration-300 motion-reduce:transition-none sm:h-10 sm:w-10",
-									isOpen
-										? "rotate-180"
-										: "group-hover:text-secondary/70",
+									isOpen ? "rotate-180" : "group-hover:text-secondary/70",
 								)}
 								aria-hidden="true"
 							>
@@ -279,5 +280,9 @@ export default function TourAccordionList({
 		);
 	}
 
-	return <div className={variant === "timeline" ? "space-y-0" : "space-y-4"}>{content}</div>;
+	return (
+		<div className={variant === "timeline" ? "space-y-0" : "space-y-4"}>
+			{content}
+		</div>
+	);
 }

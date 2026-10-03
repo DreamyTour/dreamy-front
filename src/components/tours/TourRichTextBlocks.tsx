@@ -1,5 +1,6 @@
 import * as React from "react";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
+import StrapiRichTextTable from "@/components/content/StrapiRichTextTable";
 import { normalizeLists } from "@/lib/strapiBlocks";
 import type { StrapiBlock, StrapiBlockChild } from "@/types/tours";
 
@@ -127,6 +128,8 @@ export default function TourRichTextBlocks({
 					return renderList(block, normalizedContent, blockIndex, variant);
 				}
 
+				if (block.type === "table")
+					return <StrapiRichTextTable key={blockKey} block={block} />;
 				if (block.type === "paragraph") {
 					return (
 						<p

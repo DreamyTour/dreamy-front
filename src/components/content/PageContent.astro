@@ -1,4 +1,5 @@
 ---
+import StrapiRichTextTable from "@/components/content/StrapiRichTextTable";
 import PageLayout from "@/layouts/PageLayout.astro";
 import HomeTourCard from "@/components/ui/HomeTourCard.astro";
 import LiteYouTube from "@/components/content/LiteYouTube.astro";
@@ -147,6 +148,8 @@ const pageContent = page.content?.trim() || "";
                           Array.isArray(pregunta.contenido) && (
                             <div class="space-y-3">
                               {pregunta.contenido.map((block: StrapiBlock) => {
+                                if (block.type === "table")
+                                  return <StrapiRichTextTable block={block} />;
                                 if (block.type === "paragraph") {
                                   return (
                                     <p class="text-base leading-7 text-muted-foreground">
