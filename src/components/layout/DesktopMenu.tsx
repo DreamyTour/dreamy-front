@@ -191,7 +191,7 @@ function MegaMenuFeatureCard({
 				href={href}
 				aria-label={title}
 				className={cn(
-					"group relative isolate min-h-[320px] overflow-hidden rounded-[1.15rem] border border-white/20 bg-[#0b281c] text-white shadow-[0_24px_50px_-30px_rgba(4,28,17,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+					"group relative isolate min-h-[320px] overflow-hidden rounded-[1.15rem] border-0 bg-[#0b281c] text-white shadow-[0_12px_28px_-10px_rgba(15,23,42,0.16),0_4px_10px_-4px_rgba(15,23,42,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
 					compact ? "min-w-0" : "col-start-4 row-start-1 min-w-0",
 				)}
 			>
