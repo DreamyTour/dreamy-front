@@ -7,7 +7,8 @@ import fetchApi from "@/lib/strapi";
 import type { Global } from "@/types/global";
 import {
   DEFAULT_LANG,
-  getAvailableLanguages,
+  resolveLanguageUrls,
+  type LocalizedPageCounts,
   isValidLang,
   type Lang,
 } from "@/lib/i18n";
@@ -28,10 +29,12 @@ interface Props {
   lcpImageSizes?: string;
   lcpImageMedia?: string;
   enableViewTransitions?: boolean;
+  languagePageCounts?: LocalizedPageCounts;
 }
 
 const {
   seo,
+  languagePageCounts,
   lang: langProp,
   lcpImageUrl,
   lcpImageSrcSet,
@@ -74,7 +77,11 @@ const seoProps = seo || {
   type: "website" as const,
   lang: currentLang,
 };
-const availableLangs = getAvailableLanguages(seo?.slugMap, currentLang);
+const languageUrls = resolveLanguageUrls({
+  pathname: Astro.url.pathname,
+  slugMap: seo?.slugMap,
+  pageCounts: languagePageCounts,
+});
 const transitionEnabled = enableViewTransitions &&
   !/(?:^|\/)checkout(?:\/|$)/.test(Astro.url.pathname);
 ---
@@ -132,7 +139,7 @@ const transitionEnabled = enableViewTransitions &&
     <Header
       data={globalData}
       lang={currentLang}
-      availableLangs={availableLangs}
+      languageUrls={languageUrls}
     />
     <main id="main-content" tabindex="-1">
       <slot />

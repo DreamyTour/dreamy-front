@@ -1,5 +1,5 @@
 ---
-import { LANGS, type Lang, localizePath, stripLangPrefix } from "@/lib/i18n";
+import { LANGS, type Lang, type LocalizedHrefMap } from "@/lib/i18n";
 import { rewriteUrl } from "@/lib/utils";
 import type { Link, MenuItem, Menu as MenuType } from "@/types/global";
 
@@ -8,16 +8,11 @@ interface Props {
   quickActions?: Link[];
   logoUrl: string;
   lang: Lang;
-  availableLangs?: readonly Lang[];
+  languageUrls: LocalizedHrefMap;
 }
 
-const {
-  menu,
-  quickActions = [],
-  logoUrl,
-  lang,
-  availableLangs = LANGS,
-} = Astro.props;
+const { menu, quickActions = [], logoUrl, lang, languageUrls } = Astro.props;
+const availableLangs = LANGS.filter((locale) => languageUrls[locale]);
 const languageNames: Record<Lang, string> = {
   en: "English",
   es: "Español",
@@ -95,10 +90,7 @@ const languageFlags: Record<Lang, string> = {
                 const selected = optionLang === lang;
                 return (
                   <a
-                    href={localizePath(
-                      stripLangPrefix(Astro.url.pathname),
-                      optionLang,
-                    )}
+                    href={languageUrls[optionLang]}
                     role="menuitemradio"
                     aria-checked={selected}
                     data-language={optionLang}
@@ -322,48 +314,6 @@ const languageFlags: Record<Lang, string> = {
 </section>
 
 <script>
-  import {
-    localizePath,
-    stripLangPrefix,
-    translatePathForSlug,
-    type Lang,
-  } from "@/lib/i18n";
-
-  function resolveLocalizedPath(nextLang: Lang, root: HTMLElement) {
-    if (!root.dataset.availableLangs?.split(",").includes(nextLang))
-      return null;
-
-    const normalizedPath = stripLangPrefix(window.location.pathname);
-    for (const id of ["tour-slug-map", "page-slug-map"]) {
-      const element = document.getElementById(id);
-      if (!element) continue;
-      try {
-        const slugMap = JSON.parse(element.textContent ?? "{}") as Record<
-          string,
-          string
-        >;
-        if (slugMap[nextLang])
-          return localizePath(`/${slugMap[nextLang]}`, nextLang);
-      } catch {}
-    }
-    const blogMap = document.getElementById("blog-slug-map");
-    if (blogMap) {
-      try {
-        const slugMap = JSON.parse(blogMap.textContent ?? "{}") as Record<
-          string,
-          string
-        >;
-        if (slugMap[nextLang]) {
-          return localizePath(
-            translatePathForSlug(normalizedPath, slugMap[nextLang]),
-            nextLang,
-          );
-        }
-      } catch {}
-    }
-    return localizePath(normalizedPath, nextLang);
-  }
-
   function initMobileMenus() {
     document
       .querySelectorAll<HTMLElement>("[data-mobile-menu-root]")
@@ -441,15 +391,12 @@ const languageFlags: Record<Lang, string> = {
           ?.querySelectorAll<HTMLAnchorElement>("[data-language]")
           .forEach((link) => {
             link.addEventListener("click", (event) => {
-              const nextLang = link.dataset.language as Lang;
+              const nextLang = link.dataset.language;
               languageSwitcher?.removeAttribute("open");
               if (nextLang === root.dataset.currentLang) {
                 event.preventDefault();
                 return;
               }
-              event.preventDefault();
-              const targetPath = resolveLocalizedPath(nextLang, root);
-              if (targetPath) window.location.href = targetPath;
             });
           });
 

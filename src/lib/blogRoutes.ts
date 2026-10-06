@@ -1,5 +1,11 @@
 import { getCategoryPostCounts } from "@/lib/blogCategories";
-import { DEFAULT_LANG, LANGS, type Lang, LOCALIZED_LANGS } from "@/lib/i18n";
+import {
+	DEFAULT_LANG,
+	LANGS,
+	type Lang,
+	LOCALIZED_LANGS,
+	type LocalizedPageCounts,
+} from "@/lib/i18n";
 import fetchApi, { fetchAllStrapi } from "@/lib/strapi";
 import type { Blog, CategoryBlog } from "@/types/blog";
 import type { Logo } from "@/types/common";
@@ -26,6 +32,7 @@ export type Paginate = (
 ) => unknown[];
 
 export type BlogListProps = {
+	languagePageCounts: LocalizedPageCounts;
 	page: PaginatedBlogPage;
 	lang: Lang;
 	searchBlogs: Blog[];
@@ -48,6 +55,7 @@ export type BlogPostProps = {
 };
 
 export type BlogCategoryProps = {
+	languagePageCounts: LocalizedPageCounts;
 	page: PaginatedBlogPage;
 	lang: Lang;
 	searchBlogs: Blog[];
@@ -160,9 +168,15 @@ export async function getBlogIndexPaths({
 }) {
 	const allPaths: unknown[] = [];
 	const langs = localized ? LOCALIZED_LANGS : [DEFAULT_LANG];
+	const blogsByLang: Record<string, Blog[]> = {};
+	const languagePageCounts: LocalizedPageCounts = {};
+	for (const locale of LANGS) {
+		blogsByLang[locale] = await fetchBlogs(locale);
+		languagePageCounts[locale] = Math.ceil(blogsByLang[locale].length / 12);
+	}
 
 	for (const lang of langs) {
-		const blogsList = await fetchBlogs(lang);
+		const blogsList = blogsByLang[lang];
 		const allCategories = await fetchCategories(lang);
 		const globalData = await fetchGlobalData(lang);
 
@@ -171,6 +185,7 @@ export async function getBlogIndexPaths({
 				params: localized ? { lang } : undefined,
 				pageSize: 12,
 				props: {
+					languagePageCounts,
 					lang,
 					searchBlogs: blogsList,
 					allCategories,
@@ -248,7 +263,19 @@ export async function getBlogCategoryPaths({
 					(item: CategoryBlog) => item.slug === categorySlug,
 				),
 			);
+			const languagePageCounts: LocalizedPageCounts = {};
+			for (const locale of LANGS) {
+				const translated = categoriesByLang[locale]?.find(
+					(item) => item.documentId === category.documentId,
+				);
+				if (!translated?.slug) continue;
+				const count = (blogsByLang[locale] || []).filter((post) =>
+					post.category_blogs?.some((item) => item.slug === translated.slug),
+				).length;
+				languagePageCounts[locale] = Math.max(1, Math.ceil(count / 9));
+			}
 			const sharedProps = {
+				languagePageCounts,
 				lang,
 				searchBlogs: blogsList,
 				allCategories,

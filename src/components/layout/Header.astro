@@ -11,10 +11,10 @@ import { localizePath } from "@/lib/i18n";
 interface Props {
   data: Global;
   lang: Lang;
-  availableLangs?: readonly Lang[];
+  languageUrls: import("@/lib/i18n").LocalizedHrefMap;
 }
 
-const { data, lang, availableLangs } = Astro.props;
+const { data, lang, languageUrls } = Astro.props;
 const mobileLogoUrl = localizePath("/", lang);
 const isBlogLink = (link: Link) =>
   link.url?.includes("/blog") || link.label?.toLowerCase().includes("blog");
@@ -40,20 +40,14 @@ const mobileQuickActions = [
   blogLink,
   ...(data?.headerTop?.button ?? []).filter(
     (link) =>
-      !isContactLink(link) &&
-      !isBlogLink(link) &&
-      !isRemovedHeaderPhone(link),
+      !isContactLink(link) && !isBlogLink(link) && !isRemovedHeaderPhone(link),
   ),
 ];
 ---
 
 <header class="site-header w-full shadow-sm">
   <TopBar data={data?.topBar} lang={lang} />
-  <HeaderTop
-    data={data?.headerTop}
-    lang={lang}
-    availableLangs={availableLangs}
-  />
+  <HeaderTop data={data?.headerTop} lang={lang} languageUrls={languageUrls} />
   <DesktopMenu
     menu={data?.menu}
     lang={lang}
@@ -64,6 +58,6 @@ const mobileQuickActions = [
     quickActions={mobileQuickActions}
     logoUrl={mobileLogoUrl}
     lang={lang}
-    availableLangs={availableLangs}
+    languageUrls={languageUrls}
   />
 </header>

@@ -1,5 +1,9 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
-import { getBlogPostPaths } from "@/lib/blogRoutes";
+import {
+	getBlogCategoryPaths,
+	getBlogIndexPaths,
+	getBlogPostPaths,
+} from "@/lib/blogRoutes";
 import { fetchAllStrapi } from "@/lib/strapi";
 
 const originalUrl = process.env.VITE_STRAPI_URL;
@@ -76,4 +80,47 @@ test("preserves page order when later API pages respond first", async () => {
 	} finally {
 		spy.mockRestore();
 	}
+});
+
+test("pagination availability is joined by category documentId in each locale", async () => {
+	process.env.VITE_STRAPI_URL = "https://category-pagination.test";
+	const totals = { en: 19, es: 28, pt: 1 };
+	const slugs = { en: "inca-trail", es: "camino-inca", pt: "trilha-inca" };
+	const categoryFetchSpy = spyOn(fetchTarget, "fetch");
+	categoryFetchSpy.mockImplementation(async (input) => {
+		const url = new URL(String(input));
+		const locale = url.searchParams.get("locale") as keyof typeof totals;
+		const category = { documentId: "same-category", slug: slugs[locale] };
+		if (url.pathname === "/api/category-blogs")
+			return Response.json({ data: [category] });
+		if (url.pathname === "/api/global") return Response.json({ data: {} });
+		return Response.json({
+			data: Array.from({ length: totals[locale] }, (_, i) => ({
+				documentId: `post-${i}`,
+				slug: `${locale}-${i}`,
+				category_blogs: [category],
+			})),
+			meta: { pagination: { pageCount: 1 } },
+		});
+	});
+	const paginate = (
+		_: unknown,
+		options: { props?: Record<string, unknown> },
+	) => [{ props: options.props }];
+	const categories = (await getBlogCategoryPaths({
+		localized: true,
+		paginate,
+	})) as Array<{ props: { languagePageCounts: unknown; slugMap: unknown } }>;
+	expect(categories[0].props.languagePageCounts).toEqual({
+		en: 3,
+		es: 4,
+		pt: 1,
+	});
+	expect(categories[0].props.slugMap).toEqual(slugs);
+	const indices = (await getBlogIndexPaths({
+		localized: true,
+		paginate,
+	})) as Array<{ props: { languagePageCounts: unknown } }>;
+	expect(indices[0].props.languagePageCounts).toEqual({ en: 2, es: 3, pt: 1 });
+	categoryFetchSpy.mockRestore();
 });

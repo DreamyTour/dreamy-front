@@ -101,3 +101,55 @@ export function translatePathForSlug(
 
 	return `${pathname.replace(/\/[^/]+(?=\/|$)/, `/${translatedSlug}`)}${suffix}`;
 }
+
+// Slugs are joined by documentId by the route loaders, never by their spelling.
+export type LocalizedHrefMap = Partial<Record<Lang, string>>;
+export type LocalizedPageCounts = Partial<Record<Lang, number>>;
+
+type LanguageUrlOptions = {
+	pathname: string;
+	slugMap?: Partial<Record<Lang, string>>;
+	pageCounts?: LocalizedPageCounts;
+};
+
+export function resolveLanguageUrls({
+	pathname,
+	slugMap,
+	pageCounts,
+}: LanguageUrlOptions): LocalizedHrefMap {
+	const urls: LocalizedHrefMap = {};
+	// Inspect only route shape. Destination slugs always come from slugMap.
+	const path = stripLangPrefix(pathname).replace(/\/+$/, "") || "/";
+	const index = path.match(/^\/blog(?:\/(\d+))?$/);
+	const category = path.match(/^\/blog\/[^/]+(?:\/(\d+))?$/);
+	const page = Number(index?.[1] || category?.[1] || 1);
+	if (!Number.isSafeInteger(page) || page < 1) return urls;
+	for (const locale of LANGS) {
+		if (index) {
+			if (!pageCounts || (pageCounts[locale] ?? 0) < page) continue;
+			urls[locale] = localizePath(
+				page === 1 ? "/blog" : `/blog/${page}`,
+				locale,
+			);
+		} else if (slugMap !== undefined) {
+			const slug = slugMap[locale];
+			if (slug === undefined) continue;
+			if (!slug.trim() || /[/?#]/.test(slug) || slug !== slug.trim()) {
+				console.warn(
+					`[i18n] Invalid slug for ${locale}; language link omitted.`,
+				);
+				continue;
+			}
+			if (category && pageCounts && (pageCounts[locale] ?? 0) < page) continue;
+			if (category?.[1] && !pageCounts) continue;
+			const target = category
+				? `/blog/${slug}${page > 1 ? `/${page}` : ""}`
+				: `/${slug}`;
+			urls[locale] = localizePath(target, locale);
+		} else if (["/", "/checkout", "/checkout/success"].includes(path)) {
+			// Explicit static routes that exist in all three locales.
+			urls[locale] = localizePath(path, locale);
+		}
+	}
+	return urls;
+}

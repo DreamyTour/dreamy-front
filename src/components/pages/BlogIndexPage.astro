@@ -19,6 +19,7 @@ interface Props extends BlogListProps {
 
 const {
   page,
+  languagePageCounts,
   searchBlogs,
   allCategories,
   categoryPostCounts,
@@ -94,7 +95,7 @@ const seoProps = buildSEOProps({
 });
 ---
 
-<Layout seo={seoProps} lang={lang}>
+<Layout seo={seoProps} lang={lang} languagePageCounts={languagePageCounts}>
   <section
     class="blog-page-shell relative isolate overflow-hidden"
     aria-labelledby="blog-index-title"

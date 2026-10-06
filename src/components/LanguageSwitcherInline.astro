@@ -1,12 +1,13 @@
 ---
-import { LANGS, type Lang } from "@/lib/i18n";
+import { LANGS, type Lang, type LocalizedHrefMap } from "@/lib/i18n";
 
 interface Props {
   currentLang: Lang;
-  availableLangs?: readonly Lang[];
+  languageUrls: LocalizedHrefMap;
 }
 
-const { currentLang, availableLangs = LANGS } = Astro.props;
+const { currentLang, languageUrls } = Astro.props;
+const availableLangs = LANGS.filter((locale) => languageUrls[locale]);
 
 const languageNames: Record<Lang, string> = {
   en: "English",
@@ -80,8 +81,8 @@ const menuId = "language-menu-desktop";
         const selected = lang === currentLang;
 
         return (
-          <button
-            type="button"
+          <a
+            href={languageUrls[lang]}
             role="menuitemradio"
             aria-checked={selected ? "true" : "false"}
             class={`flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-left text-sm transition-colors duration-150 focus-visible:outline-none ${
@@ -118,85 +119,17 @@ const menuId = "language-menu-desktop";
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             )}
-          </button>
+          </a>
         );
       })
     }
   </div>
 </div>
 
-<script
-  is:inline
-  define:vars={{
-    langs: LANGS,
-    defaultLang: "en",
-  }}
->
+<script is:inline>
   (() => {
     if (window.__dreamyLanguageSwitcherReady) return;
     window.__dreamyLanguageSwitcherReady = true;
-
-    const stripLangPrefix = (path) => {
-      const parts = path.split("/").filter(Boolean);
-      if (parts[0] && langs.includes(parts[0])) {
-        return `/${parts.slice(1).join("/")}` || "/";
-      }
-      return path || "/";
-    };
-
-    const localizePath = (path, lang) => {
-      const normalized = stripLangPrefix(path);
-      const localized =
-        lang === defaultLang ? normalized : `/${lang}${normalized}`;
-      return `${localized.replace(/\/+$/, "")}/`;
-    };
-
-    const translatePathForSlug = (path, slug) => {
-      const normalized = stripLangPrefix(path);
-      const segments = normalized.split("/").filter(Boolean);
-      if (segments.length === 0) return `/${slug}`;
-      // /blog/:slug/:page: translate the category, never the page number.
-      const slugIndex = segments[0] === "blog" ? 1 : 0;
-      segments[slugIndex] = slug;
-      return `/${segments.join("/")}`;
-    };
-
-    const getAvailableLangs = (switcher) =>
-      switcher?.dataset.availableLangs?.split(",").filter(Boolean) || langs;
-
-    const resolveLocalizedPath = (nextLang, availableLangs) => {
-      if (!availableLangs.includes(nextLang)) return null;
-
-      const pathname = window.location.pathname;
-      const normalizedPath = stripLangPrefix(pathname);
-
-      for (const id of ["tour-slug-map", "page-slug-map"]) {
-        const slugMapEl = document.getElementById(id);
-        if (!slugMapEl) continue;
-
-        try {
-          const slugMap = JSON.parse(slugMapEl.textContent || "{}");
-          const targetSlug = slugMap[nextLang];
-          if (targetSlug) return localizePath(`/${targetSlug}`, nextLang);
-        } catch {}
-      }
-
-      const blogSlugMapEl = document.getElementById("blog-slug-map");
-      if (blogSlugMapEl) {
-        try {
-          const slugMap = JSON.parse(blogSlugMapEl.textContent || "{}");
-          const targetSlug = slugMap[nextLang];
-          if (targetSlug) {
-            return localizePath(
-              translatePathForSlug(normalizedPath, targetSlug),
-              nextLang,
-            );
-          }
-        } catch {}
-      }
-
-      return localizePath(normalizedPath, nextLang);
-    };
 
     const closeSwitcher = (switcher) => {
       const toggle = switcher.querySelector("[data-language-toggle]");
@@ -238,11 +171,7 @@ const menuId = "language-menu-desktop";
           if (activeSwitcher) closeSwitcher(activeSwitcher);
           return;
         }
-        const targetPath = resolveLocalizedPath(
-          nextLang,
-          getAvailableLangs(activeSwitcher),
-        );
-        if (targetPath) window.location.href = targetPath;
+        if (activeSwitcher) closeSwitcher(activeSwitcher);
       }
     });
 
