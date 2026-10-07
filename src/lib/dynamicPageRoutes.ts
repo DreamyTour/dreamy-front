@@ -299,68 +299,7 @@ export async function getLocalizedDynamicPaths(): Promise<
 		}
 	}
 
-	for (const [docId, slugMap] of Object.entries(pageSlugsByDocId)) {
-		const slugs = Object.entries(slugMap) as [string, string][];
-
-		for (const [langA, slugA] of slugs) {
-			for (const [langB, slugB] of slugs) {
-				if (langA === langB || slugA === slugB) continue;
-
-				paths.push({
-					params: { lang: langA, slug: slugB },
-					props: {
-						type: "page",
-						isRedirect: true,
-						redirectTo: `/${langA}/${slugMap[langA]}`,
-						page: allPagesByLang[langA]?.find(
-							(page: Page) => page.documentId === docId,
-						),
-						pageSlugMap: slugMap,
-					},
-				});
-			}
-		}
-	}
-
-	const defaultLangTours = allToursByLang[DEFAULT_LANG] || [];
-	const allTourPathsBySlug: Record<string, string[]> = {};
-
-	for (const path of paths) {
-		if (path.props?.type !== "tour") continue;
-		const slug = path.params.slug;
-		allTourPathsBySlug[slug] ??= [];
-		allTourPathsBySlug[slug].push(path.params.lang);
-	}
-
-	for (const lang of LANGS) {
-		if (lang === DEFAULT_LANG) continue;
-
-		const currentLangTours = allToursByLang[lang] || [];
-		const currentSlugs = new Set(
-			currentLangTours.map((tour: Tour) => tour.slug),
-		);
-
-		for (const defaultTour of defaultLangTours) {
-			if (currentSlugs.has(defaultTour.slug)) continue;
-
-			const slugLanguages = allTourPathsBySlug[defaultTour.slug] || [];
-			if (!slugLanguages.includes(DEFAULT_LANG)) continue;
-			const localizedSlug = slugsByDocId[defaultTour.documentId]?.[lang];
-
-			paths.push({
-				params: { lang, slug: defaultTour.slug },
-				props: {
-					type: "tour",
-					isRedirect: true,
-					redirectTo: localizedSlug
-						? `/${lang}/${localizedSlug}`
-						: `/${defaultTour.slug}`,
-					tour: defaultTour,
-					slugMap: slugsByDocId[defaultTour.documentId] ?? {},
-				},
-			});
-		}
-	}
+	// Cross-locale slug aliases are resolved by the Worker on asset misses.
 
 	return paths;
 }

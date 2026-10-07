@@ -5,6 +5,7 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
+import localizedRouteMap from "./src/integrations/localizedRouteMap";
 
 // https://astro.build/config
 // SSG + SSR for API routes
@@ -39,6 +40,7 @@ export default defineConfig({
 	},
 
 	integrations: [
+		localizedRouteMap(),
 		react(),
 		sitemap({
 			changefreq: "weekly",
