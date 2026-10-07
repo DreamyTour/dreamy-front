@@ -6,7 +6,7 @@
 	"compatibility_flags": [],
 	"keep_vars": true,
 	"kv_namespaces": [
-		{ "binding": "SESSION", "id": "586d1e4ff42a4732b8810abdf09c02d4" }
+		{ "binding": "SESSION", "id": "586d1e4ff42d4732b8810abdf09c02d4" }
 	],
 	"images": { "binding": "IMAGES" },
 	"assets": { "binding": "ASSETS", "directory": "./dist/client" },
