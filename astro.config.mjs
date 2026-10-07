@@ -16,6 +16,11 @@ export default defineConfig({
 
 	fonts: [
 		{
+			name: "Bricolage Grotesque",
+			cssVariable: "--font-heading",
+			provider: fontProviders.fontsource(),
+		},
+		{
 			name: "Outfit",
 			cssVariable: "--font-outfit",
 			provider: fontProviders.fontsource(),

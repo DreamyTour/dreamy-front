@@ -865,6 +865,12 @@ html {
   }
 
   h1,
+  h2 {
+    font-family: var(--font-heading, "Bricolage Grotesque"), var(--font-outfit, "Outfit"), sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  h1,
   h2,
   h3,
   h4,
