@@ -8,9 +8,9 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type * as GeoJSON from "geojson";
 import { Loader2, Locate, Maximize, Minus, Plus, X } from "lucide-react";
 import {
+	type CSSProperties,
 	createContext,
 	forwardRef,
-	type CSSProperties,
 	type ReactNode,
 	useCallback,
 	useContext,
@@ -324,6 +324,9 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 
 		map.on("load", loadHandler);
 		map.on("styledata", styleDataHandler);
+		// Raster styles can finish their tile requests after the last styledata
+		// event. Restore custom layers once the map becomes idle as well.
+		map.on("idle", styleDataHandler);
 		map.on("move", handleMove);
 		setMapInstance(map);
 
@@ -331,6 +334,7 @@ const MapView = forwardRef<MapRef, MapProps>(function MapView(
 			clearStyleTimeout();
 			map.off("load", loadHandler);
 			map.off("styledata", styleDataHandler);
+			map.off("idle", styleDataHandler);
 			map.off("move", handleMove);
 			map.remove();
 			setIsLoaded(false);
@@ -1136,6 +1140,8 @@ type MapRouteProps = {
 	opacity?: number;
 	/** Dash pattern [dash length, gap length] for dashed lines */
 	dashArray?: [number, number];
+	/** End shape of route strokes; butt caps support railway cross ties. */
+	lineCap?: "butt" | "round" | "square";
 	/** Callback when the route line is clicked */
 	onClick?: () => void;
 	/** Callback when mouse enters the route line */
@@ -1153,6 +1159,7 @@ function MapRoute({
 	width = 3,
 	opacity = 0.8,
 	dashArray,
+	lineCap = "round",
 	onClick,
 	onMouseEnter,
 	onMouseLeave,
@@ -1181,7 +1188,7 @@ function MapRoute({
 			id: layerId,
 			type: "line",
 			source: sourceId,
-			layout: { "line-join": "round", "line-cap": "round" },
+			layout: { "line-join": "round", "line-cap": lineCap },
 			paint: {
 				"line-color": color,
 				"line-width": width,
@@ -1222,7 +1229,8 @@ function MapRoute({
 		map.setPaintProperty(layerId, "line-width", width);
 		map.setPaintProperty(layerId, "line-opacity", opacity);
 		map.setPaintProperty(layerId, "line-dasharray", dashArray);
-	}, [isLoaded, map, layerId, color, width, opacity, dashArray]);
+		map.setLayoutProperty(layerId, "line-cap", lineCap);
+	}, [isLoaded, map, layerId, color, width, opacity, dashArray, lineCap]);
 
 	// Handle click and hover events
 	useEffect(() => {

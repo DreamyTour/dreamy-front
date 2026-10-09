@@ -1,4 +1,7 @@
-export type TicketsByDate = Record<string, number | undefined>;
+import type { TicketsByDate } from "./calendarAvailability";
+import { fetchCalendarAvailability } from "./calendarAvailability";
+
+export type { TicketsByDate } from "./calendarAvailability";
 
 export const INCA_TRAIL_PLACE_ID = 2;
 export const INCA_TRAIL_ROUTES = ["1", "5"] as const;
@@ -28,19 +31,6 @@ export async function fetchIncaTrailTickets({
 	month,
 	signal,
 }: FetchTicketsParams): Promise<TicketsByDate> {
-	const url = new URL("https://calendar.dreamy.tours/v1/tickets");
-	url.searchParams.set("place", String(place));
-	url.searchParams.set("road", road);
-	url.searchParams.set("year", String(year));
-	url.searchParams.set("month", String(month));
-
-	const response = await fetch(url.toString(), { signal });
-
-	if (!response.ok) {
-		throw new Error(`Calendar request failed (${response.status})`);
-	}
-
-	const data = (await response.json()) as { tickets?: TicketsByDate };
-
-	return data.tickets || {};
+	return (await fetchCalendarAvailability({ place, road, year, month, signal }))
+		.dates;
 }

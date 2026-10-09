@@ -1,6 +1,7 @@
 ---
 import DynamicContentPage from "@/components/pages/DynamicContentPage.astro";
 import { DEFAULT_LANG } from "@/lib/i18n";
+import { refreshLocalTour } from '@/lib/tour-preview';
 import {
   getDefaultLangDynamicPaths,
   type DynamicPageProps,
@@ -12,6 +13,9 @@ export async function getStaticPaths() {
 
 const props = Astro.props as DynamicPageProps;
 const lang = DEFAULT_LANG;
+if(import.meta.env.DEV && props.type==='tour' && props.tour){
+ props.tour=await refreshLocalTour(props.tour,lang);
+}
 ---
 
 <DynamicContentPage

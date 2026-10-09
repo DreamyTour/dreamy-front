@@ -1,0 +1,13 @@
+---
+import RoutePlanEditor from '../../components/tours/RoutePlanEditor';
+import '../../styles/global.css';
+import '@fontsource-variable/outfit';
+export const prerender=false;
+const cmsOrigin=new URL(import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337').origin;
+Astro.response.headers.set('Content-Security-Policy',`frame-ancestors 'self' ${cmsOrigin}`);
+Astro.response.headers.set('Cache-Control','no-store');
+---
+<html lang="es">
+ <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/><meta name="robots" content="noindex,nofollow"/><title>Editor del recorrido · Dreamy Tours</title></head>
+ <body style="font-family: 'Outfit Variable', sans-serif;"><RoutePlanEditor cmsOrigin={cmsOrigin} client:load /></body>
+</html>

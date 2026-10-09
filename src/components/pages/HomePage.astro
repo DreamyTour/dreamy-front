@@ -10,6 +10,7 @@ import TourPackagesSection from "@/components/sections/TourPackagesSection.astro
 import PeruGuide from "@/components/sections/PeruGuide.astro";
 import HomePost from "@/components/sections/HomePost.astro";
 import ReviewsWall from "@/components/sections/ReviewsWall.astro";
+import TravelExperiences from "@/components/sections/TravelExperiences.astro";
 import type { Lang } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
 import dreamyToursMobile from "@/assets/dreamy-tours.webp";
@@ -84,5 +85,6 @@ const seoProps = {
     ctaLabelKey="section.verMasPaquetes"
   />
   <HomePost data={homeData?.cardPost} lang={lang} />
+  <TravelExperiences lang={lang} />
   <ReviewsWall lang={lang} />
 </Layout>

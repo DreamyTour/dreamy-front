@@ -65,6 +65,11 @@ export interface MapStop {
 	description: string;
 	duration?: string;
 	routeText?: string;
+	/** Transport from the previous stop to this destination. */
+	transportMode?: "walking" | "bus" | "train" | "flight" | "boat" | null;
+	routePlan?: unknown;
+	/** Optional reviewed GeoJSON LineString or array of [longitude, latitude]. */
+	routeGeometry?: unknown;
 	latitude: number;
 	longitude: number;
 }

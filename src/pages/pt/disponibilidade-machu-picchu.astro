@@ -1,0 +1,18 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import MachuPicchuAvailabilityDesign from "@/components/content/MachuPicchuAvailabilityDesign.astro";
+import { MACHU_PICCHU_AVAILABILITY_SLUGS } from "@/lib/machuPicchuAvailabilityI18n";
+---
+
+<PageLayout
+  lang="pt"
+  seo={{
+    title: "Disponibilidade de Machu Picchu | Dreamy Tours",
+    description:
+      "Escolha a data, o circuito e o horário da sua visita a Machu Picchu.",
+    slugMap: MACHU_PICCHU_AVAILABILITY_SLUGS,
+    robots: "noindex,nofollow",
+  }}
+>
+  <MachuPicchuAvailabilityDesign lang="pt" />
+</PageLayout>

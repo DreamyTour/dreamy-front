@@ -1,0 +1,300 @@
+---
+import type { Lang } from "@/lib/i18n";
+import { getPlanTripHref } from "@/lib/planTrip";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const copy = {
+  es: {
+    title: "Experiencias de viaje para cada",
+    highlight: "estilo de vida",
+    description:
+      "En Dreamy Tours no creemos en viajes genéricos. Creamos momentos únicos adaptados a lo que realmente te importa.",
+    experiences: [
+      [
+        "Viajes familiares",
+        "Itinerarios flexibles y actividades para todas las edades. Diversión para grandes y chicos.",
+      ],
+      [
+        "Luna de miel",
+        "Romance y paisajes de ensueño. Un comienzo inolvidable para su nueva aventura juntos.",
+      ],
+      [
+        "Viajes aventureros",
+        "Senderismo, trekking y adrenalina. Para quienes buscan ir un poco más allá en cada viaje.",
+      ],
+      [
+        "LGBTQ+ amigable",
+        "Viaja con libertad en un ambiente respetuoso. Celebra el amor y la diversidad en cada destino.",
+      ],
+      [
+        "Viajes personalizados",
+        "Tú pones las reglas. Diseñamos tu viaje según tus intereses, ritmo y presupuesto.",
+      ],
+      [
+        "Viajes privados",
+        "Guías privados y transporte exclusivo. Disfruta con los tuyos, a tu ritmo y con total flexibilidad.",
+      ],
+    ],
+  },
+  en: {
+    title: "Travel experiences for every",
+    highlight: "lifestyle",
+    description:
+      "At Dreamy Tours, we believe every journey should be personal. We create unique moments around what matters most to you.",
+    experiences: [
+      [
+        "Family travel",
+        "Flexible itineraries and activities for all ages. Memorable moments for children and adults alike.",
+      ],
+      [
+        "Honeymoons",
+        "Romance, privacy and dreamlike scenery. The perfect beginning to your next adventure together.",
+      ],
+      [
+        "Adventure travel",
+        "Hiking, trekking and a little adrenaline. For travelers who want to go further with every journey.",
+      ],
+      [
+        "LGBTQ+ friendly",
+        "Travel freely in a welcoming, respectful atmosphere. Celebrate love and diversity at every destination.",
+      ],
+      [
+        "Tailor-made travel",
+        "Your interests, your pace, your budget. A journey designed around you, down to the details.",
+      ],
+      [
+        "Private travel",
+        "Time and space for you and your loved ones. Private guides, dedicated transport and complete flexibility.",
+      ],
+    ],
+  },
+  pt: {
+    title: "Experiências de viagem para cada",
+    highlight: "estilo de vida",
+    description:
+      "Na Dreamy Tours, acreditamos que cada viagem deve ser única. Criamos momentos especiais a partir do que realmente importa para você.",
+    experiences: [
+      [
+        "Viagens em família",
+        "Roteiros flexíveis e atividades para todas as idades. Diversão para adultos e crianças.",
+      ],
+      [
+        "Lua de mel",
+        "Romance, exclusividade e paisagens dos sonhos. O início perfeito para sua nova aventura juntos.",
+      ],
+      [
+        "Viagens de aventura",
+        "Caminhadas, trekking e adrenalina. Para quem busca ir um pouco além em cada viagem.",
+      ],
+      [
+        "LGBTQ+ amigável",
+        "Viaje com liberdade em um ambiente acolhedor e respeitoso. Celebre o amor e a diversidade em cada destino.",
+      ],
+      [
+        "Viagens personalizadas",
+        "Seus interesses, seu ritmo e seu orçamento. Uma viagem pensada para você, em cada detalhe.",
+      ],
+      [
+        "Viagens privativas",
+        "Tempo e espaço para você e seus acompanhantes. Guias privados, transporte exclusivo e total flexibilidade.",
+      ],
+    ],
+  },
+} satisfies Record<
+  Lang,
+  {
+    title: string;
+    highlight: string;
+    description: string;
+    experiences: string[][];
+  }
+>;
+
+const t = copy[lang];
+const invitation = {
+  es: {
+    title: "¿Cómo te gustaría viajar?",
+    text: "Cuéntanos tu idea. Nosotros nos encargamos de los detalles.",
+    button: "Diseña tu viaje",
+  },
+  en: {
+    title: "How would you like to travel?",
+    text: "Tell us what you have in mind. We’ll take care of the details.",
+    button: "Design your trip",
+  },
+  pt: {
+    title: "Como você gostaria de viajar?",
+    text: "Conte sua ideia. Nós cuidamos dos detalhes.",
+    button: "Planeje sua viagem",
+  },
+}[lang];
+// Keep complete utility names so Tailwind can discover every color at build time.
+const illustrations = [
+  {
+    color: "bg-[#4A90E2] shadow-blue-200/60",
+    paths: [
+      "M2 20v-4a4 4 0 0 1 4-4h1M22 20v-4a4 4 0 0 0-4-4h-1",
+      "M9 20v-2a3 3 0 0 1 6 0v2",
+      "M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM21 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z",
+      "M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z",
+    ],
+  },
+  {
+    color: "bg-[#F5A623] shadow-orange-200/60",
+    paths: [
+      "M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2",
+      "M5 6h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z",
+      "M12 17l-3.5-3.5a2.1 2.1 0 0 1 3-3l.5.5.5-.5a2.1 2.1 0 0 1 3 3L12 17Z",
+    ],
+  },
+  {
+    color: "bg-[#27AE60] shadow-green-200/60",
+    paths: [
+      "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z",
+      "m16 8-3 5-5 3 3-5 5-3Z",
+      "M12 2v2M12 20v2M2 12h2M20 12h2",
+    ],
+  },
+  {
+    color: "bg-[#9B51E0] shadow-purple-200/60",
+    paths: ["M4 22V3", "M4 4c6-4 10 4 16 0v11c-6 4-10-4-16 0", "m9 8 3 3 3-3"],
+  },
+  {
+    color: "bg-[#E74C3C] shadow-red-200/60",
+    paths: ["M22 11.08V12a10 10 0 1 1-5.93-9.14", "m22 4-10 10-3-3"],
+  },
+  {
+    color: "bg-[#1ABC9C] shadow-teal-200/60",
+    paths: [
+      "M7 11V7a5 5 0 0 1 10 0v4",
+      "M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z",
+      "M12 15v3",
+    ],
+  },
+];
+---
+
+<section
+  aria-labelledby="travel-experiences-title"
+  class="bg-background py-12 md:py-20 lg:py-24"
+  data-travel-experiences
+>
+  <div class="mx-auto max-w-8xl px-6">
+    <header class="mx-auto mb-10 max-w-4xl text-center md:mb-16">
+      <h2
+        id="travel-experiences-title"
+        class="mb-0 text-3xl font-bold leading-tight tracking-tight text-foreground text-balance md:text-4xl lg:text-5xl"
+      >
+        {t.title}{" "}
+        <span class="text-primary">{t.highlight}</span>
+      </h2>
+      <p
+        class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg"
+      >
+        {t.description}
+      </p>
+      <div
+        class="mt-6 flex items-center justify-center gap-3"
+        aria-hidden="true"
+      >
+        <span class="h-px w-16 bg-secondary/30"></span>
+        <span class="relative h-1.5 w-12 rounded-full bg-secondary">
+          <span
+            class="absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background"
+          ></span>
+        </span>
+        <span class="h-px w-16 bg-secondary/30"></span>
+      </div>
+    </header>
+
+    <ul
+      class="m-0 grid list-none grid-cols-2 gap-x-4 gap-y-9 p-0 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-3 lg:gap-x-16 lg:gap-y-14"
+    >
+      {
+        t.experiences.map(([title, description], index) => (
+          <li class="group flex min-w-0 flex-col items-center text-center">
+            <div
+              class:list={[
+                "relative mb-4 flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full text-white shadow-lg ring-8 ring-background sm:mb-6 sm:size-32 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:-translate-y-1",
+                illustrations[index].color,
+              ]}
+              aria-hidden="true"
+            >
+              {index === 3 && (
+                <div class="absolute inset-0 grid grid-rows-6">
+                  <span class="bg-[#E40303]" />
+                  <span class="bg-[#FF8C00]" />
+                  <span class="bg-[#FFED00]" />
+                  <span class="bg-[#008026]" />
+                  <span class="bg-[#004DFF]" />
+                  <span class="bg-[#750787]" />
+                </div>
+              )}
+              <span class="absolute -right-3 -top-3 size-20 rounded-full bg-white/15" />
+              <span class="absolute -bottom-5 -left-3 size-16 rounded-full bg-white/10" />
+              <svg
+                class:list={[
+                  "relative size-11 sm:size-16",
+                  index === 3 && "drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]",
+                ]}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                focusable="false"
+              >
+                {illustrations[index].paths.map((d) => (
+                  <path d={d} />
+                ))}
+              </svg>
+            </div>
+            <h3 class="mb-2 min-h-10 text-sm font-bold leading-5 tracking-tight text-foreground text-balance sm:mb-3 sm:min-h-0 sm:text-xl sm:leading-normal md:text-2xl">
+              {title}
+            </h3>
+            <p class="mb-0 max-w-xs text-xs leading-5 text-muted-foreground text-pretty sm:text-sm sm:leading-6 md:text-base">
+              {description}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+    <div
+      class="mx-auto mt-12 flex max-w-4xl flex-col items-center gap-6 border-t border-primary/10 pt-8 text-center sm:mt-14 sm:flex-row sm:justify-between sm:gap-8 sm:pt-10 sm:text-left"
+    >
+      <div>
+        <h3 class="mb-2 text-xl font-bold text-foreground md:text-2xl">
+          {invitation.title}
+        </h3>
+        <p
+          class="mb-0 text-sm leading-relaxed text-muted-foreground md:text-base"
+        >
+          {invitation.text}
+        </p>
+      </div>
+      <a
+        href={getPlanTripHref(lang)}
+        class="inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-secondary px-6 py-3 text-sm font-semibold text-white shadow-md shadow-secondary/15 transition-colors hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
+      >
+        {invitation.button}
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg
+        >
+      </a>
+    </div>
+  </div>
+</section>

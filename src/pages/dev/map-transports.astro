@@ -1,0 +1,31 @@
+---
+import TransportMapDemo from "../../components/tours/TransportMapDemo";
+import "../../styles/global.css";
+import "@fontsource-variable/outfit";
+export const prerender = false;
+if (!import.meta.env.DEV) return new Response(null, { status: 404 });
+---
+
+<html lang="es">
+  <head
+    ><meta charset="utf-8" /><meta
+      name="viewport"
+      content="width=device-width"
+    /><meta name="robots" content="noindex,nofollow" /><title>
+      Prueba de transportes · Dreamy Tours
+    </title></head
+  >
+  <body
+    style="--font-outfit: 'Outfit Variable'; font-family: var(--font-outfit)"
+  >
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-8">
+      <h1 class="mb-2 text-3xl font-bold text-foreground">
+        Un viaje, distintas formas de recorrerlo
+      </h1>
+      <p class="mb-6 text-muted-foreground">
+        Prueba visual de los transportes y del trazado por carretera.
+      </p>
+      <TransportMapDemo client:load />
+    </main>
+  </body>
+</html>

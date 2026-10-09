@@ -1,0 +1,16 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import MachuPicchuPrebooking from "../../components/checkout/MachuPicchuPrebooking";
+---
+
+<PageLayout
+  lang="es"
+  seo={{
+    title: "Pre-reserva Machu Picchu | Dreamy Tours",
+    robots: "noindex,nofollow",
+  }}
+>
+  <div class="bg-[#f7f9f7] px-4 py-8 sm:px-6 sm:py-12">
+    <div class="mx-auto max-w-6xl"><MachuPicchuPrebooking client:load /></div>
+  </div>
+</PageLayout>

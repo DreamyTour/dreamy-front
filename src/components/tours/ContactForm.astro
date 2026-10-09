@@ -281,7 +281,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       <textarea
         id="contact-message"
         name="mensaje"
-        rows={4}
+    rows={2}
         required
         enterkeyhint="send"
         class="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-sm focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-400 resize-none text-sm"
@@ -319,6 +319,27 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
     </p>
   </form>
 </section>
+
+<style>
+  [data-contact-form-root] { padding: 16px; }
+  [data-contact-form-root] header { margin: 4px 0 12px; }
+  [data-contact-form-root] header h3 { font-size: 1rem; }
+  #contact-whatsapp-btn { padding-block: 10px; margin-bottom: 12px; }
+  [data-contact-form-root] > div.flex { margin-bottom: 12px; }
+  [data-contact-tour-form] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  [data-contact-tour-form] > :global(*) { margin-top: 0; min-width: 0; }
+  [data-contact-tour-form] > div:nth-of-type(1),
+  [data-contact-tour-form] > div:nth-of-type(2),
+  [data-contact-tour-form] > div:nth-of-type(5),
+  [data-contact-tour-form] > button,
+  [data-contact-tour-form] > p { grid-column: 1 / -1; }
+  [data-contact-tour-form] label { font-size: 12px; margin-bottom: 4px; }
+  [data-contact-tour-form] input:not([type=hidden]),
+  [data-contact-tour-form] select { height: 36px; padding: 7px 10px; font-size: 13px; }
+  #contact-phone-code { min-width: 38px; padding: 7px 5px; font-size: 12px; }
+  [data-contact-tour-form] textarea { padding: 8px 10px; min-height: 60px; font-size: 13px; resize: vertical; }
+  [data-contact-submit] { padding-block: 10px; font-size: 14px; }
+</style>
 
 <script>
   type ContactFormRoot = HTMLElement & {

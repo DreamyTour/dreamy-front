@@ -1,0 +1,17 @@
+---
+import PageLayout from "@/layouts/PageLayout.astro";
+import MachuPicchuAvailabilityDesign from "@/components/content/MachuPicchuAvailabilityDesign.astro";
+import { MACHU_PICCHU_AVAILABILITY_SLUGS } from "@/lib/machuPicchuAvailabilityI18n";
+---
+
+<PageLayout
+  lang="en"
+  seo={{
+    title: "Machu Picchu Availability | Dreamy Tours",
+    description: "Choose your date, circuit and entry time for Machu Picchu.",
+    slugMap: MACHU_PICCHU_AVAILABILITY_SLUGS,
+    robots: "noindex,nofollow",
+  }}
+>
+  <MachuPicchuAvailabilityDesign lang="en" />
+</PageLayout>

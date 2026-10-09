@@ -1,15 +1,29 @@
 import type { APIRoute } from "astro";
+import {
+	fetchCalendarResponse,
+	isCalendarQueryValid,
+} from "@/lib/calendarAvailability";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request }) => {
 	const url = new URL(request.url);
-	const apiUrl = `https://calendar.dreamy.tours/v1/tickets${url.search}`;
+	const params = {
+		place: Number(url.searchParams.get("place")),
+		road: url.searchParams.get("road") || "",
+		year: Number(url.searchParams.get("year")),
+		month: Number(url.searchParams.get("month")),
+	};
+	if (!isCalendarQueryValid(params))
+		return Response.json({ error: "Invalid calendar query" }, { status: 400 });
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), 10_000);
 
 	try {
-		const response = await fetch(apiUrl, { signal: controller.signal });
+		const response = await fetchCalendarResponse({
+			...params,
+			signal: controller.signal,
+		});
 		const body = await response.text();
 
 		return new Response(body, {

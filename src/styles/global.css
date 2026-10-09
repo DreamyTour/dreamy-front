@@ -858,6 +858,9 @@ html {
    BASE LAYER (Tailwind)
    ============================================ */
 @layer base {
+  body:has(dialog[data-route-image-dialog][open]) {
+    overflow: hidden;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-outfit);

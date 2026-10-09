@@ -7,6 +7,7 @@ import {
 	MapPinned,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { fetchCalendarAvailability } from "@/lib/calendarAvailability";
 import type { Lang } from "@/lib/i18n";
 import {
 	INCA_TRAIL_PLACE_ID,
@@ -216,13 +217,15 @@ async function fetchTickets({
 	road: string;
 	signal?: AbortSignal;
 }) {
-	const url = `/api/calendar-tickets?place=${INCA_TRAIL_PLACE_ID}&road=${road}&year=${year}&month=${month}`;
-	const response = await fetch(url, { signal });
-
-	if (!response.ok) throw new Error("Error fetching availability");
-
-	const data = (await response.json()) as { tickets?: TicketsByDate };
-	return data.tickets || {};
+	return (
+		await fetchCalendarAvailability({
+			place: INCA_TRAIL_PLACE_ID,
+			road,
+			year,
+			month,
+			signal,
+		})
+	).dates;
 }
 
 export default function IncaTrailAvailabilityCalendar({

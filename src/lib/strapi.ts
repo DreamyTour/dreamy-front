@@ -93,7 +93,7 @@ export default async function fetchApi<T>({
 	const url = buildStrapiUrl({ endpoint, query, locale });
 	const urlString = url.toString();
 
-	if (requestCache.has(urlString)) {
+	if (!import.meta.env.DEV && requestCache.has(urlString)) {
 		return unwrapData<T>(
 			requestCache.get(urlString),
 			wrappedByKey,
@@ -104,7 +104,7 @@ export default async function fetchApi<T>({
 	const res = await fetch(urlString);
 	const rawData = await readJsonResponse<unknown>(res, urlString);
 
-	requestCache.set(urlString, rawData);
+	if (!import.meta.env.DEV) requestCache.set(urlString, rawData);
 
 	return unwrapData<T>(rawData, wrappedByKey, wrappedByList);
 }

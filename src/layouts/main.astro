@@ -9,6 +9,8 @@ import {
   DEFAULT_LANG,
   resolveLanguageUrls,
   type LocalizedPageCounts,
+  LANGS,
+  localizePath,
   isValidLang,
   type Lang,
 } from "@/lib/i18n";
@@ -82,6 +84,14 @@ const languageUrls = resolveLanguageUrls({
   slugMap: seo?.slugMap,
   pageCounts: languagePageCounts,
 });
+// Static pages without translated counterparts still need usable language links.
+if (Object.keys(languageUrls).length === 0) {
+  for (const locale of LANGS) {
+    languageUrls[locale] = locale === currentLang
+      ? Astro.url.pathname
+      : localizePath("/", locale);
+  }
+}
 const transitionEnabled = enableViewTransitions &&
   !/(?:^|\/)checkout(?:\/|$)/.test(Astro.url.pathname);
 ---

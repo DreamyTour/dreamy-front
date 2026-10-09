@@ -17,6 +17,10 @@ import InformationTab from "./InformationTab";
 import ItineraryTab from "./ItineraryTab";
 import OverviewTab from "./OverviewTab";
 import PriceTab from "./PriceTab";
+import RouteMapPreview from "./RouteMapPreview";
+
+let mapTabModule: Promise<typeof import("./MapTab")> | undefined;
+const loadMapTab = () => (mapTabModule ??= import("./MapTab"));
 
 function DeferredMapTab({
 	lang,
@@ -34,14 +38,31 @@ function DeferredMapTab({
 
 	React.useEffect(() => {
 		if (active && !Comp) {
-			import("./MapTab").then((mod) => setComp(() => mod.default));
+			let cancelled = false;
+			loadMapTab().then((mod) => {
+				if (!cancelled) setComp(() => mod.default);
+			});
+			return () => {
+				cancelled = true;
+			};
 		}
 	}, [active, Comp]);
 
 	if (!active) return null;
 
 	if (!Comp) {
-		return <div className="h-[700px] lg:h-[840px]" aria-hidden="true" />;
+		return (
+			<div
+				role="status"
+				className="flex h-[clamp(260px,calc(100svh-340px),560px)] items-center justify-center rounded-2xl bg-muted text-sm text-muted-foreground"
+			>
+				{lang === "en"
+					? "Loading your route…"
+					: lang === "pt"
+						? "Carregando seu percurso…"
+						: "Cargando tu recorrido…"}
+			</div>
+		);
 	}
 
 	return <Comp lang={lang} mapStops={mapStops} />;
@@ -95,11 +116,15 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	const hasPrice = Boolean(
 		tab?.price && (tab.price.titulo || tab.price.contenido),
 	);
-	const mapStops = Array.isArray(tab?.maps?.mapstops)
-		? tab.maps.mapstops.filter(isValidTourMapStop)
-		: [];
+	const mapStops = React.useMemo(
+		() =>
+			Array.isArray(tab?.maps?.mapstops)
+				? tab.maps.mapstops.filter(isValidTourMapStop)
+				: [],
+		[tab?.maps?.mapstops],
+	);
 	const hasMaps = mapStops.length > 0;
-	const mapsTitle = "Maps";
+	const mapsTitle = lang === "en" ? "Map" : "Mapa";
 	const visibleTabs = React.useMemo(
 		() =>
 			[
@@ -118,6 +143,23 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	const [isStuck, setIsStuck] = React.useState(false);
 
 	const tabsRef = React.useRef<HTMLDivElement>(null);
+
+	// Download the map code shortly before the visitor reaches the tabs.
+	// Tiles and the WebGL map still load only when the map is opened.
+	React.useEffect(() => {
+		if (!hasMaps || !tabsRef.current) return;
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					void loadMapTab();
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: "300px" },
+		);
+		observer.observe(tabsRef.current);
+		return () => observer.disconnect();
+	}, [hasMaps]);
 
 	React.useEffect(() => {
 		if (!visibleTabs.includes(activeTab)) {
@@ -267,7 +309,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 	);
 
 	return (
-		<div className="w-full" ref={tabsRef}>
+		<div className="w-full scroll-mt-20" ref={tabsRef}>
 			<style>{`
         .tour-tabs-list .tour-tab-trigger::after {
           content: "";
@@ -375,7 +417,11 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							</div>
 						</div>
 
-						<div className="mt-8 min-w-0 lg:mt-12">
+						<div
+							className={
+								activeTab === "maps" ? "mt-4 min-w-0" : "mt-8 min-w-0 lg:mt-12"
+							}
+						>
 							{hasOverview && (
 								<TabsContent
 									value="overview"
@@ -552,8 +598,19 @@ export default function TourTabs({ tour, lang, children }: Props) {
 
 					{hasMaps && (
 						<details
-							className={mobileAccordionClass}
-							onToggle={(event) => setIsMapOpenMobile(event.currentTarget.open)}
+							data-tour-mobile-map
+							className={`${mobileAccordionClass} scroll-mt-20`}
+							onToggle={(event) => {
+								const accordion = event.currentTarget;
+								setIsMapOpenMobile(accordion.open);
+								if (accordion.open)
+									requestAnimationFrame(() => {
+										accordion.scrollIntoView({
+											block: "start",
+											behavior: "instant",
+										});
+									});
+							}}
 						>
 							{renderMobileSummary("maps", mapsTitle, MapIcon)}
 							<div className={mobileContentClass}>
@@ -573,9 +630,42 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					<aside
 						id="tour-contact-form"
 						aria-label="Reserva y contacto"
-						className="mt-8 min-w-0 scroll-mt-28 lg:mt-12 lg:self-start"
+						className={`mt-8 min-w-0 scroll-mt-28 lg:mt-12 ${activeTab === "maps" ? "lg:flex lg:min-h-0 lg:flex-col lg:self-stretch [&>*:first-child]:shrink-0" : "lg:self-start"}`}
 					>
 						{children}
+						{hasMaps && (activeTab === "maps" || isMapOpenMobile) && (
+							<div
+								className={`${isMapOpenMobile ? "contents" : "hidden"} ${activeTab === "maps" ? "lg:contents" : "lg:hidden"}`}
+							>
+								<RouteMapPreview
+									fitHeight={activeTab === "maps"}
+									stops={mapStops}
+									previewImage={
+										tour.slug === "peru-8-dias-arequipa-puno-cusco"
+											? "/images/tours/mapa-preview.webp"
+											: undefined
+									}
+									lang={lang}
+									onOpen={() => {
+										if (window.matchMedia("(min-width: 1024px)").matches)
+											handleTabChange("maps");
+										else {
+											const accordion =
+												document.querySelector<HTMLDetailsElement>(
+													"[data-tour-mobile-map]",
+												);
+											if (accordion) {
+												accordion.open = true;
+												accordion.scrollIntoView({
+													block: "start",
+													behavior: "smooth",
+												});
+											}
+										}
+									}}
+								/>
+							</div>
+						)}
 					</aside>
 				)}
 			</div>
