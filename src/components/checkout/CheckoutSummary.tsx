@@ -928,9 +928,8 @@ export default function CheckoutSummary({
 													onChange={(e) =>
 														handlePassengerChange(i, "dob", e.target.value)
 													}
-													onClick={(e) => openDatePicker(e.currentTarget)}
 													max={todayDateValue}
-													className={`${fieldClass} w-full cursor-pointer pr-12`}
+													className={`${fieldClass} w-full cursor-text pr-12 [&::-webkit-calendar-picker-indicator]:hidden`}
 												/>
 												<button
 													type="button"

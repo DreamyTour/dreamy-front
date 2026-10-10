@@ -454,10 +454,9 @@ export default function PlaneaTuViaje({
 								name="fechaViaje"
 								value={formData.fechaViaje}
 								onChange={handleChange}
-								onClick={openDatePicker}
 								min={todayDateValue}
 								style={inputStyle}
-								className="w-full cursor-pointer rounded-sm border border-border px-4 py-3 pr-12 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+								className="w-full cursor-text rounded-sm border border-border px-4 py-3 pr-12 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15 [&::-webkit-calendar-picker-indicator]:hidden"
 							/>
 							<button
 								type="button"

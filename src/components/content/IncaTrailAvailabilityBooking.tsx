@@ -2,7 +2,6 @@ import {
 	ArrowRight,
 	CalendarDays,
 	Clock3,
-	MapPinned,
 	Minus,
 	Mountain,
 	Plus,
@@ -143,7 +142,6 @@ export default function IncaTrailAvailabilityBooking({
 	tours,
 }: IncaTrailAvailabilityBookingProps) {
 	const copy = copyByLang[lang] ?? copyByLang.en;
-	const isContextTour = tours.some((tour) => tour.slug === initialTourSlug);
 	const [date, setDate] = useState("");
 	const [road, setRoad] = useState(initialRoad);
 	const [tourSlug, setTourSlug] = useState(initialTourSlug ?? "");
@@ -266,53 +264,6 @@ export default function IncaTrailAvailabilityBooking({
 	return (
 		<div className="grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:gap-8">
 			<div className="min-w-0 space-y-6">
-				{!isContextTour && (
-					<section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm sm:p-7">
-						{stepHeading(1, copy.tour)}
-						<p className="mb-4 text-sm text-muted-foreground">
-							{copy.routeHint}
-						</p>
-						{
-							<>
-								<label htmlFor="availability-tour" className="sr-only">
-									{copy.tour}
-								</label>
-								<select
-									id="availability-tour"
-									value={selectedTour?.slug ?? ""}
-									className="min-h-12 w-full cursor-pointer rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm font-semibold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-									onChange={(event) => {
-										const tour = tours.find(
-											(item) => item.slug === event.target.value,
-										);
-										if (!tour) return;
-										setTourSlug(tour.slug);
-										setRoad(tour.road);
-										setDate("");
-										setAvailability(null);
-										setPassengers(1);
-									}}
-								>
-									{tours.map((tour) => (
-										<option key={tour.slug} value={tour.slug}>
-											{tour.tourName}
-										</option>
-									))}
-								</select>
-							</>
-						}
-						<div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-xl border border-primary/10 bg-primary/5 px-4 py-3 text-sm text-primary">
-							<span className="flex items-center gap-2">
-								<MapPinned size={16} aria-hidden="true" />
-								{roadLabels[road] ?? `${copy.route} ${road}`}
-							</span>
-							<span className="flex items-center gap-2">
-								<Clock3 size={16} aria-hidden="true" />
-								{selectionDurationDays} {copy.days}
-							</span>
-						</div>
-					</section>
-				)}
 				<section className="min-w-0 rounded-2xl border border-border/60 bg-white p-4 shadow-sm sm:p-7">
 					{stepHeading(2, copy.dateTitle)}
 					<p className="mb-5 text-sm text-muted-foreground">
