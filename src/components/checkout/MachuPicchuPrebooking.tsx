@@ -68,7 +68,19 @@ export default function MachuPicchuPrebooking() {
 		} catch {
 			/* Missing or expired selection. */
 		}
-		requestId.current = crypto.randomUUID();
+		let storedId: string | null = null;
+		try {
+			storedId = sessionStorage.getItem("machuPicchuRequestId");
+		} catch {
+			/* Storage can be disabled by the browser. */
+		}
+		requestId.current =
+			storedId &&
+			/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(
+				storedId,
+			)
+				? storedId
+				: crypto.randomUUID();
 		setLoaded(true);
 	}, []);
 	function goTo(next: number) {
@@ -111,7 +123,7 @@ export default function MachuPicchuPrebooking() {
 				acceptedTerms,
 			});
 			if (lastRequest.current !== fingerprint) {
-				requestId.current = crypto.randomUUID();
+				if (lastRequest.current) requestId.current = crypto.randomUUID();
 				lastRequest.current = fingerprint;
 			}
 		}
@@ -147,6 +159,7 @@ export default function MachuPicchuPrebooking() {
 				throw new Error(result.error || "No pudimos enviar la solicitud.");
 			setReference(result.reference);
 			sessionStorage.removeItem("machuPicchuSelection");
+			sessionStorage.removeItem("machuPicchuRequestId");
 			setTravelers([emptyTraveler()]);
 			setContact({ email: "", phone: "" });
 		} catch (failure) {

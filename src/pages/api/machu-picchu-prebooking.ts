@@ -1,10 +1,9 @@
 import type { APIRoute } from "astro";
-import { escapeHtml } from "../../lib/html";
 import {
-	MACHU_PICCHU_ROUTES,
 	type MachuPicchuPrebooking,
 	validateMachuPicchuPrebooking,
 } from "../../lib/machuPicchuPrebooking";
+import { buildMachuPicchuPrebookingEmail } from "../../lib/machuPicchuPrebookingEmail";
 import { generateMachuPicchuPrebookingPdf } from "../../lib/machuPicchuPrebookingPdf";
 import { bytesToBase64 } from "../../lib/prebookingPdf";
 import {
@@ -54,7 +53,6 @@ export const POST: APIRoute = async ({ request }) => {
 			503,
 		);
 	const reference = `MP-${p.requestId.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
-	const safe = (value: string) => escapeHtml(value.trim());
 	try {
 		const pdf = await generateMachuPicchuPrebookingPdf({
 			request: p,
@@ -67,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
 				to: getDreamyRecipients(),
 				replyTo: p.contact.email.trim(),
 				subject: `Pre-reserva Machu Picchu · ${reference}`,
-				html: `<h1>Pre-reserva Machu Picchu</h1><p>Referencia: <strong>${reference}</strong></p><p>${safe(p.selection.date)} · ${safe(p.selection.time)} h (Perú)<br>${safe(MACHU_PICCHU_ROUTES[p.selection.route])} · Ruta ${safe(p.selection.route)}<br>${p.travelers.length} viajero(s)</p><p>La solicitud completa, los datos de viajeros y contacto están en el <strong>PDF adjunto</strong>.</p><p>Pendiente de revisión de disponibilidad y precio. No se ha cobrado ni emitido un boleto.</p>`,
+				...buildMachuPicchuPrebookingEmail(p, reference, "team"),
 				attachments: [
 					{
 						filename: `Pre-reserva-Machu-Picchu-${reference}.pdf`,
@@ -86,6 +84,32 @@ export const POST: APIRoute = async ({ request }) => {
 				},
 				502,
 			);
+		const customer = await resend.emails.send(
+			{
+				from: getDreamySender(),
+				to: [p.contact.email.trim()],
+				replyTo: getDreamyRecipients()[0],
+				subject: `Solicitud recibida: Machu Picchu ? ${reference}`,
+				...buildMachuPicchuPrebookingEmail(p, reference, "customer"),
+				attachments: [
+					{
+						filename: `Pre-reserva-Machu-Picchu-${reference}.pdf`,
+						content: bytesToBase64(pdf),
+						contentType: "application/pdf",
+					},
+				],
+			},
+			{ idempotencyKey: `machu-picchu-customer/${p.requestId}` },
+		);
+		if (customer.error || !customer.data?.id) {
+			return json(
+				{
+					error:
+						"Recibimos tu solicitud, pero no pudimos enviar la confirmaci?n a tu correo. Intenta de nuevo para reenviarla.",
+				},
+				502,
+			);
+		}
 		return json({ reference, status: "pending_review" });
 	} catch {
 		return json(

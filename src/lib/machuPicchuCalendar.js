@@ -12,6 +12,22 @@ function initMachuPicchuCalendar() {
   const lang = document.querySelector("[data-availability-lang]").dataset
     .availabilityLang;
   const translate = availabilityTranslator(lang);
+  let requestId;
+  try {
+    requestId = sessionStorage.getItem("machuPicchuRequestId");
+    if (
+      !/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(
+        requestId || "",
+      )
+    ) {
+      requestId = crypto.randomUUID();
+      sessionStorage.setItem("machuPicchuRequestId", requestId);
+    }
+  } catch {
+    requestId = crypto.randomUUID();
+  }
+  document.getElementById("bookingReference").textContent =
+    `MP-${requestId.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
   let availability = { dates: {}, times: {} };
   let loadState = "loading";
   let requestController;
@@ -334,6 +350,7 @@ function initMachuPicchuCalendar() {
     };
     try {
       sessionStorage.setItem("machuPicchuSelection", JSON.stringify(selection));
+      sessionStorage.setItem("machuPicchuRequestId", requestId);
       window.location.href = "/es/pre-reserva-machu-picchu/";
     } catch {
       document.getElementById("previewStatus").textContent = translate(

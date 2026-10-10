@@ -7,6 +7,7 @@ export const MACHU_PICCHU_AVAILABILITY_SLUGS = {
 } satisfies Record<Lang, string>;
 
 const translations: Record<string, [string, string]> = {
+	"Código de solicitud": ["Request reference", "Código da solicitação"],
 	"Disponibilidad por circuito y horario": [
 		"Availability by circuit and time",
 		"Disponibilidade por circuito e horário",

@@ -381,6 +381,15 @@ const weekdays = Array.from({ length: 7 }, (_, i) =>
             </div>
 
             <div class="p-6 space-y-4">
+              <div class="rounded-lg bg-[#e6f2e8] px-3 py-2.5">
+                <span class="block text-xs text-gray-500"
+                  >{t("Código de solicitud")}</span
+                >
+                <strong
+                  id="bookingReference"
+                  class="mt-1 block text-sm tracking-wide text-[#007020]"
+                ></strong>
+              </div>
               <div class="flex items-start justify-between gap-3 text-sm">
                 <span class="text-gray-500">{t("Mes")}</span>
                 <span
