@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { getIncaTrailBookingConfig } from "../src/lib/incaTrailBooking";
 
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth() + 1;
@@ -173,15 +174,23 @@ async function waitForBookingIslandHydration(
 	await page.waitForFunction(() =>
 		Array.from(document.querySelectorAll("astro-island")).some(
 			(island) =>
-				island.getAttribute("component-url")?.includes("BookingForm") &&
+				island
+					.getAttribute("component-url")
+					?.includes("IncaTrailAvailabilityBooking") &&
 				!island.hasAttribute("ssr"),
 		),
 	);
 }
 
-test("Inca Trail booking form creates a coherent checkout cart without sticky internal scroll", async ({
+test("Inca Trail reservation reaches checkout when randomUUID is unavailable", async ({
 	page,
 }) => {
+	await page.addInitScript(() => {
+		Object.defineProperty(Crypto.prototype, "randomUUID", {
+			value: undefined,
+			configurable: true,
+		});
+	});
 	const requestedRoads: string[] = [];
 
 	await page.route("**/api/calendar-tickets**", async (route) => {
@@ -202,22 +211,24 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 
 	await page.goto("/inca-trail-4-days", { waitUntil: "domcontentloaded" });
 
-	await page
-		.getByRole("link", { name: /reservar en linea|reservar en línea|book/i })
-		.first()
-		.click();
-	const form = page.locator("#tour-contact-form");
-	await form.scrollIntoViewIfNeeded();
+	await expect(page.locator(".booking-summary")).toBeVisible();
+	const tourTitle = await page.locator("#booking-summary-title").innerText();
 	await expect(
-		form.getByRole("heading", { name: /^(Reserva|Booking)$/ }),
-	).toBeVisible({
+		page.locator(".booking-summary").getByRole("combobox"),
+	).toHaveCount(0);
+	await page.locator(".booking-summary .reserve").click({ noWaitAfter: true });
+	await expect(page).toHaveURL(/availability|disponibilidad|disponibilidade/);
+	const form = page.locator("#availability-calendar");
+
+	await expect(form.locator("[data-calendar-months]")).toBeVisible({
 		timeout: 20000,
 	});
 	await waitForBookingIslandHydration(page);
 	await expect(form.getByText("Elija la fecha de su viaje")).toHaveCount(0);
-	await expect(
-		form.getByRole("combobox", { name: /route|ruta|rota/i }),
-	).toHaveCount(0);
+	await expect(form.locator("#availability-tour")).toHaveCount(0);
+	await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+		`Tour booking ${tourTitle}`,
+	);
 
 	const formLayout = await form.evaluate((element) => {
 		const styles = window.getComputedStyle(element);
@@ -233,9 +244,11 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 
 	if (testMonth > currentMonth) {
 		await expect(
-			form.getByRole("button", { name: /next|siguiente|proximo/i }),
+			form.getByRole("button", { name: /next|siguiente|pr[o\u00f3]ximo/i }),
 		).toBeEnabled();
-		await form.getByRole("button", { name: /next|siguiente|proximo/i }).click();
+		await form
+			.getByRole("button", { name: /next|siguiente|pr[o\u00f3]ximo/i })
+			.click();
 		await expect(
 			form.getByText(new RegExp(`\\b${currentYear}\\b`, "i")).first(),
 		).toBeVisible();
@@ -251,11 +264,17 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 			name: new RegExp(`${testDate}.*12.*(spaces|cupos|vagas)`, "i"),
 		})
 		.click();
-	await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(4);
-	await expect(form.getByText(formatDateRange(testDate, 4))).toBeVisible();
+	await expect(
+		form.locator('button[data-calendar-date][aria-pressed="true"]'),
+	).toHaveCount(4);
+	await expect(
+		form.getByText(formatDateRange(testDate, 4)).first(),
+	).toBeVisible();
 
 	await form.getByRole("button", { name: /increase|aumentar/i }).click();
-	await form.getByRole("button", { name: /book now/i }).click();
+	await form
+		.getByRole("button", { name: /book now/i })
+		.click({ noWaitAfter: true });
 
 	await expect(page).toHaveURL(/\/checkout\/?$/);
 
@@ -265,6 +284,9 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 	});
 
 	expect(cart).toMatchObject({
+		quoteRequestId: expect.stringMatching(
+			/^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i,
+		),
 		date: testDate,
 		durationDays: 4,
 		road: "1",
@@ -279,10 +301,18 @@ test("Inca Trail booking form creates a coherent checkout cart without sticky in
 	expect(cart.totalPrice).toBe(cart.pricePerPerson * cart.passengers);
 });
 
-test("Booking calendar island hydrates with the locked route on every allowed Inca Trail slug", async ({
-	page,
-}) => {
-	for (const tour of bookingCalendarTours) {
+for (const tour of bookingCalendarTours) {
+	test(`Tour card opens availability with the correct tour, permit route and duration: ${tour.path}`, async ({
+		page,
+	}) => {
+		if (tour.durationDays === 6) {
+			await page.addInitScript(() => {
+				Object.defineProperty(Crypto.prototype, "randomUUID", {
+					value: undefined,
+					configurable: true,
+				});
+			});
+		}
 		const requestedRoads: string[] = [];
 
 		await page.unroute("**/api/calendar-tickets**").catch(() => {});
@@ -304,22 +334,59 @@ test("Booking calendar island hydrates with the locked route on every allowed In
 
 		await page.goto(tour.path, { waitUntil: "domcontentloaded" });
 
-		const form = page.locator("#tour-contact-form");
-		await form.scrollIntoViewIfNeeded();
+		await expect(page.locator(".booking-summary")).toBeVisible();
+		const originalTitle = await page
+			.locator("#booking-summary-title")
+			.innerText();
 		await expect(
-			form.getByRole("heading", { name: /^(Reserva|Booking)$/ }),
-		).toBeVisible({
+			page.locator(".booking-summary").getByRole("combobox"),
+		).toHaveCount(0);
+		if (tour.durationDays === 1) {
+			const summary = page.locator(".booking-summary");
+			await expect(summary.locator(".price")).toHaveText(
+				/Consultar precio|Request a price|Consultar preço/,
+			);
+			await expect(summary.locator(".reserve, .availability a")).toHaveCount(0);
+			await expect(page.locator(".hero-cta-book")).toHaveCount(0);
+			await summary.locator("[data-open-tour-quote]").click();
+			const dialog = page.getByRole("dialog");
+			await expect(dialog).toBeVisible();
+			await expect(dialog.locator(".tour-title")).toHaveText(originalTitle);
+			await page.keyboard.press("Escape");
+			const heroQuery = page.locator(
+				".hero-cta-whatsapp[data-open-tour-quote]",
+			);
+			if (await heroQuery.count()) {
+				await heroQuery.click();
+				await expect(dialog).toBeVisible();
+				await page.keyboard.press("Escape");
+				await expect(heroQuery).toBeFocused();
+			}
+			return;
+		}
+		await page
+			.locator(".booking-summary .reserve")
+			.click({ noWaitAfter: true });
+		await expect(page).toHaveURL(/availability|disponibilidad|disponibilidade/);
+		const form = page.locator("#availability-calendar");
+
+		await expect(form.locator("[data-calendar-months]")).toBeVisible({
 			timeout: 20000,
 		});
 		await waitForBookingIslandHydration(page);
-		await expect(
-			form.getByRole("combobox", { name: /route|ruta|rota/i }),
-		).toHaveCount(0);
-		await expect(form.locator('select[name="travel-month"]')).toBeVisible();
+		const requestedSlug = new URL(page.url()).searchParams.get("tour") ?? "";
+		await expect(form.locator("#availability-tour")).toHaveCount(0);
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			`${tour.path.startsWith("/es/") ? "Reserva de tour" : tour.path.startsWith("/pt/") ? "Reserva do tour" : "Tour booking"} ${originalTitle}`,
+		);
+		await expect(form.locator('select[name="machu-picchu-route"]')).toHaveCount(
+			0,
+		);
+		await expect(form.locator("[data-calendar-months] button")).toHaveCount(12);
 
 		if (testMonth > currentMonth) {
 			await form
-				.getByRole("button", { name: /next|siguiente|proximo/i })
+				.getByRole("button", { name: /next|siguiente|pr[o\u00f3]ximo/i })
 				.click();
 		}
 
@@ -332,24 +399,87 @@ test("Booking calendar island hydrates with the locked route on every allowed In
 			})
 			.click();
 
-		await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(
-			tour.durationDays,
-		);
 		await expect(
-			form.getByText(
-				formatDateRange(
-					addDaysToDateKey(testDate, -tour.permitStartOffsetDays),
-					tour.durationDays,
-				),
-			),
+			form.locator('button[data-calendar-date][aria-pressed="true"]'),
+		).toHaveCount(tour.durationDays);
+		await expect(
+			form
+				.getByText(
+					formatDateRange(
+						addDaysToDateKey(testDate, -tour.permitStartOffsetDays),
+						tour.durationDays,
+					),
+				)
+				.first(),
 		).toBeVisible();
 		await expect(form.getByText(/US\$\d+\.\d{2}/).first()).toBeVisible();
 		expect(requestedRoads.length).toBeGreaterThan(0);
 		expect(new Set(requestedRoads)).toEqual(new Set([tour.road]));
-	}
-});
+		if (!getIncaTrailBookingConfig(requestedSlug)?.isPrimaryAvailabilityTour) {
+			await form
+				.getByRole("button", {
+					name: /book now|reservar agora|reservar ahora/i,
+				})
+				.click({ noWaitAfter: true });
+			await expect(page).toHaveURL(/\/checkout\/?$/);
+			const cart = await page.evaluate(() =>
+				JSON.parse(localStorage.getItem("bookingCart") ?? "null"),
+			);
+			expect(cart).toMatchObject({
+				tourName: originalTitle,
+				road: tour.road,
+				durationDays: tour.durationDays,
+				permitDate: testDate,
+				date: addDaysToDateKey(testDate, -tour.permitStartOffsetDays),
+			});
+		}
+	});
+}
 
-test("Short Inca Trail calendar locks route 5 and marks a two day trip", async ({
+for (const path of [
+	"/inca-trail-availability",
+	"/es/disponibilidad-camino-inca",
+	"/pt/disponibilidade-trilha-inca",
+]) {
+	test(`General availability offers only the 2 and 4 day tours: ${path}`, async ({
+		page,
+	}) => {
+		await page.route("**/api/calendar-tickets**", (route) =>
+			route.fulfill({
+				contentType: "application/json",
+				body: JSON.stringify({ tickets: { [testDate]: 12 } }),
+			}),
+		);
+		await page.goto(path, { waitUntil: "domcontentloaded" });
+		await expect(page.getByRole("heading", { level: 1 })).toContainText(/Inca/);
+		const options = page.locator("#availability-tour option");
+		await expect(options).toHaveCount(2, { timeout: 20000 });
+		const slugs = await options.evaluateAll((items) =>
+			items.map((item) => (item as HTMLOptionElement).value),
+		);
+		expect(
+			slugs.map((slug) => getIncaTrailBookingConfig(slug)?.durationDays).sort(),
+		).toEqual([2, 4]);
+		await waitForBookingIslandHydration(page);
+		const monthButtons = page.locator("[data-calendar-months] button");
+		await expect(monthButtons).toHaveCount(12);
+		await expect(
+			page.locator("[data-calendar-months] button:disabled"),
+		).toHaveCount(currentMonth - 1);
+		await expect(
+			page.locator(`[data-calendar-month="${currentMonth}"]`),
+		).toHaveAttribute("aria-pressed", "true");
+		await page.locator(`[data-calendar-month="${testMonth}"]`).click();
+		await expect(
+			page.locator(`[data-calendar-month="${testMonth}"]`),
+		).toHaveAttribute("aria-pressed", "true");
+		await expect(
+			page.getByRole("button", { name: new RegExp(`${testDate}.*12`) }),
+		).toBeEnabled();
+	});
+}
+
+test("Short Inca Trail card opens route 5 availability and marks a two day trip", async ({
 	page,
 }) => {
 	const requestedRoads: string[] = [];
@@ -373,24 +503,30 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 	await page.goto("/short-inca-trail-2-days", {
 		waitUntil: "domcontentloaded",
 	});
-	await page
-		.getByRole("link", { name: /reservar en linea|reservar en lÃ­nea|book/i })
-		.first()
-		.click();
+	const shortTourTitle = await page
+		.locator("#booking-summary-title")
+		.innerText();
 
-	const form = page.locator("#tour-contact-form");
-	await form.scrollIntoViewIfNeeded();
+	await expect(page.locator(".booking-summary")).toBeVisible();
 	await expect(
-		form.getByRole("heading", { name: /^(Reserva|Booking)$/ }),
-	).toBeVisible({
+		page.locator(".booking-summary").getByRole("combobox"),
+	).toHaveCount(0);
+	await page.locator(".booking-summary .reserve").click({ noWaitAfter: true });
+	await expect(page).toHaveURL(/availability|disponibilidad|disponibilidade/);
+	const form = page.locator("#availability-calendar");
+
+	await expect(form.locator("[data-calendar-months]")).toBeVisible({
 		timeout: 20000,
 	});
-	await expect(
-		form.getByRole("combobox", { name: /route|ruta|rota/i }),
-	).toHaveCount(0);
+	await expect(form.locator("#availability-tour")).toHaveCount(0);
+	await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+		`Tour booking ${shortTourTitle}`,
+	);
 
 	if (testMonth > currentMonth) {
-		await form.getByRole("button", { name: /next|siguiente|proximo/i }).click();
+		await form
+			.getByRole("button", { name: /next|siguiente|pr[o\u00f3]ximo/i })
+			.click();
 	}
 
 	await form
@@ -398,10 +534,16 @@ test("Short Inca Trail calendar locks route 5 and marks a two day trip", async (
 			name: new RegExp(`${testDate}.*8.*(spaces|cupos|vagas)`, "i"),
 		})
 		.click();
-	await expect(form.locator('button[aria-pressed="true"]')).toHaveCount(2);
-	await expect(form.getByText(formatDateRange(testDate, 2))).toBeVisible();
+	await expect(
+		form.locator('button[data-calendar-date][aria-pressed="true"]'),
+	).toHaveCount(2);
+	await expect(
+		form.getByText(formatDateRange(testDate, 2)).first(),
+	).toBeVisible();
 
-	await form.getByRole("button", { name: /book now/i }).click();
+	await form
+		.getByRole("button", { name: /book now/i })
+		.click({ noWaitAfter: true });
 	await expect(page).toHaveURL(/\/checkout\/?$/);
 
 	const cart = await page.evaluate(() => {

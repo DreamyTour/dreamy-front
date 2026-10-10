@@ -6,11 +6,12 @@ import type { Lang } from "@/lib/i18n";
 interface Props {
   seo?: SEOProps;
   lang?: Lang;
+  enableViewTransitions?: boolean;
 }
 
-const { seo, lang } = Astro.props;
+const { seo, lang, enableViewTransitions } = Astro.props;
 ---
 
-<Layout seo={seo} lang={lang}>
+<Layout seo={seo} lang={lang} enableViewTransitions={enableViewTransitions}>
   <slot />
 </Layout>

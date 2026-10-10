@@ -5,6 +5,8 @@ import BadgeIcon from "@/components/ui/BadgeIcon.astro";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import HeroImage from "@/components/ui/HeroImage.astro";
 import type { HeroImageData } from "@/lib/heroImage";
+import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
+import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -69,6 +71,11 @@ const ctaLabels = {
   },
 };
 const ctaLabel = ctaLabels[lang] || ctaLabels.en;
+const quoteOnly = getIncaTrailBookingConfig(tour.slug)?.durationDays === 1;
+const ContactTag = quoteOnly ? "button" : "a";
+const bookingHref = getIncaTrailBookingConfig(tour.slug)
+  ? `${rewriteUrl(`/${incaTrailAvailabilitySlugMap[lang]}`, lang)}?tour=${encodeURIComponent(tour.slug)}#availability-calendar`
+  : "#tour-contact-form";
 ---
 
 <!--
@@ -217,10 +224,14 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
       </p>
 
       <div class="mt-4 grid gap-3">
-        <a
-          href="https://wa.me/51969787221"
-          target="_blank"
-          rel="noopener noreferrer"
+        <ContactTag
+          href={quoteOnly ? undefined : "https://wa.me/51969787221"}
+          target={quoteOnly ? undefined : "_blank"}
+          rel={quoteOnly ? undefined : "noopener noreferrer"}
+          type={quoteOnly ? "button" : undefined}
+          data-open-tour-quote={quoteOnly ? "" : undefined}
+          aria-haspopup={quoteOnly ? "dialog" : undefined}
+          aria-controls={quoteOnly ? "tour-quote-dialog" : undefined}
           class="hero-cta-whatsapp inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98]"
         >
           <svg
@@ -235,13 +246,17 @@ const ctaLabel = ctaLabels[lang] || ctaLabels.en;
             ></path>
           </svg>
           {ctaLabel.whatsapp}
-        </a>
-        <a
-          href="#tour-contact-form"
-          class="hero-cta-book inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 active:scale-[0.98]"
-        >
-          {ctaLabel.book}
-        </a>
+        </ContactTag>
+        {
+          !quoteOnly && (
+            <a
+              href={bookingHref}
+              class="hero-cta-book inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              {ctaLabel.book}
+            </a>
+          )
+        }
       </div>
 
       <ul class="mt-5 space-y-2 border-t border-border pt-4">

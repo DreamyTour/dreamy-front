@@ -18,6 +18,7 @@ import {
 	isPlausibleBirthDate,
 	MAX_PASSENGERS_PER_BOOKING,
 } from "@/lib/prebooking";
+import { createRequestId } from "@/lib/requestId";
 
 interface BookingCart {
 	quoteRequestId?: string;
@@ -349,7 +350,7 @@ export default function CheckoutSummary({
 				);
 				const normalizedCart = {
 					...parsedCart,
-					quoteRequestId: parsedCart.quoteRequestId || crypto.randomUUID(),
+					quoteRequestId: parsedCart.quoteRequestId || createRequestId(),
 					passengers: normalizedPassengerCount,
 				};
 				setCart(normalizedCart);

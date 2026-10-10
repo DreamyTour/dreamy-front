@@ -2,6 +2,7 @@
 import PageLayout from "@/layouts/PageLayout.astro";
 import HomeTourCard from "@/components/ui/HomeTourCard.astro";
 import IncaTrailAvailabilityBookingIsland from "@/components/content/IncaTrailAvailabilityBookingIsland.astro";
+import IncaTrailBookingGuide from "./IncaTrailBookingGuide.astro";
 import { fetchAllStrapi } from "@/lib/strapi";
 import { dedupeLocalizedDocuments, sortToursByOrder } from "@/lib/utils";
 import type { Lang } from "@/lib/i18n";
@@ -9,7 +10,10 @@ import type { SEOProps } from "@/components/layout/SEO.astro";
 import type { Tour, Category as TourCategory } from "@/types/tours";
 import { serializeJsonForHtml } from "@/lib/html";
 import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
-import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
+import {
+  getIncaTrailBookingConfig,
+  getIncaTrailAvailabilityTours,
+} from "@/lib/incaTrailBooking";
 
 interface Props {
   lang: Lang;
@@ -17,6 +21,14 @@ interface Props {
 }
 
 const { lang, seo } = Astro.props;
+const isBookingUrl = Astro.url.searchParams.has("tour");
+const pageSeo: SEOProps = {
+  ...seo,
+  ...(isBookingUrl ? { robots: "noindex, follow" } : {}),
+};
+if (isBookingUrl) {
+  Astro.response.headers.set("X-Robots-Tag", "noindex, follow");
+}
 
 const copyByLang = {
   es: {
@@ -204,11 +216,53 @@ const copyByLang = {
 } as const;
 
 const copy = copyByLang[lang];
+const designCopy = {
+  es: {
+    title: "Tu aventura empieza en el",
+    bookingTitle: "Reserva de tour",
+    accent: "Camino Inca",
+    intro:
+      "Elige tu recorrido, encuentra una fecha disponible y prepara tu viaje a Machu Picchu en tres pasos.",
+    tours: "Experiencias",
+    permits: "Permisos diarios",
+    live: "Disponibilidad de permisos",
+    planning: "Planea tu aventura",
+    steps: ["Elige tu experiencia", "Encuentra tu fecha", "Prepara tu reserva"],
+  },
+  en: {
+    title: "Your adventure begins on the",
+    bookingTitle: "Tour booking",
+    accent: "Inca Trail",
+    intro:
+      "Choose your journey, find an available date and plan your trip to Machu Picchu in three simple steps.",
+    tours: "Experiences",
+    permits: "Daily permits",
+    live: "Permit availability",
+    planning: "Plan your adventure",
+    steps: ["Choose your experience", "Find your date", "Prepare your booking"],
+  },
+  pt: {
+    title: "Sua aventura começa na",
+    bookingTitle: "Reserva do tour",
+    accent: "Trilha Inca",
+    intro:
+      "Escolha seu roteiro, encontre uma data disponível e prepare sua viagem a Machu Picchu em três etapas.",
+    tours: "Experiências",
+    permits: "Permissões diárias",
+    live: "Disponibilidade de permissões",
+    planning: "Planeje sua aventura",
+    steps: [
+      "Escolha sua experiência",
+      "Encontre sua data",
+      "Prepare sua reserva",
+    ],
+  },
+}[lang];
 const now = new Date();
 const calendarYear = 2026;
 const initialMonth =
   calendarYear === now.getFullYear() ? now.getMonth() + 1 : 1;
-const initialRoad = "1";
+
 const calendarRoadLabelsByLang = {
   es: {
     "1": "Camino Inca 4 dias",
@@ -266,39 +320,42 @@ const tours = sortToursByOrder(
 type AvailabilityBookingTour = {
   road: string;
   durationDays: number;
+  permitStartOffsetDays: number;
   tourId: string | number;
   tourName: string;
   basePrice?: number;
   slug: string;
 };
 
-const bookingToursByRoad = new Map<string, AvailabilityBookingTour>();
-
-for (const tour of tours) {
-  const bookingConfig = getIncaTrailBookingConfig(tour.slug);
-
-  if (
-    !bookingConfig?.isPrimaryAvailabilityTour ||
-    bookingToursByRoad.has(bookingConfig.road)
-  )
-    continue;
-
-  bookingToursByRoad.set(bookingConfig.road, {
-    road: bookingConfig.road,
-    durationDays: bookingConfig.durationDays,
-    tourId: tour.documentId || tour.id,
-    tourName: tour.titulo,
-    basePrice: tour.priceTour,
-    slug: tour.slug,
-  });
-}
-
-const bookingTours = Array.from(bookingToursByRoad.values()).sort(
-  (a, b) => Number(a.road) - Number(b.road),
+const configuredTours: AvailabilityBookingTour[] = dedupeLocalizedDocuments(
+  Array.isArray(toursRaw) ? toursRaw : [],
+).flatMap((tour) => {
+  const config = getIncaTrailBookingConfig(tour.slug);
+  return config
+    ? [
+        {
+          road: config.road,
+          durationDays: config.durationDays,
+          permitStartOffsetDays: config.permitStartOffsetDays,
+          tourId: tour.documentId || tour.id,
+          tourName: tour.titulo,
+          basePrice: tour.priceTour,
+          slug: tour.slug,
+        },
+      ]
+    : [];
+});
+const requestedTour = configuredTours.find(
+  (tour) => tour.slug === Astro.url.searchParams.get("tour"),
 );
+const initialTourSlug = requestedTour?.slug;
+const initialRoad = requestedTour?.road ?? "1";
+const bookingTours = requestedTour
+  ? [requestedTour]
+  : getIncaTrailAvailabilityTours(configuredTours);
 ---
 
-<PageLayout seo={seo} lang={lang}>
+<PageLayout seo={pageSeo} lang={lang} enableViewTransitions={false}>
   <script
     is:inline
     id="page-slug-map"
@@ -306,170 +363,132 @@ const bookingTours = Array.from(bookingToursByRoad.values()).sort(
     set:html={serializeJsonForHtml(incaTrailAvailabilitySlugMap)}
   />
 
-  <div class="bg-background">
-    <section class="border-b border-border bg-muted/40">
+  <div class="inca-availability bg-[#f7f9f7]">
+    <section
+      class="border-b border-primary/10 bg-white bg-[radial-gradient(ellipse_at_15%_40%,rgba(0,112,32,0.07),transparent_55%),radial-gradient(ellipse_at_85%_20%,rgba(183,21,50,0.05),transparent_50%)]"
+    >
       <div
-        class="mx-auto grid max-w-8xl gap-10 px-4 py-12 md:px-6 lg:grid-cols-[0.96fr_1.04fr] lg:px-8 lg:py-16 xl:grid-cols-[minmax(0,1fr)_36rem]"
+        class="mx-auto flex max-w-8xl flex-col justify-between gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:items-end lg:px-8 lg:py-12"
       >
-        <div class="max-w-3xl">
-          <div
-            class="inline-flex items-center gap-2 rounded-sm border border-secondary/20 bg-white px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-secondary"
+        <div class="max-w-2xl">
+          <span
+            class="inline-flex items-center gap-2 rounded-full bg-secondary/8 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-secondary"
+            ><span class="size-1.5 rounded-full bg-secondary"></span>{
+              designCopy.live
+            }
+            {calendarYear}</span
           >
-            <span class="h-2 w-2 rounded-full bg-secondary"></span>
-            {copy.eyebrow}
-          </div>
           <h1
-            class="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+            class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-4xl lg:text-5xl"
           >
-            {copy.title}
+            {
+              requestedTour ? (
+                <>
+                  <span class="mb-3 block text-sm font-bold uppercase tracking-wider text-primary">
+                    {designCopy.bookingTitle}{" "}
+                  </span>
+                  {requestedTour.tourName}
+                </>
+              ) : (
+                <>
+                  {designCopy.title}{" "}
+                  <span class="text-primary">{designCopy.accent}</span>
+                </>
+              )
+            }
           </h1>
           <p
-            class="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg"
+            class="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground"
           >
-            {copy.intro}
+            {designCopy.intro}
           </p>
-
+        </div>
+        <div class="flex shrink-0 gap-3">
           <div
-            class="mt-8 overflow-hidden rounded-lg border border-[#d8e3dc] bg-white shadow-[0_24px_70px_-54px_rgba(15,53,35,0.5)]"
+            class="rounded-2xl border border-primary/10 bg-primary/5 px-5 py-3"
           >
-            <div
-              class="grid divide-y divide-[#e6eee9] sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+            <strong class="block text-2xl font-extrabold text-primary"
+              >{bookingTours.length}</strong
+            ><span class="text-xs text-muted-foreground"
+              >{designCopy.tours}</span
             >
+          </div>
+          <div
+            class="rounded-2xl border border-secondary/10 bg-secondary/5 px-5 py-3"
+          >
+            <strong class="block text-2xl font-extrabold text-secondary"
+              >500</strong
+            ><span class="text-xs text-muted-foreground"
+              >{designCopy.permits}</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+    <section
+      id="availability-calendar"
+      tabindex="-1"
+      aria-label={designCopy.planning}
+      class="mx-auto max-w-8xl scroll-mt-6 px-4 py-8 focus:outline-none sm:px-6 lg:px-8 lg:py-10"
+    >
+      <ol
+        class="mb-7 grid grid-cols-3 gap-2 text-xs font-semibold text-muted-foreground sm:gap-5 sm:text-sm"
+      >
+        {
+          designCopy.steps.map((step, index) => (
+            <li class="flex items-center gap-2 rounded-xl border border-border/60 bg-white px-3 py-3 sm:px-4">
+              <>
+                <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                  {index + 1}
+                </span>
+                <span>{step}</span>
+              </>
+            </li>
+          ))
+        }
+      </ol>
+      <IncaTrailAvailabilityBookingIsland
+        server:defer
+        lang={lang}
+        year={calendarYear}
+        initialMonth={initialMonth}
+        initialRoad={initialRoad}
+        initialTourSlug={initialTourSlug}
+        roadLabels={calendarRoadLabelsByLang[lang]}
+        tours={bookingTours}
+      >
+        <div
+          slot="fallback"
+          aria-hidden="true"
+          class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]"
+        >
+          <div
+            class="min-h-[650px] space-y-6 rounded-2xl border border-border/60 bg-white p-7"
+          >
+            <div class="h-7 w-1/2 rounded-lg bg-primary/10"></div><div
+              class="h-12 rounded-xl bg-muted"
+            >
+            </div><div class="mt-8 h-7 w-2/3 rounded-lg bg-primary/10">
+            </div><div class="grid grid-cols-7 gap-2">
               {
-                copy.stats.map((stat, index) => (
-                  <div class="p-4 md:p-5">
-                    <p class="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-secondary">
-                      {copy.statsKickers[index]}
-                    </p>
-                    <p class="mt-2 text-2xl font-semibold leading-none text-primary md:text-3xl">
-                      {copy.statsValues[index]}
-                    </p>
-                    <p class="mt-2 text-sm leading-6 text-muted-foreground">
-                      {stat}
-                    </p>
-                  </div>
+                Array.from({ length: 35 }).map(() => (
+                  <div class="h-16 rounded-lg bg-muted" />
                 ))
               }
             </div>
           </div>
-        </div>
-
-        <div
-          class="relative self-start overflow-hidden rounded-lg border border-[#ead9c7] bg-neutral-50 p-4 shadow-[0_28px_90px_-48px_rgba(70,45,23,0.58)] md:p-5"
-        >
-          <div
-            class="pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#244237,#db5b24,#c49a42)]"
-          >
-          </div>
-          <div class="mb-5">
-            <div>
-              <span
-                class="inline-flex items-center rounded-full border border-[#db5b24]/25 bg-[#fff4ec] px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[#8f3513]"
-              >
-                {copy.calendarBadge}
-              </span>
-              <h2
-                class="mt-3 text-2xl font-semibold tracking-tight text-foreground"
-              >
-                {copy.calendarTitle}
-              </h2>
-              <p class="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {copy.calendarIntro}
-              </p>
-            </div>
-          </div>
-          <IncaTrailAvailabilityBookingIsland
-            server:defer
-            lang={lang}
-            year={calendarYear}
-            initialMonth={initialMonth}
-            initialRoad={initialRoad}
-            roadLabels={calendarRoadLabelsByLang[lang]}
-            tours={bookingTours}
-          >
-            <div
-              slot="fallback"
-              class="min-h-[430px] overflow-hidden rounded-lg border border-[#e8d8c9] bg-[#fffdf9] shadow-sm"
+          <div class="h-96 rounded-2xl border border-primary/10 bg-white p-6">
+            <div class="h-28 rounded-xl bg-primary/5"></div><div
+              class="mt-6 h-8 rounded-lg bg-muted"
             >
-              <div
-                class="grid grid-cols-1 gap-3 border-b border-[#355548]/20 bg-[#244237] p-4 sm:grid-cols-2"
-              >
-                <div class="h-11 rounded-sm bg-white/20"></div>
-                <div class="h-11 rounded-sm bg-white/20"></div>
-              </div>
-              <div class="mt-4 flex items-center justify-between px-3 py-3">
-                <div class="h-9 w-9 rounded-full bg-[#f4eadf]"></div>
-                <div class="h-5 w-32 rounded bg-[#e8d8c9]"></div>
-                <div class="h-9 w-9 rounded-full bg-[#f4eadf]"></div>
-              </div>
-              <div
-                class="mt-3 grid grid-cols-7 gap-px overflow-hidden rounded-sm bg-[#efe3d6]"
-              >
-                {
-                  Array.from({ length: 35 }).map(() => (
-                    <div class="h-16 bg-[#fffaf4]" />
-                  ))
-                }
-              </div>
-            </div>
-          </IncaTrailAvailabilityBookingIsland>
+            </div><div class="mt-6 h-12 rounded-xl bg-primary/10"></div>
+          </div>
         </div>
-      </div>
+      </IncaTrailAvailabilityBookingIsland>
     </section>
 
     <div class="mx-auto max-w-8xl px-4 py-12 md:px-6 lg:px-8">
-      <section class="border-b border-border pb-12 md:pb-14">
-        <div>
-          <h2
-            class="max-w-3xl text-3xl font-semibold tracking-tight text-foreground"
-          >
-            {copy.availabilityTitle}
-          </h2>
-          <div
-            class="mt-6 grid gap-6 text-base leading-8 text-muted-foreground lg:grid-cols-3"
-          >
-            <div class="border-t border-[#e4d8cc] pt-5 lg:border-t-0 lg:pt-0">
-              <span class="mb-4 block h-1 w-12 rounded-full bg-secondary"
-              ></span>
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.regulationsTitle}
-              </h3>
-              <p class="mt-2">{copy.regulations}</p>
-            </div>
-            <div
-              class="border-t border-[#e4d8cc] pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
-            >
-              <span class="mb-4 block h-1 w-12 rounded-full bg-primary"></span>
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.seasonsTitle}
-              </h3>
-              <ul class="mt-2 space-y-2">
-                {copy.seasons.map((item) => <li>{item}</li>)}
-              </ul>
-            </div>
-            <div
-              class="border-t border-[#e4d8cc] pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
-            >
-              <span class="mb-4 block h-1 w-12 rounded-full bg-[#db5b24]"
-              ></span>
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.requirementsTitle}
-              </h3>
-              <p class="mt-2">{copy.requirementsIntro}</p>
-              <ul class="mt-3 space-y-2">
-                {
-                  copy.requirements.map((item) => (
-                    <li class="flex gap-3">
-                      <span class="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
-                      <span>{item}</span>
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+      <IncaTrailBookingGuide lang={lang} information={copy} />
 
       <section class="py-14 md:py-16">
         <div
@@ -505,75 +524,6 @@ const bookingTours = Array.from(bookingToursByRoad.values()).sort(
             </div>
           )
         }
-      </section>
-
-      <section class="border-t border-border py-12">
-        <div class="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-          <div>
-            <h2 class="text-3xl font-semibold tracking-tight text-foreground">
-              {copy.paymentTitle}
-            </h2>
-            <p class="mt-4 text-base leading-8 text-muted-foreground">
-              {copy.paymentIntro}
-            </p>
-          </div>
-
-          <div class="grid gap-4 md:grid-cols-2">
-            <div class="rounded-sm border border-border bg-white p-6">
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.depositTitle}
-              </h3>
-              <ul
-                class="mt-4 space-y-3 text-sm leading-6 text-muted-foreground"
-              >
-                {
-                  copy.depositItems.map((item) => (
-                    <li class="flex gap-3">
-                      <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                      <span>{item}</span>
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
-
-            <div class="rounded-sm border border-border bg-white p-6">
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.conditionsTitle}
-              </h3>
-              <p class="mt-4 text-sm leading-6 text-muted-foreground">
-                {copy.conditions}
-              </p>
-            </div>
-
-            <div class="rounded-sm border border-border bg-white p-6">
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.methodsTitle}
-              </h3>
-              <ul
-                class="mt-4 space-y-3 text-sm leading-6 text-muted-foreground"
-              >
-                {
-                  copy.methods.map((item) => (
-                    <li class="flex gap-3">
-                      <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
-                      <span>{item}</span>
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
-
-            <div class="rounded-sm border border-border bg-white p-6">
-              <h3 class="text-lg font-semibold text-foreground">
-                {copy.confirmationTitle}
-              </h3>
-              <p class="mt-4 text-sm leading-6 text-muted-foreground">
-                {copy.confirmation}
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
     </div>
   </div>

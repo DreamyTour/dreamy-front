@@ -1,0 +1,397 @@
+---
+import type { Lang } from "@/lib/i18n";
+
+interface Information {
+  regulations: string;
+  seasons: readonly string[];
+  requirementsIntro: string;
+  requirements: readonly string[];
+  paymentIntro: string;
+  depositItems: readonly string[];
+  conditions: string;
+  methods: readonly string[];
+  confirmation: string;
+}
+interface Props {
+  lang: Lang;
+  information: Information;
+}
+const { lang, information } = Astro.props;
+const copy = {
+  es: {
+    eyebrow: "Reserva con confianza",
+    title: "De la fecha elegida a tu próxima aventura",
+    intro:
+      "Primero envías una solicitud. Nuestro equipo revisa los permisos y te acompaña hasta confirmar tu reserva.",
+    steps: [
+      {
+        title: "Elige tu salida",
+        text: "Consulta los cupos de tu ruta, elige una fecha disponible e indica cuántas personas viajarán.",
+      },
+      {
+        title: "Completa la pre-reserva",
+        text: "Continúa con los datos de los viajeros y tus datos de contacto. Revisa la solicitud antes de enviarla.",
+      },
+      {
+        title: "Revisamos tu solicitud",
+        text: "Un agente verifica el precio y los permisos, se comunica contigo y te indica cómo continuar con el pago.",
+      },
+    ],
+    notice: "Sin cobro al enviar la solicitud",
+    faq: "Lo que necesitas saber antes de reservar",
+    faqIntro:
+      "Abre cada pregunta para consultar los permisos, los requisitos y la confirmación de tu viaje.",
+    questions: [
+      "¿Cómo funciona la disponibilidad de permisos?",
+      "¿En qué meses hay más demanda?",
+      "¿Con cuánto tiempo debo reservar y qué necesito?",
+      "¿Cuándo y cómo se realiza el pago?",
+      "¿Qué sucede después de enviar mi solicitud?",
+      "¿La pre-reserva garantiza mi cupo?",
+    ],
+    back: "Volver al calendario",
+  },
+  en: {
+    eyebrow: "Book with confidence",
+    title: "From your chosen date to your next adventure",
+    intro:
+      "Start with a request. Our team checks permits and guides you through confirming your booking.",
+    steps: [
+      {
+        title: "Choose your departure",
+        text: "Check spaces for your route, choose an available date and tell us how many people are traveling.",
+      },
+      {
+        title: "Complete your pre-booking",
+        text: "Continue with traveler and contact details. Review your request before submitting it.",
+      },
+      {
+        title: "We review your request",
+        text: "An agent checks prices and permits, contacts you and explains the next steps for payment.",
+      },
+    ],
+    notice: "No payment when you submit your request",
+    faq: "What to know before booking",
+    faqIntro:
+      "Open each question to learn about permits, requirements and confirming your trip.",
+    questions: [
+      "How does permit availability work?",
+      "Which months have the highest demand?",
+      "How early should I book and what do I need?",
+      "When and how do I pay?",
+      "What happens after I submit my request?",
+      "Does pre-booking guarantee my place?",
+    ],
+    back: "Back to the calendar",
+  },
+  pt: {
+    eyebrow: "Reserve com confiança",
+    title: "Da data escolhida à sua próxima aventura",
+    intro:
+      "Primeiro, envie uma solicitação. Nossa equipe verifica as permissões e acompanha você até confirmar a reserva.",
+    steps: [
+      {
+        title: "Escolha sua saída",
+        text: "Consulte as vagas da sua rota, escolha uma data disponível e informe quantas pessoas viajarão.",
+      },
+      {
+        title: "Complete a pré-reserva",
+        text: "Continue com os dados dos viajantes e seus dados de contato. Revise a solicitação antes de enviar.",
+      },
+      {
+        title: "Analisamos sua solicitação",
+        text: "Um agente verifica o preço e as permissões, entra em contato e explica como continuar com o pagamento.",
+      },
+    ],
+    notice: "Sem cobrança ao enviar a solicitação",
+    faq: "O que saber antes de reservar",
+    faqIntro:
+      "Abra cada pergunta para consultar as permissões, os requisitos e a confirmação da viagem.",
+    questions: [
+      "Como funciona a disponibilidade de permissões?",
+      "Quais meses têm maior procura?",
+      "Com quanto tempo devo reservar e o que preciso?",
+      "Quando e como faço o pagamento?",
+      "O que acontece após enviar a solicitação?",
+      "A pré-reserva garante minha vaga?",
+    ],
+    back: "Voltar ao calendário",
+  },
+}[lang];
+// Keep entries as data so more questions can be added without changing the layout.
+const answers = [
+  { paragraphs: [information.regulations] },
+  { items: information.seasons },
+  {
+    paragraphs: [information.requirementsIntro],
+    items: information.requirements,
+  },
+  { items: [...information.depositItems, ...information.methods] },
+  { paragraphs: [information.conditions] },
+  { paragraphs: [information.confirmation] },
+];
+---
+
+<section id="booking-guide" class="guide" aria-labelledby="booking-guide-title">
+  <div class="guide-heading">
+    <div>
+      <span class="eyebrow">{copy.eyebrow}</span>
+      <h2 id="booking-guide-title">{copy.title}</h2>
+      <p>{copy.intro}</p>
+    </div>
+    <a href="#availability-calendar"
+      >{copy.back} <span aria-hidden="true">↑</span></a
+    >
+  </div>
+  <ol class="steps">
+    {
+      copy.steps.map((step, index) => (
+        <li>
+          <span class="step-number" aria-hidden="true">
+            0{index + 1}
+          </span>
+          <h3>{step.title}</h3>
+          <p>{step.text}</p>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="notice">
+    <span class="notice-icon" aria-hidden="true">✓</span>
+    <div><strong>{copy.notice}</strong><p>{information.paymentIntro}</p></div>
+  </div>
+  <div class="faq-layout">
+    <div class="faq-heading">
+      <span class="eyebrow">Dreamy Tours</span>
+      <h2 id="booking-faq-title">{copy.faq}</h2>
+      <p>{copy.faqIntro}</p>
+    </div>
+    <div class="questions" aria-labelledby="booking-faq-title">
+      {
+        answers.map((answer, index) => (
+          <details open={index === 0}>
+            <summary>
+              {copy.questions[index]}
+              <span class="toggle" aria-hidden="true">
+                +
+              </span>
+            </summary>
+            <div class="answer">
+              {answer.paragraphs?.map((paragraph) => (
+                <p>{paragraph}</p>
+              ))}
+              {answer.items && (
+                <ul>
+                  {answer.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .guide {
+    padding-bottom: 1rem;
+  }
+  .guide-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .guide-heading > div {
+    max-width: 48rem;
+  }
+  .eyebrow {
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  h2 {
+    margin: 0.65rem 0 0.8rem;
+    font-size: clamp(1.65rem, 3vw, 2.3rem);
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+  }
+  p {
+    color: var(--muted-foreground);
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+  .guide-heading a {
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    padding: 0.75rem 0;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+  }
+  .steps li {
+    padding: 1.6rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+  .step-number {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, var(--primary) 9%, var(--card));
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 800;
+  }
+  h3 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .steps p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+  .notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--primary) 5%, var(--card));
+  }
+  .notice-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .notice strong {
+    font-size: 0.95rem;
+    color: var(--primary);
+  }
+  .notice p {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+  }
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 3rem;
+    padding-top: 3.5rem;
+  }
+  .faq-heading h2 {
+    max-width: 24rem;
+  }
+  .faq-heading p {
+    max-width: 27rem;
+  }
+  .questions {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+  details + details {
+    border-top: 1px solid var(--border);
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .toggle {
+    color: var(--primary);
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  details[open] .toggle {
+    transform: rotate(45deg);
+  }
+  details[open] summary {
+    color: var(--primary);
+  }
+  .answer {
+    padding: 0 1.5rem 1.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.8;
+  }
+  .answer p {
+    margin: 0;
+    font-size: inherit;
+  }
+  .answer ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .answer li + li {
+    margin-top: 0.5rem;
+  }
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -3px;
+    border-radius: 0.5rem;
+  }
+  @media (max-width: 767px) {
+    .guide-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .steps,
+    .faq-layout {
+      grid-template-columns: 1fr;
+    }
+    .steps li {
+      padding: 1.25rem;
+    }
+    .faq-layout {
+      gap: 1.25rem;
+      padding-top: 2.5rem;
+    }
+    .notice,
+    summary {
+      padding: 1rem;
+    }
+    .answer {
+      padding: 0 1rem 1rem;
+    }
+  }
+</style>

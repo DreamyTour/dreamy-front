@@ -1,3 +1,4 @@
+import { createRequestId } from "./requestId";
 import { availabilityTranslator } from "./machuPicchuAvailabilityI18n";
 import {
   fetchCalendarAvailability,
@@ -20,11 +21,11 @@ function initMachuPicchuCalendar() {
         requestId || "",
       )
     ) {
-      requestId = crypto.randomUUID();
+      requestId = createRequestId();
       sessionStorage.setItem("machuPicchuRequestId", requestId);
     }
   } catch {
-    requestId = crypto.randomUUID();
+    requestId = createRequestId();
   }
   document.getElementById("bookingReference").textContent =
     `MP-${requestId.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
@@ -171,7 +172,7 @@ function initMachuPicchuCalendar() {
           "aria-label",
           `${d} ${months[state.monthIndex].name}: ${translate("fecha pasada")}`,
         );
-      cell.className = `day-cell min-w-0 rounded-lg py-2.5 transition-colors duration-150 motion-safe:[&:enabled:hover_.day-number]:-translate-y-1 motion-safe:[&:enabled:hover_.cupos]:-translate-y-1 disabled:cursor-not-allowed ${isSelected ? "selected ring-2 ring-inset ring-[#007020]" : "enabled:hover:brightness-95 enabled:hover:cursor-pointer"} ${isPast ? "past bg-gray-50 opacity-40" : ""}`;
+      cell.className = `day-cell relative min-w-0 rounded-lg py-2.5 transition-colors duration-150 disabled:cursor-not-allowed ${isSelected ? "selected ring-2 ring-gray-900 ring-offset-2" : "motion-safe:[&:enabled:hover_.day-number]:-translate-y-1 motion-safe:[&:enabled:hover_.cupos]:-translate-y-1 enabled:hover:brightness-95 enabled:hover:cursor-pointer"} ${isPast ? "past bg-gray-50 opacity-40" : ""}`;
 
       const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
       const cupos =
@@ -185,7 +186,10 @@ function initMachuPicchuCalendar() {
             : cupos < 10
               ? "low bg-[#fff0db] text-[#b45309]"
               : "available bg-[#e6f2e8] text-[#007020]";
-      if (!isPast) cell.className += ` ${cuposState}`;
+      const selectedState =
+        cupos < 10 ? "bg-orange-700 text-white" : "bg-[#007020] text-white";
+      if (!isPast)
+        cell.className += ` ${isSelected ? selectedState : cuposState}`;
       if (!isPast && cupos === 0) cell.classList.add("sold-out");
       if (!isPast)
         cell.setAttribute(
@@ -194,8 +198,9 @@ function initMachuPicchuCalendar() {
         );
 
       cell.innerHTML = `
-          <span class="day-number block motion-safe:transition-transform motion-safe:duration-200 ${isSelected ? "text-[#007020] font-bold" : !isPast && cupos === 0 ? "text-[#b71532] font-medium" : "text-gray-700 font-medium"}">${d}</span>
-          ${isPast ? '<span class="block text-xs text-gray-400 mt-1">—</span>' : `<span class="cupos motion-safe:transition-transform motion-safe:duration-200 inline-flex flex-col items-center min-w-9 mt-1 px-1.5 py-[3px] rounded-md leading-[1.1] ${cuposState}"><strong class="text-lg font-extrabold tabular-nums">${cupos ?? "\u2014"}</strong><small class="text-[8px] font-semibold mt-0.5">${cupos === undefined ? translate("Sin datos") : cupos === 0 ? translate("Agotado") : translate("cupos")}</small></span>`}
+          ${isSelected ? '<span aria-hidden="true" class="absolute right-1 top-1 text-sm font-bold text-white">✓</span>' : ""}
+          <span class="day-number block motion-safe:transition-transform motion-safe:duration-200 ${isSelected ? "text-white font-bold" : !isPast && cupos === 0 ? "text-[#b71532] font-medium" : "text-gray-700 font-medium"}">${d}</span>
+          ${isPast ? '<span class="block text-xs text-gray-400 mt-1">—</span>' : `<span class="cupos motion-safe:transition-transform motion-safe:duration-200 inline-flex flex-col items-center min-w-9 mt-1 px-1.5 py-[3px] rounded-md leading-[1.1] ${isSelected ? "bg-white/20 text-white" : cuposState}"><strong class="text-lg font-extrabold tabular-nums">${cupos ?? "\u2014"}</strong><small class="text-[8px] font-semibold mt-0.5">${cupos === undefined ? translate("Sin datos") : cupos === 0 ? translate("Agotado") : translate("cupos")}</small></span>`}
         `;
 
       if (cupos > 0 && !isPast) {

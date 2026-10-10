@@ -1,0 +1,370 @@
+---
+import type { Lang } from "@/lib/i18n";
+
+interface Props {
+  title: string;
+  lang: Lang;
+}
+const { title, lang } = Astro.props;
+const copy = {
+  es: {
+    eyebrow: "Tu viaje empieza aquí",
+    heading: "Solicita una cotización",
+    intro:
+      "Cuéntanos cuándo quieres viajar. Nuestro equipo te ayudará a planear tu aventura.",
+    name: "Nombre completo",
+    phone: "WhatsApp con código de país",
+    messagePhone: "Número de WhatsApp",
+    messageNotes: "Mensaje",
+    email: "Correo electrónico",
+    date: "Fecha deseada de viaje",
+    travelers: "Cantidad de viajeros",
+    notes: "¿Qué te gustaría consultar?",
+    optional: "opcional",
+    required: "Los campos con * son obligatorios.",
+    submit: "Continuar por WhatsApp",
+    note: "Se abrirá WhatsApp para que revises y envíes tu consulta. La fecha está sujeta a disponibilidad.",
+    close: "Cerrar cotización",
+    greeting: "Hola, me gustaría solicitar una cotización para este tour:",
+  },
+  en: {
+    eyebrow: "Your journey starts here",
+    heading: "Request a quote",
+    intro:
+      "Tell us when you would like to travel. Our team will help you plan your adventure.",
+    name: "Full name",
+    phone: "WhatsApp with country code",
+    messagePhone: "WhatsApp number",
+    messageNotes: "Message",
+    email: "Email address",
+    date: "Preferred travel date",
+    travelers: "Number of travelers",
+    notes: "What would you like to ask?",
+    optional: "optional",
+    required: "Fields marked * are required.",
+    submit: "Continue on WhatsApp",
+    note: "WhatsApp will open so you can review and send your inquiry. Your preferred date is subject to availability.",
+    close: "Close quote request",
+    greeting: "Hello, I would like to request a quote for this tour:",
+  },
+  pt: {
+    eyebrow: "Sua viagem começa aqui",
+    heading: "Solicite uma cotação",
+    intro:
+      "Conte quando deseja viajar. Nossa equipe ajudará a planejar sua aventura.",
+    name: "Nome completo",
+    phone: "WhatsApp com código do país",
+    messagePhone: "Número de WhatsApp",
+    messageNotes: "Mensagem",
+    email: "E-mail",
+    date: "Data desejada da viagem",
+    travelers: "Quantidade de viajantes",
+    notes: "O que gostaria de perguntar?",
+    optional: "opcional",
+    required: "Os campos com * são obrigatórios.",
+    submit: "Continuar pelo WhatsApp",
+    note: "O WhatsApp será aberto para revisar e enviar sua consulta. A data está sujeita à disponibilidade.",
+    close: "Fechar cotação",
+    greeting: "Olá, gostaria de solicitar uma cotação para este tour:",
+  },
+}[lang];
+---
+
+<dialog
+  id="tour-quote-dialog"
+  data-tour-quote
+  data-title={title}
+  data-copy={JSON.stringify(copy)}
+  aria-labelledby="tour-quote-heading"
+  aria-describedby="tour-quote-intro"
+>
+  <div class="quote-content">
+    <button
+      type="button"
+      class="close"
+      data-close-tour-quote
+      aria-label={copy.close}>×</button
+    >
+    <span class="eyebrow">Dreamy Tours · {copy.eyebrow}</span>
+    <h2 id="tour-quote-heading">{copy.heading}</h2>
+    <p id="tour-quote-intro" class="intro">{copy.intro}</p>
+    <p class="tour-title">{title}</p>
+    <form>
+      <p class="required-note">{copy.required}</p>
+      <div class="fields">
+        <label class="full"
+          >{copy.name} *<input
+            name="name"
+            autocomplete="name"
+            required
+            maxlength="120"
+          /></label
+        >
+        <label
+          >{copy.phone} *<input
+            name="phone"
+            type="tel"
+            autocomplete="tel"
+            placeholder="+51 999 888 777"
+            required
+            minlength="7"
+            maxlength="30"
+            pattern="[+0-9() .\-]{7,30}"
+          /></label
+        >
+        <label
+          >{copy.email}
+          <span>({copy.optional})</span><input
+            name="email"
+            type="email"
+            autocomplete="email"
+            maxlength="160"
+          /></label
+        >
+        <label>{copy.date} *<input name="date" type="date" required /></label>
+        <label
+          >{copy.travelers} *<input
+            name="travelers"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="100"
+            step="1"
+            value="2"
+            required
+          /></label
+        >
+        <label class="full"
+          >{copy.notes}
+          <span>({copy.optional})</span><textarea
+            name="notes"
+            rows="2"
+            maxlength="1000"></textarea></label
+        >
+      </div>
+      <button type="submit" class="submit"
+        >{copy.submit}<span aria-hidden="true">→</span></button
+      >
+      <p class="footnote">{copy.note}</p>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  function initTourQuote() {
+    const dialog =
+      document.querySelector<HTMLDialogElement>("[data-tour-quote]");
+    const triggers = document.querySelectorAll<HTMLButtonElement>(
+      "[data-open-tour-quote]",
+    );
+    if (!dialog || !triggers.length || dialog.dataset.initialized) return;
+    let activeTrigger = triggers[0];
+    dialog.dataset.initialized = "true";
+    const form = dialog.querySelector<HTMLFormElement>("form")!;
+    const date = form.querySelector<HTMLInputElement>('input[name="date"]')!;
+    const copy = JSON.parse(dialog.dataset.copy!) as Record<string, string>;
+    triggers.forEach((trigger) =>
+      trigger.addEventListener("click", () => {
+        activeTrigger = trigger;
+        // Use the visitor's current date, including after a page is left open overnight.
+        const now = new Date();
+        date.min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        dialog.showModal();
+      }),
+    );
+    dialog
+      .querySelector("[data-close-tour-quote]")
+      ?.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("close", () =>
+      activeTrigger.focus({ preventScroll: true }),
+    );
+    dialog.addEventListener("click", (event) => {
+      if (event.target !== dialog) return;
+      const bounds = dialog.getBoundingClientRect();
+      if (
+        event.clientX < bounds.left ||
+        event.clientX > bounds.right ||
+        event.clientY < bounds.top ||
+        event.clientY > bounds.bottom
+      )
+        dialog.close();
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const values = new FormData(form);
+      const value = (key: string) => String(values.get(key) || "").trim();
+      const [year, month, day] = value("date").split("-");
+      const message = [
+        copy.greeting,
+        dialog.dataset.title,
+        "",
+        `${copy.name}: ${value("name")}`,
+        `${copy.messagePhone}: ${value("phone")}`,
+        value("email") ? `${copy.email}: ${value("email")}` : null,
+        `${copy.date}: ${day}/${month}/${year}`,
+        `${copy.travelers}: ${value("travelers")}`,
+        value("notes") ? `${copy.messageNotes}: ${value("notes")}` : null,
+      ]
+        .filter((line) => line !== null)
+        .join("\n");
+      window.open(
+        `https://wa.me/51969787221?text=${encodeURIComponent(message)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+    });
+  }
+  initTourQuote();
+  document.addEventListener("astro:page-load", initTourQuote);
+</script>
+
+<style>
+  dialog {
+    width: min(600px, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-top: 5px solid var(--primary);
+    border-radius: 1.25rem;
+    background: var(--card);
+    color: var(--foreground);
+    box-shadow: 0 24px 80px #102b2250;
+  }
+  dialog::backdrop {
+    background: #102b22a6;
+  }
+  :global(body:has(dialog[data-tour-quote][open])) {
+    overflow: hidden;
+  }
+  .quote-content {
+    padding: 2rem;
+    position: relative;
+  }
+  .close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--muted);
+    font-size: 1.6rem;
+  }
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .eyebrow {
+    display: block;
+    padding-right: 2rem;
+    color: var(--primary);
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  h2 {
+    margin: 0.6rem 0;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  .intro {
+    color: var(--muted-foreground);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .tour-title {
+    margin: 1rem 0;
+    padding: 0.85rem 1rem;
+    border-left: 3px solid var(--primary);
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--primary) 6%, var(--card));
+    color: var(--primary);
+    font-weight: 700;
+  }
+  .required-note,
+  .footnote {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+  }
+  .required-note {
+    margin-bottom: 0.8rem;
+  }
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 0;
+  }
+  label > span {
+    color: var(--muted-foreground);
+    font-weight: 400;
+  }
+  .full {
+    grid-column: 1 / -1;
+  }
+  input,
+  textarea {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 0.4rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    background: var(--background);
+    color: var(--foreground);
+    font: inherit;
+    font-size: 1rem;
+  }
+  textarea {
+    resize: vertical;
+  }
+  input:user-invalid {
+    border-color: var(--secondary);
+  }
+  input:focus-visible,
+  textarea:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+  .submit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 0.9rem 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 700;
+  }
+  .submit:hover {
+    background: color-mix(in srgb, var(--primary) 85%, black);
+  }
+  .footnote {
+    margin: 0.75rem 0 0;
+    text-align: center;
+  }
+  @media (max-width: 480px) {
+    .quote-content {
+      padding: 1.5rem 1rem;
+    }
+    .fields {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

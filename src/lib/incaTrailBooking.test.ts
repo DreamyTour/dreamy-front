@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
+import {
+	getIncaTrailAvailabilityTours,
+	getIncaTrailBookingConfig,
+} from "@/lib/incaTrailBooking";
 
 const bookingTours = [
 	{
@@ -56,6 +59,26 @@ const bookingTours = [
 ] as const;
 
 describe("Inca Trail booking configuration", () => {
+	for (const langIndex of [0, 1, 2]) {
+		const tours = bookingTours.map((tour) => ({
+			slug: tour.slugs[langIndex],
+			name: tour.slugs[langIndex],
+		}));
+		test(`availability offers only the primary 2 and 4 day tours for language ${langIndex}`, () => {
+			expect(getIncaTrailAvailabilityTours(tours)).toEqual(tours.slice(0, 2));
+			expect(getIncaTrailAvailabilityTours(tours, "unknown-tour")).toEqual(
+				tours.slice(0, 2),
+			);
+			expect(getIncaTrailAvailabilityTours(tours, tours[1].slug)).toEqual(
+				tours.slice(0, 2),
+			);
+		});
+		for (const tour of tours.slice(2)) {
+			test(`availability preserves only the originating tour ${tour.slug}`, () => {
+				expect(getIncaTrailAvailabilityTours(tours, tour.slug)).toEqual([tour]);
+			});
+		}
+	}
 	for (const tour of bookingTours) {
 		for (const slug of tour.slugs) {
 			test(`maps ${slug} to its permit route and itinerary`, () => {

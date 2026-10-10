@@ -11,9 +11,18 @@ interface Props {
   lcpImageUrl?: string;
   lcpImageSrcSet?: string;
   lcpImageSizes?: string;
+  enableViewTransitions?: boolean;
 }
 
-const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet, lcpImageSizes } = Astro.props;
+const {
+  slugMap,
+  seo,
+  lang,
+  lcpImageUrl,
+  lcpImageSrcSet,
+  lcpImageSizes,
+  enableViewTransitions,
+} = Astro.props;
 ---
 
 <Layout
@@ -22,6 +31,7 @@ const { slugMap, seo, lang, lcpImageUrl, lcpImageSrcSet, lcpImageSizes } = Astro
   lcpImageUrl={lcpImageUrl}
   lcpImageSrcSet={lcpImageSrcSet}
   lcpImageSizes={lcpImageSizes}
+  enableViewTransitions={enableViewTransitions}
 >
   <slot />
 </Layout>

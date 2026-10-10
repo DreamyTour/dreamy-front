@@ -1,0 +1,404 @@
+---
+import type { Tour } from "@/types/tours";
+import type { Lang } from "@/lib/i18n";
+import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
+import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
+import { rewriteUrl } from "@/lib/utils";
+import TourQuoteDialog from "./TourQuoteDialog.astro";
+import { WhatsAppIcon } from "@/components/icons/SocialContactIcons";
+
+interface Props {
+  tour: Tour;
+  lang: Lang;
+}
+const { tour, lang } = Astro.props;
+const config = getIncaTrailBookingConfig(tour.slug);
+const quoteOnly = config?.durationDays === 1;
+const copy = {
+  es: {
+    featured: "Más vendido",
+    days: "días de aventura",
+    day: "día de aventura",
+    from: "Desde",
+    person: "por persona",
+    price: "Consultar precio",
+    privateService: "Servicio privado",
+    quoteDetails: "Cotización personalizada con nuestros agentes",
+    team: "Expertos locales",
+    support: "Te acompañamos de principio a fin",
+    planning: "Tu próxima aventura",
+    details: "Elige ruta, fecha y pasajeros",
+    limited: "Permisos limitados",
+    dates: "Ver fechas y disponibilidad",
+    contact: "Contáctanos",
+    query: "Haz tu consulta",
+    book: "Reservar ahora",
+    space: "Elige tu salida",
+    note: "Sujeto a disponibilidad de permisos oficiales.",
+  },
+  en: {
+    featured: "Best seller",
+    days: "days of adventure",
+    day: "day of adventure",
+    from: "From",
+    person: "per person",
+    price: "Request a price",
+    privateService: "Private service",
+    quoteDetails: "A personalized quote from our agents",
+    team: "Local experts",
+    support: "Support from start to finish",
+    planning: "Your next adventure",
+    details: "Choose route, date and travelers",
+    limited: "Limited permits",
+    dates: "View dates and availability",
+    contact: "Contact us",
+    query: "Ask our team",
+    book: "Book now",
+    space: "Choose your departure",
+    note: "Subject to official permit availability.",
+  },
+  pt: {
+    featured: "Mais vendido",
+    days: "dias de aventura",
+    day: "dia de aventura",
+    from: "A partir de",
+    person: "por pessoa",
+    price: "Consultar preço",
+    privateService: "Serviço privado",
+    quoteDetails: "Cotação personalizada com nossos agentes",
+    team: "Especialistas locais",
+    support: "Apoio do início ao fim",
+    planning: "Sua próxima aventura",
+    details: "Escolha rota, data e viajantes",
+    limited: "Permissões limitadas",
+    dates: "Ver datas e disponibilidade",
+    contact: "Fale conosco",
+    query: "Tire suas dúvidas",
+    book: "Reservar agora",
+    space: "Escolha sua saída",
+    note: "Sujeito à disponibilidade de permissões oficiais.",
+  },
+}[lang];
+const availabilityUrl = `${rewriteUrl(`/${incaTrailAvailabilitySlugMap[lang]}`, lang)}?tour=${encodeURIComponent(tour.slug)}#availability-calendar`;
+const price =
+  !quoteOnly && tour.priceTour && tour.priceTour > 0
+    ? new Intl.NumberFormat(
+        lang === "en" ? "en-US" : lang === "pt" ? "pt-BR" : "es-PE",
+        { maximumFractionDigits: 2 },
+      ).format(tour.priceTour)
+    : null;
+---
+
+<section
+  class:list={["booking-summary", { "quote-only": quoteOnly }]}
+  aria-labelledby="booking-summary-title"
+>
+  <header>
+    {
+      tour.cardBadge === "best_seller" && (
+        <span class="ribbon">★ {copy.featured}</span>
+      )
+    }
+    <div class="heading-row">
+      <div>
+        <span class="eyebrow">Dreamy Tours</span>
+        <h2 id="booking-summary-title">{tour.titulo}</h2>
+        {
+          config && (
+            <p class="duration">
+              {config.durationDays}{" "}
+              {config.durationDays === 1 ? copy.day : copy.days}
+            </p>
+          )
+        }
+      </div>
+      <img
+        src="/logo-dreamytours.svg"
+        alt="Dreamy Tours"
+        width="88"
+        height="70"
+      />
+    </div>
+  </header>
+  <div class="card-body">
+    <div class="price-row">
+      <span class="price-mark" aria-hidden="true">$</span>
+      <div>
+        <span class="eyebrow"
+          >{quoteOnly ? copy.privateService : copy.from}</span
+        ><p class="price">
+          {price ? `US$ ${price}` : copy.price}
+        </p>{price && <span class="muted">{copy.person}</span>}
+      </div>
+    </div>
+    <div class="benefits">
+      <div>
+        <span class="benefit-icon" aria-hidden="true">✦</span><div>
+          <strong>{copy.team}</strong><p>{copy.support}</p>
+        </div>
+      </div>
+      <div>
+        <span class="benefit-icon" aria-hidden="true">↗</span><div>
+          <strong>{copy.planning}</strong><p>
+            {quoteOnly ? copy.quoteDetails : copy.details}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="availability">
+      <strong><span aria-hidden="true">◷</span> {copy.limited}</strong>{
+        !quoteOnly && (
+          <a href={availabilityUrl}>
+            {copy.dates} <span aria-hidden="true">→</span>
+          </a>
+        )
+      }
+    </div>
+    <div class="actions">
+      <button
+        class="contact"
+        type="button"
+        data-open-tour-quote
+        aria-haspopup="dialog"
+        aria-controls="tour-quote-dialog"
+        ><WhatsAppIcon
+          width={22}
+          height={22}
+          aria-hidden="true"
+          className="shrink-0"
+        /><span><strong>{copy.contact}</strong><small>{copy.query}</small></span
+        ><span aria-hidden="true">→</span></button
+      >
+      {
+        !quoteOnly && (
+          <a class="reserve" href={availabilityUrl}>
+            <>
+              <span aria-hidden="true">▦</span>
+              <span>
+                <>
+                  <strong>{copy.book}</strong>
+                  <small>{copy.space}</small>
+                </>
+              </span>
+              <span aria-hidden="true">→</span>
+            </>
+          </a>
+        )
+      }
+    </div>
+    <p class="note">{copy.note}</p>
+  </div>
+</section>
+<TourQuoteDialog title={tour.titulo} lang={lang} />
+
+<style>
+  .booking-summary {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    background: var(--card);
+    color: var(--foreground);
+    box-shadow: 0 18px 45px -25px #24423740;
+    scroll-margin-top: 7rem;
+  }
+  header {
+    position: relative;
+    padding: 2rem 1.5rem 1.75rem;
+    border-bottom: 4px solid var(--primary);
+  }
+  .heading-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .heading-row > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .heading-row img {
+    width: 72px;
+    height: auto;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border);
+  }
+  h2 {
+    margin: 0.5rem 0;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+  .eyebrow {
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .duration,
+  .muted {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+  }
+  .ribbon {
+    display: block;
+    margin: -2rem -1.5rem 1.5rem;
+    padding: 0.5rem 1.5rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+  .card-body {
+    padding: 1.25rem;
+  }
+  .price-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-mark {
+    display: grid;
+    place-items: center;
+    width: 3.75rem;
+    height: 3.75rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    outline: 4px solid color-mix(in srgb, var(--primary) 12%, transparent);
+    font-size: 2rem;
+    font-weight: 800;
+  }
+  .price {
+    margin: 0.25rem 0 0;
+    color: var(--primary);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+  }
+  .benefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+    margin: 1.25rem 0;
+  }
+  .benefits > div {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
+    border-radius: 0.75rem;
+  }
+  .benefit-icon {
+    color: var(--primary);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  .benefits strong {
+    font-size: 0.8rem;
+    line-height: 1.25;
+    display: block;
+  }
+  .benefits p {
+    margin: 0.3rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--muted-foreground);
+  }
+  .availability {
+    display: grid;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+  }
+  .availability strong {
+    color: var(--secondary);
+  }
+  .availability a {
+    padding-block: 0.65rem;
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+  .actions a,
+  .actions button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 60px;
+    padding: 0.75rem;
+    border: 1px solid var(--primary);
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .actions strong {
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+  .actions small {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.65rem;
+  }
+  .contact {
+    color: var(--primary);
+    background: var(--card);
+  }
+  .contact:hover {
+    background: var(--muted);
+  }
+  .quote-only .actions {
+    grid-template-columns: 1fr;
+  }
+  .quote-only .contact {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .quote-only .contact:hover {
+    background: color-mix(in srgb, var(--primary) 85%, black);
+  }
+  .quote-only .price {
+    font-size: 1.7rem;
+  }
+  .reserve {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .reserve:hover {
+    background: color-mix(in srgb, var(--primary) 85%, black);
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--secondary);
+    outline-offset: 3px;
+  }
+  .note {
+    margin: 0.85rem 0 0;
+    text-align: center;
+    font-size: 0.65rem;
+    color: var(--muted-foreground);
+  }
+  @media (max-width: 380px) {
+    .actions {
+      grid-template-columns: 1fr;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+  }
+</style>

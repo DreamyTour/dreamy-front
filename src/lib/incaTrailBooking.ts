@@ -83,3 +83,21 @@ export function getIncaTrailBookingConfig(
 
 	return INCA_TRAIL_BOOKING_CONFIGS[slug.replace(/^\/|\/$/g, "")] ?? null;
 }
+
+export function getIncaTrailAvailabilityTours<T extends { slug: string }>(
+	tours: readonly T[],
+	requestedSlug?: string,
+): T[] {
+	const requestedTour = tours.find((tour) => tour.slug === requestedSlug);
+	const requestedConfig = getIncaTrailBookingConfig(requestedTour?.slug);
+	if (
+		requestedTour &&
+		requestedConfig &&
+		!requestedConfig.isPrimaryAvailabilityTour
+	) {
+		return [requestedTour];
+	}
+	return tours.filter(
+		(tour) => getIncaTrailBookingConfig(tour.slug)?.isPrimaryAvailabilityTour,
+	);
+}

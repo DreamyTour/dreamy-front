@@ -25,10 +25,11 @@ import {
 	getDateKeyInTimeZone,
 	MAX_PASSENGERS_PER_BOOKING,
 } from "@/lib/prebooking";
+import { createRequestId } from "@/lib/requestId";
 
 type TravelerDraft = MachuPicchuTraveler & { id: string };
 const emptyTraveler = (): TravelerDraft => ({
-	id: crypto.randomUUID(),
+	id: createRequestId(),
 	name: "",
 	lastname: "",
 	dob: "",
@@ -80,7 +81,7 @@ export default function MachuPicchuPrebooking() {
 				storedId,
 			)
 				? storedId
-				: crypto.randomUUID();
+				: createRequestId();
 		setLoaded(true);
 	}, []);
 	function goTo(next: number) {
@@ -123,7 +124,7 @@ export default function MachuPicchuPrebooking() {
 				acceptedTerms,
 			});
 			if (lastRequest.current !== fingerprint) {
-				if (lastRequest.current) requestId.current = crypto.randomUUID();
+				if (lastRequest.current) requestId.current = createRequestId();
 				lastRequest.current = fingerprint;
 			}
 		}

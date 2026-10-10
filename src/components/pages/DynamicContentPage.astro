@@ -5,8 +5,7 @@ import PageContent from "@/components/content/PageContent.astro";
 import TourHero from "@/components/tours/TourHero.astro";
 import TourTabs from "@/components/tours/TourTabs";
 import ContactForm from "@/components/tours/ContactForm.astro";
-import BookingFormFallback from "@/components/tours/BookingFormFallback.astro";
-import BookingFormIsland from "@/components/tours/BookingFormIsland.astro";
+import BookingSummaryCard from "@/components/tours/BookingSummaryCard.astro";
 import RelatedTours from "@/components/tours/RelatedTours.astro";
 import type { Tour } from "@/types/tours";
 import type { Page } from "@/types/page";
@@ -14,11 +13,7 @@ import type { Lang } from "@/lib/i18n";
 import type { AstroComponentFactory } from "astro/runtime/server/index.js";
 import type { ManualSEO } from "@/lib/seo";
 import { buildSEOProps } from "@/lib/seo";
-import {
-  generateDescription,
-  getImageAlt,
-  getImageUrl,
-} from "@/lib/helpers";
+import { generateDescription, getImageAlt, getImageUrl } from "@/lib/helpers";
 import { serializeJsonForHtml } from "@/lib/html";
 import { getHeroImage } from "@/lib/heroImage";
 import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
@@ -99,7 +94,9 @@ const seoProps =
           siteUrl,
           lang,
           title:
-            contentFrontmatter.seo?.metaTitle || contentFrontmatter.title || "Pagina",
+            contentFrontmatter.seo?.metaTitle ||
+            contentFrontmatter.title ||
+            "Pagina",
           description:
             contentFrontmatter.seo?.metaDescription ||
             contentFrontmatter.description ||
@@ -187,11 +184,15 @@ const seoProps =
         : undefined;
 
 const contentEyebrow =
-  contentFrontmatter?.heroEyebrow ?? contentFrontmatter?.title ?? "Dreamy Tours";
+  contentFrontmatter?.heroEyebrow ??
+  contentFrontmatter?.title ??
+  "Dreamy Tours";
 const heroImage =
   (contentFrontmatter?.heroImage as string | undefined) ||
   "/imagenes/sobre_nosotros.avif";
-const heroMobileImage = contentFrontmatter?.heroMobileImage as string | undefined;
+const heroMobileImage = contentFrontmatter?.heroMobileImage as
+  | string
+  | undefined;
 const heroImageAlt =
   (contentFrontmatter?.heroImageAlt as string | undefined) || "Dreamy Tours";
 const ContentComponent = contentComponent?.default;
@@ -209,11 +210,9 @@ const ContentComponent = contentComponent?.default;
       <div class="content-shell content-shell--static mx-auto w-full">
         <section class="content-hero content-hero--static relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
           <picture class="absolute inset-0 block">
-            {
-              heroMobileImage && (
-                <source media="(max-width: 767px)" srcset={heroMobileImage} />
-              )
-            }
+            {heroMobileImage && (
+              <source media="(max-width: 767px)" srcset={heroMobileImage} />
+            )}
             <img
               src={heroImage}
               alt={heroImageAlt}
@@ -288,6 +287,7 @@ const ContentComponent = contentComponent?.default;
       lcpImageUrl={tourHeroImage.src}
       lcpImageSrcSet={tourHeroImage.srcset}
       lcpImageSizes={tourHeroImage.sizes}
+      enableViewTransitions={!hasIncaTrailBookingCalendar}
     >
       <div class="max-w-8xl mx-auto px-4 md:px-6 lg:px-8 pb-12">
         <TourHero
@@ -310,16 +310,7 @@ const ContentComponent = contentComponent?.default;
         >
           <TourTabs tour={tour} lang={lang} client:visible>
             {hasIncaTrailBookingCalendar ? (
-              <BookingFormIsland
-                server:defer
-                tourId={tour.documentId}
-                tourName={tour.titulo}
-                basePrice={tour.priceTour}
-                tourSlug={tour.slug}
-                lang={lang}
-              >
-                <BookingFormFallback slot="fallback" />
-              </BookingFormIsland>
+              <BookingSummaryCard tour={tour} lang={lang} />
             ) : (
               <ContactForm tourName={tour.titulo} lang={lang} />
             )}

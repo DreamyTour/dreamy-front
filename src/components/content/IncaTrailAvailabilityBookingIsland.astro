@@ -9,6 +9,7 @@ import {
 interface AvailabilityBookingTour {
   road: string;
   durationDays: number;
+  permitStartOffsetDays?: number;
   tourId: string | number;
   tourName: string;
   basePrice?: number;
@@ -20,12 +21,20 @@ interface Props {
   year: number;
   initialMonth: number;
   initialRoad: string;
+  initialTourSlug?: string;
   roadLabels?: Record<string, string>;
   tours: AvailabilityBookingTour[];
 }
 
-const { lang, year, initialMonth, initialRoad, roadLabels, tours } =
-  Astro.props;
+const {
+  lang,
+  year,
+  initialMonth,
+  initialRoad,
+  initialTourSlug,
+  roadLabels,
+  tours,
+} = Astro.props;
 
 let initialTickets: TicketsByDate = {};
 
@@ -46,6 +55,7 @@ try {
   year={year}
   initialMonth={initialMonth}
   initialRoad={initialRoad}
+  initialTourSlug={initialTourSlug}
   roadLabels={roadLabels}
   initialTickets={initialTickets}
   tours={tours}

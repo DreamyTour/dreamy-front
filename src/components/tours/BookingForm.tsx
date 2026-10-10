@@ -4,6 +4,7 @@ import IncaTrailAvailabilityCalendar from "@/components/tours/IncaTrailAvailabil
 import type { Lang } from "@/lib/i18n";
 import { shiftDateKey, type TicketsByDate } from "@/lib/incaTrailAvailability";
 import { MAX_PASSENGERS_PER_BOOKING } from "@/lib/prebooking";
+import { createRequestId } from "@/lib/requestId";
 import { rewriteUrl } from "@/lib/utils";
 
 interface BookingFormProps {
@@ -123,7 +124,7 @@ export default function BookingForm({
 		}
 
 		const cartItem = {
-			quoteRequestId: crypto.randomUUID(),
+			quoteRequestId: createRequestId(),
 			tourId,
 			tourName,
 			pricePerPerson: basePrice,
