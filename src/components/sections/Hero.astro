@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/i18n";
 import { getImageUrl } from "@/lib/helpers";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 import dreamyToursMobile from "@/assets/dreamy-tours.webp";
+import { homeMobileHeroImage } from "@/lib/homeHeroImage";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -71,6 +72,12 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
     videoUrl !== "/og-default.jpg" ? (
       <>
         <picture>
+          <source
+            media={homeMobileHeroImage.media}
+            type={homeMobileHeroImage.type}
+            srcset={homeMobileHeroImage.srcset}
+            sizes={homeMobileHeroImage.sizes}
+          />
           <source media="(max-width: 767px)" srcset={dreamyToursMobile.src} />
           <img
             src={backgroundImageMobile.src}
@@ -100,6 +107,12 @@ function getButtonUrl(btnUrl: string, btnLabel: string) {
       </>
     ) : (
       <picture>
+        <source
+          media={homeMobileHeroImage.media}
+          type={homeMobileHeroImage.type}
+          srcset={homeMobileHeroImage.srcset}
+          sizes={homeMobileHeroImage.sizes}
+        />
         <source media="(max-width: 767px)" srcset={dreamyToursMobile.src} />
         <img
           src={backgroundImageMobile.src}

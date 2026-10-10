@@ -55,11 +55,13 @@ function initMachuPicchuCalendar() {
     month: todayPart("month") - 1,
     day: todayPart("day"),
   };
-  const monthNames = Array.from({ length: 12 }, (_, month) =>
-    new Intl.DateTimeFormat(lang, { month: "long", timeZone: "UTC" }).format(
-      new Date(Date.UTC(2026, month, 1)),
-    ),
-  );
+  const monthNames = Array.from({ length: 12 }, (_, month) => {
+    const name = new Intl.DateTimeFormat(lang, {
+      month: "long",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(2026, month, 1)));
+    return name.charAt(0).toLocaleUpperCase(lang) + name.slice(1);
+  });
   const makeMonths = (year) =>
     monthNames.map((label, month) => ({
       label,
@@ -172,7 +174,7 @@ function initMachuPicchuCalendar() {
           "aria-label",
           `${d} ${months[state.monthIndex].name}: ${translate("fecha pasada")}`,
         );
-      cell.className = `day-cell relative min-w-0 rounded-lg py-2.5 transition-colors duration-150 disabled:cursor-not-allowed ${isSelected ? "selected ring-2 ring-gray-900 ring-offset-2" : "motion-safe:[&:enabled:hover_.day-number]:-translate-y-1 motion-safe:[&:enabled:hover_.cupos]:-translate-y-1 enabled:hover:brightness-95 enabled:hover:cursor-pointer"} ${isPast ? "past bg-gray-50 opacity-40" : ""}`;
+      cell.className = `day-cell relative min-w-0 rounded-lg py-2.5 scale-100 transition-[background-color,color,border-color,filter,scale] duration-200 motion-safe:enabled:hover:scale-[1.035] enabled:hover:z-[3] disabled:cursor-not-allowed ${isSelected ? "selected ring-2 ring-gray-900 ring-offset-2" : "motion-safe:[&:enabled:hover_.day-number]:-translate-y-1 motion-safe:[&:enabled:hover_.cupos]:-translate-y-1 enabled:hover:brightness-95 enabled:hover:cursor-pointer"} ${isPast ? "past bg-gray-50 opacity-40" : ""}`;
 
       const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
       const cupos =

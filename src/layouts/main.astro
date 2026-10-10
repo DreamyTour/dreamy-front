@@ -30,6 +30,7 @@ interface Props {
   lcpImageSrcSet?: string;
   lcpImageSizes?: string;
   lcpImageMedia?: string;
+  lcpImageType?: string;
   enableViewTransitions?: boolean;
   languagePageCounts?: LocalizedPageCounts;
 }
@@ -42,6 +43,7 @@ const {
   lcpImageSrcSet,
   lcpImageSizes = "100vw",
   lcpImageMedia,
+  lcpImageType,
   enableViewTransitions = true,
 } = Astro.props;
 
@@ -112,6 +114,7 @@ const transitionEnabled = enableViewTransitions &&
         <link
           rel="preload"
           as="image"
+          type={lcpImageType}
           href={lcpImageUrl}
           {...(lcpImageMedia ? { media: lcpImageMedia } : {})}
           {...(lcpImageSrcSet

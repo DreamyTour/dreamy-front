@@ -76,6 +76,7 @@ export interface MapStop {
 
 export interface Maps {
 	id: number;
+	imagenRecorrido?: Imagen | null;
 	mapstops: MapStop[];
 }
 

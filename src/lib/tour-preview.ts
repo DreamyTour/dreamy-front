@@ -12,6 +12,7 @@ export async function refreshLocalTour(
 		query: {
 			"filters[documentId][$eq]": tour.documentId,
 			populate: "*",
+			"populate[tab][populate][maps][populate][imagenRecorrido]": true,
 			"populate[tab][populate][maps][populate][mapstops][populate][imagen]": true,
 		},
 	});

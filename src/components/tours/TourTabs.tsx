@@ -9,6 +9,7 @@ import {
 	PriceIcon,
 } from "@/components/icons/TourIcons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getImageUrl } from "@/lib/helpers";
 import type { Lang } from "@/lib/i18n";
 import { isValidTourMapStop } from "@/lib/tour-map";
 import type { MapStop, Tour } from "@/types/tours";
@@ -641,8 +642,8 @@ export default function TourTabs({ tour, lang, children }: Props) {
 									fitHeight={activeTab === "maps"}
 									stops={mapStops}
 									previewImage={
-										tour.slug === "peru-8-dias-arequipa-puno-cusco"
-											? "/images/tours/mapa-preview.webp"
+										tab?.maps?.imagenRecorrido?.url
+											? getImageUrl(tab?.maps?.imagenRecorrido)
 											: undefined
 									}
 									lang={lang}

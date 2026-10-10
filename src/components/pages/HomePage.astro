@@ -13,7 +13,7 @@ import ReviewsWall from "@/components/sections/ReviewsWall.astro";
 import TravelExperiences from "@/components/sections/TravelExperiences.astro";
 import type { Lang } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
-import dreamyToursMobile from "@/assets/dreamy-tours.webp";
+import { homeMobileHeroImage } from "@/lib/homeHeroImage";
 
 interface Props {
   lang: Lang;
@@ -47,8 +47,11 @@ const seoProps = {
 <Layout
   seo={seoProps}
   lang={lang}
-  lcpImageUrl={dreamyToursMobile.src}
-  lcpImageMedia="(max-width: 767px)"
+  lcpImageUrl={homeMobileHeroImage.src}
+  lcpImageSrcSet={homeMobileHeroImage.srcset}
+  lcpImageSizes={homeMobileHeroImage.sizes}
+  lcpImageType={homeMobileHeroImage.type}
+  lcpImageMedia={homeMobileHeroImage.media}
 >
   <Hero data={homeData?.hero} lang={lang} />
   <HomeStats lang={lang} />

@@ -547,7 +547,7 @@ export default function IncaTrailAvailabilityCalendar({
 									onClick={() =>
 										onDateSelect?.({ date: dateKey, availability, road })
 									}
-									className={`relative flex ${compact ? "h-[58px]" : "h-[68px] @min-[480px]:h-[84px]"} flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border p-1 transition-colors focus-visible:z-[2] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary ${isSelectedRange ? selectedToneStyles[tone] : `${toneStyles[tone]} enabled:hover:brightness-95 enabled:hover:cursor-pointer motion-safe:[&:enabled:hover_.day-number]:-translate-y-1 motion-safe:[&:enabled:hover_.cupos]:-translate-y-1`} ${isSelected ? "z-[1] ring-2 ring-foreground ring-offset-2" : ""}`}
+									className={`relative flex ${compact ? "h-[58px]" : "h-[68px] @min-[480px]:h-[84px]"} flex-col items-center justify-center gap-1 overflow-hidden rounded-lg border p-1 scale-100 transition-[background-color,color,border-color,filter,scale] duration-200 motion-safe:enabled:hover:scale-[1.035] enabled:hover:z-[3] focus-visible:z-[2] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary ${isSelectedRange ? selectedToneStyles[tone] : `${toneStyles[tone]} enabled:hover:brightness-95 enabled:hover:cursor-pointer motion-safe:[&:enabled:hover_.day-number]:-translate-y-1 motion-safe:[&:enabled:hover_.cupos]:-translate-y-1`} ${isSelected ? "z-[1] ring-2 ring-foreground ring-offset-2" : ""}`}
 									aria-pressed={isSelectedRange}
 									aria-label={`${dateKey}, ${
 										isSelectable
