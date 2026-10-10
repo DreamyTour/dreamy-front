@@ -29,12 +29,14 @@ export interface PrebookingPdfData {
 	travelEndDate: string;
 	permitDate: string;
 	road: string;
-	availableSpaces: number;
+	availableSpaces: number | null;
 	passengerCount: number;
-	pricePerPerson: number;
-	totalPrice: number;
+	pricePerPerson: number | null;
+	totalPrice: number | null;
 	paymentPreference: string;
-	preferredPaymentAmount: number;
+	preferredPaymentAmount: number | null;
+	visit?: { route: string; time: string };
+	creationDate?: Date;
 	contact: {
 		firstname: string;
 		lastname: string;
@@ -169,9 +171,13 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 
 	document.setTitle(`Pre-reserva ${data.reference}`);
 	document.setAuthor("Dreamy Tours");
-	document.setSubject("Solicitud operativa de pre-reserva y cotización");
+	document.setSubject(
+		data.visit
+			? "Solicitud pendiente de revisión. No confirma disponibilidad ni pago."
+			: "Solicitud operativa de pre-reserva y cotización",
+	);
 	document.setProducer("Dreamy Tours");
-	document.setCreationDate(new Date());
+	document.setCreationDate(data.creationDate ?? new Date());
 
 	const drawRightText = (
 		targetPage: PDFPage,
@@ -633,33 +639,43 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 	{
 		const top = beginSection(
 			"01",
-			"RESUMEN DEL VIAJE",
-			"disponibilidad consultada",
+			data.visit ? "RESUMEN DE LA VISITA" : "RESUMEN DEL VIAJE",
+			data.visit ? "pendiente de verificación" : "disponibilidad consultada",
 			85,
 		);
 		const fieldTop = top - 43;
 		drawField(
-			"FECHAS DE VIAJE",
-			`${formatPrebookingDate(data.travelDate)} – ${formatPrebookingDate(data.travelEndDate)}`,
+			data.visit ? "FECHA SOLICITADA" : "FECHAS DE VIAJE",
+			data.visit
+				? formatPrebookingDate(data.travelDate)
+				: `${formatPrebookingDate(data.travelDate)} - ${formatPrebookingDate(data.travelEndDate)}`,
 			44,
 			fieldTop,
 			190,
 		);
 		drawField("PASAJEROS", String(data.passengerCount), 260, fieldTop, 75);
-		page.drawText("CUPOS", {
+		page.drawText(data.visit ? "HORARIO SOLICITADO" : "CUPOS", {
 			x: 366,
 			y: fieldTop - 7,
 			size: 6.2,
 			font: regularFont,
 			color: neutral400,
 		});
-		drawPill(page, `${data.availableSpaces} disponibles`, 366, fieldTop - 25, {
-			size: 6.8,
-			height: 15,
-			background: brandGreenSoft,
-			color: brandGreenDark,
-			maxWidth: 140,
-		});
+		drawPill(
+			page,
+			data.visit
+				? `${data.visit.time} h - Perú`
+				: `${data.availableSpaces} disponibles`,
+			366,
+			fieldTop - 25,
+			{
+				size: 6.8,
+				height: 15,
+				background: brandGreenSoft,
+				color: brandGreenDark,
+				maxWidth: 140,
+			},
+		);
 		page.drawText("RUTA OFICIAL", {
 			x: 44,
 			y: top - 74,
@@ -669,10 +685,12 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 		});
 		drawFittedText(
 			page,
-			`Camino Inca – Ruta ${data.road}`,
+			data.visit
+				? `Ruta ${data.visit.route} - ${data.tourName}`
+				: `Camino Inca - Ruta ${data.road}`,
 			102,
 			top - 74,
-			220,
+			440,
 			7.5,
 			boldFont,
 			neutral700,
@@ -711,24 +729,29 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			font: regularFont,
 			color: neutral400,
 		});
-		page.drawText(formatMoney(data.totalPrice), {
+		const totalLabel =
+			data.totalPrice === null
+				? "Pendiente de cotización"
+				: formatMoney(data.totalPrice);
+		page.drawText(totalLabel, {
 			x: 55,
 			y: boxY + 11,
-			size: fitTextSize(formatMoney(data.totalPrice), boldFont, 130, 13, 10),
+			size: fitTextSize(totalLabel, boldFont, data.visit ? 224 : 130, 13, 10),
 			font: boldFont,
 			color: ink,
 		});
-		drawFittedText(
-			page,
-			`${data.passengerCount} pasajero${data.passengerCount === 1 ? "" : "s"} × ${formatMoney(data.pricePerPerson)} c/u`,
-			170,
-			boxY + 12,
-			108,
-			6.2,
-			regularFont,
-			neutral400,
-			5.5,
-		);
+		if (data.pricePerPerson !== null)
+			drawFittedText(
+				page,
+				`${data.passengerCount} pasajero${data.passengerCount === 1 ? "" : "s"} × ${formatMoney(data.pricePerPerson)} c/u`,
+				170,
+				boxY + 12,
+				108,
+				6.2,
+				regularFont,
+				neutral400,
+				5.5,
+			);
 
 		drawFittedText(
 			page,
@@ -740,22 +763,20 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			regularFont,
 			neutral400,
 		);
-		page.drawText(formatMoney(data.preferredPaymentAmount), {
+		const paymentLabel =
+			data.preferredPaymentAmount === null
+				? "Por coordinar"
+				: formatMoney(data.preferredPaymentAmount);
+		page.drawText(paymentLabel, {
 			x: 316,
 			y: boxY + 11,
-			size: fitTextSize(
-				formatMoney(data.preferredPaymentAmount),
-				boldFont,
-				115,
-				13,
-				10,
-			),
+			size: fitTextSize(paymentLabel, boldFont, 115, 13, 10),
 			font: boldFont,
 			color: brandGreen,
 		});
 		drawFittedText(
 			page,
-			"Monto para enlace de pago · NO COBRADO",
+			data.visit ? "NO COBRADO" : "Monto para enlace de pago · NO COBRADO",
 			433,
 			boxY + 12,
 			105,
@@ -767,8 +788,6 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 	}
 
 	{
-		const top = beginSection("03", "CONTACTO DEL TITULAR", "Viajero 1", 72);
-		const boxY = top - 62;
 		const boxes = [
 			{
 				x: 44,
@@ -792,12 +811,24 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 				color: ink,
 			},
 		];
+		const contactLines = boxes.map((box) =>
+			wrapText(box.value, boldFont, 7.1, box.width - 16),
+		);
+		const contactHeight =
+			22 + (Math.max(...contactLines.map((lines) => lines.length)) - 1) * 8;
+		const top = beginSection(
+			"03",
+			"CONTACTO DEL TITULAR",
+			"Viajero 1",
+			50 + contactHeight,
+		);
+		const boxY = top - 40 - contactHeight;
 		for (const contactBox of boxes) {
 			drawRoundedRectangle(page, {
 				x: contactBox.x,
 				bottom: boxY,
 				width: contactBox.width,
-				height: 22,
+				height: contactHeight,
 				radius: 5,
 				color: white,
 				borderColor: neutral200,
@@ -805,161 +836,175 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			});
 			page.drawText(contactBox.label, {
 				x: contactBox.x + 8,
-				y: boxY + 13,
+				y: boxY + contactHeight - 9,
 				size: 5.5,
 				font: boldFont,
 				color: neutral400,
 			});
-			drawFittedText(
-				page,
-				contactBox.value,
-				contactBox.x + 8,
-				boxY + 4,
-				contactBox.width - 16,
-				7.1,
-				boldFont,
-				contactBox.color,
-				5.5,
-			);
+			contactLines[boxes.indexOf(contactBox)].forEach((line, index) => {
+				page.drawText(line, {
+					x: contactBox.x + 8,
+					y: boxY + contactHeight - 18 - index * 8,
+					size: 7.1,
+					font: boldFont,
+					color: contactBox.color,
+				});
+			});
 		}
 	}
 
 	{
-		const passengerHeight =
-			48 +
-			data.passengers.length * 55 +
-			Math.max(0, data.passengers.length - 1) * 6 +
-			8;
-		const top = beginSection(
-			"04",
-			"DATOS DE PASAJEROS",
-			`X ${data.passengerCount} PAX`,
-			passengerHeight,
+		const nameLines = data.passengers.map((passenger) =>
+			wrapText(`${passenger.name} ${passenger.lastname}`, boldFont, 8.6, 345),
 		);
-		let passengerTop = top - 43;
-
-		data.passengers.forEach((passenger, index) => {
-			const cardHeight = 55;
-			const cardBottom = passengerTop - cardHeight;
-			drawRoundedRectangle(page, {
-				x: 44,
-				bottom: cardBottom,
-				width: 507,
-				height: cardHeight,
-				radius: 6,
-				color: white,
-				borderColor: index === 0 ? brandGreen : neutral200,
-				borderWidth: 0.6,
-			});
-			drawRoundedRectangle(page, {
-				x: 49,
-				bottom: cardBottom + 7,
-				width: 3,
-				height: cardHeight - 14,
-				radius: 1.5,
-				color: index === 0 ? brandGreen : neutral200,
-			});
-
-			const passengerName = safePdfText(
-				`${passenger.name} ${passenger.lastname}`,
-				boldFont,
-			);
-			page.drawCircle({
-				x: 65,
-				y: passengerTop - 13,
-				size: 7,
-				color: brandRedSoft,
-				borderColor: brandRed,
-				borderWidth: 0.5,
-			});
-			const passengerNumber = String(index + 1);
-			page.drawText(passengerNumber, {
-				x: 65 - boldFont.widthOfTextAtSize(passengerNumber, 6.2) / 2,
-				y: passengerTop - 15.2,
-				size: 6.2,
-				font: boldFont,
-				color: brandRedDark,
-			});
-			drawFittedText(
-				page,
-				passengerName,
-				78,
-				passengerTop - 15,
-				345,
-				8.6,
-				boldFont,
-				ink,
-				6.5,
-			);
-			drawPill(
-				page,
-				index === 0 ? "TITULAR · CONTACTO" : `VIAJERO ${index + 1}`,
-				index === 0 ? 438 : 465,
-				passengerTop - 20,
-				{
-					font: boldFont,
-					size: 5.5,
-					height: 12,
-					background: index === 0 ? brandGreen : brandGreenSoft,
-					color: index === 0 ? white : brandGreenDark,
-					maxWidth: index === 0 ? 103 : 76,
-				},
-			);
-
-			const passengerFields = [
-				{ label: "GÉNERO", value: passenger.gender, x: 58, width: 55 },
-				{ label: "PAÍS", value: passenger.country, x: 120, width: 61 },
-				{
-					label: "TIPO DE DOCUMENTO",
-					value: passenger.documentType,
-					x: 188,
-					width: 83,
-				},
-				{
-					label: "NÚMERO",
-					value: passenger.documentNumber,
-					x: 278,
-					width: 84,
-				},
-				{
-					label: "NACIMIENTO",
-					value: formatPrebookingDate(passenger.dob),
-					x: 369,
-					width: 91,
-				},
-				{
-					label: "EDAD",
-					value: `${passenger.age} años`,
-					x: 467,
-					width: 70,
-				},
-			];
-			for (const field of passengerFields) {
-				drawFittedText(
-					page,
-					field.label,
-					field.x,
-					cardBottom + 23,
-					field.width,
-					5,
-					boldFont,
-					neutral400,
-					4.4,
-				);
-				drawFittedText(
-					page,
-					field.value,
-					field.x,
-					cardBottom + 10,
-					field.width,
-					6.5,
-					field.label === "EDAD" ? boldFont : regularFont,
-					field.label === "EDAD" ? brandGreenDark : ink,
-					5.2,
-				);
+		const cardHeights = nameLines.map((lines) => 55 + (lines.length - 1) * 10);
+		let offset = 0;
+		while (offset < data.passengers.length) {
+			ensureSpace(56 + cardHeights[offset]);
+			let count = 0;
+			let passengerHeight = 50;
+			while (
+				offset + count < data.passengers.length &&
+				passengerHeight + cardHeights[offset + count] + 6 <= y - PAGE_BOTTOM
+			) {
+				passengerHeight += cardHeights[offset + count] + 6;
+				count += 1;
 			}
-			passengerTop = cardBottom - 6;
-		});
+			const batch = data.passengers.slice(offset, offset + Math.max(count, 1));
+			const top = beginSection(
+				"04",
+				offset ? "DATOS DE PASAJEROS - CONTINUACIÓN" : "DATOS DE PASAJEROS",
+				`X ${data.passengerCount} PAX`,
+				passengerHeight,
+			);
+			let passengerTop = top - 43;
+
+			batch.forEach((passenger, batchIndex) => {
+				const index = offset + batchIndex;
+				const cardHeight = cardHeights[index];
+				const cardBottom = passengerTop - cardHeight;
+				drawRoundedRectangle(page, {
+					x: 44,
+					bottom: cardBottom,
+					width: 507,
+					height: cardHeight,
+					radius: 6,
+					color: white,
+					borderColor: index === 0 ? brandGreen : neutral200,
+					borderWidth: 0.6,
+				});
+				drawRoundedRectangle(page, {
+					x: 49,
+					bottom: cardBottom + 7,
+					width: 3,
+					height: cardHeight - 14,
+					radius: 1.5,
+					color: index === 0 ? brandGreen : neutral200,
+				});
+
+				page.drawCircle({
+					x: 65,
+					y: passengerTop - 13,
+					size: 7,
+					color: brandRedSoft,
+					borderColor: brandRed,
+					borderWidth: 0.5,
+				});
+				const passengerNumber = String(index + 1);
+				page.drawText(passengerNumber, {
+					x: 65 - boldFont.widthOfTextAtSize(passengerNumber, 6.2) / 2,
+					y: passengerTop - 15.2,
+					size: 6.2,
+					font: boldFont,
+					color: brandRedDark,
+				});
+				nameLines[index].forEach((line, lineIndex) => {
+					page.drawText(line, {
+						x: 78,
+						y: passengerTop - 15 - lineIndex * 10,
+						size: 8.6,
+						font: boldFont,
+						color: ink,
+					});
+				});
+				drawPill(
+					page,
+					index === 0 ? "TITULAR · CONTACTO" : `VIAJERO ${index + 1}`,
+					index === 0 ? 438 : 465,
+					passengerTop - 20,
+					{
+						font: boldFont,
+						size: 5.5,
+						height: 12,
+						background: index === 0 ? brandGreen : brandGreenSoft,
+						color: index === 0 ? white : brandGreenDark,
+						maxWidth: index === 0 ? 103 : 76,
+					},
+				);
+
+				const passengerFields = [
+					...(data.visit
+						? []
+						: [{ label: "GÉNERO", value: passenger.gender, x: 58, width: 55 }]),
+					{
+						label: data.visit ? "PAÍS EMISOR" : "PAÍS",
+						value: passenger.country,
+						x: data.visit ? 58 : 120,
+						width: data.visit ? 122 : 61,
+					},
+					{
+						label: "TIPO DE DOCUMENTO",
+						value: passenger.documentType,
+						x: 188,
+						width: 83,
+					},
+					{
+						label: "NÚMERO",
+						value: passenger.documentNumber,
+						x: 278,
+						width: 84,
+					},
+					{
+						label: "NACIMIENTO",
+						value: formatPrebookingDate(passenger.dob),
+						x: 369,
+						width: 91,
+					},
+					{
+						label: "EDAD",
+						value: `${passenger.age} años`,
+						x: 467,
+						width: 70,
+					},
+				];
+				for (const field of passengerFields) {
+					drawFittedText(
+						page,
+						field.label,
+						field.x,
+						cardBottom + 23,
+						field.width,
+						5,
+						boldFont,
+						neutral400,
+						4.4,
+					);
+					drawFittedText(
+						page,
+						field.value,
+						field.x,
+						cardBottom + 10,
+						field.width,
+						6.5,
+						field.label === "EDAD" ? boldFont : regularFont,
+						field.label === "EDAD" ? brandGreenDark : ink,
+						5.2,
+					);
+				}
+				passengerTop = cardBottom - 6;
+			});
+			offset += batch.length;
+		}
 	}
 
 	{
@@ -970,7 +1015,9 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			{
 				x: 44,
 				label: "REVISAR",
-				description: "Cupos, permiso y datos de pasajeros.",
+				description: data.visit
+					? "Fecha, circuito, horario y datos."
+					: "Cupos, permiso y datos de pasajeros.",
 				background: brandGreenSoft,
 				color: brandGreenDark,
 				borderColor: brandGreenSoft,
@@ -978,7 +1025,9 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			{
 				x: 217,
 				label: "CONTACTAR",
-				description: "Confirmar condiciones con el cliente.",
+				description: data.visit
+					? "Cotizar y confirmar condiciones."
+					: "Confirmar condiciones con el cliente.",
 				background: brandRedSoft,
 				color: brandRed,
 				borderColor: brandRedSoft,
@@ -986,7 +1035,9 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			{
 				x: 390,
 				label: "ENVIAR PAGO",
-				description: "Generar el enlace por el monto preferido.",
+				description: data.visit
+					? "Coordinar después de la revisión."
+					: "Generar el enlace por el monto preferido.",
 				background: brandGreen,
 				color: white,
 				borderColor: brandGreen,
@@ -1037,7 +1088,9 @@ export async function generatePrebookingPdf(data: PrebookingPdfData) {
 			borderWidth: 0.5,
 		});
 		page.drawText(
-			"La pre-reserva no confirma el tour hasta validar y recibir el pago.",
+			data.visit
+				? "La solicitud no bloquea cupos, no emite boletos y no acredita ningún pago."
+				: "La pre-reserva no confirma el tour hasta validar y recibir el pago.",
 			{
 				x: 52,
 				y: top - 99.5,
