@@ -421,7 +421,7 @@ export default function MapTab({
 }) {
 	const mapRef = React.useRef<MapLibreMap | null>(null);
 	const labels = mapLabels[lang];
-	const [mapMode, setMapMode] = React.useState<TourMapMode>("satellite");
+	const [mapMode, setMapMode] = React.useState<TourMapMode>("map");
 	const styles = React.useMemo(
 		() => ({ light: tourMapStyles[mapMode] }),
 		[mapMode],
@@ -672,7 +672,7 @@ export default function MapTab({
 				}
 			`}</style>
 
-			<div className="relative isolate h-[clamp(260px,calc(100svh-340px),560px)] shrink-0 overflow-hidden rounded-2xl border border-primary/15 bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]">
+			<div className="relative isolate h-[clamp(260px,calc(100svh-340px),560px)] shrink-0 overflow-hidden rounded-2xl bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]">
 				<TourMap
 					ref={mapRef}
 					center={tourMapCenter}
