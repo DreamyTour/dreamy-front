@@ -361,7 +361,10 @@ export default function TourTabs({ tour, lang, children }: Props) {
           display: none;
         }
       `}</style>
-			<div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8">
+			<div
+				data-tour-layout
+				className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8"
+			>
 				{/* Desktop Layout */}
 				<div className="hidden lg:contents">
 					<Tabs

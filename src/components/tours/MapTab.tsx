@@ -420,6 +420,42 @@ export default function MapTab({
 	mapStops: MapStop[];
 }) {
 	const mapRef = React.useRef<MapLibreMap | null>(null);
+	const layoutRef = React.useRef<HTMLDivElement>(null);
+	const headingRef = React.useRef<HTMLDivElement>(null);
+	React.useEffect(() => {
+		const layout = layoutRef.current;
+		const heading = headingRef.current;
+		const card = layout
+			?.closest("[data-tour-layout]")
+			?.querySelector<HTMLElement>(
+				"#tour-contact-form .booking-summary, #tour-contact-form [data-contact-form-root]",
+			);
+		if (!layout || !heading || !card) return;
+		const desktop = window.matchMedia("(min-width: 1024px)");
+		const alignMap = () => {
+			if (!desktop.matches) {
+				layout.style.removeProperty("--tour-map-aligned-height");
+				return;
+			}
+			const gap = Number.parseFloat(getComputedStyle(layout).rowGap) || 0;
+			const height =
+				card.getBoundingClientRect().height -
+				heading.getBoundingClientRect().height -
+				gap;
+			if (height > 0) {
+				layout.style.setProperty("--tour-map-aligned-height", `${height}px`);
+			}
+		};
+		const observer = new ResizeObserver(alignMap);
+		observer.observe(card);
+		observer.observe(heading);
+		desktop.addEventListener("change", alignMap);
+		alignMap();
+		return () => {
+			observer.disconnect();
+			desktop.removeEventListener("change", alignMap);
+		};
+	}, []);
 	const labels = mapLabels[lang];
 	const [mapMode, setMapMode] = React.useState<TourMapMode>("map");
 	const styles = React.useMemo(
@@ -619,8 +655,11 @@ export default function MapTab({
 		);
 
 	return (
-		<div className="tour-map-tab flex flex-col gap-3">
-			<div className="flex items-center justify-between gap-4 px-1">
+		<div ref={layoutRef} className="tour-map-tab flex flex-col gap-3">
+			<div
+				ref={headingRef}
+				className="flex items-center justify-between gap-4 px-1"
+			>
 				<div>
 					<p className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-primary">
 						<Compass className="size-4" aria-hidden="true" />
@@ -672,7 +711,7 @@ export default function MapTab({
 				}
 			`}</style>
 
-			<div className="relative isolate h-[clamp(260px,calc(100svh-340px),560px)] shrink-0 overflow-hidden rounded-2xl bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]">
+			<div className="relative isolate h-[clamp(260px,calc(100svh-340px),560px)] lg:h-[var(--tour-map-aligned-height,clamp(260px,calc(100svh-340px),560px))] shrink-0 overflow-hidden rounded-2xl bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]">
 				<TourMap
 					ref={mapRef}
 					center={tourMapCenter}
