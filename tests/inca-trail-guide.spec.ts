@@ -22,6 +22,14 @@ for (const { path, slug } of [
 			`${path}?tour=${slug}#availability-calendar`,
 		);
 		expect(response?.headers()["x-robots-tag"]).toBe("noindex, follow");
+		expect(response?.headers()["cache-control"]).toBe("private, no-store");
+		await expect(page.locator("h1")).toContainText(
+			path.startsWith("/es/")
+				? "Reservar tour"
+				: path.startsWith("/pt/")
+					? "Reserva do tour"
+					: "Tour booking",
+		);
 		await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 			"content",
 			"noindex, follow",
@@ -44,6 +52,20 @@ for (const { path, slug } of [
 		);
 	});
 }
+
+test("Salkantay booking keeps the six-day tour in the hero and skips experience selection", async ({
+	page,
+}) => {
+	await page.goto(
+		"/es/disponibilidad-camino-inca/?tour=salkantay-camino-inca-6-dias#availability-calendar",
+	);
+	await expect(page.locator("h1")).toContainText("Reservar tour");
+	await expect(page.locator("h1")).toContainText(/Salkantay/i);
+	await expect(page.locator("h1")).toContainText("6 Días");
+	await expect(
+		page.getByRole("heading", { name: "Elige tu experiencia", exact: true }),
+	).toHaveCount(0);
+});
 
 test("guide explains pre-booking before related tours and questions work with a keyboard", async ({
 	page,

@@ -28,6 +28,7 @@ const pageSeo: SEOProps = {
 };
 if (isBookingUrl) {
   Astro.response.headers.set("X-Robots-Tag", "noindex, follow");
+  Astro.response.headers.set("Cache-Control", "private, no-store");
 }
 
 const copyByLang = {
@@ -219,7 +220,7 @@ const copy = copyByLang[lang];
 const designCopy = {
   es: {
     title: "Tu aventura empieza en el",
-    bookingTitle: "Reserva de tour",
+    bookingTitle: "Reservar tour",
     accent: "Camino Inca",
     intro:
       "Elige tu recorrido, encuentra una fecha disponible y prepara tu viaje a Machu Picchu en tres pasos.",

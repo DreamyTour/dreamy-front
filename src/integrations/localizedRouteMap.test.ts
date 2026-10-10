@@ -69,3 +69,47 @@ for (const invalid of ["draft", "wrong-locale", "403"]) {
 		);
 	});
 }
+
+test("catalogue retries a temporary 502 for Portuguese categories", async () => {
+	let categoryAttempts = 0;
+	spyOn(fetchTarget, "fetch").mockImplementation(async (input, init) => {
+		expect(init?.signal).toBeInstanceOf(AbortSignal);
+		const url = new URL(String(input));
+		if (
+			url.pathname === "/api/category-blogs" &&
+			url.searchParams.get("locale") === "pt"
+		) {
+			categoryAttempts++;
+			if (categoryAttempts < 3)
+				return new Response("Bad Gateway", { status: 502 });
+		}
+		return Response.json({ data: [], meta: { pagination: { pageCount: 1 } } });
+	});
+	await loadPublishedRouteMap("https://catalogue.test");
+	expect(categoryAttempts).toBe(3);
+});
+
+test("catalogue fails after three 502 responses instead of omitting routes", async () => {
+	let attempts = 0;
+	spyOn(fetchTarget, "fetch").mockImplementation(async () => {
+		attempts++;
+		return new Response("Bad Gateway", { status: 502 });
+	});
+	const error = await loadPublishedRouteMap("https://catalogue.test").then(
+		() => null,
+		(cause) => String(cause),
+	);
+	expect(error).toContain("HTTP 502 (attempt 3/3)");
+	expect(attempts).toBe(3);
+});
+
+test("catalogue recovers from a temporary network failure", async () => {
+	let attempts = 0;
+	spyOn(fetchTarget, "fetch").mockImplementation(async () => {
+		attempts++;
+		if (attempts === 1) throw new TypeError("fetch failed");
+		return Response.json({ data: [] });
+	});
+	await loadPublishedRouteMap("https://catalogue.test");
+	expect(attempts).toBe(13);
+});

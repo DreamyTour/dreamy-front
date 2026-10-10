@@ -27,6 +27,46 @@ const endpoints = {
 	page: "pages",
 } as const;
 
+async function fetchCatalogue(url: URL, label: string): Promise<Response> {
+	const attempts = 3;
+	for (let attempt = 1; attempt <= attempts; attempt++) {
+		let response: Response | undefined;
+		try {
+			response = await fetch(url, {
+				headers: {
+					Accept: "application/json",
+					"User-Agent": "Dreamy-Strapi-Editor/1.0",
+				},
+				signal: AbortSignal.timeout(15_000),
+			});
+		} catch (cause) {
+			if (attempt === attempts) {
+				throw new Error(
+					`Published route catalogue: ${label} network error after ${attempts} attempts`,
+					{ cause },
+				);
+			}
+		}
+		if (response?.ok) return response;
+		if (response) {
+			await response.body?.cancel();
+			if (
+				![429, 500, 502, 503, 504].includes(response.status) ||
+				attempt === attempts
+			) {
+				throw new Error(
+					`Published route catalogue: ${label} HTTP ${response.status} (attempt ${attempt}/${attempts})`,
+				);
+			}
+		}
+		console.warn(
+			`[published-route-map] ${label}: ${response ? `HTTP ${response.status}` : "network error"}; retry ${attempt + 1}/${attempts}`,
+		);
+		await new Promise((resolve) => setTimeout(resolve, attempt * 1_000));
+	}
+	throw new Error(`Published route catalogue: ${label} unavailable`);
+}
+
 export async function loadPublishedRouteMap(
 	baseUrl: string,
 ): Promise<RouteMap> {
@@ -50,16 +90,10 @@ export async function loadPublishedRouteMap(
 				}).toString();
 				if (kind === "post")
 					url.searchParams.set("populate[category_blogs][fields][0]", "slug");
-				const response = await fetch(url, {
-					headers: {
-						Accept: "application/json",
-						"User-Agent": "Dreamy-Strapi-Editor/1.0",
-					},
-				});
-				if (!response.ok)
-					throw new Error(
-						`Published route catalogue: ${endpoints[kind]} ${locale} HTTP ${response.status}`,
-					);
+				const response = await fetchCatalogue(
+					url,
+					`${endpoints[kind]} ${locale}`,
+				);
 				const body = (await response.json()) as {
 					data: Entry[];
 					meta?: { pagination?: { pageCount?: number } };
