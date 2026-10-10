@@ -631,7 +631,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 					<aside
 						id="tour-contact-form"
 						aria-label="Reserva y contacto"
-						className={`mt-8 min-w-0 scroll-mt-28 lg:mt-12 ${activeTab === "maps" ? "lg:flex lg:min-h-0 lg:flex-col lg:self-stretch [&>*:first-child]:shrink-0" : "lg:self-start"}`}
+						className={`mt-8 min-w-0 scroll-mt-28 ${activeTab === "maps" ? "lg:mt-4 lg:flex lg:min-h-0 lg:flex-col lg:self-stretch [&>*:first-child]:shrink-0" : "lg:mt-12 lg:self-start"}`}
 					>
 						{children}
 						{hasMaps && (activeTab === "maps" || isMapOpenMobile) && (

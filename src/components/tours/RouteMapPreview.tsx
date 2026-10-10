@@ -98,7 +98,7 @@ export default function RouteMapPreview({
 			>
 				{previewImage ? (
 					<span
-						className={`relative block overflow-hidden cursor-zoom-in ${fitHeight ? "lg:min-h-0 lg:w-full lg:flex-1 lg:bg-white" : ""}`}
+						className={`relative block overflow-hidden cursor-zoom-in ${fitHeight ? "lg:min-h-44 lg:w-full lg:flex-1 lg:bg-white" : ""}`}
 					>
 						<img
 							src={previewImage}
