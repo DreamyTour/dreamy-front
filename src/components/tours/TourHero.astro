@@ -42,6 +42,9 @@ const ctaLabels = {
       "Instant confirmation",
       "Discover and Join the adventure today",
       "Local expert guides",
+      "Help choosing your travel date",
+      "Itinerary and tour details",
+      "Advice to prepare for your trip",
     ],
   },
   es: {
@@ -55,6 +58,9 @@ const ctaLabels = {
       "Confirmación instantánea",
       "Descubre y únete a la aventura hoy",
       "Guías expertos locales",
+      "Ayuda para elegir tu fecha de viaje",
+      "Información sobre la ruta y el itinerario",
+      "Consejos para preparar tu viaje",
     ],
   },
   pt: {
@@ -67,6 +73,9 @@ const ctaLabels = {
       "Confirmação instantânea",
       "Descubra e junte-se à aventura hoje",
       "Guias especialistas locais",
+      "Ajuda para escolher sua data de viagem",
+      "Informações sobre a rota e o itinerário",
+      "Dicas para preparar sua viagem",
     ],
   },
 };
@@ -201,10 +210,10 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
   </nav>
 
   <div
-    class="tour-hero-content mx-auto mt-5 grid max-w-8xl items-stretch gap-5 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_340px]"
+    class="tour-hero-content mx-auto mt-5 grid max-w-8xl items-stretch gap-5 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8"
   >
     <div
-      class="h-full rounded-sm border border-primary/30 bg-background p-4 lg:p-5"
+      class="h-full rounded-sm bg-background p-4 shadow-[0_8px_28px_-12px_rgba(15,23,42,0.18)] lg:p-5"
     >
       <p class="text-base leading-relaxed text-slate-800 md:text-[1.05rem]">
         <StrapiRichTextInline nodes={tour.content || []} />
@@ -212,7 +221,7 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
     </div>
 
     <aside
-      class="tour-contact-card rounded-sm border border-border bg-background p-4 shadow-sm lg:p-5"
+      class="tour-contact-card rounded-lg bg-background p-5 shadow-[0_8px_28px_-12px_rgba(15,23,42,0.18)] lg:p-5"
     >
       <p
         class="text-xs font-extrabold uppercase tracking-[0.16em] text-primary"
@@ -223,7 +232,7 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
         {ctaLabel.contactText}
       </p>
 
-      <div class="mt-4 grid gap-3">
+      <div class="tour-contact-actions mt-5">
         <ContactTag
           href={quoteOnly ? undefined : "https://wa.me/51969787221"}
           target={quoteOnly ? undefined : "_blank"}
@@ -232,11 +241,11 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
           data-open-tour-quote={quoteOnly ? "" : undefined}
           aria-haspopup={quoteOnly ? "dialog" : undefined}
           aria-controls={quoteOnly ? "tour-quote-dialog" : undefined}
-          class="hero-cta-whatsapp inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98]"
+          class="hero-cta-whatsapp inline-flex min-h-12 items-center justify-center gap-2 rounded-md border px-3 py-3 text-xs font-bold transition duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98]"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
+            class="h-4 w-4 shrink-0"
             fill="currentColor"
             viewBox="0 0 24 24"
             aria-hidden="true"
@@ -251,7 +260,7 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
           !quoteOnly && (
             <a
               href={bookingHref}
-              class="hero-cta-book inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.08em] transition duration-300 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 active:scale-[0.98]"
+              class="hero-cta-book inline-flex min-h-12 items-center justify-center rounded-md border px-3 py-3 text-xs font-bold transition duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 active:scale-[0.98]"
             >
               {ctaLabel.book}
             </a>
@@ -307,24 +316,34 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
     animation: tour-badge-in 0.55s ease-out both;
   }
 
+  .tour-hero-container .tour-contact-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+    gap: 0.75rem;
+  }
+
   .tour-hero-container .hero-cta-whatsapp {
     background: var(--primary);
+    border-color: var(--primary);
     color: var(--primary-foreground);
-    box-shadow: 0 18px 36px -28px var(--primary);
   }
 
   .tour-hero-container .hero-cta-whatsapp:hover {
-    background: color-mix(in oklab, var(--primary) 88%, black);
+    background: #fff;
+    color: var(--primary);
+    border-color: var(--primary);
   }
 
   .tour-hero-container .hero-cta-book {
     background: var(--secondary);
+    border-color: var(--secondary);
     color: var(--secondary-foreground);
     box-shadow: 0 18px 36px -28px var(--secondary);
   }
 
   .tour-hero-container .hero-cta-book:hover {
-    background: color-mix(in oklab, var(--secondary) 88%, black);
+    background: #fff;
+    color: var(--secondary);
   }
 
   @keyframes tour-hero-slow-zoom {
