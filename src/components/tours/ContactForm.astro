@@ -1,5 +1,6 @@
 ---
 import { countriesWithPhoneCode } from "@/data/countries";
+import { WHATSAPP_URL } from "@/lib/socialLinks";
 
 interface Props {
   tourName?: string;
@@ -79,6 +80,18 @@ const contactCopy = {
 } as const;
 
 const copy = contactCopy[lang] ?? contactCopy.es;
+const whatsappMessage = {
+  es: tourName
+    ? `Hola, me interesa el tour "${tourName}". Quisiera consultar sobre precios, disponibilidad y cómo reservar.`
+    : "Hola, quisiera información sobre sus tours, precios y disponibilidad.",
+  en: tourName
+    ? `Hello, I'm interested in the "${tourName}" tour. I'd like to ask about prices, availability and how to book.`
+    : "Hello, I'd like information about your tours, prices and availability.",
+  pt: tourName
+    ? `Olá, tenho interesse no tour "${tourName}". Gostaria de consultar preços, disponibilidade e como reservar.`
+    : "Olá, gostaria de informações sobre seus tours, preços e disponibilidade.",
+}[lang];
+const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
 
 // Prepare countries sorted by name, filter out empty phone codes
 const countries = [...countriesWithPhoneCode].sort((a, b) =>
@@ -120,7 +133,9 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
 
   <a
     id="contact-whatsapp-btn"
-    href="https://wa.me/51969787221"
+    href={whatsappHref}
+    data-whatsapp-url={WHATSAPP_URL}
+    data-whatsapp-message={whatsappMessage}
     target="_blank"
     rel="noopener noreferrer"
     class="group relative flex items-center justify-center gap-3 border border-[#064d45] bg-[#0B6B35] hover:bg-[#09582c] text-white w-full py-3.5 rounded-sm font-bold transition-color duration-300 shadow-md shadow-[#0B6B35]/20 hover:shadow-lg hover:shadow-[#0B6B35]/25 hover:-translate-y-0.5 mb-6 overflow-hidden"
@@ -486,8 +501,8 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         const whatsappBtn = root.querySelector<HTMLAnchorElement>(
           "#contact-whatsapp-btn",
         );
-        const whatsappInput =
-          root.querySelector<HTMLInputElement>("#contact-whatsapp");
+        const messageInput =
+          root.querySelector<HTMLTextAreaElement>("#contact-message");
         const form = root.querySelector<HTMLFormElement>("#contact-tour-form");
         const submitButton = root.querySelector<HTMLButtonElement>(
           "[data-contact-submit]",
@@ -521,19 +536,17 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         }
 
         function updateWhatsAppLink() {
-          if (!whatsappBtn || !whatsappInput) return;
+          if (!whatsappBtn) return;
 
-          const codeText =
-            phoneCodeInput?.value ||
-            phoneCodeDisplay.textContent?.replace("+", "").replace(/\s/g, "") ||
-            "51";
-          const phone = whatsappInput.value
-            .replace(/\s/g, "")
-            .replace(/[^0-9]/g, "");
-
-          whatsappBtn.href = phone
-            ? `https://wa.me/${codeText}${phone}`
-            : "https://wa.me/51969787221";
+          const url = new URL(whatsappBtn.dataset.whatsappUrl!);
+          const message = [
+            whatsappBtn.dataset.whatsappMessage,
+            messageInput?.value.trim(),
+          ]
+            .filter(Boolean)
+            .join("\n\n");
+          url.searchParams.set("text", message);
+          whatsappBtn.href = url.toString();
         }
 
         function updatePhoneCode() {
@@ -625,7 +638,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         countrySelect.addEventListener("change", updatePhoneCode, {
           signal: controller.signal,
         });
-        whatsappInput?.addEventListener("input", updateWhatsAppLink, {
+        messageInput?.addEventListener("input", updateWhatsAppLink, {
           signal: controller.signal,
         });
         form?.addEventListener("submit", handleSubmit, {

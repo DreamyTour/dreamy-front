@@ -8,6 +8,7 @@ import type { HeroImageData } from "@/lib/heroImage";
 import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
 import { rewriteUrl } from "@/lib/utils";
+import { WHATSAPP_URL } from "@/lib/socialLinks";
 
 interface Props {
   tour: Tour;
@@ -80,6 +81,12 @@ const ctaLabels = {
   },
 };
 const ctaLabel = ctaLabels[lang] || ctaLabels.en;
+const whatsappMessage = {
+  es: `Hola, me interesa el tour "${tour.titulo}". Quisiera consultar sobre precios, disponibilidad y cómo reservar.`,
+  en: `Hello, I'm interested in the "${tour.titulo}" tour. I'd like to ask about prices, availability and how to book.`,
+  pt: `Olá, tenho interesse no tour "${tour.titulo}". Gostaria de consultar preços, disponibilidade e como reservar.`,
+}[lang];
+const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
 const quoteOnly = getIncaTrailBookingConfig(tour.slug)?.durationDays === 1;
 const ContactTag = quoteOnly ? "button" : "a";
 const bookingHref = getIncaTrailBookingConfig(tour.slug)
@@ -234,7 +241,7 @@ const bookingHref = getIncaTrailBookingConfig(tour.slug)
 
       <div class="tour-contact-actions mt-5">
         <ContactTag
-          href={quoteOnly ? undefined : "https://wa.me/51969787221"}
+          href={quoteOnly ? undefined : whatsappHref}
           target={quoteOnly ? undefined : "_blank"}
           rel={quoteOnly ? undefined : "noopener noreferrer"}
           type={quoteOnly ? "button" : undefined}
