@@ -1,0 +1,16 @@
+---
+import DynamicContentPage from "@/components/pages/DynamicContentPage.astro";
+import * as content from "@/components/content/ChristmasProjectContent.astro";
+import { frontmatter as original } from "@/pages/es/proyecto-social/proyecto-navideno.astro";
+import { localizePurposeFrontmatter } from "@/lib/purposeMetadata";
+import { purposeSlugs } from "@/lib/purposeRoutes";
+const frontmatter = localizePurposeFrontmatter(original, "christmas", "en");
+---
+
+<DynamicContentPage
+  type="content"
+  lang="en"
+  contentComponent={content}
+  pageSlugMap={purposeSlugs.christmas}
+  contentFrontmatter={frontmatter}
+/>

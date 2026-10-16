@@ -1,4 +1,5 @@
 ---
+import SectionDivider from "@/components/ui/SectionDivider.astro";
 import type { Lang } from "@/lib/i18n";
 import type { Page } from "@/types/page";
 
@@ -159,24 +160,7 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
           class="absolute bottom-0 left-0 h-3 w-24 rounded-full bg-secondary/30 -z-0 blur-sm"
         ></span>
       </h2>
-
-      <span
-        class="mt-4 mb-6 flex items-center justify-start gap-3"
-        aria-hidden="true"
-      >
-        <span
-          class="h-[1px] w-16 bg-gradient-to-r from-transparent to-secondary"
-        ></span>
-        <span class="relative h-1.5 w-12 rounded-full bg-secondary">
-          <span
-            class="absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-          >
-          </span>
-        </span>
-        <span
-          class="h-[1px] w-16 bg-gradient-to-l from-transparent to-secondary"
-        ></span>
-      </span>
+      <SectionDivider align="center" />
 
       <p class="text-sm leading-relaxed text-gray-600 sm:text-base">
         {t.description}
@@ -275,6 +259,7 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
             >{t.titleHighlight}</span
           >
         </h2>
+        <SectionDivider />
 
         <p class="text-muted-foreground font-medium leading-relaxed">
           {t.description}

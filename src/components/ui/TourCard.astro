@@ -3,22 +3,36 @@ import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import { useTranslations } from "@/i18n/ui";
 import BadgeIcon from "@/components/ui/BadgeIcon.astro";
-import { getImageAlt, getImageUrl, extractTextFromBlocks } from "@/lib/helpers";
+import {
+  getImageAlt,
+  getImageUrl,
+  getImageSrcSet,
+  extractTextFromBlocks,
+} from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   tour: Tour;
   lang: Lang;
+  compactAction?: boolean;
+  showDescription?: boolean;
+  editorial?: {
+    title: string;
+    description: string;
+    duration: string;
+    imageAlt: string;
+    ctaLabel: string;
+  };
 }
 
-const { tour, lang } = Astro.props;
+const { tour, lang, editorial, compactAction = false, showDescription = true } = Astro.props;
 
 if (!tour) return null;
 
 const t = useTranslations(lang);
 const metaImage = tour.seo?.metaImage;
 const mainImage = getImageUrl(metaImage, "small");
-const imageAlt = getImageAlt(metaImage, tour.titulo);
+const imageAlt = editorial?.imageAlt || getImageAlt(metaImage, tour.titulo);
 const cardBadge =
   tour.cardBadge === "best_seller"
     ? {
@@ -34,7 +48,12 @@ const cardBadge =
 ---
 
 <article
-  class="group relative flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white transition-all duration-500 hover:-translate-y-1 hover:border-primary/15"
+  class:list={[
+    "group relative flex h-full flex-col overflow-hidden border border-slate-200/80 bg-white",
+    editorial
+      ? "rounded-2xl transition-[translate,border-color] duration-500 hover:border-primary/30 motion-safe:hover:-translate-y-1 motion-reduce:transition-none"
+      : "rounded-sm transition-all duration-500 hover:-translate-y-1 hover:border-primary/15",
+  ]}
 >
   {/* Image Container */}
   <a
@@ -44,7 +63,7 @@ const cardBadge =
     class="relative block w-full shrink-0 overflow-hidden border-b border-slate-200/70 aspect-[4/3]"
   >
     {
-      cardBadge && (
+      !editorial && cardBadge && (
         <div
           class:list={[
             "tour-card-badge",
@@ -71,9 +90,21 @@ const cardBadge =
       mainImage && mainImage !== "/og-default.jpg" ? (
         <img
           src={mainImage}
+          srcset={
+            editorial
+              ? getImageSrcSet(metaImage, undefined, {
+                  includeOriginal: true,
+                }) || undefined
+              : undefined
+          }
           sizes="(max-width: 767px) 92vw, (max-width: 1023px) calc((100vw - 24px) / 2), 320px"
           alt={imageAlt}
-          class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]"
+          class:list={[
+            "absolute inset-0 h-full w-full object-cover",
+            editorial
+              ? "scale-100 transition-[scale] duration-1000 motion-safe:group-hover:scale-[1.035] motion-reduce:transition-none"
+              : "transition-transform duration-700 group-hover:scale-[1.035]",
+          ]}
           loading="lazy"
           decoding="async"
         />
@@ -97,25 +128,42 @@ const cardBadge =
   <div
     class="relative z-10 flex grow flex-col bg-white px-4 py-4 md:px-5 md:py-5"
   >
+    {
+      editorial && (
+        <p class="mb-3 text-xs font-medium text-primary">
+          {editorial.duration}
+        </p>
+      )
+    }
     <h3
       class="mb-3 line-clamp-2 text-[1.26rem] font-semibold leading-[1.15] tracking-[-0.02em] text-slate-950 transition-colors duration-300 group-hover:text-secondary md:text-[1.42rem]"
     >
-      <a href={rewriteUrl(`/${tour.slug}`, lang)} class="focus:outline-hidden">
-        {tour.titulo}
+      <a
+        href={rewriteUrl(`/${tour.slug}`, lang)}
+        class={editorial
+          ? "hover:text-secondary! hover:no-underline! focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          : "focus:outline-hidden"}
+      >
+        {editorial?.title || tour.titulo}
       </a>
     </h3>
 
     {
-      tour.content && (
-        <p class="mb-5 text-[0.85rem] text-slate-600 line-clamp-2 leading-relaxed">
-          {extractTextFromBlocks(tour.content)}
+      showDescription && (editorial || tour.content) && (
+        <p
+          class:list={[
+            "mb-5 text-[0.85rem] text-slate-600 leading-relaxed",
+            !editorial && "line-clamp-2",
+          ]}
+        >
+          {editorial?.description || extractTextFromBlocks(tour.content)}
         </p>
       )
     }
 
     {/* Badges paralelos en Flex - Texto Multilínea */}
     {
-      tour.badge && tour.badge.length > 0 && (
+      !editorial && tour.badge && tour.badge.length > 0 && (
         <dl class="mb-5 mt-auto flex w-full items-start justify-between gap-1 border-t border-b border-slate-200 pt-4 pb-4">
           {tour.badge.slice(-3).map((b) => (
             <div class="flex flex-1 min-w-0" title={b.content}>
@@ -140,15 +188,29 @@ const cardBadge =
         </dl>
       )
     }
-    <div class="mt-auto pt-1">
+    <div class:list={["mt-auto pt-1", compactAction && "flex justify-center"]}>
       <a
         href={rewriteUrl(`/${tour.slug}`, lang)}
-        class="group/btn inline-flex w-full items-center justify-between gap-3 rounded-sm border border-primary/15 bg-primary px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/95 active:scale-[0.995]"
+        aria-label={editorial
+          ? `${editorial.ctaLabel}: ${editorial.title}`
+          : undefined}
+        data-sustainable-event={editorial ? "tour" : undefined}
+        data-tour-slug={editorial ? tour.slug : undefined}
+        class={editorial
+          ? `group/btn inline-flex min-h-11 items-center border border-primary/15 bg-primary py-2.5 text-sm font-medium text-white! transition-colors duration-300 hover:no-underline! hover:border-primary/30 hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none ${compactAction ? "w-auto justify-center gap-2 rounded-full px-5" : "w-full justify-between gap-3 rounded-sm px-4"}`
+          : "group/btn inline-flex w-full items-center justify-between gap-3 rounded-sm border border-primary/15 bg-primary px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/95 active:scale-[0.995]"}
       >
-        <span class="tracking-[0.05em]">{t("tour.verItinerario")}</span>
+        <span class="tracking-[0.05em]"
+          >{editorial?.ctaLabel || t("tour.verItinerario")}</span
+        >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4 shrink-0 transition-transform duration-300 group-hover/btn:translate-x-1"
+          class:list={[
+            "h-4 w-4 shrink-0 transition-transform duration-300",
+            editorial
+              ? "motion-safe:group-hover/btn:translate-x-1 motion-reduce:transition-none"
+              : "group-hover/btn:translate-x-1",
+          ]}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

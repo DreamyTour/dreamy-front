@@ -20,6 +20,7 @@ playwright-report/
 ############################
 # Local diagnostics / screenshots
 ############################
+.codex-trust-preview/
 /tmp*.png
 /home-stats*.png
 /trace-*.json

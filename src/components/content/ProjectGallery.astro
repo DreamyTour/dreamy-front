@@ -1,0 +1,224 @@
+---
+import { ArrowLeft, ArrowRight, Expand, X } from "lucide-react";
+interface Props {
+  id: string;
+  title: string;
+  images: { src: string; alt: string; preview?: string; thumbnail?: string }[];
+}
+const { id, title, images } = Astro.props;
+const first = images[0];
+const control =
+  "grid size-10 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-background text-foreground transition-colors hover:border-secondary hover:text-secondary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary";
+---
+
+<project-gallery class="block min-w-0" data-title={title}>
+  <div class="relative">
+    <a
+      href={first.src}
+      data-gallery-open
+      aria-label={`Ampliar fotos de ${title}`}
+      class="group relative block overflow-hidden rounded-2xl bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
+    >
+      <img
+        data-gallery-main
+        src={first.preview || first.src}
+        alt={first.alt}
+        width="1600"
+        height="1067"
+        class="aspect-[1.5] w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      <span
+        class="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-semibold text-foreground shadow-sm transition-colors group-hover:text-secondary"
+        ><Expand size={14} aria-hidden="true" />Ampliar</span
+      >
+    </a>
+  </div>
+  <div class="mt-3 flex items-center justify-between gap-3">
+    <div
+      class="flex min-w-0 flex-1 gap-2 overflow-x-auto py-1"
+      aria-label={`Fotos de ${title}`}
+    >
+      {
+        images.map((img, index) => (
+          <a
+            href={img.src}
+            data-gallery-thumb
+            data-preview={img.preview || img.src}
+            data-alt={img.alt}
+            aria-label={`Mostrar foto ${index + 1} de ${title}`}
+            aria-current={index === 0 ? "true" : "false"}
+            class="block w-10 shrink-0 overflow-hidden rounded-lg border-2 border-transparent opacity-60 transition-opacity hover:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary aria-[current=true]:border-secondary aria-[current=true]:opacity-100 sm:w-16"
+          >
+            <img
+              src={img.thumbnail || img.preview || img.src}
+              alt={img.alt}
+              width="96"
+              height="64"
+              loading="lazy"
+              decoding="async"
+              class="aspect-[1.5] w-full object-cover"
+            />
+          </a>
+        ))
+      }
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button
+        type="button"
+        data-gallery-prev
+        class={control}
+        aria-label={`Foto anterior de ${title}`}
+        ><ArrowLeft size={16} aria-hidden="true" /></button
+      >
+      <button
+        type="button"
+        data-gallery-next
+        class={control}
+        aria-label={`Foto siguiente de ${title}`}
+        ><ArrowRight size={16} aria-hidden="true" /></button
+      >
+    </div>
+  </div>
+  <p
+    data-gallery-status
+    aria-live="polite"
+    aria-atomic="true"
+    class="mt-2 text-xs text-muted-foreground"
+  >
+    Foto 1 de {images.length}
+  </p>
+  <dialog
+    data-gallery-dialog
+    aria-labelledby={`${id}-dialog-title`}
+    class="fixed inset-0 m-auto max-h-[95dvh] w-[min(96vw,80rem)] max-w-none overflow-auto rounded-2xl border border-border bg-background p-3 text-foreground shadow-xl backdrop:bg-black/80 sm:p-5"
+  >
+    <div class="mb-3 flex items-center justify-end gap-4">
+      <h2 id={`${id}-dialog-title`} class="sr-only">
+        {title}
+      </h2>
+      <button
+        type="button"
+        data-gallery-close
+        class={control}
+        aria-label="Cerrar galería"><X size={20} aria-hidden="true" /></button
+      >
+    </div>
+    <img
+      data-gallery-full
+      alt={first.alt}
+      width="1600"
+      height="1067"
+      loading="lazy"
+      class="mx-auto max-h-[70dvh] w-full rounded-lg object-contain"
+    />
+    <div class="mt-3 flex items-center justify-between gap-3">
+      <button
+        type="button"
+        data-gallery-prev
+        class={control}
+        aria-label="Foto anterior"
+        ><ArrowLeft size={18} aria-hidden="true" /></button
+      >
+      <p
+        data-gallery-caption
+        aria-live="polite"
+        aria-atomic="true"
+        class="sr-only"
+      >
+        {first.alt} · 1 / {images.length}
+      </p>
+      <button
+        type="button"
+        data-gallery-next
+        class={control}
+        aria-label="Foto siguiente"
+        ><ArrowRight size={18} aria-hidden="true" /></button
+      >
+    </div>
+  </dialog>
+</project-gallery>
+
+<script>
+  class ProjectGallery extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = "true";
+      const thumbs = Array.from(
+        this.querySelectorAll<HTMLAnchorElement>("[data-gallery-thumb]"),
+      );
+      const main = this.querySelector<HTMLImageElement>("[data-gallery-main]")!;
+      const full = this.querySelector<HTMLImageElement>("[data-gallery-full]")!;
+      const open = this.querySelector<HTMLAnchorElement>(
+        "[data-gallery-open]",
+      )!;
+      const dialog = this.querySelector<HTMLDialogElement>("dialog")!;
+      const status = this.querySelector<HTMLElement>("[data-gallery-status]")!;
+      const caption = this.querySelector<HTMLElement>(
+        "[data-gallery-caption]",
+      )!;
+      let current = 0;
+      const lang = this.dataset.lang || document.documentElement.lang;
+      const select = (index: number) => {
+        current = (index + thumbs.length) % thumbs.length;
+        const thumb = thumbs[current];
+        const alt =
+          thumb.dataset.alt || this.dataset.title || "Foto del proyecto";
+        main.src = thumb.dataset.preview || thumb.href;
+        open.href = thumb.href;
+        if (dialog.open) full.src = thumb.href;
+        main.alt = full.alt = alt;
+        thumbs.forEach((item, i) =>
+          item.setAttribute("aria-current", String(i === current)),
+        );
+        status.textContent =
+          lang === "en"
+            ? `Photo ${current + 1} of ${thumbs.length}`
+            : `Foto ${current + 1} de ${thumbs.length}`;
+        caption.textContent = `${alt} · ${current + 1} / ${thumbs.length}`;
+      };
+      thumbs.forEach((thumb, i) =>
+        thumb.addEventListener("click", (event) => {
+          event.preventDefault();
+          select(i);
+        }),
+      );
+      this.querySelectorAll("[data-gallery-prev]").forEach((button) =>
+        button.addEventListener("click", () => select(current - 1)),
+      );
+      this.querySelectorAll("[data-gallery-next]").forEach((button) =>
+        button.addEventListener("click", () => select(current + 1)),
+      );
+      open.addEventListener("click", (event) => {
+        event.preventDefault();
+        full.src = thumbs[current].href;
+        dialog.showModal();
+      });
+      this.querySelector("[data-gallery-close]")!.addEventListener(
+        "click",
+        () => dialog.close(),
+      );
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+          const rect = dialog.getBoundingClientRect();
+          if (
+            event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom
+          )
+            dialog.close();
+        }
+      });
+      dialog.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          event.preventDefault();
+          select(current + (event.key === "ArrowLeft" ? -1 : 1));
+        }
+      });
+    }
+  }
+  if (!customElements.get("project-gallery"))
+    customElements.define("project-gallery", ProjectGallery);
+</script>

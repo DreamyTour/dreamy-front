@@ -1,0 +1,25 @@
+---
+import { purposeSeo } from "@/data/purposeSeo";
+import { purposeSlugs } from "@/lib/purposeRoutes";
+import DynamicContentPage from "@/components/pages/DynamicContentPage.astro";
+import * as content from "@/components/content/SchoolSuppliesContent.astro";
+export const frontmatter = {
+  title: "Entrega de útiles escolares",
+  heroEyebrow: "Compartir oportunidades",
+  description: purposeSeo.school.es.metaDescription,
+  lang: "es",
+  layout: "editorial",
+  heroImage: "/imagenes/proyecto-social/utiles.webp",
+  heroImageAlt:
+    "Equipo de Dreamy Tours compartiendo materiales escolares con niños",
+  seo: purposeSeo.school.es,
+} as const;
+---
+
+<DynamicContentPage
+  type="content"
+  lang="es"
+  contentComponent={content}
+  pageSlugMap={purposeSlugs.school}
+  contentFrontmatter={frontmatter}
+/>

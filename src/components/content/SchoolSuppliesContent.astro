@@ -1,0 +1,102 @@
+---
+import LocalizedPurpose from "@/components/content/LocalizedPurpose.astro";
+import SectionDivider from "@/components/ui/SectionDivider.astro";
+import ProjectGallery from "@/components/content/ProjectGallery.astro";
+import { ArrowLeft } from "lucide-react";
+
+// Una sola actividad documentada. Añadir fecha y comunidad cuando estén confirmadas.
+const activity = {
+  title: "Herramientas para seguir aprendiendo",
+  paragraphs: [
+    "En Dreamy Tours creemos que cada niño merece comenzar el año escolar con ilusión y las herramientas necesarias para aprender. En esta actividad compartimos útiles escolares, mochilas y materiales educativos con los más pequeños.",
+    "Más que entregar materiales, buscamos apoyar la educación y motivar a los niños a seguir soñando. Una oportunidad para compartir sonrisas, sembrar confianza y reafirmar nuestro compromiso con las comunidades que nos reciben.",
+  ],
+  photos: [
+    {
+      file: "utiles-5",
+      alt: "Equipo de Dreamy Tours entregando mochilas y cuadernos a los niños",
+    },
+    {
+      file: "utiles-4",
+      alt: "Niños y equipo de Dreamy Tours mostrando los materiales escolares entregados",
+    },
+    {
+      file: "utiles-3",
+      alt: "Un momento de la actividad de entrega de útiles escolares",
+    },
+    { file: "utiles-2", alt: "Recuerdo de la jornada de apoyo a la educación" },
+    {
+      file: "utiles-1",
+      alt: "Equipo de Dreamy Tours y niños con sus cuadernos y mochilas",
+    },
+    {
+      file: "utiles",
+      alt: "Participantes de la actividad de entrega de materiales educativos",
+    },
+  ],
+};
+---
+
+<LocalizedPurpose>
+  <div class="bg-background text-foreground">
+    <div class="page-shell pb-14">
+      <nav
+        aria-label="Ruta de navegación"
+        class="flex flex-wrap items-center gap-2 py-6 text-xs text-muted-foreground"
+      >
+        <a
+          href="/es/"
+          class="hover:text-secondary focus-visible:outline-2 focus-visible:outline-secondary"
+          >Inicio</a
+        ><span aria-hidden="true">/</span>
+        <a
+          href="/es/proyecto-social/"
+          class="hover:text-secondary focus-visible:outline-2 focus-visible:outline-secondary"
+          >Proyecto social</a
+        ><span aria-hidden="true">/</span>
+        <span aria-current="page">Entrega de útiles escolares</span>
+      </nav>
+      <section
+        aria-labelledby="school-activity-title"
+        class="grid items-start gap-8 py-8 md:grid-cols-[0.85fr_1.15fr] md:gap-14 md:py-12"
+      >
+        <div>
+          <p
+            class="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-primary"
+          >
+            Apoyar la educación
+          </p>
+          <h2
+            id="school-activity-title"
+            class="text-3xl font-semibold leading-tight tracking-tight md:text-4xl"
+          >
+            {activity.title}
+          </h2>
+          <SectionDivider />
+          <div
+            class="space-y-4 text-sm leading-7 text-muted-foreground md:text-base"
+          >
+            {activity.paragraphs.map((text) => <p>{text}</p>)}
+          </div>
+        </div>
+        <div class="min-w-0">
+          <ProjectGallery
+            id="school-supplies"
+            title="Entrega de útiles escolares"
+            images={activity.photos.map((photo) => ({
+              src: `/imagenes/proyecto-social/utiles/${photo.file}.webp`,
+              alt: photo.alt,
+            }))}
+          />
+        </div>
+      </section>
+      <div class="border-t border-border pt-6">
+        <a
+          href="/es/proyecto-social/"
+          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-secondary px-5 py-2 text-sm font-semibold text-secondary transition-colors hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
+          ><ArrowLeft size={16} aria-hidden="true" />Volver a Proyecto Social</a
+        >
+      </div>
+    </div>
+  </div>
+</LocalizedPurpose>

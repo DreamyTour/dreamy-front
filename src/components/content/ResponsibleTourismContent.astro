@@ -1,0 +1,742 @@
+---
+import LocalizedPurpose from "@/components/content/LocalizedPurpose.astro";
+import SectionDivider from "@/components/ui/SectionDivider.astro";
+import HeroImage from "@/components/ui/HeroImage.astro";
+import TourCard from "@/components/ui/TourCard.astro";
+import {
+  Spool,
+  ShoppingBag,
+  HandHeart,
+  UsersRound,
+  MessagesSquare,
+  Sprout,
+  Utensils,
+  BookOpen,
+  Handshake,
+  Camera,
+  ShieldCheck,
+  ClipboardCheck,
+  Leaf,
+  Accessibility,
+  CircleHelp,
+} from "lucide-react";
+import ResponsibleCommitmentEvidence from "@/components/content/ResponsibleCommitmentEvidence.astro";
+import { getHeroImage } from "@/lib/heroImage";
+import {
+  getResponsibleTours,
+  getResponsibleHero,
+} from "@/lib/responsibleTourism";
+import { responsibleTourism as copy } from "@/data/responsibleTourism";
+
+const tours = await getResponsibleTours();
+const featured = tours.slice(0, 2);
+const cultural = tours.slice(2);
+const craftIcons = [Spool, ShoppingBag, HandHeart];
+const principleIcons = [HandHeart, UsersRound, MessagesSquare];
+const traditionIcons = [Spool, Sprout, Utensils, BookOpen];
+const commitmentIcons = [UsersRound, Handshake, Spool, Camera, ShieldCheck];
+const tipIcons = [
+  Camera,
+  HandHeart,
+  Spool,
+  ShoppingBag,
+  UsersRound,
+  MessagesSquare,
+];
+const hero = getResponsibleHero(tours[0].tour);
+const hosts = getHeroImage({
+  ...tours[1].tour.seo!.metaImage!,
+  width: 1200,
+  height: 900,
+});
+const community = getHeroImage(tours[1].tour.imagenDestacada);
+const gathering = getHeroImage(tours[0].tour.imagenDestacada);
+const imageAlts = [
+  "Anfitriones de Misminay y viajeros compartiendo una visita",
+  "Anfitriones y músicos en la comunidad de Misminay",
+  "Puente tradicional de fibras vegetales Q’eswachaka, Cusco",
+  "Paisajes de Maras y Moray en Cusco",
+  "Patrimonio cultural del Valle Sagrado de los Incas",
+  "Recorrido cultural por el Valle Sagrado, Cusco",
+];
+const principles = [
+  {
+    title: "Respeto cultural",
+    text: "Conocer las tradiciones sin imponer comportamientos ajenos a sus protagonistas.",
+  },
+  {
+    title: "Participación local",
+    text: "Valorar experiencias donde los anfitriones intervienen en el desarrollo de las actividades.",
+  },
+  {
+    title: "Intercambio auténtico",
+    text: "Fomentar encuentros basados en el aprendizaje, la escucha y el respeto mutuo.",
+  },
+];
+const traditions = [
+  "Tradiciones textiles",
+  "Agricultura andina",
+  "Gastronomía tradicional",
+  "Conocimientos e historias locales",
+];
+const wrap = "page-shell";
+const section = `${wrap} py-12 md:py-16`;
+const eyebrow =
+  "mb-4 text-[0.7rem] font-semibold tracking-[0.14em] text-primary uppercase";
+const heading =
+  "text-balance text-[clamp(1.8rem,1.2rem+1.5vw,2.6rem)] leading-[1.15] font-semibold tracking-[-0.035em]";
+const body = "space-y-4 text-[0.95rem] leading-[1.85] text-muted-foreground";
+const softCard =
+  "rounded-2xl border border-primary/10 bg-primary/[0.025] p-5 md:p-6";
+const iconBadge =
+  "flex size-12 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary";
+const button =
+  "inline-flex min-h-11 items-center justify-center gap-3 rounded-full border border-primary bg-primary px-6 py-3 text-sm font-semibold text-white! transition-colors hover:bg-primary/90 hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none";
+const outline =
+  "inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground! transition-colors hover:border-primary hover:text-primary! hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none";
+---
+
+<LocalizedPurpose>
+  <div
+    id="responsible-landing"
+    class="bg-background text-foreground [&_section[id]]:scroll-mt-28"
+  >
+    <section
+      class={`${wrap} pt-5 pb-10 md:pb-14`}
+      aria-labelledby="responsible-title"
+    >
+      <nav
+        aria-label="Ruta de navegación"
+        class="mb-8 text-xs text-muted-foreground"
+      >
+        <ol class="flex flex-wrap items-center gap-2">
+          <li>
+            <a
+              href="/es/"
+              class="hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+              >Inicio</a
+            >
+          </li><li aria-hidden="true">/</li><li aria-current="page">
+            Turismo responsable en Cusco
+          </li>
+        </ol>
+      </nav>
+      <div class="grid items-center gap-6 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>Viaja con respeto. Conecta con su gente.</p><h1
+            id="responsible-title"
+            class="text-balance text-[clamp(2.25rem,1.2rem+2.5vw,4rem)] leading-[1.07] font-semibold tracking-[-0.045em]"
+          >
+            Turismo responsable en Cusco: <span class="text-primary"
+              >experiencias con propósito</span
+            >
+          </h1><SectionDivider />
+        </div>
+        <div>
+          <div class={body}>{copy.hero.map((text) => <p>{text}</p>)}</div><div
+            class="mt-6 flex flex-wrap gap-3"
+          >
+            <a
+              href="#experiencias"
+              class={button}
+              data-responsible-action="hero_experiences"
+              >Ver tours <span aria-hidden="true">→</span></a
+            ><a
+              href="#compromiso"
+              class={outline}
+              data-responsible-action="hero_commitment">Nuestro compromiso</a
+            >
+          </div>
+        </div>
+      </div>
+      <figure class="mt-8 md:mt-10">
+        <HeroImage
+          image={hero}
+          class="aspect-[4/3] w-full rounded-2xl object-cover object-[center_55%] md:aspect-[2.2]"
+        />
+      </figure>
+    </section>
+
+    <section class={section} aria-labelledby="responsible-meaning">
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <figure>
+          <img
+            src={hosts.src}
+            srcset={hosts.srcset}
+            sizes="(min-width: 1024px) 42vw, 100vw"
+            width={hosts.width}
+            height={hosts.height}
+            alt="Anfitriones y músicos en la comunidad de Misminay"
+            loading="lazy"
+            decoding="async"
+            class="aspect-[4/3] w-full rounded-2xl object-cover"
+          />
+        </figure>
+        <div>
+          <p class={eyebrow}>Viajar es también saber respetar</p><h2
+            id="responsible-meaning"
+            class={heading}
+          >
+            ¿Qué significa practicar turismo responsable?
+          </h2><SectionDivider /><div class={`mt-5 ${body}`}>
+            {copy.meaning.map((text) => <p>{text}</p>)}
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-10 grid gap-4 border-t border-border pt-7 md:grid-cols-3 md:gap-6"
+      >
+        {
+          principles.map((item, index) => {
+            const Icon = principleIcons[index] ?? HandHeart;
+            return (
+              <div class={`${softCard} flex items-start gap-4`}>
+                <span class={iconBadge}>
+                  <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                </span>
+                <div class="min-w-0 pt-1">
+                  <h3 class="mb-2 text-sm font-semibold text-primary">
+                    {item.title}
+                  </h3>
+                  <p class="text-sm leading-relaxed text-muted-foreground">
+                    {item.text}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class={section} aria-labelledby="responsible-communities">
+      <div class="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>Historias que siguen vivas</p><h2
+            id="responsible-communities"
+            class={heading}
+          >
+            Comunidades andinas: el corazón del turismo responsable en Cusco
+          </h2><SectionDivider /><div class={`mt-5 ${body}`}>
+            {copy.communities.map((text) => <p>{text}</p>)}
+          </div>
+        </div>
+        <figure>
+          <img
+            src={community.src}
+            srcset={community.srcset}
+            sizes="(min-width: 1024px) 42vw, 100vw"
+            width={community.width}
+            height={community.height}
+            alt="Anfitriones y espacios de la comunidad de Misminay"
+            loading="lazy"
+            decoding="async"
+            class="aspect-[4/3] w-full rounded-2xl object-cover"
+          />
+        </figure>
+      </div>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          traditions.map((title, index) => {
+            const Icon = traditionIcons[index] ?? BookOpen;
+            return (
+              <div class={`${softCard} flex items-center gap-4`}>
+                <span class={iconBadge}>
+                  <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                </span>
+                <h3 class="min-w-0 text-sm leading-relaxed font-semibold">
+                  {title}
+                </h3>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section
+      id="artesanias-locales"
+      class={`${section} border-t border-border`}
+      aria-labelledby="responsible-crafts"
+    >
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>Recuerdos con historia</p>
+          <h2 id="responsible-crafts" class={heading}>{copy.crafts.title}</h2>
+          <SectionDivider />
+          <p class={`mt-5 ${body}`}>{copy.crafts.intro}</p>
+          <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+            Conocer un oficio también es una forma de valorarlo. La compra es
+            siempre una decisión personal y no una condición para disfrutar del
+            encuentro.
+          </p>
+          <figure class="mt-6 overflow-hidden rounded-2xl">
+            <img
+              src="/imagenes/artesania-cusco.webp"
+              width={1400}
+              height={1050}
+              alt="Puesto de artesanías en Cusco con textiles, bolsos y prendas de colores junto a vendedoras y visitantes"
+              loading="lazy"
+              decoding="async"
+              class="aspect-[4/3] w-full object-cover"
+            />
+          </figure>
+        </div>
+        <div class="grid gap-4">
+          {
+            copy.crafts.practices.map((item, index) => {
+              const Icon = craftIcons[index] ?? HandHeart;
+              return (
+                <div class="flex items-start gap-4 rounded-2xl border border-primary/10 bg-primary/[0.025] p-5 md:p-6">
+                  <span class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary">
+                    <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                  </span>
+                  <div class="min-w-0 pt-1">
+                    <h3 class="mb-2 text-lg leading-tight font-semibold">
+                      {item.title}
+                    </h3>
+                    <p class="text-sm leading-relaxed text-muted-foreground">
+                      {item.text}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="experiencias"
+      class="scroll-mt-28 bg-muted/30"
+      aria-labelledby="responsible-experiences"
+    >
+      <div
+        class={`${section} grid items-center gap-8 lg:grid-cols-[0.85fr_1.65fr] lg:gap-10 xl:gap-14`}
+      >
+        <div class="min-w-0">
+          <div>
+            <p class={eyebrow}>Vive Cusco desde sus comunidades</p><h2
+              id="responsible-experiences"
+              class={heading}
+            >
+              Turismo vivencial en Cusco: experiencias que conectan
+            </h2><SectionDivider />
+          </div><div class={`mt-5 ${body}`}>
+            {copy.experiences.map((text) => <p>{text}</p>)}
+          </div>
+        </div>
+        <div class="grid min-w-0 gap-5 sm:grid-cols-2">
+          {
+            featured.map(({ tour, copy: card, duration }, index) => (
+              <div
+                data-responsible-tour={tour.slug}
+                data-experience-kind="misminay"
+                class="min-w-0 [&_article>a]:aspect-[2/1] [&_h3]:line-clamp-none [&_h3]:text-lg [&_h3]:leading-snug"
+              >
+                <TourCard
+                  tour={tour}
+                  lang="es"
+                  compactAction
+                  editorial={{
+                    ...card,
+                    duration,
+                    imageAlt: imageAlts[index],
+                    ctaLabel: "Conoce el tour",
+                  }}
+                />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="experiencias-culturales" class={section} aria-labelledby="responsible-cultural">
+      <div
+        class="mb-8 grid items-center gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+      >
+        <div>
+          <p class={eyebrow}>Más allá de los monumentos</p><h2
+            id="responsible-cultural"
+            class={heading}
+          >
+            Experiencias culturales para conocer el Cusco auténtico
+          </h2><SectionDivider />
+        </div><div class={body}>
+          {copy.cultural.map((text) => <p>{text}</p>)}
+        </div>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        {
+          cultural.map(({ tour, copy: card, duration }, index) => (
+            <div
+              data-responsible-tour={tour.slug}
+              data-experience-kind="cultural"
+              class="min-w-0 [&_h3]:line-clamp-none [&_h3]:text-xl"
+            >
+              <TourCard
+                tour={tour}
+                lang="es"
+                compactAction
+                editorial={{
+                  ...card,
+                  duration,
+                  imageAlt: imageAlts[index + 2],
+                  ctaLabel: "Conoce el tour",
+                }}
+                showDescription={false}
+              />
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      id="compromiso"
+      class={section}
+      aria-labelledby="responsible-commitment"
+    >
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>El respeto se demuestra con acciones</p><h2
+            id="responsible-commitment"
+            class={heading}
+          >
+            Nuestro compromiso con las comunidades y su cultura
+          </h2><SectionDivider /><div class={`mt-5 ${body}`}>
+            {copy.commitment.map((text) => <p>{text}</p>)}
+          </div>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          {
+            copy.commitments.map((item, index) => {
+              const Icon = commitmentIcons[index] ?? HandHeart;
+              return (
+                <div
+                  class:list={[
+                    softCard,
+                    index === copy.commitments.length - 1 && "sm:col-span-2",
+                  ]}
+                >
+                  <span class={`${iconBadge} mb-5`}>
+                    <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                  </span>
+                  <h3 class="mb-3 text-lg leading-tight font-semibold tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p class="text-sm leading-[1.8] text-muted-foreground">
+                    {item.text}
+                  </p>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+      <ResponsibleCommitmentEvidence />
+    </section>
+
+    <section
+      class={`${section} border-t border-border`}
+      aria-labelledby="responsible-traveler"
+    >
+      <div
+        class="mb-8 grid items-center gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+      >
+        <div>
+          <p class={eyebrow}>Recomendaciones para el viajero</p><h2
+            id="responsible-traveler"
+            class={heading}
+          >
+            ¿Cómo practicar turismo responsable durante tu viaje?
+          </h2><SectionDivider />
+        </div><p class={body}>{copy.tipsIntro}</p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+        {
+          copy.tips.map((item, index) => {
+            const Icon = tipIcons[index] ?? HandHeart;
+            return (
+              <div class={`${softCard} flex items-start gap-4`}>
+                <span class={iconBadge}>
+                  <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                </span>
+                <div class="min-w-0 pt-1">
+                  <h3 class="mb-2 text-base font-semibold">{item.title}</h3>
+                  <p class="text-sm leading-relaxed text-muted-foreground">
+                    {item.text}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class={section} aria-labelledby="responsible-before-booking">
+      <figure class="mb-8">
+        <img
+          src={gathering.src}
+          srcset={gathering.srcset}
+          sizes="100vw"
+          width={gathering.width}
+          height={gathering.height}
+          alt="Anfitriones locales reunidos en Misminay, Valle Sagrado"
+          loading="lazy"
+          decoding="async"
+          class="aspect-[4/3] w-full rounded-2xl object-cover md:aspect-[2.5]"
+        />
+      </figure>
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>Más allá de una visita convencional</p><h2
+            id="responsible-before-booking"
+            class={heading}
+          >
+            Un viaje responsable comienza antes de llegar al destino
+          </h2><SectionDivider /><div class={`${softCard} mt-6`}>
+            <h3
+              class="mb-4 text-xs font-semibold tracking-wider text-primary uppercase"
+            >
+              Antes de reservar, pregúntate:
+            </h3><ul
+              class="space-y-3 text-sm leading-relaxed text-muted-foreground"
+            >
+              {
+                copy.questions.map((question) => (
+                  <li class="flex items-start gap-3 border-t border-primary/10 pt-3">
+                    <ClipboardCheck
+                      size={18}
+                      strokeWidth={1.6}
+                      className="mt-0.5 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                    <span>{question}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div><div class={body}>
+          {copy.beforeBooking.map((text) => <p>{text}</p>)}
+        </div>
+      </div>
+    </section>
+
+    <section
+      class={`${section} border-t border-border`}
+      aria-labelledby="responsible-comparison"
+    >
+      <div
+        class="grid items-center gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+      >
+        <div>
+          <h2 id="responsible-comparison" class={heading}>
+            Turismo responsable y sostenible: dos enfoques que se complementan
+          </h2><SectionDivider />
+        </div><div class={body}>
+          {
+            copy.comparison.map((text, index) =>
+              index === 2 ? (
+                <p>
+                  {text.split("turismo sostenible en Perú")[0]}
+                  <a
+                    href="/es/turismo-sostenible-peru/"
+                    class="text-primary underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
+                    data-responsible-action="related_sustainable"
+                  >
+                    turismo sostenible en Perú
+                  </a>
+                  {text.split("turismo sostenible en Perú")[1]}
+                </p>
+              ) : (
+                <p>{text}</p>
+              ),
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class={section} aria-labelledby="responsible-faq">
+      <div
+        class="grid items-start gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16"
+      >
+        <div>
+          <span class={`${iconBadge} mb-5`}
+            ><CircleHelp size={24} strokeWidth={1.6} aria-hidden="true" /></span
+          >
+          <h2 id="responsible-faq" class={heading}>
+            Preguntas frecuentes sobre turismo responsable en Cusco
+          </h2><SectionDivider />
+          <p class={`mt-5 ${body}`}>
+            Resuelve tus dudas sobre las comunidades, las artesanías y cómo
+            organizar una visita respetuosa.
+          </p>
+        </div><div class="space-y-3">
+          {
+            copy.faq.map((item) => (
+              <details
+                class="group/faq rounded-2xl border border-border px-5 open:border-primary/20 open:bg-primary/[0.025] md:px-6"
+                name="responsible-faq"
+              >
+                <>
+                  <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-5 py-5 text-base font-semibold focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+                    {item.question}
+                    <svg
+                      class="size-4 shrink-0 text-primary transition-transform group-open/faq:rotate-45 motion-reduce:transition-none"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </summary>
+                  <p class="pb-6 text-sm leading-[1.8] text-muted-foreground">
+                    {item.answer}
+                  </p>
+                </>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section
+      class={`${section} border-t border-border`}
+      aria-labelledby="responsible-related"
+    >
+      <div
+        class="mb-8 grid items-center gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+      >
+        <div>
+          <h2 id="responsible-related" class={heading}>
+            Nuestro compromiso continúa en cada experiencia
+          </h2><SectionDivider />
+        </div><p class={body}>{copy.relatedIntro}</p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2">
+        {
+          copy.related.map((item, index) => (
+            <article class="rounded-2xl border border-border p-6 md:p-8">
+              <>
+                <span class={`${iconBadge} mb-5`}>
+                  {index === 0 ? (
+                    <Leaf size={24} strokeWidth={1.6} aria-hidden="true" />
+                  ) : (
+                    <Accessibility
+                      size={24}
+                      strokeWidth={1.6}
+                      aria-hidden="true"
+                    />
+                  )}
+                </span>
+                <p class="mb-3 text-xs font-semibold tracking-wider text-primary uppercase">
+                  {item.label}
+                </p>
+                <h3 class="mb-3 text-xl leading-tight font-semibold">
+                  {item.title}
+                </h3>
+                <p class="text-sm leading-relaxed text-muted-foreground">
+                  {item.description}
+                </p>
+                <a
+                  href={item.href}
+                  data-responsible-action={
+                    index === 0 ? "related_sustainable" : "related_inclusive"
+                  }
+                  class="mt-4 inline-flex min-h-11 items-center gap-3 text-sm font-semibold text-primary hover:text-secondary! hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                >
+                  Conoce más{" "}
+                  <>
+                    <span aria-hidden="true">→</span>
+                    <span class="sr-only">: {item.label}</span>
+                  </>
+                </a>
+              </>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      class={`${wrap} relative isolate mb-16 overflow-hidden rounded-2xl px-6 py-12 text-white md:px-12 md:py-16`}
+      aria-labelledby="responsible-final"
+    >
+      <img
+        src={hero.src}
+        srcset={hero.srcset}
+        sizes="100vw"
+        width={hero.width}
+        height={hero.height}
+        alt="Anfitriones de Misminay y viajeros durante una visita cultural"
+        loading="lazy"
+        decoding="async"
+        class="absolute inset-0 -z-20 h-full w-full object-cover object-[center_55%]"
+      /><div class="absolute inset-0 -z-10 bg-black/75" aria-hidden="true">
+      </div>
+      <div class="mx-auto max-w-3xl text-center">
+        <p
+          class="mb-4 text-[0.7rem] font-semibold tracking-[0.14em] text-white/90 uppercase"
+        >
+          Tu viaje puede significar algo más
+        </p><h2 id="responsible-final" class={heading}>
+          Descubre Cusco a través de las personas que mantienen viva su historia
+        </h2><SectionDivider align="center" /><div
+          class="mt-5 space-y-4 text-[0.95rem] leading-[1.85] text-white/90"
+        >
+          {copy.closing.map((text) => <p>{text}</p>)}
+        </div><div class="mt-7 flex flex-wrap justify-center gap-3">
+          <a
+            href="#experiencias"
+            class={button}
+            data-responsible-action="final_experiences"
+            >Ver tours <span aria-hidden="true">→</span></a
+          ><a
+            href="/es/planea-tu-viaje/"
+            class={outline}
+            data-responsible-action="plan_trip">Planea tu viaje</a
+          >
+        </div>
+      </div>
+    </section>
+  </div>
+</LocalizedPurpose>
+
+<script>
+  // Reuse the layout's GTM dataLayer. Send only navigation metadata, no personal data.
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const link = event.target.closest<HTMLAnchorElement>(
+      "#responsible-landing a",
+    );
+    if (!link) return;
+    const experience = link.closest<HTMLElement>("[data-responsible-tour]");
+    const action = experience ? "tour" : link.dataset.responsibleAction;
+    if (!action) return;
+    const analytics = window as Window & {
+      dataLayer?: Record<string, unknown>[];
+    };
+    analytics.dataLayer ??= [];
+    analytics.dataLayer.push({
+      event: "responsible_tourism_click",
+      action,
+      destination: link.getAttribute("href"),
+      ...(experience
+        ? {
+            tour_slug: experience.dataset.responsibleTour,
+            experience_kind: experience.dataset.experienceKind,
+          }
+        : {}),
+      page_location: window.location.href,
+    });
+  });
+</script>

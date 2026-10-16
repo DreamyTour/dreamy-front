@@ -1,0 +1,9 @@
+---
+import SustainableTourismContent from "@/components/content/SustainableTourismContent.astro";
+import { getSustainableFrontmatter } from "@/lib/sustainableTourism";
+
+// Resolve CMS metadata inside getStaticPaths, never in the Worker module scope.
+export const getFrontmatter = getSustainableFrontmatter;
+---
+
+<SustainableTourismContent />

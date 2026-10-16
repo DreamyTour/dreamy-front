@@ -745,6 +745,13 @@ html {
   overflow-x: hidden;
 }
 
+/* Align editorial pages with the main site's max-w-8xl / px-6 container. */
+.page-shell {
+  width: calc(100% - 3rem);
+  max-width: calc(var(--max-width-8xl) - 3rem);
+  margin-inline: auto;
+}
+
 /* ============================================
    THEME TOKENS
    ============================================ */

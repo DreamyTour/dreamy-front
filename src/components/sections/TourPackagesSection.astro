@@ -1,4 +1,5 @@
 ---
+import SectionDivider from "@/components/ui/SectionDivider.astro";
 import ToursSlider from "@/components/ui/ToursSlider.astro";
 import { useTranslations } from "@/i18n/ui";
 import type { Lang } from "@/lib/i18n";
@@ -71,22 +72,7 @@ const ctaLabel = t(ctaLabelKey);
       >
         <span class="relative z-10">{data.titulo}</span>
       </h2>
-
-      <span
-        class="mb-6 mt-4 flex items-center justify-center gap-3"
-        aria-hidden="true"
-      >
-        <span class="h-px w-16 bg-gradient-to-r from-transparent to-secondary"
-        ></span>
-        <span class="relative h-1.5 w-12 rounded-full bg-secondary">
-          <span
-            class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-          >
-          </span>
-        </span>
-        <span class="h-px w-16 bg-gradient-to-l from-transparent to-secondary"
-        ></span>
-      </span>
+      <SectionDivider align="center" />
 
       {
         data.description && (

@@ -1,0 +1,249 @@
+---
+import LocalizedPurpose from "@/components/content/LocalizedPurpose.astro";
+import SectionDivider from "@/components/ui/SectionDivider.astro";
+import { ArrowRight, ArrowUpRight, Gift, BookOpen, Sprout } from "lucide-react";
+
+const pillars = [
+  {
+    icon: Gift,
+    tone: "secondary",
+    title: "Navidad en comunidad",
+    text: "Compartimos juguetes, chocolatada, juegos y dinámicas con niños y familias. Una ocasión para reunirnos y celebrar juntos.",
+  },
+  {
+    icon: BookOpen,
+    tone: "primary",
+    title: "Apoyo a la educación",
+    text: "Entregamos mochilas, cuadernos y útiles escolares para que los niños cuenten con materiales que los acompañen en sus clases.",
+  },
+  {
+    icon: Sprout,
+    tone: "primary",
+    title: "Cuidado del entorno",
+    text: "Promovemos el cuidado de los ecosistemas de Cusco y el Valle Sagrado mediante la reforestación con especies nativas.",
+  },
+];
+---
+
+<LocalizedPurpose>
+  <div
+    class="social-page bg-background pb-20 text-foreground [&_p]:leading-[1.8] [&_figure]:m-0 [&_img]:h-auto [&_img]:w-full [&_img]:rounded-2xl [&_img]:object-cover [&_h2]:mb-5 [&_h2]:text-[clamp(2rem,1.5rem+1.7vw,3rem)] [&_h2]:font-semibold [&_h2]:leading-[1.15] [&_h2]:tracking-[-0.035em] [&_h3]:mb-4 [&_h3]:text-[1.45rem] [&_h3]:font-semibold [&_h3]:leading-[1.2] [&_h3]:tracking-[-0.035em] [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-primary"
+  >
+    <section
+      class="social-wrap page-shell social-objective grid items-center gap-10 py-12 min-[800px]:grid-cols-[0.9fr_1.3fr] min-[800px]:gap-16 min-[800px]:py-16 [&_img]:aspect-[1.6] [&>div>p:not(:first-child)]:mt-4 [&>div>p:not(:first-child)]:text-muted-foreground"
+      aria-labelledby="social-objective-title"
+    >
+      <div>
+        <p
+          class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+        >
+          Nuestro objetivo
+        </p>
+        <h2 id="social-objective-title">
+          Un impacto positivo<br />que perdure.
+        </h2>
+        <SectionDivider />
+        <p>
+          Nuestro compromiso va más allá del turismo. Creemos en un apoyo
+          integral que fortalezca el presente y siembre las semillas para un
+          futuro mejor.
+        </p>
+        <p>
+          La educación, el bienestar de las familias y la protección de nuestro
+          patrimonio natural guían las iniciativas que impulsamos.
+        </p>
+      </div>
+      <figure>
+        <img
+          src="/imagenes/proyecto-social/navidad/2024-saylla/foto-01-800.webp"
+          srcset="/imagenes/proyecto-social/navidad/2024-saylla/foto-01-800.webp 800w, /imagenes/proyecto-social/navidad/2024-saylla/foto-01.webp 1600w"
+          sizes="(min-width: 800px) 55vw, 100vw"
+          alt="Equipo de Dreamy Tours y participantes de la celebración navideña en Saylla, 2024"
+          width="1600"
+          height="1067"
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
+    </section>
+
+    <section
+      class="social-wrap page-shell social-commitment my-12 grid items-center gap-10 rounded-3xl bg-primary/5 p-10 min-[800px]:grid-cols-[0.8fr_1.2fr] min-[800px]:gap-16 min-[800px]:p-16 [&>div:last-child>p:not(:first-child)]:mt-4 [&>div:last-child>p:not(:first-child)]:text-muted-foreground"
+      aria-labelledby="social-commitment-title"
+    >
+      <div
+        class="social-commitment-note max-w-[19rem] border-l-2 border-primary pl-6 text-primary [&>span]:text-[5rem] [&>span]:leading-[0.8] [&>p]:text-[1.55rem] [&>p]:leading-[1.4] [&>p]:tracking-[-0.02em] [&>small]:mt-6 [&>small]:block [&>small]:text-xs [&>small]:uppercase [&>small]:tracking-widest"
+      >
+        <span aria-hidden="true">“</span><p>
+          El turismo es una poderosa herramienta para transformar realidades.
+        </p><small>Dreamy Tours</small>
+      </div>
+      <div>
+        <p
+          class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+        >
+          Nuestro compromiso
+        </p>
+        <h2 id="social-commitment-title">
+          Con las personas.<br />Con nuestro entorno.
+        </h2>
+        <SectionDivider />
+        <p>
+          Cada proyecto, cada sonrisa y cada árbol plantado refuerza nuestra
+          promesa de operar de manera responsable y ética.
+        </p>
+        <p>
+          Queremos que las comunidades que nos reciben formen parte de una
+          historia de oportunidades, respeto y cuidado compartido.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="social-wrap page-shell social-support py-12 [&>header>p:last-child]:text-muted-foreground"
+      aria-labelledby="social-support-title"
+    >
+      <header>
+        <p
+          class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+        >
+          Nuestros pilares de acción
+        </p><h2 id="social-support-title">¿Cómo apoyamos?</h2>
+        <SectionDivider /><p>
+          Educación, encuentros con las familias y cuidado de los lugares que
+          visitamos.
+        </p>
+      </header>
+      <div class="social-pillars mt-8 grid gap-5 min-[800px]:grid-cols-3">
+        {
+          pillars.map(({ icon: Icon, tone, title, text }) => (
+            <article
+              class:list={[
+                "social-pillar rounded-xl border border-border border-t-2 bg-background px-6 py-7",
+                tone === "secondary"
+                  ? "border-t-secondary"
+                  : "border-t-primary",
+              ]}
+            >
+              <Icon
+                size={28}
+                strokeWidth={1.5}
+                className={
+                  tone === "secondary"
+                    ? "mb-5 text-secondary"
+                    : "mb-5 text-primary"
+                }
+                aria-hidden="true"
+              />
+              <h3>{title}</h3>
+              <p class="text-sm text-muted-foreground">{text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section
+      class="social-wrap page-shell social-projects scroll-mt-32 py-12 [&>header]:mb-12"
+      id="iniciativas"
+      aria-labelledby="social-projects-title"
+    >
+      <header>
+        <p
+          class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+        >
+          Del compromiso a la acción
+        </p><h2 id="social-projects-title">Nuestras iniciativas</h2>
+        <SectionDivider />
+      </header>
+      <article
+        class="social-project mb-16 grid items-center gap-8 min-[800px]:grid-cols-[1.2fr_1fr] min-[800px]:gap-16 [&>img]:aspect-[1.5] [&_h3]:text-[clamp(2rem,1.5rem+1vw,2.6rem)] [&>div>p:not(:first-child)]:text-muted-foreground"
+      >
+        <img
+          src="/imagenes/proyecto-social/navidad/2025-saylla/3-800.webp"
+          srcset="/imagenes/proyecto-social/navidad/2025-saylla/3-800.webp 800w, /imagenes/proyecto-social/navidad/2025-saylla/3.webp 1600w"
+          sizes="(min-width: 800px) 55vw, 100vw"
+          alt="Niños y familias participando en la campaña navideña de Saylla, 2025"
+          width="1600"
+          height="1067"
+          loading="lazy"
+          decoding="async"
+        />
+        <div>
+          <p
+            class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+          >
+            Compartir · Celebrar · Acompañar
+          </p><h3>
+            Una Navidad<br />para compartir
+          </h3><p>
+            Desde el año 2020 vivimos la Navidad de una manera especial. Más
+            allá de los viajes y las rutas que recorremos cada día, creemos que
+            esta época es el mejor momento para compartir, agradecer y llevar
+            alegría a quienes más lo necesitan.
+          </p><a
+            class="social-text-link mt-4 inline-flex min-h-11 items-center gap-3 rounded-full border border-secondary bg-secondary px-5 py-2.5 text-sm font-semibold leading-snug text-secondary-foreground no-underline transition-colors hover:bg-white hover:text-secondary hover:no-underline focus-visible:outline-secondary motion-reduce:transition-none"
+            href="/es/proyecto-social/proyecto-navideno/"
+            >Conoce el proyecto navideño <ArrowRight
+              size={20}
+              aria-hidden="true"
+            /></a
+          >
+        </div>
+      </article>
+      <article
+        class="social-project mb-16 grid items-center gap-8 min-[800px]:grid-cols-[1.2fr_1fr] min-[800px]:gap-16 [&>img]:aspect-[1.5] [&_h3]:text-[clamp(2rem,1.5rem+1vw,2.6rem)] [&>div>p:not(:first-child)]:text-muted-foreground social-project-reverse min-[800px]:grid-cols-[1fr_1.2fr] min-[800px]:[&>img]:col-start-2 min-[800px]:[&>img]:row-start-1 min-[800px]:[&>div]:col-start-1 min-[800px]:[&>div]:row-start-1"
+      >
+        <img
+          src="/imagenes/proyecto-social/utiles.webp"
+          alt="Entrega de materiales educativos y mochilas en una comunidad rural"
+          width="1200"
+          height="686"
+          loading="lazy"
+          decoding="async"
+        />
+        <div>
+          <p
+            class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+          >
+            Aprender · Crecer · Soñar
+          </p><h3>
+            Herramientas para<br />un nuevo comienzo
+          </h3><p>
+            Creemos que cada niño merece comenzar el año escolar con ilusión y
+            las herramientas necesarias para aprender. Nuestro equipo se une
+            para llevar útiles escolares, mochilas y materiales educativos a
+            niños de comunidades rurales del Cusco y del Valle Sagrado.
+          </p><a
+            class="social-text-link mt-4 inline-flex min-h-11 items-center gap-3 rounded-full border border-secondary bg-secondary px-5 py-2.5 text-sm font-semibold leading-snug text-secondary-foreground no-underline transition-colors hover:bg-white hover:text-secondary hover:no-underline focus-visible:outline-secondary motion-reduce:transition-none"
+            href="/es/proyecto-social/entrega-de-utiles-escolares/"
+            >Conoce la entrega de útiles <ArrowRight
+              size={20}
+              aria-hidden="true"
+            /></a
+          >
+        </div>
+      </article>
+    </section>
+
+    <section
+      class="social-wrap page-shell social-cta rounded-3xl bg-primary/5 px-6 py-12 text-center min-[800px]:p-16 [&>p:not(:first-child)]:text-muted-foreground [&>a]:mt-6 [&>a]:inline-flex [&>a]:items-center [&>a]:gap-3 [&>a]:rounded-full [&>a]:bg-primary [&>a]:px-6 [&>a]:py-3.5 [&>a]:font-semibold [&>a]:text-primary-foreground [&>a:hover]:bg-primary/90"
+      aria-labelledby="social-cta-title"
+    >
+      <p
+        class="social-eyebrow mb-4 text-[0.73rem] font-semibold uppercase tracking-[0.15em] text-primary"
+      >
+        Sigamos conectando
+      </p><h2 id="social-cta-title">El propósito se comparte.</h2>
+      <SectionDivider align="center" /><p>
+        Si quieres conocer más sobre nuestras iniciativas, conversemos.
+      </p><a
+        href="mailto:info@dreamy.tours?subject=Proyecto%20Social%20Dreamy%20Tours"
+        >Conversemos sobre el proyecto <ArrowUpRight
+          size={20}
+          aria-hidden="true"
+        /></a
+      >
+    </section>
+  </div>
+</LocalizedPurpose>

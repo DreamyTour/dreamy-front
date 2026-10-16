@@ -3,6 +3,43 @@ import { DEFAULT_LANG } from "@/lib/i18n";
 
 export const ui = {
 	es: {
+		"purpose.eyebrow": "Nuestros compromisos",
+		"purpose.title": "Turismo con",
+		"purpose.highlight": "propósito",
+		"purpose.description":
+			"Creemos en una manera de viajar que respeta la naturaleza, celebra nuestras culturas, abre oportunidades para todos y contribuye al bienestar de las comunidades",
+		"purpose.readMore": "Leer más",
+		"purpose.readAbout": "Leer más sobre",
+		"purpose.comingSoon": "Contenido próximamente",
+		"purpose.sustainable.label": "Cuidar",
+		"purpose.sustainable.title": "Turismo sostenible",
+		"purpose.sustainable.description":
+			"Viajar con respeto por la naturaleza y el entorno de cada destino.",
+		"purpose.sustainable.alt":
+			"Viajeros junto a un gran árbol en el bosque tropical del Perú",
+		"purpose.inclusive.label": "Incluir",
+		"purpose.inclusive.title": "Turismo inclusivo",
+		"purpose.inclusive.alt":
+			"Grupo de viajeros disfrutando las terrazas y paisajes del Valle Sagrado, Cusco",
+		"purpose.inclusive.description":
+			"Experiencias pensadas para diferentes capacidades, necesidades y formas de viajar.",
+		"purpose.responsible.label": "Respetar",
+		"purpose.responsible.title": "Turismo responsable",
+		"purpose.responsible.alt":
+			"Anfitriones de Misminay y viajeros junto a textiles y productos locales",
+		"purpose.responsible.description":
+			"Experiencias que respetan las tradiciones y valoran a las comunidades locales.",
+		"purpose.cultural.label": "Valorar",
+		"purpose.cultural.title": "Turismo cultural",
+		"purpose.cultural.description":
+			"Conectar con la historia, las tradiciones y la identidad de nuestras comunidades.",
+		"purpose.cultural.alt": "Artesanías, tejidos y prendas tradicionales en un puesto de Cusco",
+		"purpose.social.label": "Compartir",
+		"purpose.social.title": "Proyecto social",
+		"purpose.social.description":
+			"Compartir oportunidades con las comunidades de Cusco y el Valle Sagrado.",
+		"purpose.social.alt":
+			"Equipo de Dreamy Tours y participantes de la campaña navideña en Saylla, 2024",
 		"tour.verItinerario": "Ver Itinerario",
 		"tour.cardBadge.bestSeller": "Best seller",
 		"tour.cardBadge.promotion": "Promoción",
@@ -28,6 +65,43 @@ export const ui = {
 		"section.sinTours": "Próximamente agregaremos tours en esta sección.",
 	},
 	en: {
+		"purpose.eyebrow": "Our commitments",
+		"purpose.title": "Travel with",
+		"purpose.highlight": "purpose",
+		"purpose.description":
+			"We believe in a way of travelling that respects nature, celebrates our cultures, creates opportunities for everyone and contributes to the well-being of communities",
+		"purpose.readMore": "Read more",
+		"purpose.readAbout": "Read more about",
+		"purpose.comingSoon": "Content coming soon",
+		"purpose.sustainable.label": "Care",
+		"purpose.sustainable.title": "Sustainable tourism",
+		"purpose.sustainable.description":
+			"Travelling with respect for nature and the surroundings of each destination.",
+		"purpose.sustainable.alt":
+			"Travelers beside a large tree in Peru's tropical forest",
+		"purpose.inclusive.label": "Include",
+		"purpose.inclusive.title": "Inclusive tourism",
+		"purpose.inclusive.alt":
+			"Group of travelers enjoying the terraces and landscapes of the Sacred Valley, Cusco",
+		"purpose.inclusive.description":
+			"Experiences designed for different abilities, needs and ways of travelling.",
+		"purpose.responsible.label": "Respect",
+		"purpose.responsible.title": "Responsible tourism",
+		"purpose.responsible.alt":
+			"Misminay hosts and travellers beside local textiles and produce",
+		"purpose.responsible.description":
+			"Experiences that respect traditions and value local communities.",
+		"purpose.cultural.label": "Value",
+		"purpose.cultural.title": "Cultural tourism",
+		"purpose.cultural.description":
+			"Connecting with the history, traditions and identity of our communities.",
+		"purpose.cultural.alt": "Handicrafts, textiles and traditional clothing at a stall in Cusco",
+		"purpose.social.label": "Share",
+		"purpose.social.title": "Social project",
+		"purpose.social.description":
+			"Sharing opportunities with communities in Cusco and the Sacred Valley.",
+		"purpose.social.alt":
+			"Dreamy Tours team and participants at the 2024 Christmas campaign in Saylla",
 		"tour.verItinerario": "View Itinerary",
 		"tour.cardBadge.bestSeller": "Best seller",
 		"tour.cardBadge.promotion": "Promotion",
@@ -53,6 +127,43 @@ export const ui = {
 		"section.sinTours": "Tours coming soon to this section.",
 	},
 	pt: {
+		"purpose.eyebrow": "Nossos compromissos",
+		"purpose.title": "Turismo com",
+		"purpose.highlight": "propósito",
+		"purpose.description":
+			"Acreditamos em uma forma de viajar que respeita a natureza, celebra nossas culturas, abre oportunidades para todos e contribui para o bem-estar das comunidades",
+		"purpose.readMore": "Leia mais",
+		"purpose.readAbout": "Leia mais sobre",
+		"purpose.comingSoon": "Conteúdo em breve",
+		"purpose.sustainable.label": "Cuidar",
+		"purpose.sustainable.title": "Turismo sustentável",
+		"purpose.sustainable.description":
+			"Viajar com respeito pela natureza e pelo entorno de cada destino.",
+		"purpose.sustainable.alt":
+			"Viajantes ao lado de uma grande árvore na floresta tropical do Peru",
+		"purpose.inclusive.label": "Incluir",
+		"purpose.inclusive.title": "Turismo inclusivo",
+		"purpose.inclusive.alt":
+			"Grupo de viajantes aproveitando os terraços e as paisagens do Vale Sagrado, Cusco",
+		"purpose.inclusive.description":
+			"Experiências pensadas para diferentes capacidades, necessidades e formas de viajar.",
+		"purpose.responsible.label": "Respeitar",
+		"purpose.responsible.title": "Turismo responsável",
+		"purpose.responsible.alt":
+			"Anfitriões de Misminay e viajantes junto a tecidos e produtos locais",
+		"purpose.responsible.description":
+			"Experiências que respeitam as tradições e valorizam as comunidades locais.",
+		"purpose.cultural.label": "Valorizar",
+		"purpose.cultural.title": "Turismo cultural",
+		"purpose.cultural.description":
+			"Conectar-se com a história, as tradições e a identidade de nossas comunidades.",
+		"purpose.cultural.alt": "Artesanatos, tecidos e roupas tradicionais em uma banca de Cusco",
+		"purpose.social.label": "Compartilhar",
+		"purpose.social.title": "Projeto social",
+		"purpose.social.description":
+			"Compartilhar oportunidades com as comunidades de Cusco e do Vale Sagrado.",
+		"purpose.social.alt":
+			"Equipe da Dreamy Tours e participantes da campanha de Natal em Saylla, 2024",
 		"tour.verItinerario": "Ver Itinerário",
 		"tour.cardBadge.bestSeller": "Best seller",
 		"tour.cardBadge.promotion": "Promoção",

@@ -1,0 +1,42 @@
+---
+interface Evidence {
+  title: string;
+  description: string;
+  sourceUrl: string;
+  verifiedAt: string;
+  partner?: string;
+}
+interface Props {
+  items?: Evidence[];
+}
+const { items = [] } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <div
+      class="mt-8 grid gap-6 md:grid-cols-2"
+      aria-label="Compromisos documentados"
+    >
+      {items.map((item) => (
+        <article class="rounded-2xl border border-border p-6">
+          <h3 class="text-xl font-semibold">{item.title}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {item.description}
+          </p>
+          {item.partner && <p class="mt-3 text-sm">{item.partner}</p>}
+          <p class="mt-4 text-xs text-muted-foreground">
+            Verificado:{" "}
+            <time datetime={item.verifiedAt}>{item.verifiedAt}</time>
+          </p>
+          <a
+            href={item.sourceUrl}
+            class="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          >
+            Consultar la fuente
+          </a>
+        </article>
+      ))}
+    </div>
+  )
+}

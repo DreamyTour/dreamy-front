@@ -1,6 +1,6 @@
 ---
+import SectionDivider from "@/components/ui/SectionDivider.astro";
 import type { Lang } from "@/lib/i18n";
-import { useTranslations } from "@/i18n/ui";
 import TripAdvisorLogo from "@/assets/certification/certificado-tripadvisor.svg?url";
 
 interface Props {
@@ -8,9 +8,8 @@ interface Props {
 }
 
 const { lang } = Astro.props;
-const t = useTranslations(lang);
 
-type ReviewSource = "tripadvisor" | "google";
+type ReviewSource = "tripadvisor" | "google" | "trustpilot";
 type Review = {
   source: ReviewSource;
   author: string;
@@ -26,8 +25,13 @@ type SourceSummary = {
   url: string;
 };
 
-const sourceOrder: ReviewSource[] = ["tripadvisor", "google"];
+const sourceOrder: ReviewSource[] = ["tripadvisor", "google", "trustpilot"];
 const sourceLabels = {
+  trustpilot: {
+    name: "Trustpilot",
+    panelClass: "review-source-panel--trustpilot",
+    cardClass: "review-card--trustpilot",
+  },
   tripadvisor: {
     name: "Tripadvisor",
     panelClass: "review-source-panel--tripadvisor",
@@ -46,21 +50,35 @@ const reviewCopy = {
     basedOn: "Basado en",
     reviews: "opiniones",
     of: "De 5 estrellas",
-    full: "Ver la opinion completa",
+    full: "Ver en la plataforma",
+    title: "Lo que cuentan nuestros viajeros",
+    description:
+      "Experiencias compartidas en TripAdvisor, Google y Trustpilot.",
+    more: "Leer más",
+    less: "Leer menos",
   },
   en: {
     brandTour: "Dreamy Tours",
     basedOn: "Based on",
     reviews: "reviews",
     of: "Out of 5 stars",
-    full: "Read full review",
+    full: "View on platform",
+    title: "Stories from our travelers",
+    description: "Experiences shared on TripAdvisor, Google and Trustpilot.",
+    more: "Read more",
+    less: "Read less",
   },
   pt: {
     brandTour: "Dreamy Tours",
     basedOn: "Baseado em",
-    reviews: "avaliacoes",
+    reviews: "avaliações",
     of: "De 5 estrelas",
-    full: "Ver avaliacao completa",
+    full: "Ver na plataforma",
+    title: "O que contam nossos viajantes",
+    description:
+      "Experiências compartilhadas no TripAdvisor, Google e Trustpilot.",
+    more: "Leia mais",
+    less: "Leia menos",
   },
 };
 
@@ -70,8 +88,10 @@ const tripadvisorUrl =
   "https://www.tripadvisor.com.pe/Attraction_Review-g294314-d17325827-Reviews-Dreamy_Tours-Cusco_Cusco_Region.html";
 const googleUrl =
   "https://www.google.com/maps/place/Dreamy+Tours/@-13.524429,-71.9506049,1057m/data=!3m2!1e3!4b1!4m6!3m5!1s0x916dd587b52c49c5:0xdaa973fe4585e28a!8m2!3d-13.5244342!4d-71.94803!16s%2Fg%2F11fkv9g6rk";
+const trustpilotUrl = "https://www.trustpilot.com/review/dreamy.tours";
 
 const sourceSummaries: Record<ReviewSource, SourceSummary> = {
+  trustpilot: { rating: 5.0, reviewCount: 3, url: trustpilotUrl },
   tripadvisor: {
     rating: 4.9,
     reviewCount: 12910,
@@ -86,13 +106,40 @@ const sourceSummaries: Record<ReviewSource, SourceSummary> = {
 
 const reviews: Review[] = [
   {
-    source: "tripadvisor",
-    author: "Valeria N",
-    title: "Estuvo todo excelente",
-    text: "Fue una experiencia increible. Mucho mas de lo que imaginaba. El guia llevo un ritmo acorde para llegar bien, la comida fue variada y abundante. Todo de 10.",
+    source: "trustpilot",
+    author: "Raíza Celeghin Benedecti",
+    title: "Viagem em família pelo Peru",
+    text: "Viajamos em família e a Lia e Luciana nos ajudaram a organizar tudo, sempre atentas aos detalhes, pedidos especiais do grupo e orientações. Ainda, selecionaram um lunch box para a trilha de 2 dias e um restaurante no tour do Vale Sagrado que nos surpreenderam positivamente. Os almoços foram deliciosos, cheios de sabores peruanos!\n\nFizemos 3 tours com a Dreamy Tours e os 3 guias que nos receberam (Andi, Jimmy e Paula) foram excepcionais! Nos explicaram todos os detalhes e todas as histórias dos locais visitados.",
     rating: 5,
-    date: "2026-05-04",
-    url: "https://www.tripadvisor.com.pe/ShowUserReviews-g294314-d17325827-r1059010011-Dreamy_Tours-Cusco_Cusco_Region.html",
+    date: "2026-09-18",
+    url: trustpilotUrl,
+  },
+  {
+    source: "trustpilot",
+    author: "Yuri Alata tacusi",
+    title: "Perfecto para viajar con niños",
+    text: "Hemos hecho el paquete de 10 días con nuestros dos hijos y ha sido un acierto. Todo muy bien atado: vuelos, traslados, excursiones y hoteles. Los niños disfrutaron muchísimo y nosotros pudimos relajarnos porque no tuvimos que preocuparnos de nada. El guía local era muy simpático y paciente con los peques. Repetiríamos sin dudar.",
+    rating: 5,
+    date: "2026-07-16",
+    url: trustpilotUrl,
+  },
+  {
+    source: "trustpilot",
+    author: "Roel Jhonatan",
+    title: "Muy recomendado desde inicio a fin",
+    text: "Muy recomendado desde inicio a fin, compre mi paquete Lima - Puno - Arequipa y Cusco. Todo una experiencia inolvidable muy recomendado al 100%",
+    rating: 5,
+    date: "2022-04-22",
+    url: trustpilotUrl,
+  },
+  {
+    source: "tripadvisor",
+    author: "Attorla",
+    title: "Arropados en Peru",
+    text: "Nos hemos sentido muy a gusto durante toda nuestra estancia y visitas, un 5 con asterisco para esta empresa, de volver repetiremos con ellos",
+    rating: 5,
+    date: "2026-09-28",
+    url: tripadvisorUrl,
   },
   {
     source: "tripadvisor",
@@ -146,6 +193,7 @@ const formatDate = (date: string | undefined) => {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "UTC",
   }).format(parsed);
 };
 
@@ -161,45 +209,39 @@ const getSourceReviews = (source: ReviewSource) =>
   aria-labelledby="reviews-wall-title"
 >
   <div class="mx-auto max-w-8xl px-6">
-    <header class="mb-12 max-w-3xl">
+    <header class="mb-8 max-w-3xl">
       <h2
         id="reviews-wall-title"
-        class="relative mb-2 inline-block text-4xl font-bold leading-tight tracking-tight text-gray-900 md:text-5xl"
+        class="relative mb-2 inline-block text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl"
       >
-        <span class="relative z-10">{t("reviews.title")}</span>
+        <span class="relative z-10">{reviewLabels.title}</span>
       </h2>
-      <div
-        class="mb-6 mt-4 flex items-center justify-start gap-3"
-        aria-hidden="true"
-      >
-        <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary">
-        </div>
-        <div class="relative h-1.5 w-12 rounded-full bg-secondary">
-          <div
-            class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-          >
-          </div>
-        </div>
-        <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary">
-        </div>
-      </div>
+      <SectionDivider />
+
       <p class="text-base leading-relaxed text-gray-600">
-        {t("reviews.description")}
+        {reviewLabels.description}
       </p>
     </header>
-    <div class="reviews-rows">
-      {
-        sourceOrder.map((source) => {
-          const summary = sourceSummaries[source];
-          const label = sourceLabels[source]; /*  */
-
-          return (
-            <div class={`review-source-row review-source-row--${source}`}>
-              <a
+    <review-tabs class="block" data-active-source="tripadvisor">
+      <div
+        class="review-tabs-list"
+        role="tablist"
+        aria-labelledby="reviews-wall-title"
+      >
+        {
+          sourceOrder.map((source, index) => {
+            const summary = sourceSummaries[source];
+            const label = sourceLabels[source];
+            return (
+              <button
+                type="button"
+                role="tab"
+                id={`reviews-tab-${source}`}
+                aria-controls={`reviews-panel-${source}`}
+                aria-selected={index === 0 ? "true" : "false"}
+                tabindex={index === 0 ? 0 : -1}
+                data-source={source}
                 class={`review-source-panel ${label.panelClass}`}
-                href={summary.url}
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 <span
                   class={`review-brand-logo review-brand-logo--${source}`}
@@ -230,6 +272,13 @@ const getSourceReviews = (source: ReviewSource) =>
                         Reviews
                       </span>
                     </>
+                  ) : source === "trustpilot" ? (
+                    <span class="trustpilot-wordmark">
+                      <span class="trustpilot-star" aria-hidden="true">
+                        ★
+                      </span>
+                      Trustpilot
+                    </span>
                   ) : (
                     <img
                       class="tripadvisor-logo-img"
@@ -264,7 +313,23 @@ const getSourceReviews = (source: ReviewSource) =>
                   {new Intl.NumberFormat(lang).format(summary.reviewCount)}{" "}
                   {reviewLabels.reviews}
                 </span>
-              </a>
+              </button>
+            );
+          })
+        }
+      </div>
+      {
+        sourceOrder.map((source, index) => {
+          const label = sourceLabels[source];
+          return (
+            <div
+              role="tabpanel"
+              id={`reviews-panel-${source}`}
+              aria-labelledby={`reviews-tab-${source}`}
+              tabindex="0"
+              hidden={index !== 0}
+              class={`review-tab-panel review-source-row--${source}`}
+            >
               <div class="review-row-cards">
                 {getSourceReviews(source).map((review) => (
                   <article class={`review-card ${label.cardClass}`}>
@@ -276,6 +341,10 @@ const getSourceReviews = (source: ReviewSource) =>
                       {source === "google" ? (
                         <span class="g-blue" aria-hidden="true">
                           G
+                        </span>
+                      ) : source === "trustpilot" ? (
+                        <span class="trustpilot-star" aria-hidden="true">
+                          ★
                         </span>
                       ) : (
                         <img
@@ -296,7 +365,9 @@ const getSourceReviews = (source: ReviewSource) =>
                       </span>
                       <div class="review-card__author">
                         <h3 class="review-author">{review.author}</h3>
-                        <p class="review-date">{formatDate(review.date)}</p>
+                        <time class="review-date" datetime={review.date}>
+                          {formatDate(review.date)}
+                        </time>
                       </div>
                     </div>
                     <p class="review-title">{review.title || label.name}</p>
@@ -314,7 +385,27 @@ const getSourceReviews = (source: ReviewSource) =>
                         />
                       ))}
                     </span>
-                    <p class="review-text">{review.text}</p>
+                    {review.text.length > 210 ? (
+                      <div class="review-expand">
+                        <p
+                          id={`review-${source}-${reviews.indexOf(review)}`}
+                          class="review-text"
+                        >
+                          {review.text}
+                        </p>
+                        <button
+                          type="button"
+                          class="review-expand-toggle"
+                          aria-expanded="false"
+                          aria-controls={`review-${source}-${reviews.indexOf(review)}`}
+                        >
+                          <span class="review-more">{reviewLabels.more}</span>
+                          <span class="review-less">{reviewLabels.less}</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <p class="review-text">{review.text}</p>
+                    )}
                     {review.url && (
                       <a
                         class="review-link"
@@ -328,396 +419,601 @@ const getSourceReviews = (source: ReviewSource) =>
                   </article>
                 ))}
               </div>
+              <a
+                class="review-all"
+                href={sourceSummaries[source].url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {reviewLabels.full} <span aria-hidden="true">↗</span>
+              </a>
             </div>
           );
         })
       }
-    </div>
+    </review-tabs>
   </div>
 </section>
 
+<script>
+  class ReviewTabs extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = "true";
+      const tabs = Array.from(
+        this.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+      );
+      const panels = Array.from(
+        this.querySelectorAll<HTMLElement>('[role="tabpanel"]'),
+      );
+      const select = (index: number, focus = false) => {
+        tabs.forEach((tab, i) => {
+          tab.setAttribute("aria-selected", String(i === index));
+          tab.tabIndex = i === index ? 0 : -1;
+          panels[i].hidden = i !== index;
+        });
+        this.dataset.activeSource = tabs[index].dataset.source;
+        if (focus) tabs[index].focus();
+      };
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => select(index));
+        tab.addEventListener("keydown", (event) => {
+          let next = index;
+          if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+          else if (event.key === "ArrowLeft")
+            next = (index - 1 + tabs.length) % tabs.length;
+          else if (event.key === "Home") next = 0;
+          else if (event.key === "End") next = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          select(next, true);
+        });
+      });
+    }
+  }
+  if (!customElements.get("review-tabs"))
+    customElements.define("review-tabs", ReviewTabs);
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const button = event.target.closest<HTMLButtonElement>(
+      ".review-expand-toggle",
+    );
+    if (!button) return;
+    const expanded = button.getAttribute("aria-expanded") !== "true";
+    button.setAttribute("aria-expanded", String(expanded));
+    button.closest(".review-expand")?.classList.toggle("is-expanded", expanded);
+  });
+</script>
+
 <style is:global>
-  .reviews-wall {
-    position: relative;
-    overflow: clip;
-    background: linear-gradient(
-      180deg,
-      #fff 0%,
-      color-mix(in oklab, var(--muted) 68%, white) 100%
-    );
-    color: var(--foreground);
-  }
-
-  .reviews-wall::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      linear-gradient(
-        color-mix(in oklab, var(--border) 32%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in oklab, var(--border) 32%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 42px 42px;
-    mask-image: linear-gradient(
-      180deg,
-      transparent 0%,
-      black 22%,
-      black 72%,
-      transparent 100%
-    );
-    opacity: 0.4;
-  }
-
-  .reviews-wall > div {
-    position: relative;
-  }
-
-  .reviews-rows {
-    display: grid;
-    gap: 1.2rem;
-    container-type: inline-size;
-  }
-
-  .review-source-row {
-    display: grid;
-    grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
-    gap: 1.15rem;
-    align-items: stretch;
-  }
-
-  .review-source-panel {
-    position: relative;
-    display: flex;
-    min-height: 18rem;
-    flex-direction: column;
-    justify-content: center;
-    overflow: hidden;
-    border: 1px solid color-mix(in oklab, var(--border) 74%, white);
-    border-radius: 8px;
-    background:
-      linear-gradient(
-        145deg,
-        rgba(255, 255, 255, 0.98),
-        rgba(255, 255, 255, 0.9)
-      ),
-      radial-gradient(
-        circle at 16% 10%,
-        color-mix(in oklab, var(--secondary) 14%, transparent),
-        transparent 34%
-      );
-    padding: 2rem 1.8rem;
-    color: inherit;
-    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.07);
-    text-decoration: none;
-    transition:
-      border-color 180ms ease,
-      box-shadow 180ms ease,
-      transform 180ms ease;
-  }
-
-  .review-source-panel::before {
-    content: "";
-    position: absolute;
-    inset-block: 1rem;
-    inset-inline-start: 0;
-    width: 0.22rem;
-    border-radius: 999px;
-    background: var(--secondary);
-  }
-
-  .review-source-panel--tripadvisor::before {
-    background: #19c89c;
-  }
-
-  .review-source-panel--google::before {
-    background: linear-gradient(
-      180deg,
-      #4285f4 0%,
-      #34a853 48%,
-      #fbbc04 72%,
-      var(--secondary) 100%
-    );
-  }
-
-  .review-source-panel:hover .review-brand-logo {
-    transform: translateY(-2px);
-  }
-
-  .review-source-panel:hover {
-    border-color: color-mix(in oklab, var(--secondary) 44%, var(--border));
-    box-shadow: 0 22px 52px rgba(15, 23, 42, 0.1);
-    transform: translateY(-1px);
-  }
-
-  .review-brand-logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.62rem;
-    width: max-content;
-    max-width: 100%;
-    font-weight: 900;
-    letter-spacing: 0;
-    transition: transform 180ms ease;
-  }
-
-  .review-brand-logo--tripadvisor {
-    display: block;
-    width: min(100%, 14.6rem);
-  }
-
-  .tripadvisor-logo-img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .review-brand-logo--google {
-    gap: 0;
-    font-size: clamp(1.95rem, 3vw, 2.75rem);
-    line-height: 1;
-  }
-
-  .review-google-word {
-    margin-left: 0.55rem;
-    align-self: flex-end;
-    padding-bottom: 0.18rem;
-    color: #5f6368;
-    font-size: 1.03rem;
-    font-weight: 700;
-    letter-spacing: 0;
-  }
-
-  .g-blue {
-    color: #4285f4;
-  }
-
-  .g-secondary {
-    color: var(--secondary);
-  }
-
-  .g-yellow {
-    color: #fbbc04;
-  }
-
-  .g-green {
-    color: #34a853;
-  }
-
-  .review-source-tour {
-    margin-top: 1.75rem;
-    font-size: 1rem;
-    font-weight: 800;
-    color: color-mix(in oklab, var(--foreground) 84%, white);
-  }
-
-  .review-score-line {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    margin-top: 0.7rem;
-    flex-wrap: wrap;
-  }
-
-  .review-score {
-    font-size: 2.95rem;
-    font-weight: 900;
-    line-height: 0.95;
-    color: color-mix(in oklab, var(--foreground) 80%, black);
-  }
-
-  .review-score-descriptor {
-    max-width: 4rem;
-    font-size: 0.95rem;
-    line-height: 1.05;
-    color: color-mix(in oklab, var(--foreground) 62%, white);
-  }
-
-  .review-total {
-    margin-top: 0.65rem;
-    font-size: 0.95rem;
-    color: color-mix(in oklab, var(--foreground) 62%, white);
-  }
-
-  .review-link {
-    color: var(--secondary);
-  }
-
-  .review-row-cards {
+  .review-tabs-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.15rem;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
   }
-
-  .review-card {
+  review-tabs .review-source-panel {
+    --platform-color: #00aa6c;
     position: relative;
-    min-height: 18rem;
-    overflow: hidden;
-    border: 1px solid color-mix(in oklab, var(--border) 70%, white);
-    border-radius: 8px;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.98),
-        color-mix(in oklab, var(--muted) 42%, white)
-      ),
-      white;
-    padding: 1.35rem 1.35rem 3rem;
-    opacity: 0;
-    transform: translateY(14px);
-    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
-    animation: review-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-content: center;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    width: 100%;
+    min-height: 11rem;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 5px 20px -12px rgb(15 23 42 / 22%);
     transition:
-      border-color 180ms ease,
-      box-shadow 180ms ease,
-      transform 180ms ease;
+      border-color 180ms,
+      box-shadow 180ms,
+      background 180ms;
   }
-
-  .review-card::before {
+  review-tabs .review-source-panel--google {
+    --platform-color: #4285f4;
+  }
+  review-tabs .review-source-panel--trustpilot {
+    --platform-color: #00b67a;
+  }
+  review-tabs .review-source-panel[aria-selected="true"] {
+    border-color: color-mix(in oklab, var(--platform-color) 65%, white);
+    background: linear-gradient(
+      135deg,
+      white 30%,
+      color-mix(in oklab, var(--platform-color) 8%, white)
+    );
+    box-shadow: 0 12px 30px -18px
+      color-mix(in oklab, var(--platform-color) 55%, black);
+  }
+  review-tabs .review-source-panel::after {
     content: "";
     position: absolute;
-    inset-block-start: 0;
-    inset-inline: 0;
-    height: 0.22rem;
-    background: var(--secondary);
-    opacity: 0.95;
+    inset: auto 1.75rem -1px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--platform-color);
+    opacity: 0;
   }
-
-  .review-card--tripadvisor::before {
-    background: #19c89c;
+  review-tabs .review-source-panel[aria-selected="true"]::after {
+    opacity: 1;
   }
-
-  .review-card--google::before {
+  review-tabs .review-source-panel--google[aria-selected="true"] {
+    border-color: transparent;
+    background:
+      linear-gradient(135deg, #fff 30%, #f0f6ff) padding-box,
+      linear-gradient(
+          110deg,
+          #4285f4 0%,
+          #34a853 38%,
+          #fbbc04 66%,
+          #ea4335 100%
+        )
+        border-box;
+  }
+  review-tabs .review-source-panel--google[aria-selected="true"]::after {
     background: linear-gradient(
       90deg,
       #4285f4 0%,
       #34a853 38%,
       #fbbc04 66%,
-      var(--secondary) 100%
+      #ea4335 100%
     );
   }
-
-  .review-card:hover {
-    border-color: color-mix(in oklab, var(--secondary) 45%, var(--border));
-    box-shadow: 0 22px 46px rgba(15, 23, 42, 0.1);
-    transform: translateY(-3px);
+  review-tabs .review-brand-logo {
+    grid-column: 1;
+    width: max-content;
+    max-width: 100%;
   }
-
-  .review-card:nth-child(2) {
-    animation-delay: 70ms;
+  review-tabs .review-brand-logo--tripadvisor {
+    width: 9.5rem;
   }
-
-  .review-card:nth-child(3) {
-    animation-delay: 140ms;
+  review-tabs .review-source-tour {
+    display: none;
   }
-
-  .review-card__header {
-    display: flex;
-    align-items: center;
-    gap: 0.78rem;
-    padding-right: 2.8rem;
+  review-tabs .review-score-line {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
   }
-
-  .review-card__author {
-    min-width: 0;
+  review-tabs .review-score {
+    font-size: 2.5rem;
   }
-
-  .review-avatar {
-    display: inline-flex;
-    width: 3.85rem;
-    height: 3.85rem;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    object-fit: cover;
+  review-tabs .review-score-descriptor {
+    display: none;
+  }
+  review-tabs .review-score-line > .review-stars {
+    flex-basis: auto;
+    margin: 0;
+  }
+  review-tabs .review-total {
+    grid-column: 1;
+    width: auto;
+    margin: 0;
+  }
+  .review-tab-panel[hidden] {
+    display: none !important;
+  }
+  .review-tab-panel {
+    animation: reviews-panel-in 220ms ease-out;
+  }
+  .review-tab-panel .review-row-cards {
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+  .review-tab-panel .review-card {
+    min-height: 23rem;
+    padding: 1.75rem;
+    border-radius: 1.25rem;
+    background: linear-gradient(
+      155deg,
+      white 55%,
+      color-mix(in oklab, var(--review-accent) 4%, white)
+    );
+    box-shadow: 0 12px 30px -22px rgb(15 23 42 / 35%);
+  }
+  .review-tab-panel .review-card::before {
+    inset-inline: 0;
+    height: 3px;
+  }
+  .review-tab-panel .review-card {
+    transition:
+      transform 200ms ease,
+      box-shadow 200ms ease,
+      border-color 200ms ease;
+  }
+  .review-tab-panel .review-card:focus-within {
+    border-color: color-mix(in oklab, var(--review-accent) 45%, var(--border));
+    box-shadow: 0 18px 36px -22px
+      color-mix(in oklab, var(--review-accent) 35%, black);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .review-tab-panel .review-card:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(
+        in oklab,
+        var(--review-accent) 45%,
+        var(--border)
+      );
+      box-shadow: 0 18px 36px -22px
+        color-mix(in oklab, var(--review-accent) 35%, black);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .review-tab-panel .review-card {
+      transition: none;
+    }
+    .review-tab-panel .review-card:hover {
+      transform: none;
+    }
+  }
+  .review-tab-panel .review-card--google::before {
+    background: linear-gradient(
+      90deg,
+      #4285f4 0%,
+      #34a853 38%,
+      #fbbc04 66%,
+      #ea4335 100%
+    );
+    opacity: 1;
+  }
+  .review-tab-panel .review-card--google .review-avatar {
     background: linear-gradient(
       135deg,
       color-mix(in oklab, var(--primary) 28%, white),
       color-mix(in oklab, var(--secondary) 22%, white)
     );
-    color: var(--primary);
-    font-size: 1.15rem;
-    font-weight: 800;
     box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.78),
-      0 8px 18px rgba(15, 23, 42, 0.08);
+      inset 0 0 0 1px rgb(255 255 255 / 78%),
+      0 8px 18px rgb(15 23 42 / 8%);
   }
-
-  .review-avatar--initials {
-    color: color-mix(in oklab, var(--primary) 80%, black);
+  .review-tab-panel .review-avatar {
+    width: 3rem;
+    height: 3rem;
+    font-size: 0.9rem;
+    background: color-mix(in oklab, var(--review-accent) 15%, white);
   }
-
-  .review-author {
+  .review-tab-panel .review-author {
+    font-size: 0.95rem;
+  }
+  .review-tab-panel .review-date {
+    font-size: 0.75rem;
+  }
+  .review-tab-panel .review-title {
+    margin-top: 1.4rem;
+    font-size: 1.1rem;
+  }
+  .review-tab-panel .review-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+  .review-tab-panel .review-link {
+    font-size: 0.85rem;
+  }
+  .review-tab-panel .review-platform-badge {
+    top: 1.75rem;
+    right: 1.5rem;
+  }
+  .review-all {
+    display: flex;
+    width: fit-content;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem auto 0;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  @keyframes reviews-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (max-width: 820px) {
+    .review-tabs-list {
+      gap: 0.65rem;
+    }
+    review-tabs .review-source-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.65rem;
+      min-height: 12rem;
+      padding: 1rem 0.65rem;
+      text-align: center;
+    }
+    review-tabs .review-score-line {
+      align-items: center;
+    }
+    review-tabs .review-score {
+      font-size: 1.9rem;
+    }
+    review-tabs .review-total {
+      font-size: 0.65rem;
+    }
+    review-tabs .review-brand-logo--tripadvisor {
+      width: 7rem;
+    }
+    review-tabs .review-brand-logo--google,
+    review-tabs .trustpilot-wordmark {
+      font-size: 1.25rem;
+    }
+    review-tabs .review-google-word {
+      display: none;
+    }
+    .review-tab-panel .review-row-cards {
+      display: flex;
+      overflow-x: auto;
+      gap: 1rem;
+      padding: 0.25rem 0.25rem 1rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
+    .review-tab-panel .review-card {
+      flex: 0 0 min(85%, 23rem);
+      min-height: 22rem;
+      scroll-snap-align: start;
+      padding: 1.4rem;
+    }
+  }
+  @media (max-width: 420px) {
+    review-tabs .review-brand-logo--tripadvisor {
+      width: 5.25rem;
+    }
+    review-tabs .review-brand-logo--google,
+    review-tabs .trustpilot-wordmark {
+      font-size: 1.05rem;
+    }
+    review-tabs .review-source-panel {
+      padding-inline: 0.35rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .review-tab-panel {
+      animation: none;
+    }
+    review-tabs .review-source-panel {
+      transition: none;
+    }
+  }
+  .reviews-wall {
+    background: var(--background);
+    color: var(--foreground);
+  }
+  .reviews-rows {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .review-source-row {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .review-source-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 1.5rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--primary) 3%, var(--background));
+    color: inherit;
+    text-decoration: none;
+  }
+  .review-source-panel:hover {
+    border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+    text-decoration: none;
+  }
+  .review-brand-logo {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    font-weight: 700;
+  }
+  .review-brand-logo--tripadvisor {
+    max-width: 9.5rem;
+  }
+  .tripadvisor-logo-img,
+  .review-platform-badge-img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .review-brand-logo--google {
+    font-size: 1.65rem;
+    letter-spacing: -0.04em;
+  }
+  .g-blue {
+    color: #4285f4;
+  }
+  .g-secondary {
+    color: #ea4335;
+  }
+  .g-yellow {
+    color: #fbbc04;
+  }
+  .g-green {
+    color: #34a853;
+  }
+  .review-google-word {
+    margin-left: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    letter-spacing: 0;
+  }
+  .trustpilot-wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 1.65rem;
+    letter-spacing: -0.04em;
+    color: #191919;
+  }
+  .trustpilot-star {
+    color: #00b67a;
+    font-size: 1.3em;
+    line-height: 1;
+  }
+  .review-source-tour {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+  .review-score-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.6rem;
+  }
+  .review-score {
+    font-size: 2.15rem;
+    font-weight: 650;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+  .review-score-descriptor {
+    font-size: 0.7rem;
+    color: var(--muted-foreground);
+  }
+  .review-score-line > .review-stars {
+    flex-basis: 100%;
+    margin: 0.25rem 0 0;
+  }
+  .review-total {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+  }
+  .review-row-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 1rem;
+  }
+  .review-card {
+    --review-accent: #19a987;
     position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    min-height: 20rem;
+    padding: 1.25rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--background);
+    box-shadow: 0 3px 12px -8px rgb(15 23 42 / 15%);
+  }
+  .review-card--google {
+    --review-accent: #4285f4;
+  }
+  .review-card--trustpilot {
+    --review-accent: #00b67a;
+  }
+  .review-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 1.25rem auto;
+    height: 2px;
+    background: var(--review-accent);
+    opacity: 0.7;
+  }
+  .review-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding-right: 2.25rem;
+  }
+  .review-avatar {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--review-accent) 9%, white);
+    color: color-mix(in oklab, var(--review-accent) 70%, black);
+    font-size: 0.7rem;
+    font-weight: 650;
+  }
+  .review-card__author {
+    min-width: 0;
+  }
+  .review-author {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 1.02rem;
-    font-weight: 800;
-    color: color-mix(in oklab, var(--foreground) 84%, black);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    font-weight: 600;
   }
-
-  .review-author::before {
-    content: "";
-    display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    margin-right: 0.25rem;
-    border-radius: 999px;
-    background: color-mix(in oklab, var(--muted-foreground) 34%, white);
-    box-shadow:
-      0 0.62rem 0 -0.16rem
-        color-mix(in oklab, var(--muted-foreground) 34%, white),
-      0.54rem 0.62rem 0 -0.16rem
-        color-mix(in oklab, var(--muted-foreground) 34%, white);
-  }
-
   .review-date {
-    margin-top: 0.2rem;
-    font-size: 0.82rem;
-    font-style: italic;
-    color: color-mix(in oklab, var(--foreground) 54%, white);
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--muted-foreground);
+    font-size: 0.68rem;
+    line-height: 1.5;
   }
-
+  .review-platform-badge {
+    position: absolute;
+    right: 1rem;
+    top: 1.25rem;
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .review-platform-badge--tripadvisor {
+    width: 2.5rem;
+    height: auto;
+    top: 1.4rem;
+  }
+  .review-card:has(.review-platform-badge--tripadvisor) .review-card__header {
+    padding-right: 3rem;
+  }
   .review-title {
-    margin-top: 1.15rem;
-    font-size: 1.05rem;
-    font-weight: 800;
-    line-height: 1.25;
-    color: color-mix(in oklab, var(--foreground) 84%, black);
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
   }
-
   .review-stars {
     display: flex;
     align-items: center;
-    gap: 0.28rem;
-    margin-top: 0.65rem;
-    margin-bottom: 0.8rem;
-    line-height: 1;
+    gap: 0.2rem;
+    margin: 0.65rem 0 0.8rem;
   }
-
   .review-stars--tripadvisor span {
-    width: 0.82rem;
-    height: 0.82rem;
-    border-radius: 999px;
-    border: 1px solid #21c89d;
-    background: transparent;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 1px solid #00aa6c;
+    border-radius: 50%;
   }
-
   .review-stars--tripadvisor span.is-filled {
-    background: #21c89d;
+    background: #00aa6c;
   }
-
   .review-stars--google span {
-    width: 1rem;
-    height: 1rem;
-    background: color-mix(in oklab, #fbbc04 18%, var(--border));
+    width: 0.85rem;
+    height: 0.85rem;
+    background: #e5e7eb;
     clip-path: polygon(
       50% 0%,
       61% 34%,
@@ -731,141 +1027,155 @@ const getSourceReviews = (source: ReviewSource) =>
       39% 34%
     );
   }
-
   .review-stars--google span.is-filled {
     background: #fbbc04;
   }
-
+  .review-stars--trustpilot span {
+    display: grid;
+    width: 0.9rem;
+    height: 0.9rem;
+    place-items: center;
+    background: #dcdce6;
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1;
+  }
+  .review-stars--trustpilot span::before {
+    content: "★";
+  }
+  .review-stars--trustpilot span.is-filled {
+    background: #00b67a;
+  }
   .review-text {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+  .review-expand {
+    display: flex;
+    flex-direction: column;
+  }
+  .review-expand:not(.is-expanded) > .review-text {
     display: -webkit-box;
-    min-height: 6.95rem;
-    overflow: clip;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5;
-    line-clamp: 5;
-    font-size: 0.97rem;
-    line-height: 1.5;
-    color: color-mix(in oklab, var(--foreground) 62%, white);
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
   }
-
-  .review-link {
-    position: absolute;
-    right: 1.25rem;
-    bottom: 1.05rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-decoration: none;
-    transition:
-      color 160ms ease,
-      transform 160ms ease;
-  }
-
-  .review-link:hover {
-    transform: translateX(-0.1rem);
-  }
-
-  .review-platform-badge {
-    position: absolute;
-    top: 0.62rem;
-    right: 0.62rem;
-    display: inline-flex;
-    width: 2.15rem;
-    height: 2.15rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    font-size: 0.74rem;
-    font-weight: 900;
-    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
-  }
-
-  .review-platform-badge--tripadvisor {
-    width: 4.15rem;
-    height: auto;
-    min-height: 2.15rem;
-    padding: 0.28rem 0.35rem;
-    border-radius: 999px;
-    background: white;
-    box-shadow:
-      inset 0 0 0 1px color-mix(in oklab, var(--border) 65%, white),
-      0 8px 16px rgba(15, 23, 42, 0.08);
-  }
-
-  .review-platform-badge-img {
+  .review-expand > .review-text {
     display: block;
-    width: 100%;
-    height: auto;
   }
-
-  .review-platform-badge--google {
-    background: white;
-    color: #4285f4;
-    font-size: 1.28rem;
-    box-shadow:
-      inset 0 0 0 1px color-mix(in oklab, var(--border) 70%, white),
-      0 8px 16px rgba(15, 23, 42, 0.08);
+  .review-expand-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    width: fit-content;
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary);
   }
-
-  @keyframes review-rise {
-    from {
-      opacity: 0;
-      transform: translateY(14px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .review-expand-toggle::-webkit-details-marker {
+    display: none;
   }
-
+  .review-expand:not(.is-expanded) .review-less,
+  .review-expand.is-expanded .review-more {
+    display: none;
+  }
+  .review-link {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    min-height: 2.75rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .review-link::after {
+    content: "↗";
+    margin-left: 0.4rem;
+  }
+  .review-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .reviews-wall :is(a, button):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: 0.4rem;
+  }
   @media (max-width: 1180px) {
-    .review-source-row {
-      grid-template-columns: 16rem minmax(0, 1fr);
-    }
-
-    .review-row-cards {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 820px) {
-    .reviews-wall {
-      padding-block: 3rem;
-    }
-
     .review-source-row {
       grid-template-columns: 1fr;
     }
-
     .review-source-panel {
-      min-height: auto;
-      padding: 1.25rem 1.75rem;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
     }
-
+    .review-brand-logo {
+      width: auto;
+    }
+    .review-source-tour {
+      display: none;
+    }
+    .review-score-line > .review-stars {
+      flex-basis: auto;
+      margin: 0;
+    }
+    .review-total {
+      margin-left: auto;
+    }
+  }
+  @media (max-width: 640px) {
+    .reviews-rows {
+      gap: 2rem;
+    }
+    .review-source-row {
+      gap: 0.85rem;
+    }
+    .review-source-panel {
+      gap: 0.75rem;
+    }
+    .review-total {
+      margin-left: 0;
+      width: 100%;
+    }
+    .review-score {
+      font-size: 1.65rem;
+    }
+    .review-score-descriptor {
+      display: none;
+    }
     .review-brand-logo--tripadvisor {
-      width: min(100%, 10rem);
+      max-width: 8rem;
     }
-
+    .review-brand-logo--google,
+    .trustpilot-wordmark {
+      font-size: 1.35rem;
+    }
     .review-row-cards {
       display: flex;
-      gap: 0.85rem;
       overflow-x: auto;
-      padding-bottom: 0.75rem;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.15rem 0.15rem 0.75rem;
       scroll-snap-type: x mandatory;
       scrollbar-width: thin;
     }
-
     .review-card {
-      width: min(86vw, 22rem);
-      flex: 0 0 auto;
+      flex: 0 0 min(85%, 22rem);
       scroll-snap-align: start;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .review-card {
-      animation: none;
-      opacity: 1;
-      transform: none;
+      min-height: 19rem;
+      padding: 1.1rem;
     }
   }
 </style>

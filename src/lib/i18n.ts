@@ -1,3 +1,5 @@
+import { purposeSlugs } from "@/data/purposeSlugs";
+
 export const LANGS = ["en", "es", "pt"] as const;
 export type Lang = (typeof LANGS)[number];
 export const DEFAULT_LANG: Lang = "en";
@@ -92,6 +94,15 @@ export function translatePathForSlug(
 	const normalized = stripLangPrefix(path);
 	const { path: pathname, suffix } = splitUrlPath(normalized);
 
+	// Registered editorial subpages use complete translated paths, not a single slug.
+	if (
+		Object.values(purposeSlugs).some((slugs) =>
+			Object.values(slugs).some((slug) => slug === translatedSlug),
+		)
+	) {
+		return `/${translatedSlug}${pathname.endsWith("/") ? "/" : ""}${suffix}`;
+	}
+
 	if (pathname.includes("/blog/")) {
 		return `${pathname.replace(
 			/\/blog\/[^/]+(?=\/|$)/,
@@ -134,7 +145,15 @@ export function resolveLanguageUrls({
 		} else if (slugMap !== undefined) {
 			const slug = slugMap[locale];
 			if (slug === undefined) continue;
-			if (!slug.trim() || /[/?#]/.test(slug) || slug !== slug.trim()) {
+			const registeredPath = Object.values(purposeSlugs).some(
+				(slugs) => slugs[locale] === slug,
+			);
+			if (
+				!slug.trim() ||
+				/[?#]/.test(slug) ||
+				(slug.includes("/") && !registeredPath) ||
+				slug !== slug.trim()
+			) {
 				console.warn(
 					`[i18n] Invalid slug for ${locale}; language link omitted.`,
 				);

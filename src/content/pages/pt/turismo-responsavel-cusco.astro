@@ -1,0 +1,13 @@
+---
+import Content from "@/components/content/ResponsibleTourismContent.astro";
+import { getResponsibleFrontmatter } from "@/lib/responsibleTourism";
+import { localizePurposeFrontmatter } from "@/lib/purposeMetadata";
+export const getFrontmatter = async () =>
+  localizePurposeFrontmatter(
+    await getResponsibleFrontmatter(),
+    "responsible",
+    "pt",
+  );
+---
+
+<Content />

@@ -205,6 +205,24 @@ export default function PlaneaTuViaje({
 			const result = await response.json();
 
 			if (response.ok && result.success) {
+				// Attribute successful enquiries from the sustainability landing without sending personal data.
+				if (document.referrer) {
+					const source = new URL(document.referrer);
+					if (
+						source.origin === window.location.origin &&
+						source.pathname === "/es/turismo-sostenible-peru/"
+					) {
+						const analytics = window as Window & {
+							dataLayer?: Record<string, unknown>[];
+						};
+						analytics.dataLayer ??= [];
+						analytics.dataLayer.push({
+							event: "sustainable_tourism_enquiry",
+							source_page: source.pathname,
+							form: "plan_trip",
+						});
+					}
+				}
 				setSubmitStatus("success");
 				setFormData({
 					nombres: "",

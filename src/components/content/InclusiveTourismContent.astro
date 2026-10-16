@@ -1,0 +1,606 @@
+---
+import LocalizedPurpose from "@/components/content/LocalizedPurpose.astro";
+import SectionDivider from "@/components/ui/SectionDivider.astro";
+import HeroImage from "@/components/ui/HeroImage.astro";
+import TourCard from "@/components/ui/TourCard.astro";
+import InclusiveEnquiryForm from "@/components/content/InclusiveEnquiryForm.astro";
+import {
+  Compass,
+  BookOpen,
+  HeartHandshake,
+  Accessibility,
+  Timer,
+  MessagesSquare,
+  UsersRound,
+  Footprints,
+  Mountain,
+  Bus,
+  Bath,
+  ClipboardCheck,
+  FileText,
+  CalendarCheck,
+} from "lucide-react";
+import {
+  getInclusiveTours,
+  inclusiveHero,
+  accessibilityTopics,
+  accessibilityAssessments,
+} from "@/lib/inclusiveTourism";
+import { inclusiveTourism as copy } from "@/data/inclusiveTourism";
+
+const tours = await getInclusiveTours();
+const hero = inclusiveHero;
+const audienceIcons = [Accessibility, Timer, MessagesSquare, UsersRound];
+const accessibilityIcons = [
+  Footprints,
+  Mountain,
+  Bus,
+  Bath,
+  MessagesSquare,
+  Timer,
+];
+const processIcons = [MessagesSquare, ClipboardCheck, FileText, CalendarCheck];
+const imageAlts = [
+  "Patrimonio histórico de Cusco en el itinerario del City Tour",
+  "Recorrido por los paisajes y sitios históricos del Valle Sur de Cusco",
+  "Paisajes y patrimonio del Valle Sagrado de los Incas",
+  "Ciudadela de Machu Picchu en Cusco",
+  "Experiencia de viaje por Cusco y Machu Picchu",
+];
+const principles = [
+  {
+    title: "Autonomía",
+    icon: Compass,
+    text: "Respetar las decisiones y preferencias de cada viajero.",
+  },
+  {
+    title: "Información clara",
+    icon: BookOpen,
+    text: "Explicar las condiciones y limitaciones de cada experiencia.",
+  },
+  {
+    title: "Atención personalizada",
+    icon: HeartHandshake,
+    text: "Evaluar alternativas según necesidades y recursos disponibles.",
+  },
+];
+const wrap = "page-shell";
+const section = `${wrap} py-12 md:py-16`;
+const eyebrow =
+  "mb-4 text-[0.7rem] font-semibold tracking-[0.14em] text-primary uppercase";
+const heading =
+  "text-balance text-[clamp(1.8rem,1.2rem+1.5vw,2.6rem)] leading-[1.15] font-semibold tracking-[-0.035em]";
+const body = "space-y-4 text-[0.95rem] leading-[1.85] text-muted-foreground";
+const button =
+  "inline-flex min-h-11 items-center justify-center gap-3 rounded-full border border-secondary bg-secondary px-6 py-3 text-sm font-semibold text-white! transition-colors hover:bg-secondary/90 hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary motion-reduce:transition-none";
+const outline =
+  "inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground! transition-colors hover:border-primary hover:text-primary! hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none";
+---
+
+<LocalizedPurpose>
+  <div
+    id="inclusive-landing"
+    class="bg-background text-foreground [&_section[id]]:scroll-mt-28"
+  >
+    <section
+      class={`${wrap} pt-5 pb-10 md:pb-14`}
+      aria-labelledby="inclusive-title"
+    >
+      <nav
+        aria-label="Ruta de navegación"
+        class="mb-8 text-xs text-muted-foreground"
+      >
+        <ol class="flex flex-wrap items-center gap-2">
+          <li>
+            <a
+              href="/es/"
+              class="hover:text-primary focus-visible:outline-2 focus-visible:outline-primary"
+              >Inicio</a
+            >
+          </li><li aria-hidden="true">/</li><li aria-current="page">
+            Turismo inclusivo en Cusco
+          </li>
+        </ol>
+      </nav>
+      <div class="grid items-center gap-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>Viajes pensados para las personas</p><h1
+            id="inclusive-title"
+            class="text-balance text-[clamp(2.25rem,1.2rem+2.5vw,4rem)] leading-[1.07] font-semibold tracking-[-0.045em]"
+          >
+            Turismo inclusivo en Cusco: <span class="text-primary"
+              >experiencias para todos</span
+            >
+          </h1><SectionDivider />
+        </div>
+        <div>
+          <div class={body}>{copy.hero.map((text) => <p>{text}</p>)}</div><div
+            class="mt-6 flex flex-wrap gap-3"
+          >
+            <a href="#experiencias-inclusivas" class={button}
+              >Explorar experiencias <span aria-hidden="true">→</span></a
+            ><a href="#consulta-inclusiva" class={outline}
+              >Consultar opciones de adaptación</a
+            >
+          </div>
+        </div>
+      </div>
+      <figure class="mt-8 md:mt-10">
+        <HeroImage
+          image={hero}
+          class="aspect-[4/3] w-full rounded-2xl object-cover object-center md:aspect-[2.8]"
+        />
+      </figure>
+    </section>
+
+    <section class={section} aria-labelledby="inclusive-meaning">
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <figure>
+          <img
+            src="/imagenes/tour-lgbt-cusco.webp"
+            sizes="(min-width: 1024px) 42vw, 100vw"
+            width={570}
+            height={700}
+            alt="Dos viajeras sonrientes frente a la ciudadela de Machu Picchu, Cusco"
+            class="aspect-[4/3] w-full rounded-2xl object-cover object-[65%_center] lg:aspect-[4/5]"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <div>
+          <p class={eyebrow}>Un turismo con más oportunidades</p><h2
+            id="inclusive-meaning"
+            class={heading}
+          >
+            ¿Qué significa viajar de manera inclusiva?
+          </h2><SectionDivider /><div class={`mt-5 ${body}`}>
+            {copy.meaning.map((text) => <p>{text}</p>)}
+            <p>
+              Creemos en un turismo donde todas las personas se sientan
+              bienvenidas, incluidas las personas <span
+                class="bg-linear-to-r from-red-700 via-green-700 to-purple-700 bg-clip-text font-bold text-transparent"
+                >LGBT+</span
+              >, con un trato cercano y respetuoso.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        class="mt-10 grid gap-4 border-t border-border pt-7 md:grid-cols-3 md:gap-6"
+      >
+        {
+          principles.map(({ title, text, icon: Icon }) => (
+            <div class="flex items-start gap-4 rounded-2xl border border-primary/10 bg-primary/[0.025] p-5 md:p-6">
+              <div class="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary">
+                <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+              </div>
+              <div class="min-w-0 pt-1">
+                <h3 class="mb-2 text-sm font-semibold text-primary">{title}</h3>
+                <p class="text-sm leading-relaxed text-muted-foreground">
+                  {text}
+                </p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class={section} aria-labelledby="inclusive-audience-title">
+      <div
+        class="grid items-center gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16"
+      >
+        <div>
+          <h2 id="inclusive-audience-title" class={heading}>
+            Cada viajero tiene una manera diferente de descubrir Cusco
+          </h2><SectionDivider /><p class={`mt-5 ${body}`}>
+            {copy.audienceIntro}
+          </p>
+        </div>
+        <div class="grid gap-x-8 gap-y-7 sm:grid-cols-2">
+          {
+            copy.audiences.map((item, index) => {
+              const Icon = audienceIcons[index] ?? UsersRound;
+              return (
+                <div class="border-t border-border pt-5">
+                  <div class="mb-4 flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary">
+                    <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                  </div>
+                  <h3 class="mb-3 text-lg leading-tight font-semibold tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p class="text-sm leading-[1.8] text-muted-foreground">
+                    {item.text}
+                  </p>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="experiencias-inclusivas"
+      class="scroll-mt-28 bg-muted/30"
+      aria-labelledby="inclusive-experiences-title"
+    >
+      <div class={section}>
+        <div
+          class="mb-8 grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16"
+        >
+          <div class="lg:order-2">
+            <p class={eyebrow}>Descubre nuestras experiencias</p><h2
+              id="inclusive-experiences-title"
+              class={heading}
+            >
+              Tours en Cusco con opciones de personalización
+            </h2><SectionDivider />
+          </div><p class={body}>{copy.toursIntro}</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-4 lg:grid-cols-6">
+          {
+            tours.map(({ tour, copy: card, duration }, index) => (
+              <div
+                class:list={[
+                  "min-w-0 md:col-span-2",
+                  index === 3 && "lg:col-start-2",
+                  index === 4 && "md:col-start-2 lg:col-start-4",
+                ]}
+              >
+                <TourCard
+                  tour={tour}
+                  lang="es"
+                  compactAction
+                  editorial={{
+                    ...card,
+                    duration: `Tour base: ${duration}`,
+                    imageAlt: imageAlts[index],
+                    ctaLabel: "Conoce el tour",
+                  }}
+                />
+              </div>
+            ))
+          }
+        </div>
+        <div
+          class="mt-7 flex justify-center"
+        >
+          <a href="#consulta-inclusiva" class={`${button} shrink-0`}
+            >Consultar una experiencia adaptada</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class={section} aria-labelledby="inclusive-accessibility">
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div>
+          <p class={eyebrow}>Planifica con información clara</p><h2
+            id="inclusive-accessibility"
+            class={heading}
+          >
+            ¿Qué debemos revisar antes de tu viaje?
+          </h2><SectionDivider /><div class={`mt-5 ${body}`}>
+            {copy.accessibility.map((text) => <p>{text}</p>)}
+          </div>
+        </div>
+        <div
+          class="rounded-2xl border border-primary/10 bg-primary/[0.025] p-6 md:p-8"
+        >
+          <h3 class="mb-5 text-lg font-semibold">
+            Aspectos a revisar para cada itinerario
+          </h3><ul class="grid gap-3 sm:grid-cols-2">
+            {
+              accessibilityTopics.map((topic, index) => {
+                const Icon = accessibilityIcons[index] ?? Accessibility;
+                return (
+                  <li class="flex items-center gap-3 rounded-xl border border-primary/10 bg-background p-4 text-sm leading-relaxed">
+                    <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary">
+                      <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
+                    </span>
+                    <span>{topic}</span>
+                  </li>
+                );
+              })
+            }
+          </ul><p
+            class="mt-6 border-t border-border pt-5 text-xs leading-relaxed text-muted-foreground"
+          >
+            Aún no publicamos evaluaciones verificadas para estos tours. Las
+            condiciones deben confirmarse individualmente antes de contratar el
+            servicio.
+          </p>
+        </div>
+      </div>
+      {
+        accessibilityAssessments.length > 0 && (
+          <div class="mt-6 grid gap-6 md:grid-cols-2">
+            {accessibilityAssessments.map((assessment) => (
+              <article class="rounded-xl border border-border p-6">
+                <h3 class="font-semibold">
+                  Evaluación documentada del itinerario
+                </h3>
+                <p class="mt-2 text-xs text-muted-foreground">
+                  Revisada:{" "}
+                  <time datetime={assessment.reviewedAt}>
+                    {assessment.reviewedAt}
+                  </time>
+                </p>
+                <dl class="mt-4 space-y-4">
+                  {assessment.conditions.map((condition) => (
+                    <div>
+                      <dt class="text-sm font-semibold">{condition.topic}</dt>
+                      <dd class="text-sm leading-relaxed">
+                        <span>{condition.status}</span> · {condition.details}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <a
+                  class="mt-4 inline-flex text-sm text-primary underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
+                  href={assessment.source}
+                >
+                  Consultar evaluación
+                </a>
+              </article>
+            ))}
+          </div>
+        )
+      }
+    </section>
+
+    <section
+      class={`${section} border-t border-border`}
+      aria-labelledby="inclusive-process"
+    >
+      <div
+        class="mb-8 grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16"
+      >
+        <div>
+          <h2 id="inclusive-process" class={heading}>
+            Tu viaje comienza con una conversación
+          </h2><SectionDivider />
+        </div><p class={body}>{copy.processIntro}</p>
+      </div>
+      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+        {
+          copy.steps.map((item, index) => {
+            const Icon = processIcons[index] ?? CalendarCheck;
+            return (
+              <li class="rounded-2xl border border-primary/10 bg-primary/[0.025] p-5 md:p-6">
+                <div class="mb-5 flex items-center justify-between gap-4">
+                  <span class="flex size-12 items-center justify-center rounded-2xl border border-primary/10 bg-primary/5 text-primary">
+                    <Icon size={24} strokeWidth={1.6} aria-hidden="true" />
+                  </span>
+                  <span
+                    class="text-sm font-semibold tracking-widest text-primary/60"
+                    aria-hidden="true"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 class="mb-3 text-lg leading-tight font-semibold">
+                  {item.title.replace(/^\d+\.\s*/, "")}
+                </h3>
+                <p class="text-sm leading-relaxed text-muted-foreground">
+                  {item.text}
+                </p>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+
+    <section
+      id="consulta-inclusiva"
+      class="scroll-mt-28 bg-muted/30"
+      aria-labelledby="inclusive-enquiry-title"
+    >
+      <div
+        class={`${section} grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16`}
+      >
+        <div>
+          <p class={eyebrow}>Empecemos por escucharte</p><h2
+            id="inclusive-enquiry-title"
+            class={heading}
+          >
+            Cuéntanos cómo te gustaría descubrir Cusco
+          </h2><SectionDivider /><p class={`mt-5 ${body}`}>
+            {copy.formIntro}
+          </p><p
+            class="mt-5 border-l-2 border-primary/30 pl-4 text-sm leading-relaxed text-muted-foreground"
+          >
+            No necesitas compartir información médica para empezar a conversar.
+            Revisaremos las opciones disponibles antes de confirmar cualquier
+            adaptación.
+          </p>
+        </div>
+        <InclusiveEnquiryForm />
+      </div>
+    </section>
+
+    <section
+      id="turismo-accesible"
+      class={section}
+      aria-labelledby="inclusive-accessible-title"
+    >
+      <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <figure>
+          <img
+            src="/imagenes/turismo-accesible-en-cusco.webp"
+            sizes="(min-width: 1024px) 42vw, 100vw"
+            width={570}
+            height={700}
+            alt="Turista en silla de ruedas frente a la ciudadela de Machu Picchu, Cusco"
+            loading="lazy"
+            decoding="async"
+            class="aspect-[4/3] w-full rounded-2xl object-cover lg:aspect-[4/5]"
+          />
+        </figure><div>
+          <p class={eyebrow}>Cada viaje empieza escuchándote</p>
+          <h2 id="inclusive-accessible-title" class={heading}>
+            Turismo accesible en Cusco
+          </h2><SectionDivider /><div class={`mt-5 ${body}`}>
+            <p>
+              Viajar con mayor autonomía empieza por conocer las condiciones del
+              recorrido. Cuéntanos qué necesitas para revisar juntos las
+              opciones de accesibilidad antes de reservar.
+            </p>
+          </div>
+          <dl
+            class="mt-6 space-y-4 border-y border-border py-5 text-sm leading-relaxed"
+          >
+            <div>
+              <dt class="font-semibold">Movilidad y accesos</dt>
+              <dd class="mt-1 text-muted-foreground">
+                Revisamos escalones, superficies, distancias y pausas según tu
+                ritmo y el uso de silla de ruedas u otras ayudas de movilidad.
+              </dd>
+            </div>
+            <div>
+              <dt class="font-semibold">Transporte y acompañamiento</dt>
+              <dd class="mt-1 text-muted-foreground">
+                Consultamos las condiciones de embarque, el espacio para tu
+                equipo y los apoyos disponibles, siempre previa coordinación.
+              </dd>
+            </div>
+            <div>
+              <dt class="font-semibold">Comunicación y orientación</dt>
+              <dd class="mt-1 text-muted-foreground">
+                Si necesitas información visual, escrita o apoyo para
+                orientarte, cuéntanos tus preferencias para confirmar qué
+                podemos organizar.
+              </dd>
+            </div>
+          </dl>
+          <h3 class="mt-6 text-lg font-semibold">
+            ¿Y para visitar Machu Picchu?
+          </h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Sus senderos y escalinatas requieren una evaluación previa.
+            Revisaremos el circuito, los traslados y los apoyos necesarios para
+            tu visita; la accesibilidad de todo el recorrido debe confirmarse
+            antes de reservar.
+          </p>
+          <a href="#consulta-inclusiva" class={`${button} mt-5`}>
+            Consultar opciones <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class={section} aria-labelledby="inclusive-faq">
+      <div class="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
+        <div>
+          <h2 id="inclusive-faq" class={heading}>
+            Preguntas frecuentes sobre turismo inclusivo en Cusco
+          </h2><SectionDivider />
+          <p class={`mt-5 ${body}`}>
+            Resolvemos tus dudas sobre diversidad, accesibilidad y cómo
+            planificar una experiencia a tu ritmo.
+          </p>
+        </div><div class="space-y-3">
+          {
+            copy.faq.map((item) => (
+              <details
+                class="group/faq rounded-2xl border border-border px-5 open:border-primary/20 open:bg-primary/[0.025] md:px-6"
+                name="inclusive-faq"
+              >
+                <>
+                  <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-5 py-5 text-base font-semibold focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+                    {item.question}
+                    <svg
+                      class="size-4 shrink-0 text-primary transition-transform group-open/faq:rotate-45 motion-reduce:transition-none"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </summary>
+                  <p class="pb-6 text-sm leading-[1.8] text-muted-foreground">
+                    {item.answer}
+                  </p>
+                </>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section
+      class={`${section} border-t border-border`}
+      aria-labelledby="inclusive-other-purpose"
+    >
+      <div
+        class="mb-8 grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16"
+      >
+        <div class="lg:order-2">
+          <h2 id="inclusive-other-purpose" class={heading}>
+            Un compromiso que va más allá de la accesibilidad
+          </h2><SectionDivider />
+        </div><p class={body}>{copy.relatedIntro}</p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2">
+        <article class="rounded-2xl border border-border p-6 md:p-8">
+          <h3 class="mb-3 text-xl font-semibold">Turismo sostenible</h3><p
+            class="text-sm leading-relaxed text-muted-foreground"
+          >
+            Viajes que valoran la naturaleza y la conservación de los destinos.
+          </p><a
+            href="/es/turismo-sostenible-peru/"
+            class="mt-4 inline-flex min-h-11 items-center gap-3 text-sm font-semibold text-primary hover:text-secondary! hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            >Conoce nuestro enfoque <span aria-hidden="true">→</span></a
+          >
+        </article><article class="rounded-2xl border border-border p-6 md:p-8">
+          <h3 class="mb-3 text-xl font-semibold">Turismo responsable</h3><p
+            class="text-sm leading-relaxed text-muted-foreground"
+          >
+            Experiencias que respetan las tradiciones y a las comunidades
+            anfitrionas.
+          </p><a
+            href="/es/turismo-responsable-cusco/"
+            class="mt-4 inline-flex min-h-11 items-center gap-3 text-sm font-semibold text-primary hover:no-underline! focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            >Conoce más <span aria-hidden="true">→</span></a
+          >
+        </article>
+      </div>
+    </section>
+
+    <section
+      class={`${wrap} relative isolate mb-16 overflow-hidden rounded-2xl px-6 py-12 text-white md:px-12 md:py-16`}
+      aria-labelledby="inclusive-final-title"
+    >
+      <img
+        src={hero.src}
+        srcset={hero.srcset}
+        sizes="100vw"
+        width={hero.width}
+        height={hero.height}
+        alt="Viajeros compartiendo su visita a Chinchero, en Cusco"
+        loading="lazy"
+        decoding="async"
+        class="absolute inset-0 -z-20 h-full w-full object-cover"
+      /><div class="absolute inset-0 -z-10 bg-black/75" aria-hidden="true">
+      </div>
+      <div class="mx-auto max-w-3xl text-center">
+        <h2 id="inclusive-final-title" class={heading}>
+          Cusco tiene muchas historias. Queremos ayudarte a vivir la tuya.
+        </h2><SectionDivider align="center" /><div
+          class="mt-5 space-y-4 text-[0.95rem] leading-[1.85] text-white/90"
+        >
+          {copy.closing.map((text) => <p>{text}</p>)}
+        </div><div class="mt-7 flex flex-wrap justify-center gap-3">
+          <a href="/es/planea-tu-viaje/" class={button}
+            >Planificar mi experiencia <span aria-hidden="true">→</span></a
+          ><a href="/es/cusco/" class={outline}>Explorar tours en Cusco</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</LocalizedPurpose>

@@ -11,6 +11,7 @@ import PeruGuide from "@/components/sections/PeruGuide.astro";
 import HomePost from "@/components/sections/HomePost.astro";
 import ReviewsWall from "@/components/sections/ReviewsWall.astro";
 import TravelExperiences from "@/components/sections/TravelExperiences.astro";
+import PurposeTourism from "@/components/sections/PurposeTourism.astro";
 import type { Lang } from "@/lib/i18n";
 import { DEFAULT_SEO_IMAGE, buildSEOProps } from "@/lib/seo";
 import { homeMobileHeroImage } from "@/lib/homeHeroImage";
@@ -89,5 +90,6 @@ const seoProps = {
   />
   <HomePost data={homeData?.cardPost} lang={lang} />
   <TravelExperiences lang={lang} />
+  <PurposeTourism lang={lang} />
   <ReviewsWall lang={lang} />
 </Layout>

@@ -11,6 +11,7 @@ import type { Lang } from "@/lib/i18n";
 import { getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 import { normalizeWhatsAppUrl } from "@/lib/socialLinks";
+import { purposeHref } from "@/lib/purposeRoutes";
 
 interface Props {
   data?: FooterType;
@@ -40,14 +41,32 @@ const complaintsBook = {
 const isComplaintsBookLink = (link: { label?: string; url?: string }) =>
   /reclam|complaint/i.test(`${link.label || ""} ${link.url || ""}`);
 
-const dreamyAboutLinks = data?.dreamyAbout?.link?.filter(
+const dreamyAboutLinks = (data?.dreamyAbout?.link || []).filter(
   (link) => !isComplaintsBookLink(link),
 );
+if (
+  !dreamyAboutLinks.some((link) =>
+    /proyecto-social|social-project|projeto-social/.test(link.url ?? ""),
+  )
+) {
+  dreamyAboutLinks.push({
+    id: -1,
+    label: {
+      es: "Proyecto social",
+      en: "Social project",
+      pt: "Projeto social",
+    }[lang],
+    url: purposeHref("social", lang),
+    isButton: false,
+    isExternal: false,
+  });
+}
 
-const footerDescription =
-  lang === "es"
-    ? "Nuestro propósito es que cada viajero pueda descubrir Perú y Bolivia de manera segura, organizada y auténtica, contando con un equipo que lo acompañe durante todo el proceso."
-    : data?.content;
+const footerDescription = {
+  es: "Nuestro propósito es que cada viajero pueda descubrir Perú y Bolivia de manera segura, organizada y auténtica, contando con un equipo que lo acompañe durante todo el proceso.",
+  en: "Our goal is to help every traveler discover Peru and Bolivia safely, with thoughtful planning and authentic experiences, supported by our team throughout the journey.",
+  pt: "Nosso propósito é ajudar cada viajante a descobrir o Peru e a Bolívia com segurança, organização e experiências autênticas, com uma equipe que o acompanha durante todo o processo.",
+}[lang];
 ---
 
 <footer

@@ -1,0 +1,13 @@
+---
+import Content from "@/components/content/SustainableTourismContent.astro";
+import { getSustainableFrontmatter } from "@/lib/sustainableTourism";
+import { localizePurposeFrontmatter } from "@/lib/purposeMetadata";
+export const getFrontmatter = async () =>
+  localizePurposeFrontmatter(
+    await getSustainableFrontmatter(),
+    "sustainable",
+    "pt",
+  );
+---
+
+<Content />

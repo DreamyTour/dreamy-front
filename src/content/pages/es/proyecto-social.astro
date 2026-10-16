@@ -1,0 +1,21 @@
+---
+import { purposeSeo } from "@/data/purposeSeo";
+import { purposeSlugs } from "@/lib/purposeRoutes";
+import SocialProjectContent from "@/components/content/SocialProjectContent.astro";
+
+export const frontmatter = {
+  title: "Proyecto Social",
+  description: purposeSeo.social.es.metaDescription,
+  lang: "es",
+  heroEyebrow: "Turismo con propósito",
+  layout: "editorial",
+  heroImage: "/imagenes/proyecto-social/navidad/navidad-dreamy-tour.webp",
+  heroImagePosition: "bottom",
+  heroImageAlt:
+    "Celebración navideña de Dreamy Tours junto a las familias de Saylla, Cusco",
+  seo: purposeSeo.social.es,
+  slugs: purposeSlugs.social,
+} as const;
+---
+
+<SocialProjectContent />

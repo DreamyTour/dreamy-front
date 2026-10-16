@@ -1,0 +1,16 @@
+---
+import DynamicContentPage from "@/components/pages/DynamicContentPage.astro";
+import * as content from "@/components/content/SchoolSuppliesContent.astro";
+import { frontmatter as original } from "@/pages/es/proyecto-social/entrega-de-utiles-escolares.astro";
+import { localizePurposeFrontmatter } from "@/lib/purposeMetadata";
+import { purposeSlugs } from "@/lib/purposeRoutes";
+const frontmatter = localizePurposeFrontmatter(original, "school", "pt");
+---
+
+<DynamicContentPage
+  type="content"
+  lang="pt"
+  contentComponent={content}
+  pageSlugMap={purposeSlugs.school}
+  contentFrontmatter={frontmatter}
+/>

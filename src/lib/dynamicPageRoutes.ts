@@ -8,12 +8,14 @@ import type { Tour, Category as TourCategory } from "@/types/tours";
 
 export interface ContentFrontmatter {
 	title: string;
+	layout?: "esnna" | "editorial" | "landing";
 	description?: string;
 	lang: Lang;
 	seo?: ManualSEO;
 	heroImage?: string;
 	heroMobileImage?: string;
 	heroImageAlt?: string;
+	heroImagePosition?: "top" | "center" | "bottom";
 }
 
 export interface DynamicPageProps {
@@ -54,8 +56,9 @@ async function loadContentPages() {
 		const mod = (await contentPages[path]()) as {
 			default?: AstroComponentFactory;
 			frontmatter?: ContentFrontmatter & { slugs?: Record<string, string> };
+			getFrontmatter?: () => Promise<ContentFrontmatter & { slugs?: Record<string, string> }>;
 		};
-		const frontmatter = mod.frontmatter;
+		const frontmatter = mod.getFrontmatter ? await mod.getFrontmatter() : mod.frontmatter;
 		if (!frontmatter) continue;
 
 		const subpath = path

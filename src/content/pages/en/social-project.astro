@@ -1,0 +1,8 @@
+---
+import Content from "@/components/content/SocialProjectContent.astro";
+import { frontmatter as original } from "@/content/pages/es/proyecto-social.astro";
+import { localizePurposeFrontmatter } from "@/lib/purposeMetadata";
+export const frontmatter = localizePurposeFrontmatter(original, "social", "en");
+---
+
+<Content />

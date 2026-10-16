@@ -25,12 +25,13 @@ interface ContentFrontmatter {
   title: string;
   description?: string;
   lang: Lang;
-  layout?: "esnna";
+  layout?: "esnna" | "editorial" | "landing";
   seo?: ManualSEO;
   heroEyebrow?: string;
   heroImage?: string;
   heroMobileImage?: string;
   heroImageAlt?: string;
+  heroImagePosition?: "top" | "center" | "bottom";
 }
 
 interface Props {
@@ -89,21 +90,25 @@ const seoProps =
         type: "website",
         lang,
         slugMap: pageSlugMap,
-        schemas: buildStaticPageSchemas({
-          canonicalUrl,
-          siteUrl,
-          lang,
-          title:
-            contentFrontmatter.seo?.metaTitle ||
-            contentFrontmatter.title ||
-            "Pagina",
-          description:
-            contentFrontmatter.seo?.metaDescription ||
-            contentFrontmatter.description ||
-            "",
-          imageUrl: contentFrontmatter.heroImage,
-          pathname: Astro.url.pathname,
-        }),
+        // The shared SEO component already emits WebPage and BreadcrumbList.
+        schemas:
+          contentFrontmatter.layout === "landing"
+            ? []
+            : buildStaticPageSchemas({
+                canonicalUrl,
+                siteUrl,
+                lang,
+                title:
+                  contentFrontmatter.seo?.metaTitle ||
+                  contentFrontmatter.title ||
+                  "Pagina",
+                description:
+                  contentFrontmatter.seo?.metaDescription ||
+                  contentFrontmatter.description ||
+                  "",
+                imageUrl: contentFrontmatter.heroImage,
+                pathname: Astro.url.pathname,
+              }),
       })
     : type === "tour" && tour
       ? (() => {
@@ -208,61 +213,77 @@ const ContentComponent = contentComponent?.default;
         set:html={serializeJsonForHtml(pageSlugMap || {})}
       />
       <div class="content-shell content-shell--static mx-auto w-full">
-        <section class="content-hero content-hero--static relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
-          <picture class="absolute inset-0 block">
-            {heroMobileImage && (
-              <source media="(max-width: 767px)" srcset={heroMobileImage} />
-            )}
-            <img
-              src={heroImage}
-              alt={heroImageAlt}
-              class="h-full w-full object-cover object-top"
-              loading="eager"
-              fetchpriority="high"
-              width="2172"
-              height="724"
-            />
-          </picture>
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"
-            aria-hidden="true"
-          />
-
-          <div class="relative w-full px-6 py-10 text-center md:px-10 md:py-14 lg:px-14 lg:py-16">
-            <div class="mx-auto max-w-4xl">
-              <p class="inline-flex items-center gap-3 rounded-sm border border-white/20 bg-black/50 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-white shadow-sm backdrop-blur-sm">
-                <span
-                  class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]"
-                  aria-hidden="true"
-                />
-                <span>{contentEyebrow}</span>
-              </p>
-
-              <h1 class="content-hero-title mt-6 text-white text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
-                {contentFrontmatter.title}
-              </h1>
-
-              {contentFrontmatter.description && (
-                <p class="mx-auto mt-6 max-w-3xl text-base leading-8 text-white/80 md:text-lg lg:text-[1.08rem]">
-                  {contentFrontmatter.description}
-                </p>
+        {contentFrontmatter.layout !== "landing" && (
+          <section class="content-hero content-hero--static relative isolate overflow-hidden h-[400px] md:h-[450px] lg:h-[500px] flex flex-col justify-center">
+            <picture class="absolute inset-0 block">
+              {heroMobileImage && (
+                <source media="(max-width: 767px)" srcset={heroMobileImage} />
               )}
+              <img
+                src={heroImage}
+                alt={heroImageAlt}
+                class:list={[
+                  "h-full w-full object-cover",
+                  {
+                    "object-top":
+                      !contentFrontmatter.heroImagePosition ||
+                      contentFrontmatter.heroImagePosition === "top",
+                    "object-center":
+                      contentFrontmatter.heroImagePosition === "center",
+                    "object-bottom":
+                      contentFrontmatter.heroImagePosition === "bottom",
+                  },
+                ]}
+                loading="eager"
+                fetchpriority="high"
+                width="2172"
+                height="724"
+              />
+            </picture>
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"
+              aria-hidden="true"
+            />
 
-              <div
-                class="mt-8 flex items-center justify-center gap-3"
-                aria-hidden="true"
-              >
-                <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary/70" />
-                <div class="relative h-1.5 w-12 rounded-full bg-secondary">
-                  <div class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary" />
+            <div class="relative w-full px-6 py-10 text-center md:px-10 md:py-14 lg:px-14 lg:py-16">
+              <div class="mx-auto max-w-4xl">
+                <p class="inline-flex items-center gap-3 rounded-sm border border-white/20 bg-black/50 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-white shadow-sm backdrop-blur-sm">
+                  <span
+                    class="h-2 w-2 rounded-full bg-secondary shadow-[0_0_0_4px_rgba(220,123,66,0.16)]"
+                    aria-hidden="true"
+                  />
+                  <span>{contentEyebrow}</span>
+                </p>
+
+                <h1 class="content-hero-title mt-6 text-white text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-[4.1rem] lg:leading-[0.95]">
+                  {contentFrontmatter.title}
+                </h1>
+
+                {contentFrontmatter.description && (
+                  <p class="mx-auto mt-6 max-w-3xl text-base leading-8 text-white/80 md:text-lg lg:text-[1.08rem]">
+                    {contentFrontmatter.description}
+                  </p>
+                )}
+
+                <div
+                  class="mt-8 flex items-center justify-center gap-3"
+                  aria-hidden="true"
+                >
+                  <div class="h-px w-16 bg-gradient-to-r from-transparent to-secondary/70" />
+                  <div class="relative h-1.5 w-12 rounded-full bg-secondary">
+                    <div class="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary" />
+                  </div>
+                  <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary/70" />
                 </div>
-                <div class="h-px w-16 bg-gradient-to-l from-transparent to-secondary/70" />
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {contentFrontmatter.layout === "esnna" ? (
+        {contentFrontmatter.layout === "editorial" ||
+        contentFrontmatter.layout === "landing" ? (
+          <ContentComponent />
+        ) : contentFrontmatter.layout === "esnna" ? (
           <article class="content-article content-text max-w-none p-0">
             <ContentComponent />
           </article>

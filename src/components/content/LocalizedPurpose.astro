@@ -1,0 +1,11 @@
+---
+import { localizePurposeHtml, purposeLinkMap } from "@/lib/localizePurposeHtml";
+import { purposeLanguage } from "@/lib/purposeRoutes";
+const lang = purposeLanguage(Astro.url.pathname);
+const html = await Astro.slots.render("default");
+const links =
+  lang === "es" ? new Map<string, string>() : await purposeLinkMap(lang);
+const localized = localizePurposeHtml(html, lang, links);
+---
+
+<Fragment set:html={localized} />

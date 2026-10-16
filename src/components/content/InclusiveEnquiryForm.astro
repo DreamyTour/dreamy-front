@@ -1,0 +1,282 @@
+---
+import { countries } from "@/data/countries";
+import { inclusiveTourism } from "@/data/inclusiveTourism";
+import { purposeLanguage } from "@/lib/purposeRoutes";
+import { enquiryMessages } from "@/i18n/purposeClient";
+const lang = purposeLanguage(Astro.url.pathname);
+const countryDisplayNames = new Intl.DisplayNames([lang], { type: "region" });
+const countryNames = [...countries].sort((a, b) =>
+  (countryDisplayNames.of(a.iso2) ?? a.nameES).localeCompare(
+    countryDisplayNames.of(b.iso2) ?? b.nameES,
+    lang,
+  ),
+);
+const field =
+  "mt-1.5 min-h-11 w-full rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary user-invalid:border-secondary motion-reduce:transition-none";
+const label = "block text-sm font-medium";
+---
+
+<inclusive-enquiry
+  data-lang={lang}
+  data-messages={JSON.stringify(enquiryMessages[lang])}
+  class="block rounded-2xl border border-border bg-background p-5 md:p-6"
+>
+  <form
+    action="/api/planea-tu-viaje"
+    method="post"
+    class="flex flex-col gap-3"
+    aria-label="Consulta de experiencia personalizada en Cusco"
+  >
+    <p class="text-xs leading-relaxed text-muted-foreground">
+      Los campos marcados con * son obligatorios.
+    </p>
+    <div class="grid gap-x-4 gap-y-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div>
+        <label class={label} for="inclusive-name">Nombre *</label><input
+          class={field}
+          id="inclusive-name"
+          name="nombres"
+          autocomplete="name"
+          maxlength="120"
+          required
+        />
+      </div>
+      <div>
+        <label class={label} for="inclusive-email">Correo electrónico *</label
+        ><input
+          class={field}
+          id="inclusive-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          maxlength="254"
+          required
+        />
+      </div>
+      <div>
+        <label class={label} for="inclusive-country">País *</label><select
+          class={field}
+          id="inclusive-country"
+          name="pais"
+          autocomplete="country-name"
+          required
+          ><option value="">Selecciona tu país</option>{
+            countryNames.map((country) => (
+              <option value={country.nameES}>
+                {countryDisplayNames.of(country.iso2) ?? country.nameES}
+              </option>
+            ))
+          }<option value="Otro">Otro</option></select
+        >
+      </div>
+      <div>
+        <label class={label} for="inclusive-date"
+          >Fecha aproximada <span class="font-normal text-muted-foreground"
+            >(opcional)</span
+          ></label
+        ><input
+          class={field}
+          id="inclusive-date"
+          name="fechaViaje"
+          type="date"
+        />
+      </div>
+      <div>
+        <label class={label} for="inclusive-travelers"
+          >Número de viajeros <span class="font-normal text-muted-foreground"
+            >(opcional)</span
+          ></label
+        ><input
+          class={field}
+          id="inclusive-travelers"
+          name="viajeros"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="99"
+          step="1"
+        />
+      </div>
+      <div>
+        <label class={label} for="inclusive-interest"
+          >Experiencia de interés <span
+            class="font-normal text-muted-foreground">(opcional)</span
+          ></label
+        ><select class={field} id="inclusive-interest" name="tourName"
+          ><option value="">Todavía no lo he decidido</option>{
+            inclusiveTourism.tours.map((tour) => (
+              <option value={tour.title}>{tour.title}</option>
+            ))
+          }</select
+        >
+      </div>
+    </div>
+    <div>
+      <label class={label} for="inclusive-message"
+        >¿Qué condiciones o preferencias debemos tener en cuenta? <span
+          class="font-normal text-muted-foreground">(opcional)</span
+        ></label
+      ><p
+        id="inclusive-message-help"
+        class="mt-2 text-xs leading-relaxed text-muted-foreground"
+      >
+        Comparte solo tus preferencias de viaje. No incluyas diagnósticos,
+        informes médicos ni otros datos sensibles.
+      </p><textarea
+        class={`${field} min-h-20 resize-y`}
+        id="inclusive-message"
+        name="mensaje"
+        rows="2"
+        maxlength="1500"
+        aria-describedby="inclusive-message-help"></textarea>
+    </div>
+    <label
+      for="inclusive-consent"
+      class="flex min-h-11 cursor-pointer items-center gap-3 text-xs leading-relaxed text-muted-foreground"
+      ><input
+        id="inclusive-consent"
+        name="consentimiento"
+        type="checkbox"
+        value="accepted"
+        required
+        class="mt-0.5 size-5 shrink-0 accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+      /><span
+        >He leído la <a
+          href="/es/politicas-privacidad/"
+          class="font-medium text-primary underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-primary"
+          >Política de privacidad</a
+        > y autorizo el uso de mis datos para responder esta consulta. *</span
+      ></label
+    >
+    <p
+      data-success
+      role="status"
+      aria-live="polite"
+      class="text-sm leading-relaxed text-primary empty:hidden"
+    >
+    </p>
+    <p
+      data-error
+      role="alert"
+      tabindex="-1"
+      class="text-sm leading-relaxed text-secondary empty:hidden focus-visible:outline-2 focus-visible:outline-secondary"
+    >
+    </p>
+    <button
+      type="submit"
+      class="inline-flex min-h-11 w-full items-center justify-center gap-3 rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none"
+      >Solicitar propuesta personalizada <span aria-hidden="true">→</span
+      ></button
+    >
+    <p class="text-xs leading-relaxed text-muted-foreground">
+      La consulta no confirma una reserva ni la disponibilidad de adaptaciones.
+    </p>
+    <noscript
+      ><p class="text-sm leading-relaxed">
+        También puedes <a
+          href="/es/planea-tu-viaje/"
+          class="text-primary underline"
+          >consultarnos desde el formulario de planificación</a
+        >. Sin JavaScript, indica el número de viajeros en el mensaje.
+      </p></noscript
+    >
+  </form>
+</inclusive-enquiry>
+
+<script>
+  class InclusiveEnquiry extends HTMLElement {
+    private pending = false;
+    private controller?: AbortController;
+    private form?: HTMLFormElement;
+
+    connectedCallback() {
+      this.form = this.querySelector("form")!;
+      this.form.addEventListener("submit", this.submit);
+    }
+
+    private submit = async (event: SubmitEvent) => {
+      event.preventDefault();
+      if (this.pending || !this.form?.reportValidity()) return;
+      const form = this.form;
+      const copy = JSON.parse(this.dataset.messages!) as {
+        sending: string;
+        unavailable: string;
+        success: string;
+        error: string;
+        submit: string;
+        language: string;
+      };
+      const button = form.querySelector<HTMLButtonElement>(
+        "button[type=submit]",
+      )!;
+      const success = this.querySelector<HTMLElement>("[data-success]")!;
+      const error = this.querySelector<HTMLElement>("[data-error]")!;
+      const data = new FormData(form);
+      const value = (key: string) => String(data.get(key) || "").trim();
+      if (value("consentimiento") !== "accepted") return;
+      const mensaje = [
+        "Consulta de turismo inclusivo en Cusco.",
+        `Número de viajeros: ${value("viajeros") || "Por confirmar"}.`,
+        value("mensaje"),
+        "Consentimiento: autoriza el uso de sus datos para responder esta consulta, tras leer la Política de privacidad.",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      this.pending = true;
+      success.textContent = "";
+      error.textContent = "";
+      button.disabled = true;
+      button.textContent = copy.sending;
+      form.setAttribute("aria-busy", "true");
+      this.controller = new AbortController();
+      const timeout = window.setTimeout(() => this.controller?.abort(), 20000);
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            nombres: value("nombres"),
+            email: value("email"),
+            pais: value("pais"),
+            fechaViaje: value("fechaViaje"),
+            tourName: value("tourName") || "Turismo inclusivo en Cusco",
+            adultos: "Por confirmar",
+            menores: "Por confirmar",
+            idioma: copy.language,
+            mensaje,
+            formLanguage: this.dataset.lang || "es",
+          }),
+          signal: this.controller.signal,
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error("Enquiry failed");
+        if (result.simulation) {
+          error.textContent = copy.unavailable;
+          error.focus();
+          return;
+        }
+        success.textContent = copy.success;
+        form.reset();
+      } catch {
+        error.textContent = copy.error;
+        error.focus();
+      } finally {
+        window.clearTimeout(timeout);
+        this.pending = false;
+        button.disabled = false;
+        button.textContent = copy.submit;
+        form.removeAttribute("aria-busy");
+      }
+    };
+
+    disconnectedCallback() {
+      this.form?.removeEventListener("submit", this.submit);
+      this.controller?.abort();
+    }
+  }
+  if (!customElements.get("inclusive-enquiry"))
+    customElements.define("inclusive-enquiry", InclusiveEnquiry);
+</script>

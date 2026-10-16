@@ -1,0 +1,13 @@
+---
+import Content from "@/components/content/InclusiveTourismContent.astro";
+import { getInclusiveFrontmatter } from "@/lib/inclusiveTourism";
+import { localizePurposeFrontmatter } from "@/lib/purposeMetadata";
+export const getFrontmatter = async () =>
+  localizePurposeFrontmatter(
+    await getInclusiveFrontmatter(),
+    "inclusive",
+    "en",
+  );
+---
+
+<Content />

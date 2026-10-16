@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	ArrowRight,
 	ArrowUpRight,
 	ChevronRight,
 	Leaf,
@@ -367,6 +368,21 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 								const primaryFeatureTitle = hasCategoryPage
 									? item.link.label
 									: (item.item[0]?.label ?? item.link.label);
+								const categoryAction = hasCategoryPage ? (
+									<NavigationMenuLink asChild variant="dropdown">
+										<a
+											href={categoryHref}
+											className="group/all inline-flex min-h-11 max-w-full items-center justify-center gap-3 rounded-full border border-primary bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-white hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+										>
+											{copy.viewAll}
+											<ArrowRight
+												size={14}
+												aria-hidden="true"
+												className="transition-transform duration-200 group-hover/all:translate-x-0.5 motion-reduce:transform-none"
+											/>
+										</a>
+									</NavigationMenuLink>
+								) : null;
 								return (
 									<NavigationMenuItem
 										key={item.id}
@@ -436,29 +452,7 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 																		{item.link.label}
 																	</h2>
 																</div>
-																{hasCategoryPage ? (
-																	<NavigationMenuLink
-																		asChild
-																		variant="dropdown"
-																	>
-																		<a
-																			href={categoryHref}
-																			className="group/all shrink-0 rounded-full border border-primary bg-primary px-3.5 py-2 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-primary/90 hover:text-white focus:text-white focus-visible:ring-2 focus-visible:ring-primary/40"
-																		>
-																			{copy.viewAll}
-																			<ArrowUpRight
-																				size={14}
-																				aria-hidden="true"
-																				className="transition-transform duration-200 group-hover/all:-translate-y-0.5 group-hover/all:translate-x-0.5"
-																			/>
-																		</a>
-																	</NavigationMenuLink>
-																) : (
-																	<span
-																		className="hidden size-2 rounded-full bg-secondary shadow-[0_0_12px_rgba(204,54,42,0.7)] 2xl:block"
-																		aria-hidden="true"
-																	/>
-																)}
+																{isDense && categoryAction}
 															</div>
 															<div
 																className={cn(
@@ -479,6 +473,7 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 																		<p className="mt-5 border-l-2 border-secondary pl-3 text-[0.6875rem] font-medium leading-relaxed text-foreground/80">
 																			{intro.detail}
 																		</p>
+																		<div className="mt-5">{categoryAction}</div>
 																	</div>
 																) : null}
 																<ul
