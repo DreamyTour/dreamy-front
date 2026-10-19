@@ -1,0 +1,39 @@
+---
+import { guideSources } from "@/data/machuPicchuGuide";
+---
+
+<aside
+  class="rounded-xl border border-border bg-muted/40 p-5 text-sm leading-6 text-muted-foreground sm:p-6"
+  aria-label="Fuentes de la guía"
+>
+  <p class="font-semibold text-foreground">Fuentes y revisión de la guía</p>
+  <p class="mt-2">
+    Nombres y clasificación de las rutas contrastados el <time
+      datetime={guideSources.checkedOn}>19 de octubre de 2026</time
+    >. Los límites de permanencia citados corresponden a los mapas publicados
+    por el Ministerio de Cultura y enlazados en cada ruta.
+  </p>
+  <ul class="mt-3 flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
+    <li>
+      <a
+        class="inline-flex min-h-8 items-center text-primary underline underline-offset-4"
+        href={guideSources.circuits}>Circuitos y rutas oficiales</a>
+    </li>
+    <li>
+      <a
+        class="inline-flex min-h-8 items-center text-primary underline underline-offset-4"
+        href={guideSources.hours}>Horarios oficiales</a>
+    </li>
+    <li>
+      <a
+        class="inline-flex min-h-8 items-center text-primary underline underline-offset-4"
+        href={guideSources.tickets}>Venta oficial en TuBoleto</a>
+    </li>
+  </ul>
+  <p class="mt-3">
+    Antes de comprar, confirma la habilitación de la ruta, horario, tarifa y
+    restricciones para tu fecha. La clasificación de temporada alta no garantiza
+    su apertura todos los días. Las recomendaciones de esfuerzo y elección son
+    orientación editorial de Dreamy Tours.
+  </p>
+</aside>

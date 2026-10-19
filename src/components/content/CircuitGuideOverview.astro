@@ -1,0 +1,276 @@
+---
+import { ArrowRight, Camera, Check, Info, MapPinned } from "lucide-react";
+import CircuitMap from "./CircuitMap.astro";
+import CircuitGuideSources from "./CircuitGuideSources.astro";
+import {
+  circuitGuides,
+  circuitRouteGuides,
+  routeGuideHref,
+} from "@/data/machuPicchuGuide";
+import { serializeJsonForHtml } from "@/lib/html";
+import "@/styles/circuit-themes.css";
+const site = Astro.site ?? new URL("https://dreamy.tours");
+const routeListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "@id": new URL("/es/circuitos-machupicchu/#rutas", site).href,
+  name: "Las 10 rutas de los circuitos de Machu Picchu",
+  numberOfItems: circuitRouteGuides.length,
+  itemListElement: circuitRouteGuides.map((route, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: `Ruta ${route.code}: ${route.name}`,
+    url: new URL(routeGuideHref(route), site).href,
+  })),
+};
+---
+
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={serializeJsonForHtml(routeListSchema)}
+/>
+<div class="circuit-guide page-shell py-10 text-foreground md:py-16">
+  <section
+    aria-labelledby="choose-circuit"
+    class="mb-10 grid gap-6 border-b border-border pb-8 md:grid-cols-[1.25fr_1fr] md:items-end md:gap-16"
+  >
+    <div>
+      <p class="eyebrow">Tu guía para explorar Machu Picchu</p>
+      <h2
+        id="choose-circuit"
+        class="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-tight md:text-4xl"
+      >
+        Elige tu circuito.<br />Encuentra tu ruta.
+      </h2>
+      <p class="mt-4 max-w-2xl leading-7 text-muted-foreground">
+        Machu Picchu tiene 3 circuitos que agrupan 10 rutas. El circuito te
+        orienta sobre el tipo de experiencia; la ruta define el recorrido
+        concreto que eliges al comprar tu boleto.
+      </p>
+    </div>
+    <div class="guide-tip rounded-2xl p-6">
+      <p class="flex items-center gap-2 font-semibold">
+        <MapPinned size={26} aria-hidden="true" />Empieza por el mapa general
+      </p>
+      <p class="mt-3 text-sm leading-7">
+        Compara los tres circuitos y abre el mapa para ubicarte. Luego entra en
+        una ruta para ver su mapa individual, qué incluye y cómo preparar tu
+        visita.
+      </p>
+    </div>
+  </section>
+
+  <div class="space-y-10 md:space-y-14">
+    {
+      circuitGuides.map((circuit) => {
+        const routes = circuitRouteGuides.filter(
+          (route) => route.circuit === circuit.number,
+        );
+        return (
+          <article
+            id={circuit.id}
+            class={`circuit-card theme-${circuit.theme} scroll-mt-24 overflow-hidden rounded-2xl border border-border bg-background`}
+            aria-labelledby={`${circuit.id}-heading`}
+          >
+            <div class="circuit-card-top grid gap-8 p-6 md:p-9 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+              <div class="circuit-summary min-w-0">
+                <div class="mb-6 flex items-center justify-between gap-4">
+                  <span class="circuit-number grid size-14 place-items-center rounded-full text-2xl font-semibold">
+                    0{circuit.number}
+                  </span>
+                  <span class="route-count rounded-full px-3 py-1.5 text-xs font-semibold">
+                    {routes.length} rutas para elegir
+                  </span>
+                </div>
+                <p class="eyebrow">Circuito {circuit.number}</p>
+                <h2
+                  id={`${circuit.id}-heading`}
+                  class="mt-2 text-3xl font-semibold leading-tight tracking-tight md:text-4xl"
+                >
+                  {circuit.name}
+                </h2>
+                <p class="circuit-tagline mt-2 text-base font-medium">
+                  {circuit.tagline}
+                </p>
+                <p class="mt-5 text-sm leading-7 text-muted-foreground md:text-base">
+                  {circuit.intro}
+                </p>
+                <dl class="circuit-facts mt-6 space-y-4 rounded-xl p-4 text-sm leading-6">
+                  <div>
+                    <>
+                      <dt class="fact-label flex items-center gap-2 font-semibold">
+                        <Check size={24} aria-hidden="true" />
+                        Ideal para
+                      </dt>
+                      <dd class="mt-1 pl-8 text-muted-foreground">
+                        {circuit.ideal}
+                      </dd>
+                    </>
+                  </div>
+                  <div>
+                    <>
+                      <dt class="flex items-center gap-2 font-semibold">
+                        <Info size={24} aria-hidden="true" />
+                        Antes de elegir
+                      </dt>
+                      <dd class="mt-1 pl-8 text-muted-foreground">
+                        {circuit.limit}
+                      </dd>
+                    </>
+                  </div>
+                </dl>
+                <nav
+                  class="mt-6"
+                  aria-label={`Rutas del circuito ${circuit.number}`}
+                >
+                  <h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                    Elige tu ruta
+                  </h3>
+                  <ul class="grid list-none gap-2 p-0 sm:grid-cols-2">
+                    {routes.map((route) => (
+                      <li class="min-w-0">
+                        <a
+                          href={routeGuideHref(route)}
+                          aria-label={`Ruta ${route.code}: ${route.name}`}
+                          class="route-link group flex min-h-14 h-full items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-foreground no-underline transition-colors hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none"
+                        >
+                          <span class="route-code shrink-0 rounded-md px-2 py-1 text-xs font-semibold">
+                            {route.code}
+                          </span>
+                          <span class="min-w-0 flex-1 text-sm font-medium leading-5">
+                            {route.name}
+                            {route.seasonal && (
+                              <span class="mt-0.5 block text-xs font-normal text-amber-900">
+                                De temporada
+                              </span>
+                            )}
+                          </span>
+                          <ArrowRight
+                            size={20}
+                            className="shrink-0 text-muted-foreground group-hover:text-primary"
+                            aria-hidden="true"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
+              <div class="circuit-map-panel min-w-0 self-center rounded-2xl p-3 sm:p-4">
+                <p class="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  <MapPinned size={22} aria-hidden="true" />
+                  Mapa general · Circuito {circuit.number}
+                </p>
+                <CircuitMap
+                  id={`general-${circuit.number}`}
+                  src={circuit.map}
+                  title={`Mapa general del circuito ${circuit.number}: ${circuit.name}`}
+                />
+              </div>
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+
+  <section
+    class="guide-cta my-12 grid gap-6 rounded-2xl p-6 md:grid-cols-[auto_1fr_auto] md:items-center md:p-8"
+    aria-labelledby="circuit-help"
+  >
+    <Camera size={30} className="text-primary" aria-hidden="true" />
+    <div>
+      <h2 id="circuit-help" class="text-xl font-semibold">
+        ¿Qué experiencia quieres llevarte?
+      </h2><p class="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
+        Cuéntanos si priorizas la vista panorámica, el recorrido arqueológico o
+        una caminata. Te ayudamos a elegir la ruta y coordinarla con tus trenes
+        y el resto del viaje.
+      </p>
+    </div>
+    <a
+      href="/es/planea-tu-viaje/"
+      class="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground no-underline hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+      >Pedir asesoría <ArrowRight size={24} aria-hidden="true" /></a
+    >
+  </section>
+  <CircuitGuideSources />
+</div>
+
+<style is:inline>
+  /* Keep map dialogs responsive when opened immediately after navigation. */
+  @view-transition {
+    navigation: none;
+  }
+</style>
+
+<style>
+  .circuit-guide :global(svg) {
+    flex-shrink: 0;
+  }
+  .eyebrow {
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .circuit-card {
+    border-top: 4px solid var(--circuit-color);
+    background: var(--circuit-surface);
+    box-shadow: 0 8px 28px rgb(27 53 37 / 0.04);
+  }
+  .circuit-card .eyebrow,
+  .circuit-tagline,
+  .fact-label,
+  .route-count {
+    color: var(--circuit-color);
+  }
+  .route-count,
+  .circuit-map-panel {
+    background: var(--circuit-tint);
+  }
+  .circuit-facts {
+    background: rgb(255 255 255 / 0.8);
+    border-left: 3px solid var(--circuit-color);
+  }
+  .circuit-map-panel :global([data-map-open] > span) {
+    background: var(--circuit-color);
+    color: white;
+  }
+  .circuit-map-panel :global([data-map-open]:hover > span) {
+    background: color-mix(in srgb, var(--circuit-color) 85%, black);
+  }
+  .route-link {
+    border-color: color-mix(in srgb, var(--circuit-color) 35%, white);
+    background: white;
+  }
+  .route-link:hover {
+    background: var(--circuit-tint);
+    border-color: var(--circuit-color);
+  }
+  .route-link:focus-visible {
+    outline-color: var(--circuit-color);
+  }
+  .guide-tip {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 8px 28px rgb(27 53 37 / 0.12);
+  }
+  .guide-tip > p:last-child {
+    color: #000;
+  }
+  .guide-cta {
+    background: #f7ecd9;
+    border: 1px solid #ead7b8;
+  }
+  .circuit-number {
+    background: var(--circuit-color);
+    color: white;
+  }
+  .route-code {
+    color: white;
+    background: var(--circuit-color);
+  }
+</style>

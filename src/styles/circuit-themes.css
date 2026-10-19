@@ -1,0 +1,17 @@
+.theme-panoramic {
+  --circuit-color: #14663d;
+  --circuit-surface: #f5faf4;
+  --circuit-tint: #e3f0df;
+}
+
+.theme-classic {
+  --circuit-color: #165f72;
+  --circuit-surface: #f3f9fa;
+  --circuit-tint: #deedf1;
+}
+
+.theme-royal {
+  --circuit-color: var(--secondary);
+  --circuit-surface: color-mix(in srgb, var(--secondary) 4%, white);
+  --circuit-tint: color-mix(in srgb, var(--secondary) 10%, white);
+}
