@@ -13,24 +13,31 @@ const activity = {
   ],
   photos: [
     {
-      file: "utiles-5",
+      file: "utiles escolares cusco",
       alt: "Equipo de Dreamy Tours entregando mochilas y cuadernos a los niños",
     },
     {
-      file: "utiles-4",
+      file: "apoyo escolar cusco",
       alt: "Niños y equipo de Dreamy Tours mostrando los materiales escolares entregados",
     },
     {
-      file: "utiles-3",
+      file: "apoyo escolar cusco (1)",
       alt: "Un momento de la actividad de entrega de útiles escolares",
     },
-    { file: "utiles-2", alt: "Recuerdo de la jornada de apoyo a la educación" },
     {
-      file: "utiles-1",
+      file: "apoyo cominitario",
+      alt: "Recuerdo de la jornada de apoyo a la educación",
+    },
+    {
+      file: "apoyo escolar",
       alt: "Equipo de Dreamy Tours y niños con sus cuadernos y mochilas",
     },
     {
-      file: "utiles",
+      file: "apoyo utiles escolares cusco",
+      alt: "Participantes de la actividad de entrega de materiales educativos",
+    },
+    {
+      file: "dreamu tours apoyo",
       alt: "Participantes de la actividad de entrega de materiales educativos",
     },
   ],
@@ -84,7 +91,7 @@ const activity = {
             id="school-supplies"
             title="Entrega de útiles escolares"
             images={activity.photos.map((photo) => ({
-              src: `/imagenes/proyecto-social/utiles/${photo.file}.webp`,
+              src: `/imagenes/proyecto-social/utiles/${encodeURIComponent(photo.file)}.webp`,
               alt: photo.alt,
             }))}
           />
