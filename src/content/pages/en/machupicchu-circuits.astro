@@ -1,14 +1,17 @@
 ---
 export const frontmatter = {
-  title: "Official Guide to Machu Picchu Circuits",
-  description: "Compare the official Machu Picchu circuits, their routes, duration, difficulty, seasons and recommendations to choose the right ticket.",
+  title: "Machu Picchu Circuits",
+  description:
+    "Compare the 3 circuits and their 10 routes. Explore the maps and learn what each itinerary includes to choose your Machu Picchu ticket.",
   lang: "en",
+  layout: "editorial",
   heroEyebrow: "Guides",
   heroImage: "/imagenes/circuitos.webp",
-  heroImageAlt: "Dreamy Tours",
+  heroImageAlt: "Panoramic view of the Inka city of Machu Picchu",
   seo: {
-    metaTitle: "Machu Picchu Circuits 2026 | Official Route Guide",
-    metaDescription: "Clear guide to Machu Picchu Circuits 1, 2 and 3: routes, duration, difficulty, seasons, availability and tips for booking the right ticket.",
+    metaTitle: "Machu Picchu Circuits: Compare All 10 Routes | Dreamy Tours",
+    metaDescription:
+      "Compare the 3 Machu Picchu circuits and their 10 routes: maps, what each itinerary includes and seasonal trails. Choose the right ticket for your visit.",
   },
   slugs: {
     es: "circuitos-machupicchu",
@@ -16,8 +19,7 @@ export const frontmatter = {
     pt: "circuitos-machupicchu",
   },
 };
-
-import MachupicchuCircuitsInteractive from "@/components/content/MachupicchuCircuitsInteractive.astro";
+import CircuitGuideOverview from "@/components/content/CircuitGuideOverview.astro";
 ---
 
-<MachupicchuCircuitsInteractive lang="en" />
+<CircuitGuideOverview lang="en" />

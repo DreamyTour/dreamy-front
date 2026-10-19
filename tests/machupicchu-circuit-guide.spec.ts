@@ -1,4 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { parse } from "parse5";
+import {
+	circuitOverviewPath,
+	localizedRoutePath,
+	translatedRoutes,
+} from "../src/data/circuitGuideTranslations";
 import {
 	circuitRouteGuides,
 	routeGuideHref,
@@ -99,3 +105,142 @@ test("cards and route maps fit a narrow mobile viewport", async ({ page }) => {
 		await page.getByRole("button", { name: "Cerrar mapa" }).click();
 	}
 });
+
+test("all 33 circuit pages publish localized content and reciprocal language links", async ({
+	request,
+}) => {
+	test.setTimeout(120_000);
+	const uniqueTitles = new Set<string>();
+	for (const lang of ["es", "en", "pt"] as const) {
+		for (const route of [undefined, ...circuitRouteGuides]) {
+			const path = route
+				? localizedRoutePath(route.slug, lang)
+				: circuitOverviewPath[lang];
+			const response = await request.get(path);
+			expect(response.status(), path).toBe(200);
+			const html = await response.text();
+			const doc = parse(html);
+			const found: {
+				title?: string;
+				canonical?: string;
+				language?: string;
+				description?: string;
+				h1: number;
+				alternates: Record<string, string>;
+				schemas: Record<string, any>[];
+				links: string[];
+			} = { h1: 0, alternates: {}, schemas: [], links: [] };
+			function visit(node: any, content = false) {
+				const attrs = Object.fromEntries(
+					(node.attrs ?? []).map((a: any) => [a.name, a.value]),
+				);
+				const text = (node.childNodes ?? [])
+					.map((n: any) => n.value ?? "")
+					.join("");
+				content =
+					content ||
+					(attrs.class ?? "")
+						.split(/\s+/)
+						.some((c: string) => ["circuit-guide", "route-guide"].includes(c));
+				if (node.tagName === "html") found.language = attrs.lang;
+				if (node.tagName === "h1") found.h1++;
+				if (node.tagName === "title") found.title = text;
+				if (node.tagName === "meta" && attrs.name === "description")
+					found.description = attrs.content;
+				if (node.tagName === "link" && attrs.rel === "canonical")
+					found.canonical = attrs.href;
+				if (node.tagName === "link" && attrs.hreflang)
+					found.alternates[attrs.hreflang] = attrs.href;
+				if (node.tagName === "script" && attrs.type === "application/ld+json")
+					found.schemas.push(JSON.parse(text));
+				if (content && node.tagName === "a") found.links.push(attrs.href);
+				(node.childNodes ?? []).forEach((n: any) => visit(n, content));
+			}
+			visit(doc);
+			expect(found.language).toBe(lang);
+			expect(found.h1).toBe(1);
+			expect(found.canonical).toBe("https://dreamy.tours" + path);
+			expect(found.description?.length).toBeGreaterThan(100);
+			expect(uniqueTitles.has(found.title!)).toBe(false);
+			uniqueTitles.add(found.title!);
+			for (const [locale, hreflang] of [
+				["es", "es-PE"],
+				["en", "en"],
+				["pt", "pt-BR"],
+			] as const)
+				expect(found.alternates[hreflang]).toBe(
+					"https://dreamy.tours" +
+						(route
+							? localizedRoutePath(route.slug, locale)
+							: circuitOverviewPath[locale]),
+				);
+			if (lang !== "es")
+				expect(found.links.some((href) => href.startsWith("/es/"))).toBe(false);
+			if (route) {
+				expect(
+					found.schemas.find((s) => s["@type"] === "BreadcrumbList")
+						?.itemListElement,
+				).toHaveLength(3);
+				if (lang !== "es") {
+					const index = circuitRouteGuides.indexOf(route);
+					expect(html).toContain(translatedRoutes[lang][index].paragraphs[0]);
+					expect(html).toContain(translatedRoutes[lang][index].maxStay);
+				}
+			} else {
+				const list = found.schemas.find((s) => s["@type"] === "ItemList");
+				expect(list?.itemListElement).toHaveLength(10);
+				expect(list?.itemListElement.map((item: any) => item.url)).toEqual(
+					circuitRouteGuides.map(
+						(item) =>
+							"https://dreamy.tours" + localizedRoutePath(item.slug, lang),
+					),
+				);
+			}
+		}
+	}
+	expect(uniqueTitles.size).toBe(33);
+});
+
+for (const lang of ["en", "pt"] as const) {
+	test(`${lang} guides retain maps, navigation and mobile layout`, async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 390, height: 844 });
+		await page.goto(circuitOverviewPath[lang]);
+		await expect(page.locator(".circuit-card")).toHaveCount(3);
+		await expect(page.locator(".route-link")).toHaveCount(10);
+		await page.locator("#circuito1 [data-map-open]").click();
+		await expect(page.locator("#general-1-dialog")).toBeVisible();
+		await page
+			.getByRole("button", {
+				name: lang === "en" ? "Close map" : "Fechar mapa",
+			})
+			.click();
+		await page.locator(".route-link").first().click();
+		await expect(page).toHaveURL(
+			new RegExp(localizedRoutePath("ruta-1-a", lang)),
+		);
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+			lang === "en"
+				? "Route 1-A: Machupicchu Mountain"
+				: "Rota 1-A: Montanha Machupicchu",
+		);
+		await page.locator("[data-map-open]").click();
+		await expect(page.locator("dialog[open]")).toBeVisible();
+		await page.keyboard.press("Escape");
+		expect(
+			await page.evaluate(
+				() => document.documentElement.scrollWidth <= innerWidth,
+			),
+		).toBe(true);
+		await page
+			.getByRole("link", {
+				name:
+					lang === "en"
+						? "Back to all circuits and overview maps"
+						: "Voltar a todos os circuitos e mapas gerais",
+			})
+			.click();
+		await expect(page.locator(".circuit-card")).toHaveCount(3);
+	});
+}

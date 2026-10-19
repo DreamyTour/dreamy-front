@@ -1,4 +1,5 @@
 import { purposeSlugs } from "@/data/purposeSlugs";
+import { isCircuitGuideSlug } from "./circuitGuidePaths";
 
 export const LANGS = ["en", "es", "pt"] as const;
 export type Lang = (typeof LANGS)[number];
@@ -96,6 +97,7 @@ export function translatePathForSlug(
 
 	// Registered editorial subpages use complete translated paths, not a single slug.
 	if (
+		isCircuitGuideSlug(translatedSlug) ||
 		Object.values(purposeSlugs).some((slugs) =>
 			Object.values(slugs).some((slug) => slug === translatedSlug),
 		)
@@ -145,9 +147,9 @@ export function resolveLanguageUrls({
 		} else if (slugMap !== undefined) {
 			const slug = slugMap[locale];
 			if (slug === undefined) continue;
-			const registeredPath = Object.values(purposeSlugs).some(
-				(slugs) => slugs[locale] === slug,
-			);
+			const registeredPath =
+				isCircuitGuideSlug(slug) ||
+				Object.values(purposeSlugs).some((slugs) => slugs[locale] === slug);
 			if (
 				!slug.trim() ||
 				/[?#]/.test(slug) ||

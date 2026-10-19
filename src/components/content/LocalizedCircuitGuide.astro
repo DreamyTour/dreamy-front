@@ -1,0 +1,10 @@
+---
+import { localizeCircuitGuideHtml } from "@/lib/localizeCircuitGuide";
+import type { Lang } from "@/lib/i18n";
+interface Props {
+  lang: Lang;
+}
+const html = await Astro.slots.render("default");
+---
+
+<Fragment set:html={localizeCircuitGuideHtml(html, Astro.props.lang)} />

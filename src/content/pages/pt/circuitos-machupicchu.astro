@@ -1,14 +1,17 @@
 ---
 export const frontmatter = {
-  title: "Guia oficial dos circuitos de Machu Picchu",
-  description: "Compare os circuitos oficiais de Machu Picchu, suas rotas, duração, dificuldade, temporadas e recomendações para escolher o ingresso correto.",
+  title: "Circuitos de Machu Picchu",
+  description:
+    "Compare os 3 circuitos e suas 10 rotas. Explore os mapas e descubra o que cada percurso inclui para escolher seu ingresso de Machu Picchu.",
   lang: "pt",
+  layout: "editorial",
   heroEyebrow: "Guias",
   heroImage: "/imagenes/circuitos.webp",
-  heroImageAlt: "Dreamy Tours",
+  heroImageAlt: "Vista panor?mica da cidade inka de Machu Picchu",
   seo: {
-    metaTitle: "Circuitos de Machu Picchu 2026 | Guia oficial de rotas",
-    metaDescription: "Guia claro dos Circuitos 1, 2 e 3 de Machu Picchu: rotas, duração, dificuldade, temporadas, vagas e dicas para reservar o ingresso adequado.",
+    metaTitle: "Circuitos de Machu Picchu: compare as 10 rotas | Dreamy Tours",
+    metaDescription:
+      "Compare os 3 circuitos de Machu Picchu e suas 10 rotas: mapas, o que cada percurso inclui e rotas sazonais. Escolha o ingresso adequado para sua visita.",
   },
   slugs: {
     es: "circuitos-machupicchu",
@@ -16,8 +19,7 @@ export const frontmatter = {
     pt: "circuitos-machupicchu",
   },
 };
-
-import MachupicchuCircuitsInteractive from "@/components/content/MachupicchuCircuitsInteractive.astro";
+import CircuitGuideOverview from "@/components/content/CircuitGuideOverview.astro";
 ---
 
-<MachupicchuCircuitsInteractive lang="pt" />
+<CircuitGuideOverview lang="pt" />

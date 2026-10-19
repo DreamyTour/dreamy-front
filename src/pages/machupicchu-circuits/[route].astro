@@ -1,0 +1,12 @@
+---
+import CircuitRoutePage from "@/components/content/CircuitRoutePage.astro";
+import { circuitRouteGuides } from "@/data/machuPicchuGuide";
+export function getStaticPaths() {
+  return circuitRouteGuides.map((route) => ({
+    params: { route: route.slug.replace("ruta-", "route-") },
+    props: { route },
+  }));
+}
+---
+
+<CircuitRoutePage route={Astro.props.route} lang="en" />
