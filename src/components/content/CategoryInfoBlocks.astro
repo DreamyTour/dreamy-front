@@ -1,0 +1,67 @@
+---
+import StrapiRichTextInline from "./StrapiRichTextInline";
+import StrapiRichTextTable from "./StrapiRichTextTable";
+import type { StrapiBlock } from "@/types/page";
+
+interface Props {
+  blocks: StrapiBlock[];
+}
+const { blocks } = Astro.props;
+const headingTag = (level: unknown): "h4" | "h5" | "h6" =>
+  Number(level) === 5 ? "h5" : Number(level) === 6 ? "h6" : "h4";
+---
+
+{
+  blocks.map((block) => {
+    if (block.type === "paragraph")
+      return (
+        <p>
+          <StrapiRichTextInline nodes={block.children || []} />
+        </p>
+      );
+    if (block.type === "heading") {
+      const Heading = headingTag(block.level);
+      return (
+        <Heading>
+          <StrapiRichTextInline nodes={block.children || []} />
+        </Heading>
+      );
+    }
+    if (block.type === "list") {
+      const List = block.format === "ordered" ? "ol" : "ul";
+      return (
+        <List
+          class={
+            block.format === "ordered" ? "list-decimal pl-6" : "list-disc pl-6"
+          }
+        >
+          {(block.children || []).map((item) =>
+            item.type === "list" ? (
+              <Astro.self blocks={[item as StrapiBlock]} />
+            ) : (
+              <li>
+                <StrapiRichTextInline nodes={item.children || []} />
+              </li>
+            ),
+          )}
+        </List>
+      );
+    }
+    if (block.type === "quote")
+      return (
+        <blockquote>
+          <StrapiRichTextInline nodes={block.children || []} />
+        </blockquote>
+      );
+    if (block.type === "code")
+      return (
+        <pre>
+          <code>
+            <StrapiRichTextInline nodes={block.children || []} />
+          </code>
+        </pre>
+      );
+    if (block.type === "table") return <StrapiRichTextTable block={block} />;
+    return null;
+  })
+}

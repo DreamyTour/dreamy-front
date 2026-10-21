@@ -1,0 +1,249 @@
+---
+import SectionDivider from "@/components/ui/SectionDivider.astro";
+import CategoryInfoBlocks from "@/components/content/CategoryInfoBlocks.astro";
+import type { UsefulInfo } from "@/types/page";
+import { getUsefulInfoItems } from "@/lib/categoryTourSections";
+import {
+  BusFront,
+  ChevronDown,
+  Clock3,
+  TicketCheck,
+  UsersRound,
+} from "lucide-react";
+interface Props {
+  info?: UsefulInfo | null;
+}
+const { info } = Astro.props;
+const icons = [Clock3, BusFront, UsersRound, TicketCheck];
+const tabs = getUsefulInfoItems(info).map((item, index) => ({
+  ...item,
+  id: index + 1,
+  icon: icons[index % icons.length],
+}));
+---
+
+{
+  tabs.length > 0 && (
+    <section
+      class="w-full py-16 md:py-20"
+      aria-labelledby="tour-category-info-title"
+    >
+      <header class="mb-10 max-w-3xl">
+        <h2
+          id="tour-category-info-title"
+          class="mb-4 text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl"
+        >
+          {info?.titulo}
+        </h2>
+        <SectionDivider />
+        {info?.descripcion && (
+          <p class="mt-6 leading-7 text-muted-foreground">{info.descripcion}</p>
+        )}
+      </header>
+      <category-info-tabs class="block">
+        <div
+          data-tab-list
+          hidden
+          role="tablist"
+          aria-labelledby="tour-category-info-title"
+          class="category-info-tab-list mb-5 rounded-[1.5rem] border border-border/60 bg-background p-2.5 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.34)]"
+        >
+          <div class="grid grid-cols-2 gap-2.5 rounded-[1.125rem] bg-muted/70 p-2.5 sm:grid-cols-4">
+            {tabs.map(({ icon: Icon, ...tab }) => (
+              <button
+                type="button"
+                role="tab"
+                id={`category-info-tab-${tab.id}`}
+                aria-controls={`category-info-panel-${tab.id}`}
+                aria-selected="false"
+                tabindex="-1"
+                class="category-info-tab relative flex min-h-[4.875rem] min-w-0 flex-col items-center justify-center gap-2 rounded-xl border border-transparent bg-background px-4 py-3.5 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-foreground/60 shadow-[0_8px_18px_-14px_rgba(15,23,42,0.28)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <Icon
+                  size={22}
+                  strokeWidth={1.8}
+                  className="shrink-0"
+                  aria-hidden="true"
+                />
+                <span>{tab.etiqueta}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div class="space-y-3 sm:space-y-5">
+          {tabs.map(({ icon: Icon, ...tab }) => (
+            <details
+              id={`category-info-panel-${tab.id}`}
+              data-info-panel
+              open
+              class="group/info overflow-hidden rounded-2xl border border-border bg-card shadow-[0_2px_0_rgba(0,0,0,0.05)] sm:rounded-lg sm:shadow-[0_4px_18px_-10px_rgba(13,43,29,0.2)]"
+            >
+              <summary class="flex min-h-24 cursor-pointer list-none items-center gap-3 px-4 py-4 text-left hover:bg-primary/[0.03] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-primary group-open/info:bg-primary/[0.05] sm:hidden [&::-webkit-details-marker]:hidden">
+                <span class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.08] text-primary group-open/info:bg-primary group-open/info:text-primary-foreground">
+                  <Icon size={20} strokeWidth={1.8} aria-hidden="true" />
+                </span>
+                <span class="flex min-w-0 flex-1 flex-col gap-1">
+                  <span class="text-base font-semibold leading-tight tracking-tight text-foreground">
+                    {tab.etiqueta}
+                  </span>
+                  <span class="text-xs leading-relaxed text-muted-foreground">
+                    {tab.titulo}
+                  </span>
+                </span>
+                <ChevronDown
+                  size={16}
+                  aria-hidden="true"
+                  className="shrink-0 text-primary group-open/info:rotate-180 motion-safe:transition-transform"
+                />
+              </summary>
+              <div class="border-t border-primary/10 px-4 py-5 sm:border-0 sm:p-6 md:p-8">
+                <h3 class="mb-5 hidden text-xl font-semibold text-foreground sm:block md:text-2xl">
+                  {tab.titulo}
+                </h3>
+                <div class="max-w-4xl space-y-4 leading-7 text-muted-foreground">
+                  <CategoryInfoBlocks blocks={tab.contenido || []} />
+                </div>
+              </div>
+            </details>
+          ))}
+        </div>
+      </category-info-tabs>
+    </section>
+  )
+}
+
+<script>
+  class CategoryInfoTabs extends HTMLElement {
+    private controller?: AbortController;
+
+    connectedCallback() {
+      if (this.dataset.enhanced) return;
+      this.dataset.enhanced = "true";
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      const list = this.querySelector<HTMLElement>("[data-tab-list]");
+      const tabs = Array.from(
+        this.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+      );
+      const panels = Array.from(
+        this.querySelectorAll<HTMLDetailsElement>("[data-info-panel]"),
+      );
+      if (!list || tabs.length !== panels.length || !tabs.length) return;
+
+      const desktop = window.matchMedia("(min-width: 640px)");
+      let activeIndex = 0;
+      const select = (index: number, focus = false) => {
+        activeIndex = index;
+        tabs.forEach((tab, tabIndex) => {
+          const active = tabIndex === index;
+          tab.setAttribute("aria-selected", String(active));
+          tab.tabIndex = active ? 0 : -1;
+          panels[tabIndex].hidden = desktop.matches && !active;
+        });
+        if (focus) tabs[index].focus();
+      };
+      const updateLayout = () => {
+        list.hidden = !desktop.matches;
+        panels.forEach((panel, index) => {
+          panel.open = desktop.matches;
+          if (desktop.matches) {
+            panel.setAttribute("role", "tabpanel");
+            panel.setAttribute("aria-labelledby", tabs[index].id);
+            panel.tabIndex = 0;
+          } else {
+            panel.removeAttribute("role");
+            panel.removeAttribute("aria-labelledby");
+            panel.removeAttribute("tabindex");
+          }
+        });
+        select(activeIndex);
+      };
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => select(index), { signal });
+        tab.addEventListener(
+          "keydown",
+          (event) => {
+            let next = index;
+            if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+            else if (event.key === "ArrowLeft")
+              next = (index - 1 + tabs.length) % tabs.length;
+            else if (event.key === "Home") next = 0;
+            else if (event.key === "End") next = tabs.length - 1;
+            else return;
+            event.preventDefault();
+            select(next, true);
+          },
+          { signal },
+        );
+      });
+      desktop.addEventListener("change", updateLayout, { signal });
+      updateLayout();
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+      delete this.dataset.enhanced;
+    }
+  }
+  if (!customElements.get("category-info-tabs"))
+    customElements.define("category-info-tabs", CategoryInfoTabs);
+</script>
+
+<style>
+  .category-info-tab-list[hidden] {
+    display: none;
+  }
+
+  .category-info-tab[aria-selected="true"] {
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+
+  .category-info-tab::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0.35rem;
+    width: 0;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0;
+    transform: translateX(-50%);
+  }
+
+  .category-info-tab[aria-selected="true"]::after {
+    width: min(3.25rem, calc(100% - 2rem));
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .category-info-tab:not([aria-selected="true"]):hover {
+      color: var(--primary);
+      border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+      background: color-mix(in srgb, var(--primary) 6%, var(--card));
+    }
+    .category-info-tab:not([aria-selected="true"]):hover::after {
+      width: min(2.75rem, calc(100% - 2rem));
+      opacity: 0.5;
+    }
+    .category-info-tab[aria-selected="true"]:hover {
+      background: var(--primary);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .category-info-tab {
+      transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease;
+    }
+    .category-info-tab::after {
+      transition:
+        width 220ms ease,
+        opacity 220ms ease;
+    }
+  }
+</style>

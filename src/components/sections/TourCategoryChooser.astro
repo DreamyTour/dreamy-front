@@ -1,0 +1,208 @@
+---
+import SectionDivider from "@/components/ui/SectionDivider.astro";
+import MobileCardCarousel from "@/components/ui/MobileCardCarousel.astro";
+import { rewriteUrl } from "@/lib/utils";
+import type { Lang } from "@/lib/i18n";
+import type { TourSelector } from "@/types/page";
+import { getValidTourRecommendations } from "@/lib/categoryTourSections";
+import {
+  ArrowRight,
+  BookOpen,
+  Clock3,
+  Compass,
+  Heart,
+  Landmark,
+  Layers3,
+  MapPin,
+  MoonStar,
+  Sparkles,
+  Users,
+  UtensilsCrossed,
+} from "lucide-react";
+
+interface Props {
+  selector?: TourSelector | null;
+  locale?: string;
+  lang: Lang;
+}
+const { selector, locale, lang } = Astro.props;
+const navigationLabels = {
+  es: { previous: "Recomendación anterior", next: "Siguiente recomendación" },
+  en: { previous: "Previous recommendation", next: "Next recommendation" },
+  pt: { previous: "Recomendação anterior", next: "Próxima recomendação" },
+}[lang];
+const icons = [Compass, Landmark, UtensilsCrossed, MoonStar];
+// Preserve the approved action captions. CMS relations still select and order
+// every recommendation; other tours receive the generic localized action.
+const actionCaptions: Record<string, string> = {
+  j2bi54khx9tvp7kq5bdgpjg2: "Ver City Tour",
+  j71agcbrd39z864z2b518y6p: "Ver Pachacámac",
+  n66qydy1wrj5hkmt9celbgw8: "Ver experiencia",
+  zhpvawkj5hzkketvb25z3mck: "Ver tour nocturno",
+};
+const tagIcons = {
+  "Primera visita": MapPin,
+  "Poco tiempo": Clock3,
+  Historia: Landmark,
+  Cultura: BookOpen,
+  Arqueología: Layers3,
+  Gastronomía: UtensilsCrossed,
+  Parejas: Heart,
+  "Viajeros curiosos": Sparkles,
+  Familias: Users,
+  "Noche libre": MoonStar,
+};
+const choices = getValidTourRecommendations(selector, locale, lang).map(
+  (item) => ({
+    ...item,
+    icon: icons[item.sourceIndex % icons.length],
+    label: item.etiqueta,
+    title: item.titulo,
+    description: item.descripcion,
+    idealFor: (item.idealPara || "")
+      .split(/\r?\n/)
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+      .map((label) => ({
+        label,
+        icon: tagIcons[label as keyof typeof tagIcons] || Users,
+      })),
+    linkLabel:
+      (lang === "es" && actionCaptions[item.tour.documentId]) ||
+      { es: "Ver tour", en: "View tour", pt: "Ver tour" }[lang],
+  }),
+);
+---
+
+{
+  choices.length > 0 && (
+    <section
+      class="w-full bg-background py-12 md:py-14"
+      aria-labelledby="tour-category-chooser-title"
+    >
+      <header class="mb-8 max-w-3xl">
+        <h2
+          id="tour-category-chooser-title"
+          class="mb-4 text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl"
+        >
+          {selector?.titulo}
+        </h2>
+        <SectionDivider />
+        <p class="mt-6 leading-7 text-muted-foreground">
+          {selector?.descripcion}
+        </p>
+      </header>
+      <MobileCardCarousel
+        id="tour-category-choices"
+        labelledby="tour-category-chooser-title"
+        count={choices.length}
+        previousLabel={navigationLabels.previous}
+        nextLabel={navigationLabels.next}
+      >
+        <ul
+          id="tour-category-choices"
+          data-mobile-carousel-track
+          role="list"
+          class="grid grid-cols-1 gap-5 md:auto-rows-fr md:grid-cols-2 xl:grid-cols-4"
+        >
+          {choices.map(
+            ({
+              icon: Icon,
+              label,
+              title,
+              description,
+              idealFor,
+              linkLabel,
+              tour,
+            }) => (
+              <li class="min-w-0">
+                <article class="tour-recommendation flex h-full flex-col items-start rounded-xl border border-border/80 bg-card p-5 shadow-[0_4px_20px_-16px_rgba(13,43,29,0.2)]">
+                  <div class="mb-3 flex w-full items-center gap-3">
+                    <span class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/[0.06] text-primary">
+                      <Icon size={20} strokeWidth={1.7} aria-hidden="true" />
+                    </span>
+                    <p class="min-w-0 flex-1 text-[0.65rem] font-semibold uppercase leading-4 tracking-[0.1em] text-primary">
+                      {label}
+                    </p>
+                  </div>
+                  <h3 class="mb-2 text-lg font-semibold leading-6 tracking-tight text-foreground">
+                    {title}
+                  </h3>
+                  <p class="mb-4 text-sm leading-6 text-muted-foreground">
+                    {description}
+                  </p>
+                  <div class="mt-auto min-h-[5.25rem] w-full border-t border-border/60 pt-3">
+                    <p class="mb-2 text-xs font-medium text-foreground">
+                      Ideal para:
+                    </p>
+                    <ul role="list" class="flex flex-wrap gap-1.5">
+                      {idealFor.map(({ label: tag, icon: TagIcon }) => (
+                        <li class="inline-flex items-center gap-1.5 rounded-sm bg-muted/60 px-2 py-0.5 text-xs leading-5 text-muted-foreground">
+                          <TagIcon
+                            size={14}
+                            strokeWidth={1.7}
+                            className="shrink-0 text-primary/75"
+                            aria-hidden="true"
+                          />
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <a
+                    href={rewriteUrl(`/${tour.slug}`, lang)}
+                    aria-label={`${linkLabel}: ${tour.titulo}`}
+                    class="group/link mt-3 inline-flex min-h-9 items-center gap-2 rounded-md border border-secondary/15 bg-secondary/[0.04] px-3 py-1.5 text-sm font-semibold text-secondary hover:border-secondary hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary motion-safe:transition-colors"
+                  >
+                    {linkLabel}
+                    <ArrowRight
+                      size={17}
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                      className="shrink-0 motion-safe:transition-transform motion-safe:group-hover/link:translate-x-0.5"
+                    />
+                  </a>
+                </article>
+              </li>
+            ),
+          )}
+        </ul>
+      </MobileCardCarousel>
+    </section>
+  )
+}
+
+<style>
+  .tour-recommendation:focus-within {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+    box-shadow: 0 14px 32px -24px
+      color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+
+  @media (hover: hover) {
+    .tour-recommendation:hover {
+      border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+      box-shadow: 0 14px 32px -24px
+        color-mix(in srgb, var(--primary) 40%, transparent);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tour-recommendation {
+      translate: 0;
+      transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        translate 180ms ease;
+    }
+
+    .tour-recommendation:focus-within {
+      translate: 0 -2px;
+    }
+    @media (hover: hover) {
+      .tour-recommendation:hover {
+        translate: 0 -2px;
+      }
+    }
+  }
+</style>

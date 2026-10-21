@@ -2,6 +2,7 @@
 import SectionDivider from "@/components/ui/SectionDivider.astro";
 import type { Lang } from "@/lib/i18n";
 import TripAdvisorLogo from "@/assets/certification/certificado-tripadvisor.svg?url";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
   lang: Lang;
@@ -25,7 +26,7 @@ type SourceSummary = {
   url: string;
 };
 
-const sourceOrder: ReviewSource[] = ["tripadvisor", "google", "trustpilot"];
+const sourceOrder: ReviewSource[] = ["tripadvisor", "trustpilot", "google"];
 const sourceLabels = {
   trustpilot: {
     name: "Trustpilot",
@@ -84,6 +85,11 @@ const reviewCopy = {
 
 const reviewLabels =
   reviewCopy[lang as keyof typeof reviewCopy] || reviewCopy.es;
+const navigationLabels = {
+  es: { previous: "Comentario anterior", next: "Siguiente comentario" },
+  en: { previous: "Previous review", next: "Next review" },
+  pt: { previous: "Avaliação anterior", next: "Próxima avaliação" },
+}[lang];
 const tripadvisorUrl =
   "https://www.tripadvisor.com.pe/Attraction_Review-g294314-d17325827-Reviews-Dreamy_Tours-Cusco_Cusco_Region.html";
 const googleUrl =
@@ -205,10 +211,10 @@ const getSourceReviews = (source: ReviewSource) =>
 ---
 
 <section
-  class="reviews-wall bg-white py-14 sm:py-16"
+  class="reviews-wall bg-white py-6 sm:py-16"
   aria-labelledby="reviews-wall-title"
 >
-  <div class="mx-auto max-w-8xl px-6">
+  <div class="mx-auto max-w-8xl px-4 sm:px-6">
     <header class="mb-8 max-w-3xl">
       <h2
         id="reviews-wall-title"
@@ -222,212 +228,298 @@ const getSourceReviews = (source: ReviewSource) =>
         {reviewLabels.description}
       </p>
     </header>
-    <review-tabs class="block" data-active-source="tripadvisor">
-      <div
-        class="review-tabs-list"
-        role="tablist"
-        aria-labelledby="reviews-wall-title"
-      >
-        {
-          sourceOrder.map((source, index) => {
-            const summary = sourceSummaries[source];
-            const label = sourceLabels[source];
-            return (
-              <button
-                type="button"
-                role="tab"
-                id={`reviews-tab-${source}`}
-                aria-controls={`reviews-panel-${source}`}
-                aria-selected={index === 0 ? "true" : "false"}
-                tabindex={index === 0 ? 0 : -1}
-                data-source={source}
-                class={`review-source-panel ${label.panelClass}`}
-              >
-                <span
-                  class={`review-brand-logo review-brand-logo--${source}`}
-                  role="img"
-                  aria-label={label.name}
-                >
-                  {source === "google" ? (
-                    <>
-                      <span class="g-blue" aria-hidden="true">
-                        G
-                      </span>
-                      <span class="g-secondary" aria-hidden="true">
-                        o
-                      </span>
-                      <span class="g-yellow" aria-hidden="true">
-                        o
-                      </span>
-                      <span class="g-blue" aria-hidden="true">
-                        g
-                      </span>
-                      <span class="g-green" aria-hidden="true">
-                        l
-                      </span>
-                      <span class="g-secondary" aria-hidden="true">
-                        e
-                      </span>
-                      <span class="review-google-word" aria-hidden="true">
-                        Reviews
-                      </span>
-                    </>
-                  ) : source === "trustpilot" ? (
-                    <span class="trustpilot-wordmark">
-                      <span class="trustpilot-star" aria-hidden="true">
-                        ★
-                      </span>
-                      Trustpilot
-                    </span>
-                  ) : (
-                    <img
-                      class="tripadvisor-logo-img"
-                      src={TripAdvisorLogo}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                </span>
-                <span class="review-source-tour">{reviewLabels.brandTour}</span>
-                <span class="review-score-line">
-                  <span class="review-score">{summary.rating.toFixed(1)}</span>
-                  <span class="review-score-descriptor">{reviewLabels.of}</span>
-                  <span
-                    class={`review-stars review-stars--${source}`}
-                    role="img"
-                    aria-label={`${summary.rating} / 5`}
+    <review-tabs
+      class="block space-y-3 sm:space-y-6"
+      data-active-source="tripadvisor"
+    >
+      {
+        sourceOrder.map((source) => {
+          const label = sourceLabels[source];
+          const summary = sourceSummaries[source];
+          return (
+            <details
+              open
+              data-review-source
+              id={`reviews-panel-${source}`}
+              class={`review-tab-panel review-source-row--${source} rounded-2xl border border-border bg-card shadow-[0_2px_0_rgba(0,0,0,0.05)] sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none`}
+            >
+              <summary class="flex min-h-24 cursor-pointer list-none items-center gap-3 px-4 py-4 text-left hover:bg-primary/[0.03] focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-primary sm:hidden [&::-webkit-details-marker]:hidden">
+                <span class="flex min-w-0 flex-1 items-center justify-between gap-3">
+                  <a
+                    href={summary.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="review-accordion-brand"
+                    aria-label={label.name}
                   >
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <span
-                        aria-hidden="true"
-                        class:list={{
-                          "is-filled": index < Math.round(summary.rating),
-                        }}
+                    {source === "tripadvisor" ? (
+                      <img
+                        src={TripAdvisorLogo}
+                        alt=""
+                        width="104"
+                        height="32"
+                        loading="lazy"
                       />
-                    ))}
+                    ) : source === "google" ? (
+                      <span class="review-accordion-google" aria-hidden="true">
+                        <span class="g-blue">G</span>
+                        <span class="g-secondary">o</span>
+                        <span class="g-yellow">o</span>
+                        <span class="g-blue">g</span>
+                        <span class="g-green">l</span>
+                        <span class="g-secondary">e</span>
+                      </span>
+                    ) : (
+                      <span
+                        class="review-accordion-trustpilot"
+                        aria-hidden="true"
+                      >
+                        <span class="trustpilot-star">★</span>Trustpilot
+                      </span>
+                    )}
+                  </a>
+                  <span class="flex shrink-0 flex-col items-end gap-1 text-xs leading-relaxed text-muted-foreground">
+                    <span class="flex items-baseline gap-1">
+                      <strong class="text-3xl font-semibold leading-none tracking-tight text-foreground">
+                        {sourceSummaries[source].rating.toFixed(1)}
+                      </strong>
+                      <span class="text-xs">/ 5</span>
+                    </span>
+                    <span class="text-[0.65rem]">
+                      {new Intl.NumberFormat(lang).format(
+                        sourceSummaries[source].reviewCount,
+                      )}{" "}
+                      {reviewLabels.reviews}
+                    </span>
                   </span>
                 </span>
-                <span class="review-total">
-                  {reviewLabels.basedOn}{" "}
-                  {new Intl.NumberFormat(lang).format(summary.reviewCount)}{" "}
-                  {reviewLabels.reviews}
-                </span>
-              </button>
-            );
-          })
-        }
-      </div>
-      {
-        sourceOrder.map((source, index) => {
-          const label = sourceLabels[source];
-          return (
-            <div
-              role="tabpanel"
-              id={`reviews-panel-${source}`}
-              aria-labelledby={`reviews-tab-${source}`}
-              tabindex="0"
-              hidden={index !== 0}
-              class={`review-tab-panel review-source-row--${source}`}
-            >
-              <div class="review-row-cards">
-                {getSourceReviews(source).map((review) => (
-                  <article class={`review-card ${label.cardClass}`}>
-                    <span
-                      class={`review-platform-badge review-platform-badge--${source}`}
-                      role="img"
-                      aria-label={label.name}
-                    >
-                      {source === "google" ? (
+                <ChevronDown
+                  size={16}
+                  aria-hidden="true"
+                  className="review-source-chevron shrink-0 text-primary motion-safe:transition-transform"
+                />
+              </summary>
+              <div class="review-desktop-row">
+                <div
+                  data-rating-summary
+                  class={`review-source-panel review-desktop-summary ${label.panelClass}`}
+                >
+                  <a
+                    href={summary.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class={`review-brand-logo review-brand-logo--${source}`}
+                    aria-label={label.name}
+                  >
+                    {source === "google" ? (
+                      <>
                         <span class="g-blue" aria-hidden="true">
                           G
                         </span>
-                      ) : source === "trustpilot" ? (
+                        <span class="g-secondary" aria-hidden="true">
+                          o
+                        </span>
+                        <span class="g-yellow" aria-hidden="true">
+                          o
+                        </span>
+                        <span class="g-blue" aria-hidden="true">
+                          g
+                        </span>
+                        <span class="g-green" aria-hidden="true">
+                          l
+                        </span>
+                        <span class="g-secondary" aria-hidden="true">
+                          e
+                        </span>
+                        <span class="review-google-word" aria-hidden="true">
+                          Reviews
+                        </span>
+                      </>
+                    ) : source === "trustpilot" ? (
+                      <span class="trustpilot-wordmark">
                         <span class="trustpilot-star" aria-hidden="true">
                           ★
                         </span>
-                      ) : (
-                        <img
-                          class="review-platform-badge-img"
-                          src={TripAdvisorLogo}
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      )}
-                    </span>
-                    <div class="review-card__header">
-                      <span
-                        class="review-avatar review-avatar--initials"
-                        aria-hidden="true"
-                      >
-                        {review.author.slice(0, 2).toUpperCase()}
+                        Trustpilot
                       </span>
-                      <div class="review-card__author">
-                        <h3 class="review-author">{review.author}</h3>
-                        <time class="review-date" datetime={review.date}>
-                          {formatDate(review.date)}
-                        </time>
-                      </div>
-                    </div>
-                    <p class="review-title">{review.title || label.name}</p>
+                    ) : (
+                      <img
+                        class="tripadvisor-logo-img"
+                        src={TripAdvisorLogo}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                  </a>
+                  <span class="review-source-tour">
+                    {reviewLabels.brandTour}
+                  </span>
+                  <span class="review-score-line">
+                    <span class="review-score">
+                      {summary.rating.toFixed(1)}
+                    </span>
+                    <span class="review-score-descriptor">
+                      {reviewLabels.of}
+                    </span>
                     <span
                       class={`review-stars review-stars--${source}`}
                       role="img"
-                      aria-label={`${review.rating} / 5`}
+                      aria-label={`${summary.rating} / 5`}
                     >
                       {Array.from({ length: 5 }).map((_, index) => (
                         <span
                           aria-hidden="true"
                           class:list={{
-                            "is-filled": index < Math.round(review.rating),
+                            "is-filled": index < Math.round(summary.rating),
                           }}
                         />
                       ))}
                     </span>
-                    {review.text.length > 210 ? (
-                      <div class="review-expand">
-                        <p
-                          id={`review-${source}-${reviews.indexOf(review)}`}
-                          class="review-text"
-                        >
-                          {review.text}
-                        </p>
-                        <button
-                          type="button"
-                          class="review-expand-toggle"
-                          aria-expanded="false"
-                          aria-controls={`review-${source}-${reviews.indexOf(review)}`}
-                        >
-                          <span class="review-more">{reviewLabels.more}</span>
-                          <span class="review-less">{reviewLabels.less}</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <p class="review-text">{review.text}</p>
-                    )}
-                    {review.url && (
-                      <a
-                        class="review-link"
-                        href={review.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {reviewLabels.full}
-                      </a>
-                    )}
-                  </article>
-                ))}
+                  </span>
+                  <span class="review-total">
+                    {reviewLabels.basedOn}{" "}
+                    {new Intl.NumberFormat(lang).format(summary.reviewCount)}{" "}
+                    {reviewLabels.reviews}
+                  </span>
+                </div>
+                <div class="review-carousel-body border-t border-border px-3 py-4 sm:border-0 sm:p-0">
+                  <div class="review-carousel">
+                    <button
+                      type="button"
+                      class="review-carousel-button review-carousel-button--previous"
+                      data-review-previous
+                      hidden
+                      aria-label={navigationLabels.previous}
+                      aria-controls={`reviews-cards-${source}`}
+                    >
+                      <ChevronLeft size={20} aria-hidden="true" />
+                    </button>
+                    <div
+                      class="review-row-cards"
+                      id={`reviews-cards-${source}`}
+                    >
+                      {getSourceReviews(source).map((review) => (
+                        <article class={`review-card ${label.cardClass}`}>
+                          <span
+                            class={`review-platform-badge review-platform-badge--${source}`}
+                            role="img"
+                            aria-label={label.name}
+                          >
+                            {source === "google" ? (
+                              <span class="g-blue" aria-hidden="true">
+                                G
+                              </span>
+                            ) : source === "trustpilot" ? (
+                              <span class="trustpilot-star" aria-hidden="true">
+                                ★
+                              </span>
+                            ) : (
+                              <img
+                                class="review-platform-badge-img"
+                                src={TripAdvisorLogo}
+                                alt=""
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            )}
+                          </span>
+                          <div class="review-card__header">
+                            <span
+                              class="review-avatar review-avatar--initials"
+                              aria-hidden="true"
+                            >
+                              {review.author.slice(0, 2).toUpperCase()}
+                            </span>
+                            <div class="review-card__author">
+                              <h3 class="review-author">
+                                {review.url ? (
+                                  <a
+                                    href={review.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="hover:underline underline-offset-2"
+                                  >
+                                    {review.author}
+                                  </a>
+                                ) : (
+                                  review.author
+                                )}
+                              </h3>
+                              <time class="review-date" datetime={review.date}>
+                                {formatDate(review.date)}
+                              </time>
+                            </div>
+                          </div>
+                          <p class="review-title">
+                            {review.title || label.name}
+                          </p>
+                          <span
+                            class={`review-stars review-stars--${source}`}
+                            role="img"
+                            aria-label={`${review.rating} / 5`}
+                          >
+                            {Array.from({ length: 5 }).map((_, index) => (
+                              <span
+                                aria-hidden="true"
+                                class:list={{
+                                  "is-filled":
+                                    index < Math.round(review.rating),
+                                }}
+                              />
+                            ))}
+                          </span>
+                          {review.text.length > 160 ? (
+                            <div class="review-expand">
+                              <p
+                                id={`review-${source}-${reviews.indexOf(review)}`}
+                                class="review-text"
+                              >
+                                {review.text}
+                              </p>
+                              <button
+                                type="button"
+                                class="review-expand-toggle"
+                                aria-expanded="false"
+                                aria-controls={`review-${source}-${reviews.indexOf(review)}`}
+                              >
+                                <span class="review-more">
+                                  {reviewLabels.more}
+                                </span>
+                                <span class="review-less">
+                                  {reviewLabels.less}
+                                </span>
+                              </button>
+                            </div>
+                          ) : (
+                            <p class="review-text">{review.text}</p>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      class="review-carousel-button review-carousel-button--next"
+                      data-review-next
+                      hidden
+                      aria-label={navigationLabels.next}
+                      aria-controls={`reviews-cards-${source}`}
+                    >
+                      <ChevronRight size={20} aria-hidden="true" />
+                    </button>
+                  </div>
+                  <output
+                    class="review-carousel-position"
+                    data-review-position
+                    hidden
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    1 / {getSourceReviews(source).length}
+                  </output>
+                </div>
               </div>
-              <a
-                class="review-all"
-                href={sourceSummaries[source].url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {reviewLabels.full} <span aria-hidden="true">↗</span>
-              </a>
-            </div>
+            </details>
           );
         })
       }
@@ -437,38 +529,101 @@ const getSourceReviews = (source: ReviewSource) =>
 
 <script>
   class ReviewTabs extends HTMLElement {
+    private controller?: AbortController;
+    private observers: ResizeObserver[] = [];
+
     connectedCallback() {
       if (this.dataset.ready) return;
       this.dataset.ready = "true";
-      const tabs = Array.from(
-        this.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
-      );
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      const mobile = window.matchMedia("(max-width: 639px)");
+      const desktop = window.matchMedia("(min-width: 1024px)");
       const panels = Array.from(
-        this.querySelectorAll<HTMLElement>('[role="tabpanel"]'),
+        this.querySelectorAll<HTMLDetailsElement>("[data-review-source]"),
       );
-      const select = (index: number, focus = false) => {
-        tabs.forEach((tab, i) => {
-          tab.setAttribute("aria-selected", String(i === index));
-          tab.tabIndex = i === index ? 0 : -1;
-          panels[i].hidden = i !== index;
-        });
-        this.dataset.activeSource = tabs[index].dataset.source;
-        if (focus) tabs[index].focus();
-      };
-      tabs.forEach((tab, index) => {
-        tab.addEventListener("click", () => select(index));
-        tab.addEventListener("keydown", (event) => {
-          let next = index;
-          if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-          else if (event.key === "ArrowLeft")
-            next = (index - 1 + tabs.length) % tabs.length;
-          else if (event.key === "Home") next = 0;
-          else if (event.key === "End") next = tabs.length - 1;
-          else return;
-          event.preventDefault();
-          select(next, true);
-        });
+      panels.forEach((panel) => {
+        const track = panel.querySelector<HTMLElement>(".review-row-cards");
+        const previous = panel.querySelector<HTMLButtonElement>(
+          "[data-review-previous]",
+        );
+        const next =
+          panel.querySelector<HTMLButtonElement>("[data-review-next]");
+        const position = panel.querySelector<HTMLOutputElement>(
+          "[data-review-position]",
+        );
+        const cards = Array.from(
+          panel.querySelectorAll<HTMLElement>(".review-card"),
+        );
+        if (!track || !previous || !next || !position || !cards.length) return;
+        let active = 0;
+        const sync = () => {
+          const visibleCount = mobile.matches ? 1 : desktop.matches ? 3 : 2;
+          previous.hidden = next.hidden = cards.length <= visibleCount;
+          position.hidden = !mobile.matches;
+          if (!track.clientWidth) return;
+          const start = cards[0].offsetLeft;
+          active = cards.reduce(
+            (nearest, card, index) =>
+              Math.abs(card.offsetLeft - start - track.scrollLeft) <
+              Math.abs(cards[nearest].offsetLeft - start - track.scrollLeft)
+                ? index
+                : nearest,
+            0,
+          );
+          previous.disabled = active === 0;
+          next.disabled = active >= cards.length - visibleCount;
+          position.value = `${active + 1} / ${cards.length}`;
+          cards.forEach((card) => {
+            const start = card.offsetLeft - cards[0].offsetLeft;
+            card.inert =
+              start + card.offsetWidth <= track.scrollLeft + 1 ||
+              start >= track.scrollLeft + track.clientWidth - 1;
+          });
+        };
+        const move = (direction: number) => {
+          const index = Math.max(
+            0,
+            Math.min(
+              cards.length - (mobile.matches ? 1 : desktop.matches ? 3 : 2),
+              active + direction,
+            ),
+          );
+          track.scrollTo({
+            left: cards[index].offsetLeft - cards[0].offsetLeft,
+            behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+              .matches
+              ? "auto"
+              : "smooth",
+          });
+        };
+        previous.addEventListener("click", () => move(-1), { signal });
+        next.addEventListener("click", () => move(1), { signal });
+        track.addEventListener("scroll", sync, { passive: true, signal });
+        mobile.addEventListener("change", sync, { signal });
+        desktop.addEventListener("change", sync, { signal });
+        const observer = new ResizeObserver(sync);
+        observer.observe(track);
+        this.observers.push(observer);
+        sync();
       });
+      const updateLayout = () => {
+        panels.forEach((panel) => {
+          panel.open = !mobile.matches;
+          panel
+            .querySelector<HTMLElement>(".review-row-cards")
+            ?.scrollTo({ left: 0, behavior: "instant" });
+        });
+      };
+      mobile.addEventListener("change", updateLayout, { signal });
+      updateLayout();
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+      this.observers.forEach((observer) => observer.disconnect());
+      this.observers = [];
+      delete this.dataset.ready;
     }
   }
   if (!customElements.get("review-tabs"))
@@ -480,18 +635,207 @@ const getSourceReviews = (source: ReviewSource) =>
       ".review-expand-toggle",
     );
     if (!button) return;
+    const container = button.closest(".review-expand");
+    const text = container?.querySelector<HTMLElement>(".review-text");
+    const before = text?.getBoundingClientRect().height;
     const expanded = button.getAttribute("aria-expanded") !== "true";
     button.setAttribute("aria-expanded", String(expanded));
     button.closest(".review-expand")?.classList.toggle("is-expanded", expanded);
+    if (
+      text &&
+      before &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      text.animate(
+        [
+          { height: `${before}px` },
+          { height: `${text.getBoundingClientRect().height}px` },
+        ],
+        {
+          duration: 220,
+          easing: "ease-out",
+        },
+      );
+    }
   });
 </script>
 
 <style is:global>
+  .review-desktop-summary {
+    display: none !important;
+  }
+  @media (min-width: 640px) {
+    .reviews-wall .review-desktop-row {
+      --review-row-height: 13rem;
+      display: grid;
+      grid-template-columns: minmax(14rem, 0.95fr) minmax(0, 2fr);
+      align-items: stretch;
+      gap: 2rem;
+    }
+    .reviews-wall review-tabs .review-desktop-summary {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto;
+      min-height: var(--review-row-height);
+      height: 100%;
+      padding: 1.25rem;
+      text-decoration: none;
+      cursor: default;
+      gap: 0.5rem;
+    }
+    .reviews-wall .review-desktop-summary .review-brand-logo--tripadvisor {
+      width: 8rem;
+    }
+    .reviews-wall .review-desktop-summary .review-score-line {
+      align-items: flex-end;
+    }
+    .reviews-wall .review-desktop-summary .review-score {
+      font-size: 2rem;
+    }
+    .reviews-wall .review-desktop-summary .review-total {
+      font-size: 0.65rem;
+    }
+    .reviews-wall .review-desktop-summary .review-brand-logo--google,
+    .reviews-wall .review-desktop-summary .trustpilot-wordmark {
+      font-size: 1.35rem;
+    }
+    .reviews-wall .review-desktop-summary .review-google-word {
+      display: none;
+    }
+    .reviews-wall .review-carousel-body {
+      min-width: 0;
+    }
+    .reviews-wall .review-carousel {
+      position: relative;
+    }
+    .reviews-wall .review-tab-panel .review-row-cards {
+      display: flex;
+      overflow-x: auto;
+      align-items: stretch;
+      gap: 1rem;
+      padding: 0;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .reviews-wall .review-row-cards::-webkit-scrollbar {
+      display: none;
+    }
+    .reviews-wall .review-tab-panel .review-card {
+      flex: 0 0 calc((100% - 1rem) / 2);
+      min-height: var(--review-row-height);
+      padding: 0.875rem;
+      border-radius: 1rem;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      box-shadow: none;
+    }
+    .reviews-wall .review-tab-panel .review-card:hover {
+      transform: none;
+    }
+    .reviews-wall .review-tab-panel .review-avatar {
+      width: 2rem;
+      height: 2rem;
+      font-size: 0.7rem;
+    }
+    .reviews-wall .review-tab-panel .review-author {
+      font-size: 0.75rem;
+    }
+    .reviews-wall .review-tab-panel .review-date {
+      font-size: 0.62rem;
+    }
+    .reviews-wall .review-tab-panel .review-title {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .reviews-wall .review-tab-panel .review-text {
+      font-size: 0.78rem;
+      line-height: 1.65;
+    }
+    .reviews-wall .review-stars {
+      margin-block: 0.4rem 0.6rem;
+    }
+    .reviews-wall .review-expand:not(.is-expanded) > .review-text {
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+    }
+    .reviews-wall .review-expand-toggle {
+      min-height: 2rem;
+      font-size: 0.72rem;
+    }
+    .reviews-wall .review-tab-panel .review-platform-badge {
+      top: 1rem;
+      right: 1rem;
+      width: 1.75rem;
+    }
+    .reviews-wall .review-tab-panel .review-link {
+      display: none;
+    }
+    .reviews-wall .review-all {
+      display: none;
+    }
+    .reviews-wall .review-carousel-button:not([hidden]) {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      display: flex;
+      width: 2.5rem;
+      height: 2.5rem;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      transform: translateY(-50%);
+    }
+    .reviews-wall .review-carousel-button--previous {
+      left: -1.25rem;
+    }
+    .reviews-wall .review-carousel-button--next {
+      right: -1.25rem;
+    }
+    .reviews-wall .review-carousel-button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
   .review-tabs-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     margin-bottom: 1.75rem;
+  }
+  @media (min-width: 1024px) {
+    .reviews-wall .review-desktop-row {
+      grid-template-columns: calc((100% - 3rem) / 4) minmax(0, 1fr);
+      gap: 1rem;
+    }
+    .reviews-wall .review-tab-panel .review-card {
+      flex-basis: calc((100% - 2rem) / 3);
+    }
+  }
+  @media (min-width: 640px) {
+    .reviews-wall review-tabs .review-desktop-summary {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.65rem;
+    }
+    .reviews-wall .review-desktop-summary .review-brand-logo {
+      justify-content: center;
+    }
+    .reviews-wall .review-desktop-summary .review-score-line {
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .reviews-wall .review-desktop-summary .review-total {
+      width: 100%;
+      text-align: center;
+    }
   }
   review-tabs .review-source-panel {
     --platform-color: #00aa6c;
@@ -521,7 +865,7 @@ const getSourceReviews = (source: ReviewSource) =>
   review-tabs .review-source-panel--trustpilot {
     --platform-color: #00b67a;
   }
-  review-tabs .review-source-panel[aria-selected="true"] {
+  review-tabs .review-source-panel:is(:hover, :focus-within) {
     border-color: color-mix(in oklab, var(--platform-color) 65%, white);
     background: linear-gradient(
       135deg,
@@ -540,10 +884,10 @@ const getSourceReviews = (source: ReviewSource) =>
     background: var(--platform-color);
     opacity: 0;
   }
-  review-tabs .review-source-panel[aria-selected="true"]::after {
+  review-tabs .review-source-panel:is(:hover, :focus-within)::after {
     opacity: 1;
   }
-  review-tabs .review-source-panel--google[aria-selected="true"] {
+  review-tabs .review-source-panel--google:is(:hover, :focus-within) {
     border-color: transparent;
     background:
       linear-gradient(135deg, #fff 30%, #f0f6ff) padding-box,
@@ -556,7 +900,7 @@ const getSourceReviews = (source: ReviewSource) =>
         )
         border-box;
   }
-  review-tabs .review-source-panel--google[aria-selected="true"]::after {
+  review-tabs .review-source-panel--google:is(:hover, :focus-within)::after {
     background: linear-gradient(
       90deg,
       #4285f4 0%,
@@ -1176,6 +1520,97 @@ const getSourceReviews = (source: ReviewSource) =>
       scroll-snap-align: start;
       min-height: 19rem;
       padding: 1.1rem;
+    }
+  }
+
+  .review-tab-panel[open] > summary .review-source-chevron {
+    rotate: 180deg;
+  }
+  .review-carousel-button,
+  .review-carousel-position {
+    display: none;
+  }
+  @media (max-width: 639px) {
+    .reviews-wall .review-tabs-list {
+      display: none;
+    }
+    .review-accordion-brand {
+      display: flex;
+      min-width: 0;
+      min-height: 3rem;
+      align-items: center;
+    }
+    .review-accordion-brand img {
+      width: 8rem;
+      max-width: 100%;
+      height: auto;
+    }
+    .review-accordion-google,
+    .review-accordion-trustpilot {
+      display: inline-flex;
+      align-items: center;
+      font-size: clamp(1.35rem, 6vw, 1.65rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .review-accordion-trustpilot {
+      gap: 0.2rem;
+    }
+    .content-shell .reviews-wall > div {
+      padding-inline: 0;
+    }
+    .reviews-wall .review-carousel {
+      position: relative;
+      padding-inline: 1rem;
+    }
+    .reviews-wall .review-tab-panel .review-row-cards {
+      gap: 1rem;
+      padding: 0;
+      align-items: stretch;
+      scrollbar-width: none;
+      overscroll-behavior-x: contain;
+    }
+    .reviews-wall .review-tab-panel .review-row-cards::-webkit-scrollbar {
+      display: none;
+    }
+    .reviews-wall .review-tab-panel .review-card {
+      flex: 0 0 100%;
+      min-height: 21rem;
+      padding: 1.1rem;
+      scroll-snap-stop: always;
+    }
+    .reviews-wall .review-carousel-button:not([hidden]) {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      display: flex;
+      width: 2.25rem;
+      height: 2.75rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--primary);
+      box-shadow: 0 3px 10px rgb(0 0 0 / 7%);
+      transform: translateY(-50%);
+    }
+    .review-carousel-button--previous {
+      left: 0;
+    }
+    .review-carousel-button--next {
+      right: 0;
+    }
+    .review-carousel-button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .reviews-wall .review-carousel-position:not([hidden]) {
+      display: block;
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
     }
   }
 </style>

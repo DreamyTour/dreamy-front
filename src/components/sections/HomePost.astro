@@ -7,17 +7,31 @@ import type { sectionCardPost } from "@/types/home";
 import { useTranslations } from "@/i18n/ui";
 import CardPostHome from "@/components/ui/CardPostHome.astro";
 import { rewriteUrl } from "@/lib/utils";
+import MobileCardCarousel from "@/components/ui/MobileCardCarousel.astro";
 
 interface Props {
-  data: sectionCardPost;
+  data?: sectionCardPost;
   lang: Lang;
+  categorySlug?: string;
+  heading?: string;
+  description?: string;
+  ctaText?: string;
+  ctaHref?: string;
 }
 
-const { data, lang } = Astro.props;
+const {
+  data,
+  lang,
+  categorySlug,
+  heading: customHeading,
+  description,
+  ctaText,
+  ctaHref,
+} = Astro.props;
 
 const t = useTranslations(lang);
 
-if (!data || !data.titulo) return;
+if (!data?.titulo && !customHeading) return;
 
 const posts = await fetchApi<Blog[]>({
   endpoint: "posts",
@@ -27,60 +41,105 @@ const posts = await fetchApi<Blog[]>({
     sort: "publishedAt:desc",
     "pagination[limit]": 4,
     populate: "*",
+    ...(categorySlug
+      ? {
+          "filters[category_blogs][slug][$eq]": categorySlug,
+          "filters[publishedAt][$notNull]": true,
+        }
+      : {}),
   },
 });
 
-const heading = {
-  es: "Ideas y consejos para tu próximo viaje",
-  en: "Ideas and tips for your next adventure",
-  pt: "Ideias e dicas para sua próxima viagem",
-}[lang];
+const heading =
+  customHeading ??
+  {
+    es: "Ideas y consejos para tu próximo viaje",
+    en: "Ideas and tips for your next adventure",
+    pt: "Ideias e dicas para sua próxima viagem",
+  }[lang];
 const postsList = posts && Array.isArray(posts) ? posts : [];
+const sectionDescription = description ?? data?.description;
+const titleId = categorySlug
+  ? `home-posts-${categorySlug}-title`
+  : "home-posts-title";
+const navigationLabels = {
+  es: { previous: "Artículo anterior", next: "Siguiente artículo" },
+  en: { previous: "Previous article", next: "Next article" },
+  pt: { previous: "Artigo anterior", next: "Próximo artigo" },
+}[lang];
+// The Home keeps its original composition. Category sections also accommodate
+// small collections without reserving space for articles that do not exist.
+const gridClass =
+  !categorySlug || postsList.length >= 4
+    ? "lg:grid-cols-2 lg:grid-rows-3"
+    : postsList.length === 3
+      ? "lg:grid-cols-2 lg:grid-rows-2"
+      : postsList.length === 2
+        ? "lg:grid-cols-2"
+        : "mx-auto max-w-3xl";
+const featuredSpan =
+  !categorySlug || postsList.length >= 4
+    ? "lg:row-span-3"
+    : postsList.length === 3
+      ? "lg:row-span-2"
+      : "";
 ---
 
 {
   postsList.length > 0 && (
     <section
-      aria-labelledby="home-posts-title"
+      aria-labelledby={titleId}
       class="content-deferred content-deferred--tall w-full bg-primary/5 py-16 md:py-20"
     >
       <div class="max-w-8xl mx-auto px-6">
         <header class="mb-12 max-w-4xl mx-auto text-center md:mb-16">
-          {data.titulo && (
+          {heading && (
             <h2
-              id="home-posts-title"
+              id={titleId}
               class="relative mb-6 inline-block text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl"
             >
               <span class="relative z-10">{heading}</span>
             </h2>
           )}
           <SectionDivider align="center" />
-          {data.description && (
+          {sectionDescription && (
             <p class="mx-auto mt-6 max-w-2xl text-muted-foreground">
-              {data.description}
+              {sectionDescription}
             </p>
           )}
         </header>
 
-        <ul class="m-0 grid list-none grid-cols-1 gap-5 p-0 lg:grid-cols-2 lg:grid-rows-3">
-          {postsList.map((blog: Blog, index: number) => (
-            <li class:list={["min-w-0", index === 0 && "lg:row-span-3"]}>
-              <CardPostHome
-                blog={blog}
-                lang={lang}
-                variant={index === 0 ? "featured" : "standard"}
-              />
-            </li>
-          ))}
-        </ul>
+        <MobileCardCarousel
+          id={`${titleId}-cards`}
+          labelledby={titleId}
+          count={postsList.length}
+          previousLabel={navigationLabels.previous}
+          nextLabel={navigationLabels.next}
+        >
+          <ul
+            data-mobile-carousel-track
+            id={`${titleId}-cards`}
+            class:list={["m-0 grid list-none grid-cols-1 gap-5 p-0", gridClass]}
+          >
+            {postsList.map((blog: Blog, index: number) => (
+              <li class:list={["min-w-0", index === 0 && featuredSpan]}>
+                <CardPostHome
+                  blog={blog}
+                  lang={lang}
+                  variant={index === 0 ? "featured" : "standard"}
+                />
+              </li>
+            ))}
+          </ul>
+        </MobileCardCarousel>
 
         <div class="mt-12 flex justify-center">
           <a
-            href={rewriteUrl("/blog", lang)}
-            aria-label={t("aria.verMasSeccion")}
+            href={ctaHref ?? rewriteUrl("/blog", lang)}
+            aria-label={ctaText ?? t("aria.verMasSeccion")}
             class="group inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-6 py-3 text-sm font-semibold text-white shadow-md shadow-secondary/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary/90 hover:shadow-lg hover:shadow-secondary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40 focus-visible:ring-offset-2"
           >
-            {t("section.verTodoArticulos")}
+            {ctaText ?? t("section.verTodoArticulos")}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"

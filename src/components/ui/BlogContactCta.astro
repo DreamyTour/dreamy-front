@@ -6,9 +6,24 @@ import { WhatsAppIcon } from "@/components/icons/SocialContactIcons";
 interface Props {
   lang: Lang;
   title?: string;
+  heading?: string;
+  description?: string;
+  primaryText?: string;
+  primaryHref?: string;
+  secondaryText?: string;
+  secondaryHref?: string;
 }
 
-const { lang, title } = Astro.props;
+const {
+  lang,
+  title,
+  heading,
+  description,
+  primaryText,
+  primaryHref,
+  secondaryText,
+  secondaryHref,
+} = Astro.props;
 
 const copy = {
   es: {
@@ -54,6 +69,8 @@ const t = copy[lang];
 const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
   `${t.whatsapp}${title ? ` Post: ${title}` : ""}`,
 )}`;
+const secondaryDestination = secondaryHref ?? whatsappHref;
+const secondaryExternal = /^https?:\/\//.test(secondaryDestination);
 ---
 
 <section
@@ -71,10 +88,10 @@ const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
         id="blog-contact-title"
         class="max-w-2xl text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
       >
-        {t.title}
+        {heading ?? t.title}
       </h2>
       <p class="mt-4 max-w-3xl text-base leading-relaxed text-foreground/70">
-        {t.description}
+        {description ?? t.description}
       </p>
     </div>
 
@@ -82,19 +99,19 @@ const whatsappHref = `https://wa.me/51969787221?text=${encodeURIComponent(
       class="flex flex-col justify-center gap-3 border-t border-primary/15 bg-white/55 p-6 backdrop-blur-[1px] sm:flex-row sm:items-center lg:min-w-[280px] lg:flex-col lg:items-stretch lg:border-l lg:border-t-0"
     >
       <a
-        href={getPlanTripHref(lang)}
+        href={primaryHref ?? getPlanTripHref(lang)}
         class="inline-flex items-center justify-center rounded-sm bg-secondary px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-secondary-foreground shadow-sm shadow-secondary/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-secondary/90 hover:shadow-md hover:shadow-secondary/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
       >
-        {t.primary}
+        {primaryText ?? t.primary}
       </a>
       <a
-        href={whatsappHref}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={secondaryDestination}
+        target={secondaryExternal ? "_blank" : undefined}
+        rel={secondaryExternal ? "noopener noreferrer" : undefined}
         class="inline-flex items-center justify-center gap-2 rounded-sm border-2 border-primary bg-white px-5 py-3.5 text-sm font-bold uppercase tracking-wide text-primary transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md hover:shadow-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       >
-        <WhatsAppIcon className="size-4" />
-        {t.secondary}
+        {!secondaryHref && <WhatsAppIcon className="size-4" />}
+        {secondaryText ?? t.secondary}
       </a>
     </div>
   </div>

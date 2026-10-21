@@ -91,20 +91,20 @@ const footerDescription = {
   <div class="relative z-10">
     <Certification lang={lang} />
 
-    <div class="max-w-8xl mx-auto px-6 pt-8 md:px-10 lg:pt-10">
-      <div class="border-b border-white/10 py-8 lg:py-10">
-        <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
+    <div class="max-w-8xl mx-auto px-6 pt-4 sm:pt-8 md:px-10 lg:pt-10">
+      <div class="border-b border-white/10 py-5 sm:py-8 lg:py-10">
+        <div class="grid grid-cols-1 gap-5 sm:gap-10 lg:grid-cols-12 lg:gap-12">
           <div
-            class="flex flex-col border-b border-white/10 pb-10 lg:col-span-5 lg:border-b-0 lg:border-r lg:pr-12"
+            class="flex flex-col border-b border-white/10 pb-5 sm:pb-10 lg:col-span-5 lg:border-b-0 lg:border-r lg:pr-12"
           >
             <a
               href="/"
-              class="group mb-7 inline-block w-max focus:outline-hidden"
+              class="group mx-auto mb-4 inline-block w-max focus:outline-hidden sm:mx-0 sm:mb-7"
             >
               <img
                 src="/logo-dreamytours.svg"
                 alt="Logo Dreamy Tours"
-                class="h-16 w-auto brightness-0 invert drop-shadow-sm transition-opacity duration-300 group-hover:opacity-85 md:h-[72px]"
+                class="h-12 sm:h-16 w-auto brightness-0 invert drop-shadow-sm transition-opacity duration-300 group-hover:opacity-85 md:h-[72px]"
                 width="220"
                 height="80"
                 loading="lazy"
@@ -113,7 +113,7 @@ const footerDescription = {
             </a>
             {
               footerDescription && (
-                <p class="max-w-md text-base leading-8 text-white/64">
+                <p class="max-w-md text-sm leading-6 text-white/64 sm:text-base sm:leading-8">
                   {footerDescription}
                 </p>
               )
@@ -121,19 +121,22 @@ const footerDescription = {
           </div>
 
           <div
-            class="grid grid-cols-1 gap-9 md:grid-cols-2 lg:col-span-4 lg:gap-10"
+            class="grid grid-cols-1 gap-5 sm:gap-9 md:grid-cols-2 lg:col-span-4 lg:gap-10"
           >
-            <div class="flex flex-col gap-5">
+            <div
+              data-footer-links
+              class="border-b border-white/10 pb-3 sm:border-0 sm:pb-0"
+            >
               {
                 data?.destination?.titulo && (
-                  <h3 class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/82">
+                  <h3 class="mb-3 text-sm font-semibold text-white/85 sm:mb-5 sm:text-[0.72rem] sm:uppercase sm:tracking-[0.22em]">
                     {data.destination.titulo}
                   </h3>
                 )
               }
               {
                 data?.destination?.link && data.destination.link.length > 0 && (
-                  <ul class="flex flex-col gap-3">
+                  <ul class="grid grid-cols-2 gap-x-4 gap-y-1 pb-1 sm:flex sm:flex-col sm:gap-3 sm:pb-0">
                     {data.destination.link.map((link) => (
                       <li>
                         <a
@@ -141,7 +144,7 @@ const footerDescription = {
                             normalizeWhatsAppUrl(link.label, link.url) || "",
                             lang,
                           )}
-                          class="group inline-flex items-center text-[0.95rem] text-white/62 transition-colors duration-300 hover:text-white"
+                          class="group inline-flex min-h-10 items-center text-sm sm:min-h-0 sm:text-[0.95rem] text-white/62 transition-colors duration-300 hover:text-white"
                           target={link.isExternal ? "_blank" : "_self"}
                           rel={link.isExternal ? "noopener noreferrer" : ""}
                         >
@@ -155,17 +158,20 @@ const footerDescription = {
               }
             </div>
 
-            <div class="flex flex-col gap-5">
+            <div
+              data-footer-links
+              class="border-b border-white/10 pb-3 sm:border-0 sm:pb-0"
+            >
               {
                 data?.dreamyAbout?.titulo && (
-                  <h3 class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/82">
+                  <h3 class="mb-3 text-sm font-semibold text-white/85 sm:mb-5 sm:text-[0.72rem] sm:uppercase sm:tracking-[0.22em]">
                     {data.dreamyAbout.titulo}
                   </h3>
                 )
               }
               {
                 dreamyAboutLinks && dreamyAboutLinks.length > 0 && (
-                  <ul class="flex flex-col gap-3">
+                  <ul class="grid grid-cols-2 gap-x-4 gap-y-1 pb-1 sm:flex sm:flex-col sm:gap-3 sm:pb-0">
                     {dreamyAboutLinks.map((link) => (
                       <li>
                         <a
@@ -173,7 +179,7 @@ const footerDescription = {
                             normalizeWhatsAppUrl(link.label, link.url) || "",
                             lang,
                           )}
-                          class="group inline-flex items-center text-[0.95rem] text-white/62 transition-colors duration-300 hover:text-white"
+                          class="group inline-flex min-h-10 items-center text-sm sm:min-h-0 sm:text-[0.95rem] text-white/62 transition-colors duration-300 hover:text-white"
                           target={link.isExternal ? "_blank" : "_self"}
                           rel={link.isExternal ? "noopener noreferrer" : ""}
                         >
@@ -298,7 +304,7 @@ const footerDescription = {
       </div>
 
       <div
-        class="flex flex-col items-center gap-6 pt-6 md:flex-row md:justify-between"
+        class="flex flex-col items-center gap-4 pt-5 sm:gap-6 sm:pt-6 md:flex-row md:justify-between"
       >
         <p
           class="text-center text-sm leading-relaxed text-white/55 xl:text-left"

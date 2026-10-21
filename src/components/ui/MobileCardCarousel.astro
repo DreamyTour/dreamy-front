@@ -1,0 +1,200 @@
+---
+import { ChevronLeft, ChevronRight } from "lucide-react";
+interface Props {
+  id: string;
+  labelledby: string;
+  count: number;
+  previousLabel: string;
+  nextLabel: string;
+}
+const { id, labelledby, count, previousLabel, nextLabel } = Astro.props;
+---
+
+<mobile-card-carousel class="block" role="group" aria-labelledby={labelledby}>
+  <div class="mobile-card-carousel">
+    <button
+      type="button"
+      data-carousel-previous
+      hidden
+      class="mobile-card-carousel-button mobile-card-carousel-button--previous"
+      aria-label={previousLabel}
+      aria-controls={id}
+    >
+      <ChevronLeft size={20} aria-hidden="true" />
+    </button>
+    <slot />
+    <button
+      type="button"
+      data-carousel-next
+      hidden
+      class="mobile-card-carousel-button mobile-card-carousel-button--next"
+      aria-label={nextLabel}
+      aria-controls={id}
+    >
+      <ChevronRight size={20} aria-hidden="true" />
+    </button>
+  </div>
+  <output
+    class="mobile-card-carousel-position"
+    data-carousel-position
+    hidden
+    aria-live="polite"
+    aria-atomic="true">1 / {count}</output
+  >
+</mobile-card-carousel>
+
+<script>
+  class MobileCardCarousel extends HTMLElement {
+    private controller?: AbortController;
+    private observer?: ResizeObserver;
+
+    connectedCallback() {
+      if (this.controller && !this.controller.signal.aborted) return;
+      const track = this.querySelector<HTMLUListElement>(
+        "[data-mobile-carousel-track]",
+      );
+      const previous = this.querySelector<HTMLButtonElement>(
+        "[data-carousel-previous]",
+      );
+      const next = this.querySelector<HTMLButtonElement>(
+        "[data-carousel-next]",
+      );
+      const position = this.querySelector<HTMLOutputElement>(
+        "[data-carousel-position]",
+      );
+      if (
+        !track ||
+        !previous ||
+        !next ||
+        !(position instanceof HTMLOutputElement)
+      )
+        return;
+      const cards = Array.from(track.children) as HTMLLIElement[];
+      if (!cards.length) return;
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+      const mobile = window.matchMedia("(max-width: 639px)");
+      let active = 0;
+      const sync = () => {
+        previous.hidden =
+          next.hidden =
+          position.hidden =
+            !mobile.matches || cards.length < 2;
+        if (!mobile.matches) {
+          cards.forEach((card) => {
+            card.inert = false;
+          });
+          return;
+        }
+        if (!track.clientWidth) return;
+        const start = cards[0].offsetLeft;
+        active = cards.reduce(
+          (nearest, card, index) =>
+            Math.abs(card.offsetLeft - start - track.scrollLeft) <
+            Math.abs(cards[nearest].offsetLeft - start - track.scrollLeft)
+              ? index
+              : nearest,
+          0,
+        );
+        previous.disabled = active === 0;
+        next.disabled = active === cards.length - 1;
+        position.value = `${active + 1} / ${cards.length}`;
+        cards.forEach((card, index) => {
+          card.inert = index !== active;
+        });
+      };
+      const move = (direction: number) => {
+        const index = Math.max(
+          0,
+          Math.min(cards.length - 1, active + direction),
+        );
+        track.scrollTo({
+          left: cards[index].offsetLeft - cards[0].offsetLeft,
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches
+            ? "auto"
+            : "smooth",
+        });
+      };
+      previous.addEventListener("click", () => move(-1), { signal });
+      next.addEventListener("click", () => move(1), { signal });
+      track.addEventListener("scroll", sync, { passive: true, signal });
+      mobile.addEventListener("change", sync, { signal });
+      this.observer = new ResizeObserver(sync);
+      this.observer.observe(track);
+      sync();
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+      this.observer?.disconnect();
+    }
+  }
+  if (!customElements.get("mobile-card-carousel"))
+    customElements.define("mobile-card-carousel", MobileCardCarousel);
+</script>
+
+<style>
+  .mobile-card-carousel-button,
+  .mobile-card-carousel-position {
+    display: none;
+  }
+
+  @media (max-width: 639px) {
+    .mobile-card-carousel {
+      position: relative;
+      padding-inline: 0.25rem;
+    }
+    .mobile-card-carousel > :global([data-mobile-carousel-track]) {
+      display: flex;
+      max-width: 100%;
+      overflow-x: auto;
+      align-items: stretch;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .mobile-card-carousel
+      > :global([data-mobile-carousel-track])::-webkit-scrollbar {
+      display: none;
+    }
+    .mobile-card-carousel > :global([data-mobile-carousel-track] > li) {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    .mobile-card-carousel-button:not([hidden]) {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      display: flex;
+      width: 2.25rem;
+      height: 2.75rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--primary);
+      box-shadow: 0 3px 10px rgb(0 0 0 / 7%);
+      transform: translateY(-50%);
+    }
+    .mobile-card-carousel-button--previous {
+      left: -0.875rem;
+    }
+    .mobile-card-carousel-button--next {
+      right: -0.875rem;
+    }
+    .mobile-card-carousel-button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .mobile-card-carousel-position:not([hidden]) {
+      display: block;
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+    }
+  }
+</style>

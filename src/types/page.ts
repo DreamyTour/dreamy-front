@@ -34,6 +34,9 @@ export interface Pregunta {
 }
 
 export interface Page {
+	locale?: string;
+	selectorTours?: TourSelector | null;
+	informacionUtil?: UsefulInfo | null;
 	documentId: string;
 	titulo: string;
 	video: Video;
@@ -43,4 +46,38 @@ export interface Page {
 	seo?: SEO;
 	tituloPreguntas: string;
 	preguntasAcordeon: Pregunta[];
+}
+
+export interface CategoryTourRelation {
+	documentId: string;
+	titulo: string;
+	slug: string;
+	locale: string;
+}
+
+export interface TourRecommendation {
+	etiqueta?: string | null;
+	titulo?: string | null;
+	descripcion?: string | null;
+	/** One profile per line; icons are assigned by the frontend. */
+	idealPara?: string | null;
+	tour?: CategoryTourRelation | null;
+}
+
+export interface TourSelector {
+	titulo?: string | null;
+	descripcion?: string | null;
+	recomendaciones?: TourRecommendation[] | null;
+}
+
+export interface UsefulInfoItem {
+	etiqueta?: string | null;
+	titulo?: string | null;
+	contenido?: StrapiBlock[] | null;
+}
+
+export interface UsefulInfo {
+	titulo?: string | null;
+	descripcion?: string | null;
+	items?: UsefulInfoItem[] | null;
 }

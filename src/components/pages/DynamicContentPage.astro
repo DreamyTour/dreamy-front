@@ -20,6 +20,7 @@ import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
 import { buildTourSchemas } from "@/lib/tourSchema";
 import { buildCollectionSchemas } from "@/lib/collectionSchema";
 import { buildFaqPageSchema, buildStaticPageSchemas } from "@/lib/pageSchema";
+import { refreshLocalPageSections } from "@/lib/page-preview";
 
 interface ContentFrontmatter {
   title: string;
@@ -53,7 +54,7 @@ const {
   lang,
   tour,
   tourPageCategory,
-  page,
+  page: prerenderedPage,
   slugMap,
   pageSlugMap,
   contentComponent,
@@ -61,6 +62,13 @@ const {
   toursRelated = [],
   toursByCategory = [],
 } = Astro.props;
+
+const page =
+  import.meta.env.DEV &&
+  type === "page" &&
+  prerenderedPage
+    ? await refreshLocalPageSections(prerenderedPage, lang)
+    : prerenderedPage;
 
 const siteUrl = Astro.site?.origin || "https://dreamy.tours";
 const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
