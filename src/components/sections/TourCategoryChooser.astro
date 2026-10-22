@@ -32,6 +32,11 @@ const navigationLabels = {
   pt: { previous: "Recomendação anterior", next: "Próxima recomendação" },
 }[lang];
 const icons = [Compass, Landmark, UtensilsCrossed, MoonStar];
+const idealForLabel = {
+  es: "Ideal para:",
+  en: "Ideal for:",
+  pt: "Ideal para:",
+}[lang];
 // Preserve the approved action captions. CMS relations still select and order
 // every recommendation; other tours receive the generic localized action.
 const actionCaptions: Record<string, string> = {
@@ -40,18 +45,19 @@ const actionCaptions: Record<string, string> = {
   n66qydy1wrj5hkmt9celbgw8: "Ver experiencia",
   zhpvawkj5hzkketvb25z3mck: "Ver tour nocturno",
 };
-const tagIcons = {
-  "Primera visita": MapPin,
-  "Poco tiempo": Clock3,
-  Historia: Landmark,
-  Cultura: BookOpen,
-  Arqueología: Layers3,
-  Gastronomía: UtensilsCrossed,
-  Parejas: Heart,
-  "Viajeros curiosos": Sparkles,
-  Familias: Users,
-  "Noche libre": MoonStar,
-};
+const tagIcons = [
+  MapPin,
+  Clock3,
+  Landmark,
+  BookOpen,
+  Layers3,
+  UtensilsCrossed,
+  Heart,
+  Sparkles,
+  Users,
+  MoonStar,
+  Compass,
+];
 const choices = getValidTourRecommendations(selector, locale, lang).map(
   (item) => ({
     ...item,
@@ -63,9 +69,9 @@ const choices = getValidTourRecommendations(selector, locale, lang).map(
       .split(/\r?\n/)
       .map((tag) => tag.trim())
       .filter(Boolean)
-      .map((label) => ({
+      .map((label, tagIndex) => ({
         label,
-        icon: tagIcons[label as keyof typeof tagIcons] || Users,
+        icon: tagIcons[(item.sourceIndex * 3 + tagIndex * 2) % tagIcons.length],
       })),
     linkLabel:
       (lang === "es" && actionCaptions[item.tour.documentId]) ||
@@ -133,7 +139,7 @@ const choices = getValidTourRecommendations(selector, locale, lang).map(
                   </p>
                   <div class="mt-auto min-h-[5.25rem] w-full border-t border-border/60 pt-3">
                     <p class="mb-2 text-xs font-medium text-foreground">
-                      Ideal para:
+                      {idealForLabel}
                     </p>
                     <ul role="list" class="flex flex-wrap gap-1.5">
                       {idealFor.map(({ label: tag, icon: TagIcon }) => (
