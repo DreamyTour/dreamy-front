@@ -14,6 +14,10 @@ import TourCategoryChooser from "@/components/sections/TourCategoryChooser.astro
 import TourCategoryInfo from "@/components/sections/TourCategoryInfo.astro";
 import HomePost from "@/components/sections/HomePost.astro";
 import ReviewsWall from "@/components/sections/ReviewsWall.astro";
+import {
+  getUsefulInfoItems,
+  getValidTourRecommendations,
+} from "@/lib/categoryTourSections";
 
 interface Props {
   page: Page;
@@ -35,6 +39,13 @@ const pageVideoThumbnail = page?.video?.thumbnail
 
 const pageContent = page.content?.trim() || "";
 const isSpanishLima = lang === "es" && page.slug === "lima";
+const hasCategoryCmsContent =
+  getValidTourRecommendations(
+    page.selectorTours,
+    page.locale,
+    lang,
+    () => {},
+  ).length > 0 || getUsefulInfoItems(page.informacionUtil).length > 0;
 const faqQuestions = page.preguntasAcordeon || [];
 const faqColumnSize = Math.ceil(faqQuestions.length / 2);
 const faqColumns = [
@@ -137,7 +148,7 @@ const faqColumns = [
       }
 
       <TourCategoryInfo info={page.informacionUtil} />
-      {isSpanishLima && <ReviewsWall lang="es" />}
+      {hasCategoryCmsContent && <ReviewsWall lang={lang} />}
 
       {
         page.tituloPreguntas &&
