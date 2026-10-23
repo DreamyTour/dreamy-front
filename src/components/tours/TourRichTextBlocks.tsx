@@ -1,11 +1,4 @@
-import {
-	Baby,
-	CalendarDays,
-	CircleDollarSign,
-	IdCard,
-	Info,
-	RefreshCw,
-} from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import * as React from "react";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import StrapiRichTextTable from "@/components/content/StrapiRichTextTable";
@@ -58,17 +51,17 @@ function getIncludedListStyle(
 	return styles[headingIndex % styles.length];
 }
 
-function getBlockText(children: StrapiBlockChild[] = []): string {
-	return children
-		.map((child) => `${child.text || ""}${getBlockText(child.children || [])}`)
-		.join(" ");
-}
-
 function normalizeText(value: string) {
 	return value
 		.normalize("NFD")
 		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase();
+}
+
+function getBlockText(children: StrapiBlockChild[] = []): string {
+	return children
+		.map((child) => `${child.text || ""}${getBlockText(child.children || [])}`)
+		.join(" ");
 }
 
 function isGeneralConditionsSection(
@@ -85,34 +78,6 @@ function isGeneralConditionsSection(
 		);
 	}
 	return false;
-}
-
-function getConditionIcon(children: StrapiBlockChild[]) {
-	const text = normalizeText(getBlockText(children));
-	if (/dolar|tarifa|precio|igv|impuesto|divisa|currency|tax|price/.test(text)) {
-		return CircleDollarSign;
-	}
-	if (
-		/disponibilidad|cambio|sujetas|availability|change|subject to/.test(text)
-	) {
-		return RefreshCw;
-	}
-	if (/nino|menor|bebe|infant|child|age|edad/.test(text)) return Baby;
-	if (
-		/documento|identidad|identificacion|pasaporte|document|identity|passport/.test(
-			text,
-		)
-	) {
-		return IdCard;
-	}
-	if (
-		/festiv|semana santa|fin de semana|navidad|ano nuevo|holiday|weekend/.test(
-			text,
-		)
-	) {
-		return CalendarDays;
-	}
-	return Info;
 }
 
 function renderList(
@@ -145,19 +110,15 @@ function renderList(
 			className={`${isOrdered ? "list-decimal" : "list-none"} my-3 ml-0 space-y-2 ${isOverview ? "" : "p-3"}`}
 		>
 			{(block.children || []).map((listItem: StrapiBlockChild) => {
-				const ConditionIcon = isConditionsList
-					? getConditionIcon(listItem.children || [])
-					: null;
-
 				return (
 					<li key={JSON.stringify(listItem)} className="flex items-start gap-2">
 						{!isOrdered &&
-							(ConditionIcon ? (
+							(isConditionsList ? (
 								<span
 									className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
 									aria-hidden="true"
 								>
-									<ConditionIcon size={14} strokeWidth={2} />
+									<CircleAlert size={14} strokeWidth={2} />
 								</span>
 							) : (
 								<span className={`${iconClass} font-bold`}>{icon}</span>
