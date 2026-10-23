@@ -1,3 +1,11 @@
+import {
+	Baby,
+	CalendarDays,
+	CircleDollarSign,
+	IdCard,
+	Info,
+	RefreshCw,
+} from "lucide-react";
 import * as React from "react";
 import StrapiRichTextInline from "@/components/content/StrapiRichTextInline";
 import StrapiRichTextTable from "@/components/content/StrapiRichTextTable";
@@ -50,6 +58,63 @@ function getIncludedListStyle(
 	return styles[headingIndex % styles.length];
 }
 
+function getBlockText(children: StrapiBlockChild[] = []): string {
+	return children
+		.map((child) => `${child.text || ""}${getBlockText(child.children || [])}`)
+		.join(" ");
+}
+
+function normalizeText(value: string) {
+	return value
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase();
+}
+
+function isGeneralConditionsSection(
+	content: StrapiBlock[],
+	blockIndex: number,
+) {
+	for (let index = blockIndex - 1; index >= 0; index--) {
+		const block = content[index];
+		if (block.type !== "heading") continue;
+
+		const heading = normalizeText(getBlockText(block.children || []));
+		return /condiciones generales|general conditions|condicoes gerais/.test(
+			heading,
+		);
+	}
+	return false;
+}
+
+function getConditionIcon(children: StrapiBlockChild[]) {
+	const text = normalizeText(getBlockText(children));
+	if (/dolar|tarifa|precio|igv|impuesto|divisa|currency|tax|price/.test(text)) {
+		return CircleDollarSign;
+	}
+	if (
+		/disponibilidad|cambio|sujetas|availability|change|subject to/.test(text)
+	) {
+		return RefreshCw;
+	}
+	if (/nino|menor|bebe|infant|child|age|edad/.test(text)) return Baby;
+	if (
+		/documento|identidad|identificacion|pasaporte|document|identity|passport/.test(
+			text,
+		)
+	) {
+		return IdCard;
+	}
+	if (
+		/festiv|semana santa|fin de semana|navidad|ano nuevo|holiday|weekend/.test(
+			text,
+		)
+	) {
+		return CalendarDays;
+	}
+	return Info;
+}
+
 function renderList(
 	block: StrapiBlock,
 	normalizedContent: StrapiBlock[],
@@ -65,6 +130,9 @@ function renderList(
 		variant === "included"
 			? getIncludedListStyle(normalizedContent, blockIndex)
 			: null;
+	const isConditionsList =
+		variant === "included" &&
+		isGeneralConditionsSection(normalizedContent, blockIndex);
 	const icon = variant === "included" ? includedStyle?.icon : "\u2022";
 	const iconClass =
 		variant === "included"
@@ -76,18 +144,32 @@ function renderList(
 			key={blockKey}
 			className={`${isOrdered ? "list-decimal" : "list-none"} my-3 ml-0 space-y-2 ${isOverview ? "" : "p-3"}`}
 		>
-			{(block.children || []).map((listItem: StrapiBlockChild) => (
-				<li key={JSON.stringify(listItem)} className="flex items-start gap-2">
-					{!isOrdered && (
-						<span className={`${iconClass} font-bold`}>{icon}</span>
-					)}
-					<span
-						className={`text-base ${isOverview ? "mt-1 text-gray-600" : "text-gray-700"}`}
-					>
-						{renderTextNodes(listItem.children || [])}
-					</span>
-				</li>
-			))}
+			{(block.children || []).map((listItem: StrapiBlockChild) => {
+				const ConditionIcon = isConditionsList
+					? getConditionIcon(listItem.children || [])
+					: null;
+
+				return (
+					<li key={JSON.stringify(listItem)} className="flex items-start gap-2">
+						{!isOrdered &&
+							(ConditionIcon ? (
+								<span
+									className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
+									aria-hidden="true"
+								>
+									<ConditionIcon size={14} strokeWidth={2} />
+								</span>
+							) : (
+								<span className={`${iconClass} font-bold`}>{icon}</span>
+							))}
+						<span
+							className={`text-base ${isOverview ? "mt-1 text-gray-600" : "text-gray-700"}`}
+						>
+							{renderTextNodes(listItem.children || [])}
+						</span>
+					</li>
+				);
+			})}
 		</ListTag>
 	);
 }
