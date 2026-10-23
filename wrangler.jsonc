@@ -14,7 +14,8 @@
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist/client",
-		"run_worker_first": ["/en", "/en/*"]
+		// Preserve /en/ handling and run query checks before the three home assets.
+		"run_worker_first": ["/en", "/en/*", "/", "/es", "/es/", "/pt", "/pt/"]
 	},
 	"observability": {
 		"enabled": true,

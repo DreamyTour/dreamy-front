@@ -2,6 +2,10 @@ import routeMap from "virtual:localized-route-map";
 import { handle } from "@astrojs/cloudflare/handler";
 import historicalRedirects from "../public/_redirects?raw";
 import {
+	isLegacyWordPressQuery,
+	legacyWordPressGone,
+} from "./lib/legacyWordPressRoutes";
+import {
 	isLegacyEnglishPath,
 	legacyEnglishGone,
 	protectedEnglishRedirectSources,
@@ -21,6 +25,12 @@ export default {
 		ctx: Parameters<typeof handle>[2],
 	) {
 		const url = new URL(request.url);
+		if (
+			(request.method === "GET" || request.method === "HEAD") &&
+			isLegacyWordPressQuery(url)
+		) {
+			return legacyWordPressGone(request.method);
+		}
 		if (isLegacyEnglishPath(url.pathname)) {
 			// Priority 1: let the original _redirects rules produce their response.
 			// Do not treat automatic asset slash redirects as backlink exceptions.
@@ -36,7 +46,8 @@ export default {
 		}
 		if (
 			(request.method === "GET" || request.method === "HEAD") &&
-			parseContentRoute(url.pathname)
+			(parseContentRoute(url.pathname) ||
+				["/", "/es", "/es/", "/pt", "/pt/"].includes(url.pathname))
 		) {
 			// Assets-first is also enforced here for preview/dev and as a defensive guard.
 			const asset = await env.ASSETS.fetch(request.url, {
@@ -45,6 +56,7 @@ export default {
 				redirect: "manual",
 			});
 			if (asset.status !== 404) return asset;
+			if (!parseContentRoute(url.pathname)) return handle(request, env, ctx);
 			const result = resolveLocalizedRoute(url.pathname, routeMap);
 			if (result && "ambiguous" in result) {
 				console.warn(
