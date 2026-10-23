@@ -2,8 +2,9 @@
 import RoutePlanEditor from '../../components/tours/RoutePlanEditor';
 import '../../styles/global.css';
 import '@fontsource-variable/outfit';
+import { getCmsOrigin } from '../../lib/cms-editor-auth';
 export const prerender=false;
-const cmsOrigin=new URL(import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337').origin;
+const cmsOrigin=getCmsOrigin()!;
 Astro.response.headers.set('Content-Security-Policy',`frame-ancestors 'self' ${cmsOrigin}`);
 Astro.response.headers.set('Cache-Control','no-store');
 ---
