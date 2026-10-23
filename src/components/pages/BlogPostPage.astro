@@ -16,6 +16,7 @@ import {
   getThumbnailUrl,
 } from "@/lib/helpers";
 import { serializeJsonForHtml } from "@/lib/html";
+import { currentEnglishCmsHref } from "@/lib/legacyEnglishLinks";
 import type { BlogPostProps } from "@/lib/blogRoutes";
 import { buildSEOProps } from "@/lib/seo";
 import { buildBlogSearchItems } from "@/lib/blogSearch";
@@ -38,7 +39,7 @@ function getSafeLinkHref(url: string | undefined): string | undefined {
 
   const scheme = href.match(/^([a-z][a-z\d+.-]*):/i)?.[1]?.toLowerCase();
   return !scheme || ["http", "https", "mailto", "tel"].includes(scheme)
-    ? href
+    ? currentEnglishCmsHref(href)
     : undefined;
 }
 

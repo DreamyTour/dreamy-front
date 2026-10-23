@@ -304,5 +304,7 @@ export async function getLocalizedDynamicPaths(): Promise<
 
 	// Cross-locale slug aliases are resolved by the Worker on asset misses.
 
-	return paths;
+	// English records still feed translation maps, but English pages are generated
+	// only by getDefaultLangDynamicPaths() at their canonical unprefixed paths.
+	return paths.filter(({ params }) => params.lang !== DEFAULT_LANG);
 }

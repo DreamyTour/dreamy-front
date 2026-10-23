@@ -49,6 +49,17 @@ const result = await Bun.build({
 		{
 			name: "fixture-imports",
 			setup(build) {
+				build.onResolve({ filter: /_redirects\?raw$/ }, () => ({
+					path: "redirects",
+					namespace: "historical-redirects",
+				}));
+				build.onLoad(
+					{ filter: /.*/, namespace: "historical-redirects" },
+					async () => ({
+						contents: `export default ${JSON.stringify(await Bun.file("public/_redirects").text())}`,
+						loader: "js",
+					}),
+				);
 				build.onResolve({ filter: /^virtual:localized-route-map$/ }, () => ({
 					path: "map",
 					namespace: "fixture",

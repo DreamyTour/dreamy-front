@@ -11,7 +11,11 @@
 		{ "binding": "SESSION", "id": "586d1e4ff42d4732b8810abdf09c02d4" }
 	],
 	"images": { "binding": "IMAGES" },
-	"assets": { "binding": "ASSETS", "directory": "./dist/client" },
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist/client",
+		"run_worker_first": ["/en", "/en/*"]
+	},
 	"observability": {
 		"enabled": true,
 		"logs": { "enabled": true },

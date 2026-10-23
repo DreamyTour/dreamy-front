@@ -1,0 +1,33 @@
+{
+	"checkout": [
+		"/checkout/",
+		"/checkout/success/",
+		"/es/checkout/",
+		"/es/checkout/success/",
+		"/pt/checkout/",
+		"/pt/checkout/success/"
+	],
+	"blogPagination": [
+		"/blog/2/",
+		"/blog/3/",
+		"/blog/4/",
+		"/blog/5/",
+		"/blog/6/",
+		"/blog/7/",
+		"/blog/8/",
+		"/es/blog/2/",
+		"/es/blog/3/",
+		"/es/blog/4/",
+		"/es/blog/5/",
+		"/es/blog/6/",
+		"/es/blog/7/",
+		"/es/blog/8/",
+		"/pt/blog/2/",
+		"/pt/blog/3/",
+		"/pt/blog/4/",
+		"/pt/blog/5/",
+		"/pt/blog/6/",
+		"/pt/blog/7/",
+		"/pt/blog/8/"
+	]
+}

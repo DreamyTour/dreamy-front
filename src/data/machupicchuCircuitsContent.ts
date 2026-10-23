@@ -378,7 +378,7 @@ export const machupicchuCircuitsContent = {
 		},
 	},
 	en: {
-		ctaHref: "/en/plan-your-trip",
+		ctaHref: "/plan-your-trip/",
 		ui: {
 			circuit: "Circuit",
 			routes: "routes",

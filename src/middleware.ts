@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import { hasCmsEditorSession, isCmsProtectedPath } from "@/lib/cms-editor-auth";
-import { collapseRepeatedBlogPath, stripDefaultLangPrefix } from "@/lib/i18n";
+import { collapseRepeatedBlogPath } from "@/lib/i18n";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const { pathname, search } = context.url;
@@ -23,10 +23,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		return context.redirect(`${collapsedPath}${search}`, 301);
 	}
 
-	const targetPath = stripDefaultLangPrefix(pathname);
-	if (targetPath !== pathname) {
-		return context.redirect(`${targetPath}${search}`, 301);
-	}
+	// The Worker handles /en/ before Astro, preserving historical backlinks first.
 
 	const response = await next();
 	const headers = response.headers;

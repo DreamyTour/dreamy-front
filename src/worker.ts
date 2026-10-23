@@ -1,9 +1,18 @@
 import routeMap from "virtual:localized-route-map";
 import { handle } from "@astrojs/cloudflare/handler";
+import historicalRedirects from "../public/_redirects?raw";
+import {
+	isLegacyEnglishPath,
+	legacyEnglishGone,
+	protectedEnglishRedirectSources,
+} from "./lib/legacyEnglishRoutes";
 import {
 	parseContentRoute,
 	resolveLocalizedRoute,
 } from "./lib/localizedRouteResolver";
+
+const protectedEnglishSources =
+	protectedEnglishRedirectSources(historicalRedirects);
 
 export default {
 	async fetch(
@@ -12,6 +21,19 @@ export default {
 		ctx: Parameters<typeof handle>[2],
 	) {
 		const url = new URL(request.url);
+		if (isLegacyEnglishPath(url.pathname)) {
+			// Priority 1: let the original _redirects rules produce their response.
+			// Do not treat automatic asset slash redirects as backlink exceptions.
+			if (protectedEnglishSources.has(url.pathname)) {
+				return env.ASSETS.fetch(request.url, {
+					method: request.method,
+					headers: Array.from(request.headers),
+					redirect: "manual",
+				});
+			}
+			// Priority 2: no assets, locale resolution or generic redirects for /en/.
+			return legacyEnglishGone(request.method);
+		}
 		if (
 			(request.method === "GET" || request.method === "HEAD") &&
 			parseContentRoute(url.pathname)

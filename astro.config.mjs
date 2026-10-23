@@ -6,7 +6,16 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import { loadEnv } from "vite";
+import sitemapExclusions from "./src/data/sitemapExclusions.json" with {
+	type: "json",
+};
 import localizedRouteMap from "./src/integrations/localizedRouteMap";
+
+// These pages remain generated and navigable; only sitemap membership changes.
+const excludedSitemapPaths = new Set([
+	...sitemapExclusions.checkout,
+	...sitemapExclusions.blogPagination,
+]);
 
 const devEnv = loadEnv("development", process.cwd(), "");
 const cmsOrigin = new URL(
@@ -69,11 +78,14 @@ export default defineConfig({
 			filter: (page) => {
 				const { pathname } = new URL(page);
 				return (
+					!excludedSitemapPaths.has(`${pathname.replace(/\/+$/, "")}/`) &&
 					!page.includes("/404") &&
 					pathname !== "/dev" &&
 					!pathname.startsWith("/dev/") &&
 					pathname !== "/cms" &&
-					!pathname.startsWith("/cms/")
+					!pathname.startsWith("/cms/") &&
+					pathname !== "/en" &&
+					!pathname.startsWith("/en/")
 				);
 			},
 		}),
