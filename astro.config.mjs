@@ -51,7 +51,14 @@ export default defineConfig({
 			changefreq: "weekly",
 			priority: 0.7,
 			lastmod: new Date(),
-			filter: (page) => !page.includes("/404"),
+			filter: (page) => {
+				const { pathname } = new URL(page);
+				return (
+					!page.includes("/404") &&
+					pathname !== "/dev" &&
+					!pathname.startsWith("/dev/")
+				);
+			},
 		}),
 	],
 });
