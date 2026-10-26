@@ -2,17 +2,18 @@ import assert from "node:assert/strict";
 import { readdir, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { Miniflare } from "miniflare";
+import { parse } from "parse5";
 
 const server = resolve("dist/server");
 const config = JSON.parse(await readFile(join(server, "wrangler.json"), "utf8"));
-assert.equal(config.assets.run_worker_first, undefined, "assets-first must remain enabled");
+assert.deepEqual(config.assets.run_worker_first, ["/en", "/en/*", "/", "/es", "/es/", "/pt", "/pt/"], "retired English paths and homepage queries must run before assets");
 assert.equal(config.assets.not_found_handling, undefined);
 const files = (await readdir(server, { recursive: true })).filter((path) => /\.(mjs|js)$/.test(path) && !path.startsWith(".prerender"));
 const map = JSON.parse(await readFile("dist/localized-route-map.json", "utf8"));
 const modules = ["entry.mjs", ...files.filter((path) => path !== "entry.mjs")].map((path) => ({ type: "ESModule", path: join(server, path) }));
 const mf = new Miniflare({
 	modules, modulesRootPath: server, compatibilityDate: config.compatibility_date,
-	assets: { directory: resolve("dist/client"), binding: "ASSETS", routerConfig: { has_user_worker: true } },
+	assets: { directory: resolve("dist/client"), binding: "ASSETS", routerConfig: { has_user_worker: true, static_routing: { user_worker: config.assets.run_worker_first } } },
 	kvNamespaces: ["SESSION"],
 });
 let requests = 0;
@@ -34,6 +35,48 @@ async function redirect(source, destination, status = 301) {
 	assert.equal(final.headers.get("location"), null, "must take exactly one jump");
 }
 try {
+	for (const home of ["/", "/es/", "/pt/"]) {
+		for (const query of ["?p=7457", "?p=1336", "?s=inca", "?s=", "?p=x&p=7457&utm_source=test"]) {
+			for (const method of ["GET", "HEAD"]) {
+				const response = await request(home + query, method);
+				assert.equal(response.status, 410, home + query);
+				assert.equal(response.headers.get("location"), null);
+				assert.equal(response.headers.get("x-robots-tag"), "noindex, follow");
+				if (method === "HEAD") assert.equal(await response.text(), "");
+			}
+		}
+		assert.equal((await request(home + "?utm_source=google&gclid=123&x=1&x=2")).status, 200);
+	}
+	assert.equal((await request("/inca-trail-4-days/?p=7457&s=inca")).status, 200, "query retirement is restricted to homepages");
+	const exclusions = JSON.parse(await readFile("src/data/sitemapExclusions.json", "utf8"));
+	const hrefs = html => {
+		const result = [];
+		const visit = node => {
+			if (node.tagName === "a") {
+				const href = node.attrs?.find(attr => attr.name === "href")?.value;
+				if (href) result.push(new URL(href, origin).pathname);
+			}
+			for (const child of node.childNodes ?? []) visit(child);
+		};
+		visit(parse(html));
+		return result;
+	};
+	for (const path of exclusions.checkout) {
+		const response = await request(path);
+		assert.equal(response.status, 200, path);
+		const html = await response.text();
+		assert.match(html, /<meta\b[^>]*name="robots"[^>]*content="noindex, nofollow"/, `existing noindex: ${path}`);
+	}
+	for (const path of exclusions.blogPagination) {
+		const response = await request(path);
+		assert.equal(response.status, 200, path);
+		assert.equal(response.headers.get("location"), null, path);
+		const page = Number(path.match(/\/(\d+)\/$/)[1]);
+		const base = path.replace(/\d+\/$/, "");
+		const links = hrefs(await response.text());
+		assert(links.includes(page === 2 ? base : `${base}${page - 1}/`), `previous pagination link ${path}`);
+		if (page < 8) assert(links.includes(`${base}${page + 1}/`), `next pagination link ${path}`);
+	}
 	// All map destinations must return 200 directly, including every category page.
 	for (const [id, translations] of Object.entries(map.documents)) {
 		const kind = id.split(":")[0];
@@ -43,6 +86,11 @@ try {
 				const response = await request(path);
 				assert.equal(response.status, 200, path);
 				assert.equal(response.headers.get("location"), null, path);
+				if (locale === "en") {
+					const retired = await request(`/en${path}`);
+					assert.equal(retired.status, 410, `retired alias of ${path}`);
+					assert.equal(retired.headers.get("location"), null);
+				}
 			}
 		}
 	}
@@ -74,10 +122,26 @@ try {
 	assert.equal((await request(pathFor("category", "en", paginated[1].es.slug, paginated[1].en.pages + 1))).status, 404);
 	// Existing static content outside Strapi remains directly available.
 	assert.equal((await request("/")).status, 200);
-	const historical = (await readFile("public/_redirects", "utf8")).split(/\r?\n/).find((line) => line && !line.startsWith("#"));
-	const [old, target, status] = historical.trim().split(/\s+/);
-	assert.equal((await request(old)).status, Number(status));
-	assert.equal((await request(target)).status, 200);
+	const historical = (await readFile("public/_redirects", "utf8")).split(/\r?\n/).map(line => line.trim()).filter(line => line.startsWith("/en/"));
+	for (const rule of historical) {
+		const [old, target, status] = rule.split(/\s+/);
+		for (const method of ["GET", "HEAD"]) for (const query of ["", "?utm_source=backlink&x=1&x=2"]) {
+			const response = await request(old + query, method);
+			assert.equal(response.status, Number(status), old);
+			assert.equal(response.headers.get("location"), target + query, old);
+		}
+		assert.equal((await request(target)).status, 200);
+	}
+	for (const path of ["/en", "/en/", "/en/inca-trail-4-days/", "/en/cusco/", "/en/lima/", "/en/blog/x/blog/x", "/en/unknown/"]) {
+		for (const method of ["GET", "HEAD", "POST"]) {
+			const response = await request(path, method);
+			assert.equal(response.status, 410, path);
+			assert.equal(response.headers.get("location"), null);
+			if (method === "HEAD") assert.equal(await response.text(), "");
+		}
+	}
+	assert.equal((await request("/es/")).status, 200);
+	assert.equal((await request("/pt/")).status, 200);
 	console.log(`Production Worker integration: ${requests} HTTP requests passed; real posts, category, pagination, tour, commercial page, queries, HEAD, 404 and historical redirect.`);
 } finally {
 	await mf.dispose();

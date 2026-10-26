@@ -7,7 +7,7 @@ import {
   DurationIcon,
   GroupIcon,
 } from "@/components/icons/BadgeIcons";
-import { extractTextFromBlocks, getImageUrl } from "@/lib/helpers";
+import { extractTextFromBlocks, getImageAlt, getImageUrl } from "@/lib/helpers";
 import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
@@ -22,6 +22,7 @@ const featuredImage = Array.isArray(tour.imagenDestacada)
   ? tour.imagenDestacada[0]
   : tour.imagenDestacada;
 const imageUrl = getImageUrl(tour.seo?.metaImage ?? featuredImage, "medium");
+const imageAlt = getImageAlt(tour.seo?.metaImage ?? featuredImage, tour.titulo);
 const description = tour.content ? extractTextFromBlocks(tour.content) : "";
 const badges = (tour.badge ?? []).filter(
   (badge) =>
@@ -64,7 +65,7 @@ const cardBadge = promotion
         imageUrl && imageUrl !== "/og-default.jpg" ? (
           <img
             src={imageUrl}
-            alt=""
+            alt={imageAlt}
             sizes="(max-width: 767px) 88vw, (max-width: 1023px) 47vw, 32vw"
             loading="lazy"
             decoding="async"

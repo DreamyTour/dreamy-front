@@ -18,6 +18,7 @@ import {
   getUsefulInfoItems,
   getValidTourRecommendations,
 } from "@/lib/categoryTourSections";
+import { rewriteUrl } from "@/lib/utils";
 
 interface Props {
   page: Page;
@@ -38,7 +39,23 @@ const pageVideoThumbnail = page?.video?.thumbnail
   : null;
 
 const pageContent = page.content?.trim() || "";
-const isSpanishLima = lang === "es" && page.slug === "lima";
+const blogSectionCopy = {
+  es: {
+    heading: "Ideas y consejos para tu pr\u00f3ximo viaje",
+    description: "Gu\u00edas, recomendaciones y novedades para inspirar tu pr\u00f3xima aventura.",
+    cta: "Ver todos los art\u00edculos",
+  },
+  en: {
+    heading: "Ideas and tips for your next trip",
+    description: "Guides, recommendations, and stories to inspire your next adventure.",
+    cta: "See all articles",
+  },
+  pt: {
+    heading: "Ideias e dicas para sua proxima viagem",
+    description: "Guias, recomenda\u00e7\u00f5es e novidades para inspirar sua pr\u00f3xima aventura.",
+    cta: "Ver todos os artigos",
+  },
+}[lang];
 const hasCategoryCmsContent =
   getValidTourRecommendations(
     page.selectorTours,
@@ -134,20 +151,15 @@ const faqColumns = [
         locale={page.locale}
         lang={lang}
       />
-      {
-        isSpanishLima && (
-          <HomePost
-            lang={lang}
-            categorySlug="lima"
-            heading="Planifica tu viaje a Lima"
-            description="Encuentra guías, recomendaciones y consejos para organizar mejor tus días en Lima y aprovechar cada experiencia en la ciudad."
-            ctaText="Ver todas las guías de Lima"
-            ctaHref="/es/blog/lima/"
-          />
-        )
-      }
 
       <TourCategoryInfo info={page.informacionUtil} />
+      <HomePost
+        lang={lang}
+        heading={blogSectionCopy.heading}
+        description={blogSectionCopy.description}
+        ctaText={blogSectionCopy.cta}
+        ctaHref={rewriteUrl("/blog", lang)}
+      />
       {hasCategoryCmsContent && <ReviewsWall lang={lang} />}
 
       {

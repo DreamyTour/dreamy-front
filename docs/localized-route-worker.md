@@ -1,9 +1,14 @@
 # Resolución de slugs multilenguaje
 
-Cloudflare mantiene **assets-first**. `wrangler.jsonc` selecciona `src/worker.ts`
-como entrada del adaptador, sin activar `run_worker_first`. Un asset existente
-se sirve antes de invocar el Worker. El guard de `ASSETS` también protege preview
-y desarrollo frente a resolver una ruta que ya existe.
+Cloudflare mantiene **assets-first** para las rutas actuales. `wrangler.jsonc`
+selecciona `src/worker.ts` como entrada del adaptador. `/en` y `/en/*` ejecutan
+primero el Worker para retirar ese prefijo sin servir duplicados estáticos.
+Las portadas `/`, `/es`, `/es/`, `/pt` y `/pt/` también pasan primero por el
+Worker para retirar consultas antiguas de WordPress; sus peticiones normales
+se delegan a los assets sin redirección. Las redirecciones históricas tienen prioridad y se
+delegan al binding `ASSETS`, que ejecuta el archivo `_redirects` original.
+Los demás assets vigentes se sirven antes de invocar el Worker. El guard de
+`ASSETS` también protege preview y desarrollo frente a resolver una ruta existente.
 
 El build consulta únicamente contenido publicado del mismo `VITE_STRAPI_URL`
 utilizado por Astro. No necesita un token administrativo. La integración empaqueta
@@ -35,7 +40,8 @@ nueva añade datos en el siguiente build, sin añadir reglas de Cloudflare.
 Se retiraron dos generadores **A: multilenguaje artificial** en
 `dynamicPageRoutes.ts`: combinaciones cruzadas de slugs de páginas y slugs EN de
 tours bajo otros locales. Ambos usaban traducciones vigentes, sin historial de
-migración. Los archivos canónicos y los prefijos heredados existentes se conservan.
+migración. Los archivos canónicos se conservan. Los duplicados ingleses `/en/`
+se retiran según [el inventario de excepciones y validación](legacy-en-retirement.md).
 `public/_redirects`, que contiene redirecciones históricas, no se modifica.
 
 ## Validación local

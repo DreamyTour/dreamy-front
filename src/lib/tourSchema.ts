@@ -1,5 +1,6 @@
 import type { Lang } from "@/lib/i18n";
 import type { Tour } from "@/types/tours";
+import { getTourStartingPrice } from "./tourPrice";
 
 interface BuildTourSchemasOptions {
 	tour: Tour;
@@ -43,6 +44,7 @@ export function buildTourSchemas({
 	const summary = cleanText(description);
 	const absoluteImage = toAbsoluteUrl(imageUrl, siteUrl);
 	const image = absoluteImage ? [absoluteImage] : undefined;
+	const startingPrice = getTourStartingPrice(tour);
 	const additionalProperty = tour.badge
 		?.map((badge) => {
 			const propertyName = cleanText(badge.titulo);
@@ -83,6 +85,17 @@ export function buildTourSchemas({
 		provider: {
 			"@id": `${siteUrl}/#organization`,
 		},
+		...(startingPrice !== null
+			? {
+					offers: {
+						"@type": "Offer",
+						url: canonicalUrl,
+						name: { en: "From", es: "Desde", pt: "A partir de" }[lang],
+						price: startingPrice,
+						priceCurrency: "USD",
+					},
+				}
+			: {}),
 		...(additionalProperty?.length ? { additionalProperty } : {}),
 		...(itineraryItems?.length
 			? {

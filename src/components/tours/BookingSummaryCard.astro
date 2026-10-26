@@ -2,6 +2,7 @@
 import type { Tour } from "@/types/tours";
 import type { Lang } from "@/lib/i18n";
 import { getIncaTrailBookingConfig } from "@/lib/incaTrailBooking";
+import { getTourStartingPrice } from "@/lib/tourPrice";
 import { incaTrailAvailabilitySlugMap } from "@/data/incaTrailAvailabilityPage";
 import { rewriteUrl } from "@/lib/utils";
 import TourQuoteDialog from "./TourQuoteDialog.astro";
@@ -80,12 +81,13 @@ const copy = {
   },
 }[lang];
 const availabilityUrl = `${rewriteUrl(`/${incaTrailAvailabilitySlugMap[lang]}`, lang)}?tour=${encodeURIComponent(tour.slug)}#availability-calendar`;
+const startingPrice = getTourStartingPrice(tour);
 const price =
-  !quoteOnly && tour.priceTour && tour.priceTour > 0
+  startingPrice !== null
     ? new Intl.NumberFormat(
         lang === "en" ? "en-US" : lang === "pt" ? "pt-BR" : "es-PE",
         { maximumFractionDigits: 2 },
-      ).format(tour.priceTour)
+      ).format(startingPrice)
     : null;
 ---
 

@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { lang } = Astro.props;
-import mapSvg from "@/assets/svg/mapa-peru.svg?raw";
+import mapSvgUrl from "@/assets/svg/mapa-peru.svg?url";
 import backgroundImageMobile from "@/assets/backgroundImageMobile.webp";
 import fetchApi from "@/lib/strapi";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
@@ -340,10 +340,19 @@ const rightColumnPoints = mapPoints.slice(Math.ceil(mapPoints.length / 2));
             >
               <!-- Map SVG -->
               <div
-                class="absolute inset-0 flex items-center justify-center p-2 opacity-60 mix-blend-multiply pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:drop-shadow-xl [&>path]:!fill-secondary/20 [&>path]:!stroke-secondary/30"
+                class="absolute inset-0 flex items-center justify-center p-2 opacity-60 mix-blend-multiply pointer-events-none"
                 aria-hidden="true"
-                set:html={mapSvg}
-              />
+              >
+                <img
+                  src={mapSvgUrl}
+                  alt=""
+                  width="402"
+                  height="601"
+                  loading="lazy"
+                  decoding="async"
+                  class="h-full w-full object-contain drop-shadow-xl"
+                />
+              </div>
 
               <!-- Map Points -->
               <ul class="absolute inset-0 m-0 list-none p-0" aria-hidden="true">
