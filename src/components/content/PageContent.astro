@@ -39,6 +39,9 @@ const pageVideoThumbnail = page?.video?.thumbnail
   : null;
 
 const pageContent = page.content?.trim() || "";
+const blogCategorySlug = page.categories?.find(
+  (category) => category.slug !== "peru-tours",
+)?.slug;
 const blogSectionCopy = {
   es: {
     heading: "Ideas y consejos para tu pr\u00f3ximo viaje",
@@ -153,13 +156,14 @@ const faqColumns = [
       />
 
       <TourCategoryInfo info={page.informacionUtil} />
-      {hasCategoryCmsContent && (
+      {hasCategoryCmsContent && blogCategorySlug && (
         <HomePost
           lang={lang}
+          categorySlug={blogCategorySlug}
           heading={blogSectionCopy.heading}
           description={blogSectionCopy.description}
           ctaText={blogSectionCopy.cta}
-          ctaHref={rewriteUrl("/blog", lang)}
+          ctaHref={rewriteUrl(`/blog/${blogCategorySlug}`, lang)}
         />
       )}
       {hasCategoryCmsContent && <ReviewsWall lang={lang} />}
