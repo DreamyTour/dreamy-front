@@ -39,9 +39,32 @@ const pageVideoThumbnail = page?.video?.thumbnail
   : null;
 
 const pageContent = page.content?.trim() || "";
-const blogCategorySlug = page.categories?.find(
+const tourCategorySlug = page.categories?.find(
   (category) => category.slug !== "peru-tours",
 )?.slug;
+const blogCategorySlugOverrides: Record<Lang, Record<string, string>> = {
+  en: {
+    "alternative-treks": "trekking-cusco",
+    "treks-alternativos": "trekking-cusco",
+    bolivia: "bolivia",
+    chile: "chile",
+  },
+  es: {
+    "treks-alternativos": "trekking-cusco",
+    bolivia: "bolivia",
+    chile: "chile",
+  },
+  pt: {
+    "trilhas-alternativas": "trilhas-cusco",
+    "treks-alternativos": "trilhas-cusco",
+    bolivia: "bolivia",
+    chile: "chile",
+  },
+};
+const blogCategorySlug = [tourCategorySlug, page.slug]
+  .filter((slug): slug is string => Boolean(slug))
+  .map((slug) => blogCategorySlugOverrides[lang][slug])
+  .find(Boolean) ?? tourCategorySlug;
 const blogSectionCopy = {
   es: {
     heading: "Ideas y consejos para tu pr\u00f3ximo viaje",
