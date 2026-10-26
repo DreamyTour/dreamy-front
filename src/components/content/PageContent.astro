@@ -153,13 +153,15 @@ const faqColumns = [
       />
 
       <TourCategoryInfo info={page.informacionUtil} />
-      <HomePost
-        lang={lang}
-        heading={blogSectionCopy.heading}
-        description={blogSectionCopy.description}
-        ctaText={blogSectionCopy.cta}
-        ctaHref={rewriteUrl("/blog", lang)}
-      />
+      {hasCategoryCmsContent && (
+        <HomePost
+          lang={lang}
+          heading={blogSectionCopy.heading}
+          description={blogSectionCopy.description}
+          ctaText={blogSectionCopy.cta}
+          ctaHref={rewriteUrl("/blog", lang)}
+        />
+      )}
       {hasCategoryCmsContent && <ReviewsWall lang={lang} />}
 
       {
