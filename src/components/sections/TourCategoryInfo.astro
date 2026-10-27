@@ -5,9 +5,19 @@ import type { UsefulInfo } from "@/types/page";
 import { getUsefulInfoItems } from "@/lib/categoryTourSections";
 import {
   ArrowUpRight,
+  BedDouble,
   BusFront,
+  BookOpen,
+  CircleHelp,
   ChevronDown,
+  CloudSun,
   Clock3,
+  Compass,
+  Info,
+  MapPinned,
+  MessageSquareText,
+  Mountain,
+  Route,
   TicketCheck,
   UsersRound,
 } from "lucide-react";
@@ -16,7 +26,37 @@ interface Props {
   lang: "es" | "en" | "pt";
 }
 const { info, lang } = Astro.props;
-const icons = [Clock3, BusFront, UsersRound, TicketCheck];
+const normalizeTabText = (value?: string | null) =>
+  (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+const getTabIcon = (label?: string | null, title?: string | null) => {
+  const text = `${normalizeTabText(label)} ${normalizeTabText(title)}`;
+  if (/transporte|transport|bus|traslad|transfer|shuttle|movilidad/.test(text))
+    return BusFront;
+  if (/altitud|altura|elevacion|montana|mountain|colca|canon|canyon|trek|sendero|trilha/.test(text))
+    return Mountain;
+  if (/clima|weather|climate|temperatura|temperature|lluvia|rain/.test(text))
+    return CloudSun;
+  if (/conexion|connection|ruta|route|como llegar|how to get|acceso|access/.test(text))
+    return Route;
+  if (/duracion|duration|horario|schedule|tiempo|time/.test(text)) return Clock3;
+  if (/entrada|ticket|boleto|ingreso|admission/.test(text)) return TicketCheck;
+  if (/guia|guide|acompanamiento|acompanhar/.test(text)) return UsersRound;
+  if (/alojamiento|hospedaje|hotel|accommodation|lodging/.test(text))
+    return BedDouble;
+  if (/comentario|opinion|resena|review|testimonial/.test(text))
+    return MessageSquareText;
+  if (/pregunta|faq|frecuente|question|duvida/.test(text)) return CircleHelp;
+  if (/itinerario|itinerary|programa|program|circuito|circuit/.test(text))
+    return Compass;
+  if (/historia|history|cultura|culture|arqueolog|archaeolog/.test(text))
+    return BookOpen;
+  if (/destino|destination|lugar|place|visita|visit/.test(text))
+    return MapPinned;
+  return Info;
+};
 const isTransportLabel = (label?: string | null) =>
   /^(transporte(?: turistico)?|transport(?:ation)?|tourist transportation)$/.test(
     (label || "")
@@ -31,7 +71,7 @@ const categoryTabs = usefulInfoItems
   .map((item, index) => ({
   ...item,
   id: index + 1,
-  icon: icons[index % icons.length],
+    icon: getTabIcon(item.etiqueta, item.titulo),
   isTransport: false as const,
 }));
 const transportCopy = {
