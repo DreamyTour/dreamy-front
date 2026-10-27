@@ -11,7 +11,7 @@ function hasBlockText(value: unknown): boolean {
 /** Strapi may save an added component before any of its fields are filled. */
 export function getUsefulInfoItems(info?: UsefulInfo | null) {
 	return (info?.items || []).filter((item) =>
-		!!item && (!!item.etiqueta?.trim() || !!item.titulo?.trim() || hasBlockText(item.contenido)),
+		!!item && (!!item.titulo?.trim() || hasBlockText(item.contenido)),
 	);
 }
 

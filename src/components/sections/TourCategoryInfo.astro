@@ -4,6 +4,7 @@ import CategoryInfoBlocks from "@/components/content/CategoryInfoBlocks.astro";
 import type { UsefulInfo } from "@/types/page";
 import { getUsefulInfoItems } from "@/lib/categoryTourSections";
 import {
+  ArrowUpRight,
   BusFront,
   ChevronDown,
   Clock3,
@@ -12,18 +13,77 @@ import {
 } from "lucide-react";
 interface Props {
   info?: UsefulInfo | null;
+  lang: "es" | "en" | "pt";
 }
-const { info } = Astro.props;
+const { info, lang } = Astro.props;
 const icons = [Clock3, BusFront, UsersRound, TicketCheck];
-const tabs = getUsefulInfoItems(info).map((item, index) => ({
+const isTransportLabel = (label?: string | null) =>
+  /^(transporte(?: turistico)?|transport(?:ation)?|tourist transportation)$/.test(
+    (label || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLowerCase(),
+  );
+const usefulInfoItems = getUsefulInfoItems(info);
+const categoryTabs = usefulInfoItems
+  .filter((item) => !isTransportLabel(item.etiqueta))
+  .map((item, index) => ({
   ...item,
   id: index + 1,
   icon: icons[index % icons.length],
+  isTransport: false as const,
 }));
+const transportCopy = {
+  es: {
+    sectionTitle: "Información para organizar tu viaje",
+    label: "Transporte",
+    title: "Transporte turístico en Perú para tu viaje",
+    paragraphs: [
+      "En Dreamy Tours coordinamos opciones de transporte turístico junto a Viamed Perú para complementar tu itinerario. Puedes consultar traslados desde el aeropuerto, excursiones de medio día o día completo y viajes entre destinos, según la ruta que tengas prevista.",
+      "Cada servicio se organiza de acuerdo con la fecha, el recorrido y el tamaño del grupo. La disponibilidad y el tipo de vehículo se confirman al planificar tu viaje.",
+    ],
+    link: "Conoce los servicios de Viamed Perú",
+  },
+  en: {
+    sectionTitle: "Information to plan your trip",
+    label: "Transportation",
+    title: "Tourist transportation in Peru for your trip",
+    paragraphs: [
+      "At Dreamy Tours, we coordinate tourist transportation options with Viamed Perú to complement your itinerary. Ask us about airport transfers, half-day or full-day excursions, and trips between destinations, depending on your planned route.",
+      "Each service is arranged according to your travel date, route, and group size. Availability and vehicle type are confirmed while planning your trip.",
+    ],
+    link: "Explore Viamed Perú services",
+  },
+  pt: {
+    sectionTitle: "Informações para organizar sua viagem",
+    label: "Transporte",
+    title: "Transporte turístico no Peru para sua viagem",
+    paragraphs: [
+      "Na Dreamy Tours, coordenamos opções de transporte turístico junto com a Viamed Perú para complementar seu roteiro. Consulte traslados do aeroporto, excursões de meio dia ou dia inteiro e viagens entre destinos, de acordo com o percurso planejado.",
+      "Cada serviço é organizado conforme a data, o trajeto e o tamanho do grupo. A disponibilidade e o tipo de veículo são confirmados durante o planejamento da viagem.",
+    ],
+    link: "Conheça os serviços da Viamed Perú",
+  },
+}[lang];
+const transportTab = {
+  ...transportCopy,
+  etiqueta: transportCopy.label,
+  titulo: transportCopy.title,
+  id: 0,
+  icon: BusFront,
+  isTransport: true as const,
+};
+const orderedTabs = usefulInfoItems.length
+  ? [...categoryTabs, transportTab].map((tab, index) => ({
+      ...tab,
+      id: index + 1,
+    }))
+  : [];
 ---
 
 {
-  tabs.length > 0 && (
+  orderedTabs.length > 0 && (
     <section
       class="w-full py-16 md:py-20"
       aria-labelledby="tour-category-info-title"
@@ -33,7 +93,7 @@ const tabs = getUsefulInfoItems(info).map((item, index) => ({
           id="tour-category-info-title"
           class="mb-4 text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-4xl"
         >
-          {info?.titulo}
+          {info?.titulo || transportCopy.sectionTitle}
         </h2>
         <SectionDivider />
         {info?.descripcion && (
@@ -48,8 +108,8 @@ const tabs = getUsefulInfoItems(info).map((item, index) => ({
           aria-labelledby="tour-category-info-title"
           class="category-info-tab-list mb-5 rounded-[1.5rem] border border-border/60 bg-background p-2.5 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.34)]"
         >
-          <div class="grid grid-cols-2 gap-2.5 rounded-[1.125rem] bg-muted/70 p-2.5 sm:grid-cols-4">
-            {tabs.map(({ icon: Icon, ...tab }) => (
+          <div class="grid grid-cols-2 gap-2.5 rounded-[1.125rem] bg-muted/70 p-2.5 sm:grid-cols-4 xl:grid-cols-5">
+            {orderedTabs.map(({ icon: Icon, ...tab }) => (
               <button
                 type="button"
                 role="tab"
@@ -71,7 +131,7 @@ const tabs = getUsefulInfoItems(info).map((item, index) => ({
           </div>
         </div>
         <div class="space-y-3 sm:space-y-5">
-          {tabs.map(({ icon: Icon, ...tab }) => (
+          {orderedTabs.map(({ icon: Icon, ...tab }) => (
             <details
               id={`category-info-panel-${tab.id}`}
               data-info-panel
@@ -101,7 +161,31 @@ const tabs = getUsefulInfoItems(info).map((item, index) => ({
                   {tab.titulo}
                 </h3>
                 <div class="max-w-4xl space-y-4 leading-7 text-muted-foreground">
-                  <CategoryInfoBlocks blocks={tab.contenido || []} />
+                  {tab.isTransport ? (
+                    <>
+                      {tab.paragraphs.map((paragraph) => (
+                        <p>{paragraph}</p>
+                      ))}
+                      <p>
+                        <a
+                          href="https://viamedperu.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="group/viamed inline-flex min-h-11 items-center gap-2 rounded-lg border border-primary/20 bg-primary/[0.045] px-4 py-2 font-semibold text-primary shadow-[0_2px_8px_-5px_color-mix(in_srgb,var(--primary)_28%,transparent)] motion-safe:transition-[background-color,border-color,box-shadow,transform] motion-safe:duration-200 motion-safe:ease-out hover:border-primary/35 hover:bg-primary/[0.09] hover:shadow-[0_9px_20px_-12px_color-mix(in_srgb,var(--primary)_48%,transparent)] active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-safe:hover:-translate-y-0.5"
+                        >
+                          {tab.link}
+                          <ArrowUpRight
+                            size={16}
+                            strokeWidth={1.8}
+                            aria-hidden="true"
+                            className="shrink-0 motion-safe:transition-transform motion-safe:duration-200 group-hover/viamed:translate-x-0.5 group-hover/viamed:-translate-y-0.5"
+                          />
+                        </a>
+                      </p>
+                    </>
+                  ) : (
+                    <CategoryInfoBlocks blocks={tab.contenido || []} />
+                  )}
                 </div>
               </div>
             </details>

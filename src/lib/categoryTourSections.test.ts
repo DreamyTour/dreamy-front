@@ -9,7 +9,7 @@ const recommendation: TourRecommendation = {
 
 describe("category tour CMS recommendations", () => {
 	test("useful information stays hidden for missing or empty CMS components", () => {
-		for (const info of [undefined, null, {}, { items: [] }, { items: [{}, { etiqueta: "  ", titulo: " ", contenido: [{ type: "paragraph", children: [{ type: "text", text: " " }] }] }] }]) {
+		for (const info of [undefined, null, {}, { items: [] }, { items: [{}, { etiqueta: "Transporte" }, { etiqueta: "  ", titulo: " ", contenido: [{ type: "paragraph", children: [{ type: "text", text: " " }] }] }] }]) {
 			expect(getUsefulInfoItems(info)).toEqual([]);
 		}
 		expect(getUsefulInfoItems({ items: [{}, { titulo: "Transporte" }, { contenido: [{ type: "paragraph", children: [{ type: "text", text: "Recojo incluido" }] }] }] })).toHaveLength(2);
