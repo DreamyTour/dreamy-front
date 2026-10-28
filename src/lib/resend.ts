@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { isMailDryRun } from "./formSecurity";
 
 const DEFAULT_FROM = "Dreamy Tours <info@dreamy.tours>";
 const DEFAULT_TO = "info@dreamy.tours";
@@ -12,16 +13,23 @@ export function getResendApiKey() {
 	return import.meta.env.RESEND_API_KEY || readProcessEnv("RESEND_API_KEY");
 }
 
-export function isResendConfigured() {
-	return Boolean(getResendApiKey());
+export async function isResendConfigured() {
+	return (await isMailDryRun()) || Boolean(getResendApiKey());
 }
 
-export function getResendClient() {
+export async function getResendClient() {
+	const dryRun = await isMailDryRun();
 	const apiKey = getResendApiKey();
 
-	if (!apiKey) return null;
+	if (!apiKey && !dryRun) return null;
 
-	return new Resend(apiKey);
+	const client = new Resend(apiKey || "dry-run");
+	const send = client.emails.send.bind(client.emails);
+	client.emails.send = async (...args: Parameters<typeof send>) => {
+		if (dryRun) return { data: { id: "dry-run" }, error: null, headers: null };
+		return send(...args);
+	};
+	return client;
 }
 
 export function getDreamySender() {
@@ -53,7 +61,7 @@ export async function sendDreamyEmail({
 	subject: string;
 	html: string;
 }) {
-	const resend = getResendClient();
+	const resend = await getResendClient();
 
 	if (!resend) {
 		return {

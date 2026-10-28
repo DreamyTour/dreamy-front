@@ -1,4 +1,5 @@
 ---
+import FormSecurity from "../ui/FormSecurity";
 import { countriesWithPhoneCode } from "@/data/countries";
 import { WHATSAPP_URL } from "@/lib/socialLinks";
 
@@ -332,6 +333,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       aria-live="polite"
     >
     </p>
+    <FormSecurity client:load lang={lang} />
   </form>
 </section>
 
@@ -476,6 +478,10 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
 </style>
 
 <script>
+  import {
+    resetFormSecurity,
+    protectedFormData,
+  } from "../../lib/formSecurityClient";
   type ContactFormRoot = HTMLElement & {
     __dreamyContactFormController?: AbortController;
   };
@@ -613,7 +619,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           try {
             const response = await fetch(form.action, {
               method: form.method || "POST",
-              body: new FormData(form),
+              body: protectedFormData(form),
               headers: {
                 Accept: "application/json",
               },
@@ -631,6 +637,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
             console.error("Error al enviar formulario de tour:", error);
             setStatus("error", errorText);
           } finally {
+            resetFormSecurity(form);
             setSubmitting(false);
           }
         }
@@ -693,7 +700,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
     try {
       const response = await fetch(form.action, {
         method: form.method || "POST",
-        body: new FormData(form),
+        body: protectedFormData(form),
         headers: {
           Accept: "application/json",
         },
@@ -742,6 +749,7 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         statusMessage.setAttribute("aria-live", "assertive");
       }
     } finally {
+      resetFormSecurity(form);
       if (submitButton) {
         submitButton.disabled = false;
         submitButton.classList.remove("cursor-not-allowed", "opacity-75");

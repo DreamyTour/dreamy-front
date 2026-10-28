@@ -9,6 +9,7 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"test:e2e": "playwright test",
+		"test:antispam": "bun test tests/form-antispam.test.ts && node tests/form-rate-limiter.integration.mjs",
 		"test:cms-origin": "node --test tests/validate-cms-origin.test.mjs",
 		"test:cms-editor": "node --experimental-strip-types tests/cms-editor.integration.ts",
 		"test:legacy-en": "node tests/legacy-en.integration.mjs",

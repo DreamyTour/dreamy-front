@@ -1,4 +1,6 @@
 import type { APIRoute } from "astro";
+import { checkFormSecurity, securityError } from "../../lib/formSecurity";
+import { validateMailForm } from "../../lib/formValidation";
 import { countries } from "../../data/countries";
 import { escapeHtml } from "../../lib/html";
 import {
@@ -261,6 +263,27 @@ export const POST: APIRoute = async ({ request }) => {
 		}
 
 		const data = JSON.parse(rawBody) as CheckoutPayload;
+		if (!data || typeof data !== "object" || Array.isArray(data))
+			return jsonResponse({ error: "Invalid body" }, 400);
+		const security = await checkFormSecurity(
+			request,
+			data as Record<string, unknown>,
+		);
+		if (security === "discard") {
+			const lang = data.cart?.lang;
+			return jsonResponse(
+				{
+					success: true,
+					reference: "DT-RECEIVED",
+					redirectUrl:
+						lang === "en"
+							? "/checkout/success"
+							: `/${lang === "pt" ? "pt" : "es"}/checkout/success`,
+				},
+				200,
+			);
+		}
+		if (security !== "allow") return securityError(security);
 		const { passengersInfo, contactInfo, cart } = data;
 		const passengers = Array.isArray(passengersInfo) ? passengersInfo : [];
 		const checkoutLang = getCheckoutLang(cart?.lang);
@@ -284,7 +307,20 @@ export const POST: APIRoute = async ({ request }) => {
 			return jsonResponse({ error: "Missing cart data" }, 400);
 		}
 
-		if (!isValidContact(contactInfo)) {
+		const holder = passengers[0];
+		if (
+			!validateMailForm(
+				{
+					nombres: `${holder?.name || ""} ${holder?.lastname || ""}`,
+					pais: countries.find((c) => c.iso2 === holder?.country)?.nameES,
+					email: contactInfo?.email,
+					telefono: contactInfo?.phone,
+				},
+				false,
+				false,
+			) ||
+			!isValidContact(contactInfo)
+		) {
 			return jsonResponse({ error: errors.invalidContact }, 400);
 		}
 
@@ -401,7 +437,7 @@ export const POST: APIRoute = async ({ request }) => {
 			return jsonResponse({ error: errors.insufficientAvailability }, 409);
 		}
 
-		const resend = getResendClient();
+		const resend = await getResendClient();
 		if (!resend) {
 			return jsonResponse({ error: errors.emailUnavailable }, 503);
 		}

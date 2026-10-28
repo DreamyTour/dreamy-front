@@ -45,6 +45,8 @@ const result = await Bun.build({
 	entrypoints: ["tests/fixtures/localized-worker.ts"],
 	target: "browser",
 	format: "esm",
+	// Provided by workerd when Miniflare runs this fixture.
+	external: ["cloudflare:workers"],
 	plugins: [
 		{
 			name: "fixture-imports",

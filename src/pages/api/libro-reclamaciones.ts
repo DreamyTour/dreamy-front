@@ -2,7 +2,8 @@ import type { APIRoute } from "astro";
 import { escapeHtml } from "../../lib/html";
 import { isResendConfigured, sendDreamyEmail } from "../../lib/resend";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { validateMailForm } from "../../lib/formValidation";
+import { checkFormSecurity, securityError } from "../../lib/formSecurity";
 
 export const prerender = false;
 
@@ -20,6 +21,16 @@ async function readRequestData(request: Request) {
 export const POST: APIRoute = async ({ request }) => {
 	try {
 		const body = await readRequestData(request);
+		if (!body || typeof body !== "object" || Array.isArray(body))
+			return Response.json({ error: "Invalid body" }, { status: 400 });
+		const security = await checkFormSecurity(request, body);
+		if (security === "discard") {
+			return Response.json({
+				success: true,
+				message: "Reclamacion enviada correctamente",
+			});
+		}
+		if (security !== "allow") return securityError(security);
 		const {
 			nombres,
 			pais,
@@ -41,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
 			!ciudad ||
 			!documento ||
 			!emailValue ||
-			!emailPattern.test(emailValue) ||
+			!validateMailForm(body, true, false) ||
 			!telefono ||
 			!tipo ||
 			!detalle
@@ -54,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
-		if (!isResendConfigured()) {
+		if (!(await isResendConfigured())) {
 			console.log("Email simulation: RESEND_API_KEY is not configured", {
 				form: "libro-reclamaciones",
 				type: typeValue,
@@ -178,6 +189,8 @@ export const POST: APIRoute = async ({ request }) => {
 			{ status: 200, headers: { "Content-Type": "application/json" } },
 		);
 	} catch (error) {
+		if (error instanceof SyntaxError || error instanceof TypeError)
+			return Response.json({ error: "Invalid body" }, { status: 400 });
 		console.error("Error en el endpoint:", error);
 		return new Response(
 			JSON.stringify({ error: "Error interno del servidor" }),

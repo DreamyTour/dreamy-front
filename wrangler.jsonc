@@ -7,6 +7,8 @@
 	"compatibility_date": "2026-04-15",
 	"compatibility_flags": [],
 	"keep_vars": true,
+	"durable_objects": { "bindings": [{ "name": "FORM_RATE_LIMITER", "class_name": "FormRateLimiter" }] },
+	"migrations": [{ "tag": "form-antispam-v1", "new_sqlite_classes": ["FormRateLimiter"] }],
 	"kv_namespaces": [
 		{ "binding": "SESSION", "id": "586d1e4ff42d4732b8810abdf09c02d4" }
 	],

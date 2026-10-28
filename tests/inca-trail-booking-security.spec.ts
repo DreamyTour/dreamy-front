@@ -18,7 +18,7 @@ const completePassenger = {
 
 const completeContact = {
 	email: "maria@example.com",
-	phone: "999888777",
+	phone: "+51999888777",
 };
 
 function addDaysToDateKey(dateKey: string, daysToAdd: number) {
@@ -122,7 +122,7 @@ const bookingCalendarTours = [
 		spaces: 7,
 	},
 	{
-		path: "/pt/lares-trek-caminho-inca-curto-4-dias",
+		path: "/pt/lares-trek-trilha-inca-curto-4-dias",
 		road: "5",
 		durationDays: 4,
 		permitStartOffsetDays: 2,
@@ -143,7 +143,7 @@ const bookingCalendarTours = [
 		spaces: 5,
 	},
 	{
-		path: "/pt/salkantay-caminho-inca-6-dias",
+		path: "/pt/salkantay-trilha-inca-6-dias",
 		road: "1",
 		durationDays: 6,
 		permitStartOffsetDays: 2,
@@ -153,6 +153,9 @@ const bookingCalendarTours = [
 
 function checkoutPayload(overrides = {}) {
 	return {
+		website: "",
+		formRenderedAt: Date.now() - 10_000,
+		"cf-turnstile-response": `e2e-fixture-${crypto.randomUUID()}`,
 		passengersInfo: [completePassenger, completePassenger],
 		contactInfo: completeContact,
 		cart: {
@@ -377,7 +380,7 @@ for (const tour of bookingCalendarTours) {
 		const requestedSlug = new URL(page.url()).searchParams.get("tour") ?? "";
 		await expect(form.locator("#availability-tour")).toHaveCount(0);
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-			`${tour.path.startsWith("/es/") ? "Reserva de tour" : tour.path.startsWith("/pt/") ? "Reserva do tour" : "Tour booking"} ${originalTitle}`,
+			`${tour.path.startsWith("/es/") ? "Reservar tour" : tour.path.startsWith("/pt/") ? "Reserva do tour" : "Tour booking"} ${originalTitle}`,
 		);
 		await expect(form.locator('select[name="machu-picchu-route"]')).toHaveCount(
 			0,
@@ -452,15 +455,22 @@ for (const path of [
 		);
 		await page.goto(path, { waitUntil: "domcontentloaded" });
 		await expect(page.getByRole("heading", { level: 1 })).toContainText(/Inca/);
-		const options = page.locator("#availability-tour option");
-		await expect(options).toHaveCount(2, { timeout: 20000 });
-		const slugs = await options.evaluateAll((items) =>
+		await waitForBookingIslandHydration(page);
+		const routeSelect = page.locator('select[name="machu-picchu-route"]');
+		const options = routeSelect.locator("option");
+		await expect(options).toHaveCount(2);
+		const roads = await options.evaluateAll((items) =>
 			items.map((item) => (item as HTMLOptionElement).value),
 		);
-		expect(
-			slugs.map((slug) => getIncaTrailBookingConfig(slug)?.durationDays).sort(),
-		).toEqual([2, 4]);
-		await waitForBookingIslandHydration(page);
+		expect(roads.sort()).toEqual(["1", "5"]);
+		// The current UI chooses the experience through the permit route control.
+		// Both primary tours must remain selectable, with their original duration.
+		for (const [road, duration] of [["5", 2], ["1", 4]] as const) {
+			await routeSelect.selectOption(road);
+			await expect(page.locator("#availability-calendar aside")).toContainText(
+				new RegExp(`${duration}\\s+(days|días|dias)`, "i"),
+			);
+		}
 		const monthButtons = page.locator("[data-calendar-months] button");
 		await expect(monthButtons).toHaveCount(12);
 		await expect(
@@ -638,6 +648,7 @@ test("checkout API rejects client prices without an authoritative Strapi tour id
 	request,
 }) => {
 	const response = await request.post("/api/checkout", {
+		headers: { "cf-connecting-ip": "192.0.2.11" },
 		data: checkoutPayload(),
 	});
 
@@ -650,6 +661,7 @@ test("checkout API rejects a child as the pre-booking holder", async ({
 	request,
 }) => {
 	const response = await request.post("/api/checkout", {
+		headers: { "cf-connecting-ip": "192.0.2.12" },
 		data: checkoutPayload({
 			passengersInfo: [
 				{ ...completePassenger, dob: "2020-01-10" },
@@ -707,7 +719,10 @@ test("checkout API rejects risky or incomplete booking payloads", async ({
 	];
 
 	for (const payload of invalidPayloads) {
-		const response = await request.post("/api/checkout", { data: payload });
+		const response = await request.post("/api/checkout", {
+			data: payload,
+			headers: { "cf-connecting-ip": "192.0.2.13" },
+		});
 		expect(response.status()).toBe(400);
 		const body = await response.json();
 		expect(body.error).toBeTruthy();

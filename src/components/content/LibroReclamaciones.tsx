@@ -1,6 +1,12 @@
 "use client";
 
-import { type ChangeEvent, useMemo, useState } from "react";
+import { type ChangeEvent, useRef, useMemo, useState } from "react";
+import FormSecurity from "../ui/FormSecurity";
+import {
+	securityFields,
+	resetFormSecurity,
+	internationalPhone,
+} from "../../lib/formSecurityClient";
 import { countries } from "@/data/countries";
 
 // Colores del theme (definidos en global.css)
@@ -123,6 +129,7 @@ interface LibroReclamacionesProps {
 export default function LibroReclamaciones({
 	lang = "es",
 }: LibroReclamacionesProps) {
+	const securityForm = useRef<HTMLFormElement>(null);
 	const copy = complaintCopy[lang] ?? complaintCopy.es;
 	const sortedCountries = useMemo(
 		() =>
@@ -175,7 +182,11 @@ export default function LibroReclamaciones({
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(formData),
+				body: JSON.stringify({
+					...formData,
+					telefono: internationalPhone(formData.telefono),
+					...securityFields(securityForm.current),
+				}),
 			});
 
 			const result = await response.json();
@@ -203,6 +214,7 @@ export default function LibroReclamaciones({
 			setSubmitStatus("error");
 			setStatusMessage(copy.error);
 		} finally {
+			resetFormSecurity(securityForm.current);
 			setIsSubmitting(false);
 		}
 	};
@@ -234,6 +246,7 @@ export default function LibroReclamaciones({
 
 	return (
 		<form
+			ref={securityForm}
 			action="/api/libro-reclamaciones"
 			method="post"
 			onSubmit={handleSubmit}
@@ -598,6 +611,7 @@ export default function LibroReclamaciones({
 								: copy.submit}
 				</button>
 			</div>
+			<FormSecurity lang={lang} />
 		</form>
 	);
 }

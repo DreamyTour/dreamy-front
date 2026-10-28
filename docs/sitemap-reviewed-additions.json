@@ -1,0 +1,237 @@
+{
+  "reviewedOn": "2026-10-28",
+  "reason": "Read-only verification against published Strapi metadata, unique localized document IDs, canonical URLs and compiled HTML. The historical snapshot is unchanged.",
+  "entries": [
+    {
+      "url": "https://dreamy.tours/blog/best-things-to-do-in-arequipa-peru/",
+      "kind": "published-post",
+      "documentId": "post:tan5o1c8vzp7hyrlpl9zzohz",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/best-time-to-visit-lima/",
+      "kind": "published-post",
+      "documentId": "post:vnn60nl52uj7n5kszmv281kr",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/caral-from-lima/",
+      "kind": "published-post",
+      "documentId": "post:u1ndnfe3z0jafywabxktk03w",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/huaca-pucllana-lima/",
+      "kind": "published-post",
+      "documentId": "post:o042qz6jesq7iyp0mapn4ku4",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/lima-airport-to-miraflores/",
+      "kind": "published-post",
+      "documentId": "post:zolrbpn72rgw0uvfpcdumqg3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/lima/2/",
+      "kind": "category-pagination",
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/things-to-do-in-barranco-lima/",
+      "kind": "published-post",
+      "documentId": "post:rbve8jv9v7d6v19bpo0qhujv",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/things-to-do-in-lima-at-night/",
+      "kind": "published-post",
+      "documentId": "post:m6te80cll52bwft821n9h6i3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/things-to-do-in-miraflores-lima/",
+      "kind": "published-post",
+      "documentId": "post:i881vv4uvg4oe3ohaqrqxmr3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/where-to-stay-in-lima/",
+      "kind": "published-post",
+      "documentId": "post:aectdtwwjeky82er6tz2xxxw",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/aeropuerto-lima-a-miraflores/",
+      "kind": "published-post",
+      "documentId": "post:zolrbpn72rgw0uvfpcdumqg3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/caral-desde-lima/",
+      "kind": "published-post",
+      "documentId": "post:u1ndnfe3z0jafywabxktk03w",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/donde-alojarse-en-lima/",
+      "kind": "published-post",
+      "documentId": "post:aectdtwwjeky82er6tz2xxxw",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/huaca-pucllana-lima/",
+      "kind": "published-post",
+      "documentId": "post:o042qz6jesq7iyp0mapn4ku4",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/lima/2/",
+      "kind": "category-pagination",
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/lugares-turisticos-de-arequipa/",
+      "kind": "published-post",
+      "documentId": "post:etrrdnvn53ycm5e3efz4j9i7",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/mejor-epoca-para-visitar-lima/",
+      "kind": "published-post",
+      "documentId": "post:vnn60nl52uj7n5kszmv281kr",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/que-hacer-en-arequipa-20-lugares/",
+      "kind": "published-post",
+      "documentId": "post:tan5o1c8vzp7hyrlpl9zzohz",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/que-hacer-en-barranco-lima/",
+      "kind": "published-post",
+      "documentId": "post:rbve8jv9v7d6v19bpo0qhujv",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/que-hacer-en-lima-de-noche/",
+      "kind": "published-post",
+      "documentId": "post:m6te80cll52bwft821n9h6i3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/es/blog/que-hacer-en-miraflores-lima/",
+      "kind": "published-post",
+      "documentId": "post:i881vv4uvg4oe3ohaqrqxmr3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/aeroporto-de-lima-a-miraflores/",
+      "kind": "published-post",
+      "documentId": "post:zolrbpn72rgw0uvfpcdumqg3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/caral-saindo-de-lima/",
+      "kind": "published-post",
+      "documentId": "post:u1ndnfe3z0jafywabxktk03w",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/huaca-pucllana-lima/",
+      "kind": "published-post",
+      "documentId": "post:o042qz6jesq7iyp0mapn4ku4",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/lima/2/",
+      "kind": "category-pagination",
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/melhor-epoca-para-visitar-lima/",
+      "kind": "published-post",
+      "documentId": "post:vnn60nl52uj7n5kszmv281kr",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/o-que-fazer-em-arequipa-20-lugares-imperdiveis/",
+      "kind": "published-post",
+      "documentId": "post:tan5o1c8vzp7hyrlpl9zzohz",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/o-que-fazer-em-barranco-lima/",
+      "kind": "published-post",
+      "documentId": "post:rbve8jv9v7d6v19bpo0qhujv",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/o-que-fazer-em-lima-a-noite/",
+      "kind": "published-post",
+      "documentId": "post:m6te80cll52bwft821n9h6i3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/o-que-fazer-em-miraflores-lima/",
+      "kind": "published-post",
+      "documentId": "post:i881vv4uvg4oe3ohaqrqxmr3",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/onde-ficar-em-lima/",
+      "kind": "published-post",
+      "documentId": "post:aectdtwwjeky82er6tz2xxxw",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true
+    },
+    {
+      "url": "https://dreamy.tours/blog/tourist-attractions-in-arequipa/",
+      "kind": "published-post",
+      "documentId": "post:etrrdnvn53ycm5e3efz4j9i7",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true,
+      "reason": "Translations of the Spanish Arequipa article published during the audit; verified separately from the initial 32 URLs."
+    },
+    {
+      "url": "https://dreamy.tours/pt/blog/pontos-turisticos-de-arequipa/",
+      "kind": "published-post",
+      "documentId": "post:etrrdnvn53ycm5e3efz4j9i7",
+      "cmsPublishedVerified": true,
+      "canonicalVerified": true,
+      "reason": "Translations of the Spanish Arequipa article published during the audit; verified separately from the initial 32 URLs."
+    }
+  ],
+  "excludedRegression": {
+    "url": "https://dreamy.tours/es/blog/9/",
+    "reason": "Blog index pagination; the existing sitemap exclusion policy must grow past page 8. The route and content remain available."
+  }
+}

@@ -2,7 +2,8 @@ import type { APIRoute } from "astro";
 import { escapeHtml } from "../../lib/html";
 import { isResendConfigured, sendDreamyEmail } from "../../lib/resend";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { validateMailForm } from "../../lib/formValidation";
+import { checkFormSecurity, securityError } from "../../lib/formSecurity";
 
 export const prerender = false;
 
@@ -110,6 +111,22 @@ export const POST: APIRoute = async ({ request }) => {
 		const shouldReturnJson = expectsJson(request);
 		const backUrl = request.headers.get("referer") || "/";
 		const body = await readRequestData(request);
+		if (!body || typeof body !== "object" || Array.isArray(body))
+			return Response.json({ error: "Invalid body" }, { status: 400 });
+		const security = await checkFormSecurity(request, body);
+		if (security === "discard") {
+			if (!shouldReturnJson)
+				return htmlFormResponse({
+					title: "Formulario enviado",
+					message: "Gracias por contactarnos. Te responderemos pronto.",
+					backUrl,
+				});
+			return Response.json({
+				success: true,
+				message: "Solicitud enviada correctamente",
+			});
+		}
+		if (security !== "allow") return securityError(security);
 		const {
 			nombres,
 			pais,
@@ -127,7 +144,7 @@ export const POST: APIRoute = async ({ request }) => {
 		} = body;
 		const emailValue = String(email || "").trim();
 
-		if (!nombres || !pais || !emailValue || !emailPattern.test(emailValue)) {
+		if (!validateMailForm(body)) {
 			if (!shouldReturnJson) {
 				return htmlFormResponse({
 					title: "No se pudo enviar",
@@ -145,7 +162,7 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
-		if (!isResendConfigured()) {
+		if (!(await isResendConfigured())) {
 			console.log("Email simulation: RESEND_API_KEY is not configured", {
 				form: "planea-tu-viaje",
 				hasPhone: Boolean(telefono),
@@ -214,7 +231,7 @@ export const POST: APIRoute = async ({ request }) => {
           </tr>
           <tr>
             <td style="padding: 8px; border: 1px solid #e5e7eb; background-color: #f9fafb; font-weight: bold;">WhatsApp:</td>
-            <td style="padding: 8px; border: 1px solid #e5e7eb;">${telefono ? `+${safe.codigoPais} ${safe.telefono}` : "No proporcionado"}</td>
+            <td style="padding: 8px; border: 1px solid #e5e7eb;">${telefono ? safe.telefono : "No proporcionado"}</td>
           </tr>
         </table>
 
@@ -312,6 +329,8 @@ export const POST: APIRoute = async ({ request }) => {
 			{ status: 200, headers: { "Content-Type": "application/json" } },
 		);
 	} catch (error) {
+		if (error instanceof SyntaxError || error instanceof TypeError)
+			return Response.json({ error: "Invalid body" }, { status: 400 });
 		console.error("Error en el endpoint:", error);
 		return new Response(
 			JSON.stringify({ error: "Error interno del servidor" }),

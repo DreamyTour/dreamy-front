@@ -53,6 +53,7 @@ const INCA_TRAIL_BOOKING_CONFIGS: Record<string, IncaTrailBookingConfig> = {
 			"lares-trek-camino-inca-corto-4-dias",
 			"lares-trek-short-inca-trail-4-days",
 			"lares-trek-caminho-inca-curto-4-dias",
+			"lares-trek-trilha-inca-curto-4-dias",
 		],
 		{
 			road: "5",
@@ -66,6 +67,7 @@ const INCA_TRAIL_BOOKING_CONFIGS: Record<string, IncaTrailBookingConfig> = {
 			"salkantay-camino-inca-6-dias",
 			"salkantay-inca-trail-to-6-days",
 			"salkantay-caminho-inca-6-dias",
+			"salkantay-trilha-inca-6-dias",
 		],
 		{
 			road: "1",

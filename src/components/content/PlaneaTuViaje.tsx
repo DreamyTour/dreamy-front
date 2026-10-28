@@ -2,6 +2,12 @@
 
 import { CalendarDays } from "lucide-react";
 import { type ChangeEvent, useRef, useState } from "react";
+import FormSecurity from "../ui/FormSecurity";
+import {
+	securityFields,
+	resetFormSecurity,
+	internationalPhone,
+} from "../../lib/formSecurityClient";
 import { countries } from "@/data/countries";
 
 interface CountryOption {
@@ -123,6 +129,7 @@ export default function PlaneaTuViaje({
 }) {
 	const t = i18n[lang] || i18n.es;
 	const dateInputRef = useRef<HTMLInputElement>(null);
+	const securityForm = useRef<HTMLFormElement>(null);
 	const today = new Date();
 	const todayDateValue = `${today.getFullYear()}-${String(
 		today.getMonth() + 1,
@@ -199,7 +206,13 @@ export default function PlaneaTuViaje({
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ ...formData, codigoPais, formLanguage: lang }),
+				body: JSON.stringify({
+					...formData,
+					telefono: internationalPhone(formData.telefono, codigoPais),
+					codigoPais,
+					formLanguage: lang,
+					...securityFields(securityForm.current),
+				}),
 			});
 
 			const result = await response.json();
@@ -246,6 +259,7 @@ export default function PlaneaTuViaje({
 			setSubmitStatus("error");
 			setStatusMessage(t.alertError);
 		} finally {
+			resetFormSecurity(securityForm.current);
 			setIsSubmitting(false);
 		}
 	};
@@ -272,6 +286,7 @@ export default function PlaneaTuViaje({
 
 	return (
 		<form
+			ref={securityForm}
 			action="/api/planea-tu-viaje"
 			method="post"
 			onSubmit={handleSubmit}
@@ -586,6 +601,7 @@ export default function PlaneaTuViaje({
 								: t.submitText}
 				</button>
 			</div>
+			<FormSecurity lang={lang} />
 		</form>
 	);
 }

@@ -1,5 +1,124 @@
 # Dreamy Tours Frontend
 
+La preparación actual, pendientes remotos, revisión de URLs y recuperación
+compatible con Durable Objects se documentan en
+[el plan de publicación antispam](docs/antispam-release-plan.md).
+
+## Protección antispam de formularios
+
+Todos los formularios que envían correos usan Turnstile, validación compartida,
+honeypot `website`, timestamp `formRenderedAt` y límite persistente de 5 intentos
+en una ventana móvil de 10 minutos por endpoint e IP (`cf-connecting-ip`). Se
+protegen `/api/planea-tu-viaje`, `/api/libro-reclamaciones`, `/api/checkout` y
+`/api/machu-picchu-prebooking`, incluidas las variantes ES/EN/PT, contacto de tours
+y consulta de turismo inclusivo. El mensaje de Planea tu viaje sigue siendo opcional.
+
+Configuración antes de publicar:
+
+1. En Cloudflare → Turnstile, crear un widget **Managed** para `dreamy.tours`.
+   Añadir también `www.dreamy.tours` si se sirven formularios desde ese hostname.
+2. Configurar `PUBLIC_TURNSTILE_SITE_KEY` en el entorno de **build** y reconstruir
+   el sitio. La clave pública es la única que recibe el navegador. El widget usa
+   `appearance: interaction-only`: ocupa espacio solo cuando necesita interacción.
+3. Configurar `TURNSTILE_SECRET_KEY` como **secret del Worker en ejecución**.
+   En desarrollo local usar `.dev.vars` para el secreto y `DRY_RUN=true`, y `.env`
+   para la clave pública. `.env.example` contiene los nombres sin claves reales.
+4. Mantener la configuración existente de Resend. Usar `DRY_RUN=true` durante
+   pruebas: simula la respuesta del proveedor, incluso sin API key, sin enviar
+   correos ni los adjuntos al proveedor. Para el primer despliegue de revisión,
+   conservar `DRY_RUN=true`; habilitar correo real requiere autorización separada.
+5. Publicar con el flujo habitual, conservando el binding `FORM_RATE_LIMITER` y
+   la migración `form-antispam-v1` incluidos en `wrangler.jsonc` (también se copian
+   a `dist/server/wrangler.json`). El despliegue crea el Durable Object SQLite;
+   no requiere crear un namespace KV manualmente. Sin binding disponible se
+   responde 503 y no se envía correo. No eliminar la migración después del deploy.
+
+El servidor llama a [Siteverify de Cloudflare](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/),
+comprueba `success` y el hostname, y rechaza con 403 el token ausente, rechazado,
+expirado o cualquier error/timeout del servicio. No hay bypass de Turnstile en
+`DRY_RUN`. Los honeypots y envíos de menos de tres segundos devuelven el éxito
+habitual sin correo. El reloj se inicia al montar el formulario en el navegador,
+no durante el build estático. El timestamp es una heurística manipulable por bots;
+Turnstile sigue siendo la barrera principal. Todos los intentos cuentan para el
+límite, incluidos los descartados; el sexto devuelve 429 con `Retry-After: 600`.
+Los identificadores persistentes usan un hash de endpoint/IP y los contadores se
+limpian mediante alarmas. El contador es atómico, incluso con peticiones concurrentes.
+
+Refuerzo manual en **Cloudflare WAF → Rate limiting rules**:
+
+- Expresión: `http.request.uri.path contains "/api/"`.
+- Característica de conteo: IP de origen.
+- Umbral: **5 peticiones / 10 minutos**; acción **Block**; duración **1 hora**.
+- Este alcance incluye otras APIs y GET. Revisarlo antes de activarlo, porque
+  puede bloquear navegación que consulta APIs. Si se desea limitar solo envíos,
+  añadir `http.request.method eq "POST"` y los cuatro paths anteriores.
+- La disponibilidad de ventanas/duración depende del plan del panel; si no ofrece
+  esos valores, el Durable Object ya aplica exactamente 5/10 minutos al formulario.
+
+Validación reproducible (no envía correos reales):
+
+```sh
+bun run test:antispam
+bun run check
+node tests/form-security.browser.mjs
+```
+
+Para probar también contra Siteverify real con las claves **públicas de prueba de
+Cloudflare**, en PowerShell:
+
+```powershell
+$env:RUN_LIVE_TURNSTILE='true'
+bun test tests/form-antispam.test.ts
+$env:VITE_STRAPI_URL='https://cms.dreamy.tours'
+npm run build
+```
+
+El test en vivo usa `example.com`, hostname que devuelve la clave de prueba de
+Cloudflare, y verifica ambos endpoints con `DRY_RUN=true`. Las claves de prueba
+nunca se configuran automáticamente en producción.
+
+### Preparar el build local sin cambiar el CMS de desarrollo
+
+`bun run build` hereda las variables que Bun carga desde `.env`. El preflight
+`scripts/validate-cms-origin.mjs` exige exactamente `https://cms.dreamy.tours`
+(con una barra final opcional). Si `.env` apunta al CMS local, el rechazo es
+correcto: ese origen local no debe entrar en una compilación de producción.
+El preflight ejecutado directamente con Node tampoco carga `.env` por sí solo.
+No cambiar la URL del VPS ni quitar esta validación.
+
+Para preparar los artefactos de producción desde PowerShell, usar el origen que
+ya exige el proyecto solo durante el comando, conservando el entorno anterior:
+
+```powershell
+$previousCmsOrigin = $env:VITE_STRAPI_URL
+$previousDryRun = $env:DRY_RUN
+try {
+  $env:VITE_STRAPI_URL = 'https://cms.dreamy.tours'
+  $env:DRY_RUN = 'true'
+  bun run build
+  if ($LASTEXITCODE -ne 0) { throw 'Build fallido: no continuar con Wrangler.' }
+  npx wrangler deploy --dry-run
+  if ($LASTEXITCODE -ne 0) { throw 'Validación de Wrangler fallida.' }
+} finally {
+  $env:VITE_STRAPI_URL = $previousCmsOrigin
+  $env:DRY_RUN = $previousDryRun
+}
+```
+
+La variable local `DRY_RUN` **no confirma ni modifica** el valor de runtime remoto.
+Antes de autorizar un despliegue, comprobar en el panel del Worker `dreamy-front`
+que `DRY_RUN=true` está guardado y que existe `TURNSTILE_SECRET_KEY`. Mantener
+`keep_vars: true`, `workers_dev: false` y la migración del Durable Object.
+El `--dry-run` debe ejecutarse después del build exitoso: puede empaquetar `dist`
+antiguo si se omite ese paso. Un push a `main` puede activar el despliegue GitHub;
+no hacerlo durante esta preparación.
+
+Antes del primer despliegue, registrar la versión activa y preparar la reversión:
+una migración que crea un Durable Object limita el rollback a versiones previas.
+Ver las [restricciones de rollback de Cloudflare](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/#bindings).
+Si hay que revertir el comportamiento, conservar la exportación de la clase,
+su binding y la migración; no borrar namespaces ni datos para forzar un rollback.
+
 Frontend de Dreamy Tours construido con Astro, React y Tailwind CSS. Publica la web informativa, tours y blog alimentados por Strapi, checkout, formularios comerciales y contenido en ingles, espanol y portugues.
 
 ## Stack y arquitectura

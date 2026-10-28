@@ -10,6 +10,12 @@ import {
 	Users,
 } from "lucide-react";
 import { type SubmitEvent, useEffect, useRef, useState } from "react";
+import FormSecurity from "../ui/FormSecurity";
+import {
+	securityFields,
+	resetFormSecurity,
+	internationalPhone,
+} from "../../lib/formSecurityClient";
 import { countries } from "@/data/countries";
 import {
 	getDateKeyInTimeZone,
@@ -303,6 +309,7 @@ export default function CheckoutSummary({
 	initialLang = "en",
 }: CheckoutSummaryProps) {
 	const copy = checkoutCopy[initialLang] ?? checkoutCopy.en;
+	const securityForm = useRef<HTMLFormElement>(null);
 	const [cart, setCart] = useState<BookingCart | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [emptyCartHref, setEmptyCartHref] = useState("/");
@@ -501,6 +508,7 @@ export default function CheckoutSummary({
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
+					...securityFields(securityForm.current),
 					cart: {
 						quoteRequestId: cart.quoteRequestId,
 						tourId: cart.tourId,
@@ -512,7 +520,7 @@ export default function CheckoutSummary({
 					passengersInfo: passengers,
 					contactInfo: {
 						email: contact.email,
-						phone: contact.phone,
+						phone: internationalPhone(contact.phone),
 					},
 				}),
 			});
@@ -542,6 +550,7 @@ export default function CheckoutSummary({
 			const message = err instanceof Error ? err.message : copy.prebookingError;
 			setError(message);
 		} finally {
+			resetFormSecurity(securityForm.current);
 			setIsSubmitting(false);
 		}
 	};
@@ -622,6 +631,7 @@ export default function CheckoutSummary({
 	const labelClass = "text-xs font-bold uppercase tracking-wide text-[#5f5349]";
 	return (
 		<form
+			ref={securityForm}
 			action="/api/checkout"
 			method="post"
 			onSubmit={handleFormSubmit}
@@ -1386,6 +1396,7 @@ export default function CheckoutSummary({
 					</div>
 				)}
 			</div>
+			<FormSecurity />
 		</form>
 	);
 }

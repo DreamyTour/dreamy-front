@@ -15,6 +15,8 @@ import {
 	resolveLocalizedRoute,
 } from "./lib/localizedRouteResolver";
 
+export { FormRateLimiter } from "./lib/formRateLimiter";
+
 const protectedEnglishSources =
 	protectedEnglishRedirectSources(historicalRedirects);
 

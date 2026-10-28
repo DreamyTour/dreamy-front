@@ -1,4 +1,7 @@
 import type { APIRoute } from "astro";
+import { checkFormSecurity, securityError } from "../../lib/formSecurity";
+import { validateMailForm } from "../../lib/formValidation";
+import { countries } from "../../data/countries";
 import {
 	type MachuPicchuPrebooking,
 	validateMachuPicchuPrebooking,
@@ -40,10 +43,33 @@ export const POST: APIRoute = async ({ request }) => {
 	} catch {
 		return json({ error: "Solicitud no válida." }, 400);
 	}
+	if (!payload || typeof payload !== "object" || Array.isArray(payload))
+		return json({ error: "Invalid body" }, 400);
+	const security = await checkFormSecurity(
+		request,
+		payload as Record<string, unknown>,
+	);
+	if (security === "discard")
+		return json({ reference: "MP-RECEIVED", status: "pending_review" });
+	if (security !== "allow") return securityError(security);
 	const error = validateMachuPicchuPrebooking(payload);
 	if (error) return json({ error }, 400);
 	const p = payload as MachuPicchuPrebooking;
-	const resend = getResendClient();
+	const holder = p.travelers[0];
+	if (
+		!validateMailForm(
+			{
+				nombres: `${holder.name} ${holder.lastname}`,
+				pais: countries.find((c) => c.iso2 === holder.country)?.nameES,
+				email: p.contact.email,
+				telefono: p.contact.phone,
+			},
+			false,
+			false,
+		)
+	)
+		return json({ error: "Invalid contact details" }, 400);
+	const resend = await getResendClient();
 	if (!resend)
 		return json(
 			{

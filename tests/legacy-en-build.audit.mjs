@@ -8,7 +8,11 @@ const client = resolve("dist/client");
 const origin = "https://dreamy.tours";
 const exclusions = JSON.parse(await readFile("src/data/sitemapExclusions.json", "utf8"));
 const excludedPaths = new Set([...exclusions.checkout, ...exclusions.blogPagination]);
-const additionallyExcluded = url => excludedPaths.has(new URL(url).pathname);
+const additionallyExcluded = url => {
+	const path = new URL(url).pathname;
+	const pagination = path.match(/^\/(?:(?:es|pt)\/)?blog\/(\d+)\/$/);
+	return excludedPaths.has(path) || (pagination !== null && Number(pagination[1]) >= 2);
+};
 const legacy = value => {
 	if (typeof value !== "string" || !/^(?:\/|https?:\/\/)/i.test(value)) return false;
 	try {
@@ -27,7 +31,7 @@ for (const child of children) {
 }
 assert(urls.length > 0);
 assert.deepEqual(urls.filter(legacy), [], "no old /en/ URLs, including backlinks, may enter the sitemap");
-assert.deepEqual(urls.filter(additionallyExcluded), [], "the 27 authorized checkout and blog index pages must stay outside the sitemap");
+assert.deepEqual(urls.filter(additionallyExcluded), [], "checkout and blog index pagination must stay outside the sitemap as the CMS grows");
 const files = await readdir(client, { recursive: true });
 assert.deepEqual(files.filter(file => /^en[\\/].*\.html$/.test(file)), [], "do not generate old English assets");
 const references = [];
@@ -65,10 +69,15 @@ try {
 // be checked against the captured public sitemap, not a different content source.
 try {
 	const baseline = JSON.parse(await readFile(".astro/sitemap-phase2-baseline.json", "utf8"));
-	const expected = baseline.live.filter(url => !legacy(url) && !additionallyExcluded(url));
+	const review = JSON.parse(await readFile("docs/sitemap-reviewed-additions.json", "utf8"));
+	const additions = review.entries.map(entry => entry.url);
+	assert.equal(new Set(additions).size, additions.length, "reviewed URLs must be unique");
+	assert(additions.every(url => new URL(url).origin === origin && !legacy(url) && !additionallyExcluded(url)));
+	const historical = baseline.live.filter(url => !legacy(url) && !additionallyExcluded(url));
+	const expected = [...new Set([...historical, ...additions])];
 	assert.deepEqual(expected.filter(url => !urls.includes(url)), [], "must not lose legitimate URLs from the public sitemap");
 	assert.deepEqual(urls.filter(url => !expected.includes(url)), [], "review unexpected CMS changes before claiming an exact sitemap comparison");
-	Object.assign(report, { publicBefore: baseline.live.length, removedLegacyEn: baseline.live.filter(legacy).length, checkoutPresentBefore: baseline.live.filter(url => exclusions.checkout.includes(new URL(url).pathname)).length, blogPaginationPresentBefore: baseline.live.filter(url => exclusions.blogPagination.includes(new URL(url).pathname)).length, retainedPublicUrls: expected.length });
+	Object.assign(report, { publicBefore: baseline.live.length, removedLegacyEn: baseline.live.filter(legacy).length, checkoutPresentBefore: baseline.live.filter(url => exclusions.checkout.includes(new URL(url).pathname)).length, blogPaginationPresentBefore: baseline.live.filter(url => exclusions.blogPagination.includes(new URL(url).pathname)).length, retainedPublicUrls: historical.length, reviewedAdditions: additions.length });
 } catch (error) {
 	if (error.code !== "ENOENT") throw error;
 }

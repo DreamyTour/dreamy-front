@@ -30,7 +30,13 @@ test("category labels open submenus on hover and arrows support the keyboard", a
 	await toggle.focus();
 	await toggle.press("Enter");
 	await expect(toggle).toHaveAttribute("aria-expanded", "true");
-	await toggle.press("Escape");
+	await toggle.press("ArrowDown");
+	await expect(
+		page.locator('[data-slot="navigation-menu-content"]:visible a').first(),
+	).toBeFocused();
+	// Send Escape within the menu. locator.press() on the trigger would focus
+	// the trigger again before sending the key and miss the menu's key handler.
+	await page.keyboard.press("Escape");
 	await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 

@@ -12,6 +12,12 @@ import {
 	Users,
 } from "lucide-react";
 import { type SubmitEvent, useEffect, useRef, useState } from "react";
+import FormSecurity from "../ui/FormSecurity";
+import {
+	securityFields,
+	resetFormSecurity,
+	internationalPhone,
+} from "../../lib/formSecurityClient";
 import { countries } from "@/data/countries";
 import {
 	MACHU_PICCHU_ROUTES,
@@ -45,6 +51,7 @@ const secondary =
 	"inline-flex min-h-11 items-center gap-2 rounded-lg border border-gray-200 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50";
 
 export default function MachuPicchuPrebooking() {
+	const securityForm = useRef<HTMLFormElement>(null);
 	const [selection, setSelection] = useState<MachuPicchuSelection | null>(null);
 	const [loaded, setLoaded] = useState(false);
 	const [step, setStep] = useState(0);
@@ -148,7 +155,14 @@ export default function MachuPicchuPrebooking() {
 			const response = await fetch("/api/machu-picchu-prebooking", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
+				body: JSON.stringify({
+					...data,
+					contact: {
+						...data.contact,
+						phone: internationalPhone(data.contact.phone),
+					},
+					...securityFields(securityForm.current),
+				}),
 				signal: AbortSignal.timeout(20000),
 			});
 			const result = await response.json();
@@ -170,6 +184,7 @@ export default function MachuPicchuPrebooking() {
 					: "El envío tardó demasiado. Vuelve a intentarlo; tus datos siguen en pantalla.",
 			);
 		} finally {
+			resetFormSecurity(securityForm.current);
 			setSending(false);
 		}
 	}
@@ -346,7 +361,7 @@ export default function MachuPicchuPrebooking() {
 							</button>
 						</>
 					) : (
-						<form onSubmit={submit}>
+						<form ref={securityForm} onSubmit={submit}>
 							{step === 1 ? (
 								<>
 									<p className="mb-6 text-sm leading-6 text-gray-500">
@@ -624,6 +639,7 @@ export default function MachuPicchuPrebooking() {
 									)}
 								</button>
 							</div>
+							<FormSecurity />
 						</form>
 					)}
 				</section>

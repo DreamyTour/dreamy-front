@@ -38,7 +38,7 @@ test("checkout passenger and holder contact fields keep focus while typing", asy
 	}, cart);
 
 	await page.goto("/checkout", {
-		waitUntil: "networkidle",
+		waitUntil: "domcontentloaded",
 	});
 	await page.getByText("Traveler Information").waitFor({ state: "visible" });
 	await expect(
@@ -107,7 +107,7 @@ test("traveler 1 must be an adult to hold the pre-booking", async ({
 		);
 	}, cart);
 
-	await page.goto("/checkout", { waitUntil: "networkidle" });
+	await page.goto("/checkout", { waitUntil: "domcontentloaded" });
 	await page.locator('input[name="passenger-1-given-name"]').fill("Lucia");
 	await page.locator('input[name="passenger-1-family-name"]').fill("Perez");
 	await page.locator('input[name="passenger-1-birthdate"]').fill("2020-01-10");
