@@ -6,19 +6,32 @@ import { getUsefulInfoItems } from "@/lib/categoryTourSections";
 import {
   ArrowUpRight,
   BedDouble,
+  BookOpenText,
   BusFront,
+  CalendarDays,
   BookOpen,
+  Camera,
   CircleHelp,
+  CircleDollarSign,
   ChevronDown,
   CloudSun,
   Clock3,
   Compass,
+  Flower2,
+  Globe2,
   Info,
+  Landmark,
+  Map,
   MapPinned,
   MessageSquareText,
   Mountain,
+  Plane,
   Route,
+  ShieldCheck,
+  Sparkles,
+  Sun,
   TicketCheck,
+  UtensilsCrossed,
   UsersRound,
 } from "lucide-react";
 interface Props {
@@ -31,16 +44,18 @@ const normalizeTabText = (value?: string | null) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
-const getTabIcon = (label?: string | null, title?: string | null) => {
-  const text = `${normalizeTabText(label)} ${normalizeTabText(title)}`;
-  if (/transporte|transport|bus|traslad|transfer|shuttle|movilidad/.test(text))
+const getSemanticTabIcon = (text: string) => {
+  if (/transporte|transport|\bbuses?\b|traslad|transfer|shuttle|movilidad/.test(text))
     return BusFront;
-  if (/altitud|altura|elevacion|montana|mountain|colca|canon|canyon|trek|sendero|trilha/.test(text))
+  if (/altitud|altura|elevacion|altitude|elevation|\bmontana\b/.test(text))
     return Mountain;
   if (/clima|weather|climate|temperatura|temperature|lluvia|rain/.test(text))
     return CloudSun;
   if (/conexion|connection|ruta|route|como llegar|how to get|acceso|access/.test(text))
     return Route;
+  if (/colca|canon|canyon|destino|destination|lugar|place|visita|visit/.test(text))
+    return MapPinned;
+  if (/trek|sendero|trilha|hike|montanha|mountain/.test(text)) return Mountain;
   if (/duracion|duration|horario|schedule|tiempo|time/.test(text)) return Clock3;
   if (/entrada|ticket|boleto|ingreso|admission/.test(text)) return TicketCheck;
   if (/guia|guide|acompanamiento|acompanhar/.test(text)) return UsersRound;
@@ -53,10 +68,27 @@ const getTabIcon = (label?: string | null, title?: string | null) => {
     return Compass;
   if (/historia|history|cultura|culture|arqueolog|archaeolog/.test(text))
     return BookOpen;
-  if (/destino|destination|lugar|place|visita|visit/.test(text))
-    return MapPinned;
-  return Info;
+  return undefined;
 };
+const getTabIcon = (label?: string | null, title?: string | null) =>
+  getSemanticTabIcon(normalizeTabText(label)) ||
+  getSemanticTabIcon(normalizeTabText(title)) ||
+  Info;
+const fallbackTabIcons = [
+  CalendarDays,
+  Camera,
+  CircleDollarSign,
+  Flower2,
+  Globe2,
+  Landmark,
+  Map,
+  Plane,
+  ShieldCheck,
+  Sparkles,
+  Sun,
+  UtensilsCrossed,
+  BookOpenText,
+];
 const isTransportLabel = (label?: string | null) =>
   /^(transporte(?: turistico)?|transport(?:ation)?|tourist transportation)$/.test(
     (label || "")
@@ -66,14 +98,24 @@ const isTransportLabel = (label?: string | null) =>
       .toLowerCase(),
   );
 const usefulInfoItems = getUsefulInfoItems(info);
+const usedTabIcons = new Set([BusFront]);
 const categoryTabs = usefulInfoItems
   .filter((item) => !isTransportLabel(item.etiqueta))
-  .map((item, index) => ({
-  ...item,
-  id: index + 1,
-    icon: getTabIcon(item.etiqueta, item.titulo),
-  isTransport: false as const,
-}));
+  .map((item, index) => {
+    const preferredIcon = getTabIcon(item.etiqueta, item.titulo);
+    const icon = usedTabIcons.has(preferredIcon)
+      ? (fallbackTabIcons.find((candidate) => !usedTabIcons.has(candidate)) ||
+        Info)
+      : preferredIcon;
+    usedTabIcons.add(icon);
+
+    return {
+      ...item,
+      id: index + 1,
+      icon,
+      isTransport: false as const,
+    };
+  });
 const transportCopy = {
   es: {
     sectionTitle: "Información para organizar tu viaje",
@@ -200,7 +242,7 @@ const orderedTabs = usefulInfoItems.length
                 <h3 class="mb-5 hidden text-xl font-semibold text-foreground sm:block md:text-2xl">
                   {tab.titulo}
                 </h3>
-                <div class="max-w-4xl space-y-4 leading-7 text-muted-foreground">
+                <div class="max-w-[72ch] space-y-4 leading-7 text-muted-foreground">
                   {tab.isTransport ? (
                     <>
                       {tab.paragraphs.map((paragraph) => (
