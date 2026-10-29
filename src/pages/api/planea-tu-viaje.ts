@@ -1,9 +1,12 @@
 import type { APIRoute } from "astro";
-import { escapeHtml } from "../../lib/html";
-import { isResendConfigured, sendDreamyEmail } from "../../lib/resend";
-
-import { validateMailForm } from "../../lib/formValidation";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
+import { validateMailForm } from "../../lib/formValidation";
+import { escapeHtml } from "../../lib/html";
+import {
+	getMailDeliveryMode,
+	isResendConfigured,
+	sendDreamyEmail,
+} from "../../lib/resend";
 
 export const prerender = false;
 
@@ -163,29 +166,29 @@ export const POST: APIRoute = async ({ request }) => {
 		}
 
 		if (!(await isResendConfigured())) {
-			console.log("Email simulation: RESEND_API_KEY is not configured", {
-				form: "planea-tu-viaje",
-				hasPhone: Boolean(telefono),
-				hasMessage: Boolean(mensaje),
-				destinationsCount: Array.isArray(destinos) ? destinos.length : 0,
-			});
-
+			console.warn(
+				JSON.stringify({
+					event: "mail_delivery",
+					form: "planea-tu-viaje",
+					outcome: "unavailable",
+				}),
+			);
 			if (!shouldReturnJson) {
 				return htmlFormResponse({
-					title: "Formulario enviado",
-					message: "Gracias por contactarnos. Te responderemos pronto.",
+					title: "No se pudo enviar",
+					message:
+						"El servicio de correo no estÃ¡ disponible. Intenta nuevamente mÃ¡s tarde.",
 					backUrl,
+					status: 503,
 				});
 			}
 
-			return new Response(
-				JSON.stringify({
-					success: true,
-					message:
-						"Solicitud recibida correctamente (simulacion - API key no configurada)",
-					simulation: true,
-				}),
-				{ status: 200, headers: { "Content-Type": "application/json" } },
+			return Response.json(
+				{
+					error:
+						"Servicio de correo no disponible. Intenta nuevamente mÃ¡s tarde.",
+				},
+				{ status: 503, headers: { "Cache-Control": "no-store" } },
 			);
 		}
 
@@ -295,7 +298,13 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 
 		if (error) {
-			console.error("Error de Resend:", error);
+			console.error(
+				JSON.stringify({
+					event: "mail_delivery",
+					form: "planea-tu-viaje",
+					outcome: "provider_error",
+				}),
+			);
 			if (!shouldReturnJson) {
 				return htmlFormResponse({
 					title: "No se pudo enviar",
@@ -311,6 +320,14 @@ export const POST: APIRoute = async ({ request }) => {
 				{ status: 500, headers: { "Content-Type": "application/json" } },
 			);
 		}
+		console.info(
+			JSON.stringify({
+				event: "mail_delivery",
+				form: "planea-tu-viaje",
+				outcome:
+					(await getMailDeliveryMode()) === "dry_run" ? "dry_run" : "accepted",
+			}),
+		);
 
 		if (!shouldReturnJson) {
 			return htmlFormResponse({
@@ -331,7 +348,13 @@ export const POST: APIRoute = async ({ request }) => {
 	} catch (error) {
 		if (error instanceof SyntaxError || error instanceof TypeError)
 			return Response.json({ error: "Invalid body" }, { status: 400 });
-		console.error("Error en el endpoint:", error);
+		console.error(
+			JSON.stringify({
+				event: "mail_delivery",
+				form: "planea-tu-viaje",
+				outcome: "internal_error",
+			}),
+		);
 		return new Response(
 			JSON.stringify({ error: "Error interno del servidor" }),
 			{ status: 500, headers: { "Content-Type": "application/json" } },

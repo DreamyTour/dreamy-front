@@ -2,7 +2,6 @@ import { afterAll, beforeEach, expect, mock, test } from "bun:test";
 import type { APIContext } from "astro";
 
 // Tests use the actual endpoint and Resend wrapper. No email network call is allowed.
-process.env.RESEND_API_KEY = "test-only-not-a-real-key";
 const counts = new Map<string, number>();
 const bindings = {
 	DRY_RUN: "true",
@@ -132,6 +131,18 @@ for (const [path, endpoint] of [
 	["planea-tu-viaje", trip],
 	["libro-reclamaciones", complaint],
 ] as const) {
+	test(`${path}: missing runtime mail secret returns 503, never simulated success`, async () => {
+		const originalDryRun = bindings.DRY_RUN;
+		bindings.DRY_RUN = "false";
+		try {
+			const response = await post(endpoint, path, valid());
+			expect(response.status).toBe(503);
+			expect((await response.json()).success).toBeUndefined();
+			expect(mailCalls).toBe(0);
+		} finally {
+			bindings.DRY_RUN = originalDryRun;
+		}
+	});
 	test(`${path}: a) exact garbage rejected, zero emails`, async () => {
 		const response = await post(endpoint, path, {
 			nombres: "Test",

@@ -161,13 +161,14 @@ Crea un archivo `.env` en la raiz:
 
 ```env
 VITE_STRAPI_URL=
+# Runtime Worker secret; configure it in Cloudflare, not in a build variable.
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=
 RESEND_TO_EMAIL=
 ```
 
 - `VITE_STRAPI_URL`: URL base de Strapi; necesaria para cargar contenido del CMS.
-- `RESEND_API_KEY`: habilita el envio real de emails. Es obligatoria para recibir solicitudes de pre-reserva.
+- `RESEND_API_KEY`: secreto de runtime del Worker; habilita el envÃ­o real de emails. Con `DRY_RUN=false`, su ausencia devuelve `503` y no simula un envÃ­o.
 - `RESEND_FROM_EMAIL`: remitente verificado. Por defecto: `Dreamy Tours <info@dreamy.tours>`.
 - `RESEND_TO_EMAIL`: destinatarios separados por coma. Por defecto: `info@dreamy.tours`.
 
@@ -559,7 +560,7 @@ Payload conceptual:
 
 POST /api/planea-tu-viaje recibe nombres, pais, email, telefono, codigoPais, adultos, menores, fechaViaje, idioma, categoriaHotel, destinos, mensaje y tourName.
 
-Son requeridos nombres, pais y un email valido. El endpoint acepta JSON y formularios HTML. Sin RESEND_API_KEY registra una simulacion en el servidor.
+Son requeridos nombres, pais y un email valido. El endpoint acepta JSON y formularios HTML. Con `DRY_RUN=false`, sin `RESEND_API_KEY` devuelve `503`; las respuestas de Ã©xito simuladas se reservan para las trampas antispam.
 
 ### Libro de reclamaciones
 
@@ -720,4 +721,4 @@ Revisar quoteRequestId, tourId, cantidad de pasajeros, edad del titular, datos d
 
 ### Email no llega
 
-Revisar RESEND_API_KEY, remitente verificado, destinatarios, logs y si el formulario esta en modo simulacion.
+Revisar que `RESEND_API_KEY` sea un secreto de runtime, el remitente verificado, los destinatarios y los logs estructurados `mail_delivery`. Con `DRY_RUN=false`, la ausencia de la clave devuelve `503`.

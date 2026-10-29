@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
+import { countries } from "../../data/countries";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
 import { validateMailForm } from "../../lib/formValidation";
-import { countries } from "../../data/countries";
 import {
 	type MachuPicchuPrebooking,
 	validateMachuPicchuPrebooking,
@@ -78,6 +78,8 @@ export const POST: APIRoute = async ({ request }) => {
 			},
 			503,
 		);
+	const sender = await getDreamySender();
+	const recipients = await getDreamyRecipients();
 	const reference = `MP-${p.requestId.replaceAll("-", "").slice(0, 12).toUpperCase()}`;
 	try {
 		const pdf = await generateMachuPicchuPrebookingPdf({
@@ -87,8 +89,8 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 		const result = await resend.emails.send(
 			{
-				from: getDreamySender(),
-				to: getDreamyRecipients(),
+				from: sender,
+				to: recipients,
 				replyTo: p.contact.email.trim(),
 				subject: `Pre-reserva Machu Picchu · ${reference}`,
 				...buildMachuPicchuPrebookingEmail(p, reference, "team"),
@@ -112,9 +114,9 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		const customer = await resend.emails.send(
 			{
-				from: getDreamySender(),
+				from: sender,
 				to: [p.contact.email.trim()],
-				replyTo: getDreamyRecipients()[0],
+				replyTo: recipients[0],
 				subject: `Solicitud recibida: Machu Picchu ? ${reference}`,
 				...buildMachuPicchuPrebookingEmail(p, reference, "customer"),
 				attachments: [

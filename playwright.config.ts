@@ -14,7 +14,9 @@ export default defineConfig({
 		command: `"${process.execPath}" tests/e2e-server.mjs`,
 		reuseExistingServer: false,
 		timeout: 120000,
-		url: "http://127.0.0.1:4322",
+		// The home route renders CMS content; a local static asset is a deterministic
+		// health check for the isolated workerd server used by these endpoint tests.
+		url: "http://127.0.0.1:4322/favicon.ico",
 	},
 	projects: [
 		{

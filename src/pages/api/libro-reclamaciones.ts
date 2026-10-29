@@ -1,9 +1,12 @@
 import type { APIRoute } from "astro";
-import { escapeHtml } from "../../lib/html";
-import { isResendConfigured, sendDreamyEmail } from "../../lib/resend";
-
-import { validateMailForm } from "../../lib/formValidation";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
+import { validateMailForm } from "../../lib/formValidation";
+import { escapeHtml } from "../../lib/html";
+import {
+	getMailDeliveryMode,
+	isResendConfigured,
+	sendDreamyEmail,
+} from "../../lib/resend";
 
 export const prerender = false;
 
@@ -66,20 +69,19 @@ export const POST: APIRoute = async ({ request }) => {
 		}
 
 		if (!(await isResendConfigured())) {
-			console.log("Email simulation: RESEND_API_KEY is not configured", {
-				form: "libro-reclamaciones",
-				type: typeValue,
-				hasGuardianData: Boolean(datosApoderado),
-			});
-
-			return new Response(
+			console.warn(
 				JSON.stringify({
-					success: true,
-					message:
-						"Reclamacion recibida correctamente (simulacion - API key no configurada)",
-					simulation: true,
+					event: "mail_delivery",
+					form: "libro-reclamaciones",
+					outcome: "unavailable",
 				}),
-				{ status: 200, headers: { "Content-Type": "application/json" } },
+			);
+			return Response.json(
+				{
+					error:
+						"Servicio de correo no disponible. Intenta nuevamente mÃ¡s tarde.",
+				},
+				{ status: 503, headers: { "Cache-Control": "no-store" } },
 			);
 		}
 
@@ -173,12 +175,26 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 
 		if (error) {
-			console.error("Error de Resend:", error);
+			console.error(
+				JSON.stringify({
+					event: "mail_delivery",
+					form: "libro-reclamaciones",
+					outcome: "provider_error",
+				}),
+			);
 			return new Response(
-				JSON.stringify({ error: "Error al enviar el email", details: error }),
+				JSON.stringify({ error: "Error al enviar el email" }),
 				{ status: 500, headers: { "Content-Type": "application/json" } },
 			);
 		}
+		console.info(
+			JSON.stringify({
+				event: "mail_delivery",
+				form: "libro-reclamaciones",
+				outcome:
+					(await getMailDeliveryMode()) === "dry_run" ? "dry_run" : "accepted",
+			}),
+		);
 
 		return new Response(
 			JSON.stringify({
@@ -191,7 +207,13 @@ export const POST: APIRoute = async ({ request }) => {
 	} catch (error) {
 		if (error instanceof SyntaxError || error instanceof TypeError)
 			return Response.json({ error: "Invalid body" }, { status: 400 });
-		console.error("Error en el endpoint:", error);
+		console.error(
+			JSON.stringify({
+				event: "mail_delivery",
+				form: "libro-reclamaciones",
+				outcome: "internal_error",
+			}),
+		);
 		return new Response(
 			JSON.stringify({ error: "Error interno del servidor" }),
 			{ status: 500, headers: { "Content-Type": "application/json" } },

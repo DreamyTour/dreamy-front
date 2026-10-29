@@ -1,25 +1,35 @@
 import { Resend } from "resend";
-import { isMailDryRun } from "./formSecurity";
+import { formSecurityBindings } from "./formSecurity";
 
 const DEFAULT_FROM = "Dreamy Tours <info@dreamy.tours>";
 const DEFAULT_TO = "info@dreamy.tours";
 
-function readProcessEnv(name: string) {
-	if (typeof process === "undefined") return undefined;
-	return process.env?.[name];
-}
-
-export function getResendApiKey() {
-	return import.meta.env.RESEND_API_KEY || readProcessEnv("RESEND_API_KEY");
+async function getMailRuntimeConfig() {
+	const env = await formSecurityBindings();
+	return {
+		dryRun: env.DRY_RUN === "true",
+		apiKey: env.RESEND_API_KEY?.trim(),
+		from: env.RESEND_FROM_EMAIL?.trim() || DEFAULT_FROM,
+		to: (env.RESEND_TO_EMAIL || DEFAULT_TO)
+			.split(",")
+			.map((email) => email.trim())
+			.filter(Boolean),
+	};
 }
 
 export async function isResendConfigured() {
-	return (await isMailDryRun()) || Boolean(getResendApiKey());
+	const { apiKey, dryRun } = await getMailRuntimeConfig();
+	return dryRun || Boolean(apiKey);
+}
+
+export async function getMailDeliveryMode() {
+	const { apiKey, dryRun } = await getMailRuntimeConfig();
+	if (dryRun) return "dry_run" as const;
+	return apiKey ? ("live" as const) : ("unavailable" as const);
 }
 
 export async function getResendClient() {
-	const dryRun = await isMailDryRun();
-	const apiKey = getResendApiKey();
+	const { apiKey, dryRun } = await getMailRuntimeConfig();
 
 	if (!apiKey && !dryRun) return null;
 
@@ -32,24 +42,12 @@ export async function getResendClient() {
 	return client;
 }
 
-export function getDreamySender() {
-	return (
-		import.meta.env.RESEND_FROM_EMAIL ||
-		readProcessEnv("RESEND_FROM_EMAIL") ||
-		DEFAULT_FROM
-	);
+export async function getDreamySender() {
+	return (await getMailRuntimeConfig()).from;
 }
 
-export function getDreamyRecipients() {
-	const recipients =
-		import.meta.env.RESEND_TO_EMAIL || readProcessEnv("RESEND_TO_EMAIL");
-
-	if (!recipients) return [DEFAULT_TO];
-
-	return recipients
-		.split(",")
-		.map((email) => email.trim())
-		.filter(Boolean);
+export async function getDreamyRecipients() {
+	return (await getMailRuntimeConfig()).to;
 }
 
 export async function sendDreamyEmail({
@@ -71,8 +69,8 @@ export async function sendDreamyEmail({
 	}
 
 	return await resend.emails.send({
-		from: getDreamySender(),
-		to: getDreamyRecipients(),
+		from: await getDreamySender(),
+		to: await getDreamyRecipients(),
 		replyTo,
 		subject,
 		html,

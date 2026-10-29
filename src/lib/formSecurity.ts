@@ -1,6 +1,9 @@
 export interface FormSecurityBindings {
 	TURNSTILE_SECRET_KEY?: string;
 	DRY_RUN?: string;
+	RESEND_API_KEY?: string;
+	RESEND_FROM_EMAIL?: string;
+	RESEND_TO_EMAIL?: string;
 	FORM_RATE_LIMITER?: Cloudflare.Env["FORM_RATE_LIMITER"];
 }
 
@@ -15,6 +18,17 @@ export async function isMailDryRun() {
 
 export type SecurityResult = "allow" | "discard" | 403 | 429 | 503;
 
+/** Logs only the security outcome. Request content, tokens and IP addresses stay out of logs. */
+function logSecurityOutcome(request: Request, outcome: string) {
+	console.info(
+		JSON.stringify({
+			event: "form_security",
+			endpoint: new URL(request.url).pathname,
+			outcome,
+		}),
+	);
+}
+
 /** Trap responses deliberately use the endpoint's normal success response. */
 export async function checkFormSecurity(
 	request: Request,
@@ -25,7 +39,10 @@ export async function checkFormSecurity(
 ): Promise<SecurityResult> {
 	const config = bindings ?? (await formSecurityBindings());
 	try {
-		if (!config.FORM_RATE_LIMITER) return 503;
+		if (!config.FORM_RATE_LIMITER) {
+			logSecurityOutcome(request, "unavailable");
+			return 503;
+		}
 		const ip = request.headers.get("cf-connecting-ip") || "unknown";
 		// Hash IPs before using them as persistent object identifiers.
 		const key = Array.from(
@@ -40,25 +57,34 @@ export async function checkFormSecurity(
 		const limiter = config.FORM_RATE_LIMITER.get(
 			config.FORM_RATE_LIMITER.idFromName(key),
 		);
-		if (!(await limiter.consume())) return 429;
-		if (typeof body.website === "string" && body.website.trim())
+		if (!(await limiter.consume())) {
+			logSecurityOutcome(request, "rate_limited");
+			return 429;
+		}
+		if (typeof body.website === "string" && body.website.trim()) {
+			logSecurityOutcome(request, "discarded_honeypot");
 			return "discard";
+		}
 		const token = body["cf-turnstile-response"];
 		if (
 			typeof token !== "string" ||
 			!token ||
 			token.length > 2048 ||
 			!config.TURNSTILE_SECRET_KEY
-		)
+		) {
+			logSecurityOutcome(request, "turnstile_rejected");
 			return 403;
+		}
 		const renderedAt = Number(body.formRenderedAt);
 		// Missing/invalid/future timestamps cannot bypass the time trap.
 		if (
 			!Number.isFinite(renderedAt) ||
 			renderedAt <= 0 ||
 			now - renderedAt < 3000
-		)
+		) {
+			logSecurityOutcome(request, "discarded_too_fast");
 			return "discard";
+		}
 		try {
 			const response = await verifyFetch(
 				"https://challenges.cloudflare.com/turnstile/v0/siteverify",
@@ -76,13 +102,22 @@ export async function checkFormSecurity(
 				success?: boolean;
 				hostname?: string;
 			};
-			if (!response.ok || result.success !== true) return 403;
-			if (result.hostname !== new URL(request.url).hostname) return 403;
+			if (!response.ok || result.success !== true) {
+				logSecurityOutcome(request, "turnstile_rejected");
+				return 403;
+			}
+			if (result.hostname !== new URL(request.url).hostname) {
+				logSecurityOutcome(request, "turnstile_rejected");
+				return 403;
+			}
+			logSecurityOutcome(request, "verified");
 			return "allow";
 		} catch {
+			logSecurityOutcome(request, "turnstile_rejected");
 			return 403;
 		}
 	} catch {
+		logSecurityOutcome(request, "unavailable");
 		return 503;
 	}
 }

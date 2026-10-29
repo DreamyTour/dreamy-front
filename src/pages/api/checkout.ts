@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
+import { countries } from "../../data/countries";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
 import { validateMailForm } from "../../lib/formValidation";
-import { countries } from "../../data/countries";
 import { escapeHtml } from "../../lib/html";
 import {
 	fetchIncaTrailTickets,
@@ -441,6 +441,8 @@ export const POST: APIRoute = async ({ request }) => {
 		if (!resend) {
 			return jsonResponse({ error: errors.emailUnavailable }, 503);
 		}
+		const sender = await getDreamySender();
+		const recipients = await getDreamyRecipients();
 
 		const totalPrice = pricePerPerson * passengerCount;
 		const preferredPaymentAmount = getPreferredPaymentAmount(
@@ -526,8 +528,8 @@ export const POST: APIRoute = async ({ request }) => {
 
 		const { data: emailData, error: resendError } = await resend.emails.send(
 			{
-				from: getDreamySender(),
-				to: getDreamyRecipients(),
+				from: sender,
+				to: recipients,
 				replyTo: normalizedContact.email,
 				subject: `Pre-reserva ${reference}: ${tour.titulo}`,
 				html: `
