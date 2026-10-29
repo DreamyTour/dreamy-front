@@ -2,13 +2,14 @@
 
 import { CalendarDays } from "lucide-react";
 import { type ChangeEvent, useRef, useState } from "react";
-import FormSecurity from "../ui/FormSecurity";
-import {
-	securityFields,
-	resetFormSecurity,
-	internationalPhone,
-} from "../../lib/formSecurityClient";
 import { countries } from "@/data/countries";
+import {
+	internationalPhone,
+	resetFormSecurity,
+	securityFields,
+} from "../../lib/formSecurityClient";
+import FormResultModal, { type FormResult } from "../ui/FormResultModal";
+import FormSecurity from "../ui/FormSecurity";
 
 interface CountryOption {
 	nombre: string;
@@ -41,6 +42,16 @@ const i18n = {
 		alertSuccess: "¡Gracias por contactarnos! Te responderemos en breve.",
 		alertError:
 			"Hubo un error al enviar tu solicitud. Por favor intente nuevamente.",
+		modalSuccessTitle: "Solicitud recibida",
+		modalErrorTitle: "No pudimos confirmar el envío",
+		modalRetryTitle: "Espera unos segundos",
+		modalSuccess:
+			"¡Recibimos tu solicitud! Nuestro equipo revisará los detalles de tu viaje y se pondrá en contacto contigo.",
+		modalError:
+			"No pudimos confirmar el envío. Por favor, inténtalo nuevamente.",
+		modalRetry:
+			"Por favor, espera unos segundos y vuelve a intentarlo. Tus datos se conservarán.",
+		modalClose: "Cerrar",
 		otherCountry: "Otro",
 		hotelCatList: [
 			"2 Estrellas",
@@ -74,6 +85,15 @@ const i18n = {
 		submitText: "Request Quote",
 		alertSuccess: "Thank you for contacting us! We will reply shortly.",
 		alertError: "There was an error sending your request. Please try again.",
+		modalSuccessTitle: "Request received",
+		modalErrorTitle: "We could not confirm the submission",
+		modalRetryTitle: "Please wait a moment",
+		modalSuccess:
+			"We received your request. Our team will review your trip details and contact you.",
+		modalError: "We could not confirm the submission. Please try again.",
+		modalRetry:
+			"Please wait a few seconds and try again. Your details will be kept.",
+		modalClose: "Close",
 		otherCountry: "Other",
 		hotelCatList: ["2 Stars", "3 Stars", "4 Stars", "5 Stars", "Not specified"],
 	},
@@ -102,6 +122,15 @@ const i18n = {
 		alertSuccess: "Obrigado por nos contatar! Responderemos em breve.",
 		alertError:
 			"Houve um erro ao enviar a sua solicitação. Por favor, tente novamente.",
+		modalSuccessTitle: "Solicitação recebida",
+		modalErrorTitle: "Não foi possível confirmar o envio",
+		modalRetryTitle: "Aguarde alguns segundos",
+		modalSuccess:
+			"Recebemos sua solicitação. Nossa equipe analisará os detalhes da sua viagem e entrará em contato.",
+		modalError: "Não foi possível confirmar o envio. Tente novamente.",
+		modalRetry:
+			"Aguarde alguns segundos e tente novamente. Seus dados serão mantidos.",
+		modalClose: "Fechar",
 		otherCountry: "Outro",
 		hotelCatList: [
 			"2 Estrelas",
@@ -161,10 +190,7 @@ export default function PlaneaTuViaje({
 
 	const [codigoPais, setCodigoPais] = useState("51");
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [submitStatus, setSubmitStatus] = useState<
-		"idle" | "success" | "error"
-	>("idle");
-	const [statusMessage, setStatusMessage] = useState("");
+	const [modalResult, setModalResult] = useState<FormResult | null>(null);
 
 	// Obtener código de país al seleccionar país
 	const handlePaisChange = (paisNombre: string) => {
@@ -197,8 +223,6 @@ export default function PlaneaTuViaje({
 	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 		setIsSubmitting(true);
-		setSubmitStatus("idle");
-		setStatusMessage("");
 
 		try {
 			const response = await fetch("/api/planea-tu-viaje", {
@@ -215,9 +239,9 @@ export default function PlaneaTuViaje({
 				}),
 			});
 
-			const result = await response.json();
+			const result = await response.json().catch(() => ({}));
 
-			if (response.ok && result.success) {
+			if (response.ok && result.success && !result.simulation) {
 				// Attribute successful enquiries from the sustainability landing without sending personal data.
 				if (document.referrer) {
 					const source = new URL(document.referrer);
@@ -236,7 +260,6 @@ export default function PlaneaTuViaje({
 						});
 					}
 				}
-				setSubmitStatus("success");
 				setFormData({
 					nombres: "",
 					pais: "",
@@ -250,14 +273,15 @@ export default function PlaneaTuViaje({
 					mensaje: "",
 				});
 				setCodigoPais("51");
-				setStatusMessage(t.alertSuccess);
+				setModalResult({ kind: "success", message: t.modalSuccess });
 			} else {
-				throw new Error(result.error || "Error en el envío");
+				setModalResult({
+					kind: result.code === "FORM_RETRY" ? "retry" : "error",
+					message: result.code === "FORM_RETRY" ? t.modalRetry : t.modalError,
+				});
 			}
-		} catch (error) {
-			console.error("Error:", error);
-			setSubmitStatus("error");
-			setStatusMessage(t.alertError);
+		} catch {
+			setModalResult({ kind: "error", message: t.modalError });
 		} finally {
 			resetFormSecurity(securityForm.current);
 			setIsSubmitting(false);
@@ -268,21 +292,10 @@ export default function PlaneaTuViaje({
 		backgroundColor: "rgba(255,255,255,0.88)",
 	};
 
-	const buttonStyle = () => {
-		if (submitStatus === "success") {
-			return { background: "linear-gradient(to right, #22c55e, #16a34a)" };
-		}
-		if (submitStatus === "error") {
-			return {
-				background:
-					"linear-gradient(to right, var(--secondary), var(--secondary))",
-			};
-		}
-		return {
-			background:
-				"linear-gradient(to right, var(--primary), oklch(0.6 0.15 148))",
-		};
-	};
+	const buttonStyle = () => ({
+		background:
+			"linear-gradient(to right, var(--primary), oklch(0.6 0.15 148))",
+	});
 
 	return (
 		<form
@@ -571,20 +584,6 @@ export default function PlaneaTuViaje({
 				</div>
 			</section>
 
-			{statusMessage && (
-				<p
-					role={submitStatus === "error" ? "alert" : "status"}
-					aria-live={submitStatus === "error" ? "assertive" : "polite"}
-					className={`rounded-sm border px-4 py-3 text-sm font-medium ${
-						submitStatus === "error"
-							? "border-secondary/25 bg-secondary/10 text-secondary"
-							: "border-green-200 bg-green-50 text-green-700"
-					}`}
-				>
-					{statusMessage}
-				</p>
-			)}
-
 			<div className="pt-2">
 				<button
 					type="submit"
@@ -592,16 +591,20 @@ export default function PlaneaTuViaje({
 					style={buttonStyle()}
 					className="w-full rounded-sm px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground transition-all shadow-[0_18px_36px_rgba(15,23,42,0.14)] hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(15,23,42,0.18)] disabled:cursor-not-allowed disabled:opacity-75"
 				>
-					{isSubmitting
-						? t.sending
-						: submitStatus === "success"
-							? t.sent
-							: submitStatus === "error"
-								? t.errorBtn
-								: t.submitText}
+					{isSubmitting ? t.sending : t.submitText}
 				</button>
 			</div>
 			<FormSecurity lang={lang} />
+			<FormResultModal
+				result={modalResult}
+				onClose={() => setModalResult(null)}
+				messages={{
+					successTitle: t.modalSuccessTitle,
+					errorTitle: t.modalErrorTitle,
+					retryTitle: t.modalRetryTitle,
+					closeLabel: t.modalClose,
+				}}
+			/>
 		</form>
 	);
 }

@@ -2,11 +2,7 @@ import type { APIRoute } from "astro";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
 import { validateMailForm } from "../../lib/formValidation";
 import { escapeHtml } from "../../lib/html";
-import {
-	getMailDeliveryMode,
-	isResendConfigured,
-	sendDreamyEmail,
-} from "../../lib/resend";
+import { getMailDeliveryMode, sendDreamyEmail } from "../../lib/resend";
 
 export const prerender = false;
 
@@ -117,19 +113,19 @@ export const POST: APIRoute = async ({ request }) => {
 		if (!body || typeof body !== "object" || Array.isArray(body))
 			return Response.json({ error: "Invalid body" }, { status: 400 });
 		const security = await checkFormSecurity(request, body);
-		if (security === "discard") {
+		if (security !== "allow") {
 			if (!shouldReturnJson)
 				return htmlFormResponse({
-					title: "Formulario enviado",
-					message: "Gracias por contactarnos. Te responderemos pronto.",
+					title: "No se pudo confirmar el envío",
+					message:
+						security === 409
+							? "Espera unos segundos y vuelve a intentarlo. Tus datos se conservarán."
+							: "No pudimos confirmar el envío. Por favor, inténtalo nuevamente.",
 					backUrl,
+					status: security,
 				});
-			return Response.json({
-				success: true,
-				message: "Solicitud enviada correctamente",
-			});
+			return securityError(security);
 		}
-		if (security !== "allow") return securityError(security);
 		const {
 			nombres,
 			pais,
@@ -165,7 +161,8 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
-		if (!(await isResendConfigured())) {
+		const deliveryMode = await getMailDeliveryMode();
+		if (deliveryMode === "unavailable") {
 			console.warn(
 				JSON.stringify({
 					event: "mail_delivery",
@@ -187,6 +184,31 @@ export const POST: APIRoute = async ({ request }) => {
 				{
 					error:
 						"Servicio de correo no disponible. Intenta nuevamente mÃ¡s tarde.",
+				},
+				{ status: 503, headers: { "Cache-Control": "no-store" } },
+			);
+		}
+		if (deliveryMode === "dry_run") {
+			console.info(
+				JSON.stringify({
+					event: "mail_delivery",
+					form: "planea-tu-viaje",
+					outcome: "dry_run_not_confirmed",
+				}),
+			);
+			if (!shouldReturnJson)
+				return htmlFormResponse({
+					title: "No se pudo confirmar el envío",
+					message:
+						"No pudimos confirmar el envío. Por favor, inténtalo nuevamente.",
+					backUrl,
+					status: 503,
+				});
+			return Response.json(
+				{
+					error: "Unable to confirm the submission",
+					code: "FORM_NOT_CONFIRMED",
+					simulation: true,
 				},
 				{ status: 503, headers: { "Cache-Control": "no-store" } },
 			);
@@ -297,7 +319,7 @@ export const POST: APIRoute = async ({ request }) => {
 			html: htmlContent,
 		});
 
-		if (error) {
+		if (error || !data?.id) {
 			console.error(
 				JSON.stringify({
 					event: "mail_delivery",
@@ -324,8 +346,7 @@ export const POST: APIRoute = async ({ request }) => {
 			JSON.stringify({
 				event: "mail_delivery",
 				form: "planea-tu-viaje",
-				outcome:
-					(await getMailDeliveryMode()) === "dry_run" ? "dry_run" : "accepted",
+				outcome: "accepted",
 			}),
 		);
 

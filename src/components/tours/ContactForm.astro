@@ -1,5 +1,6 @@
 ---
 import FormSecurity from "../ui/FormSecurity";
+import FormResultModal from "../ui/FormResultModal";
 import { countriesWithPhoneCode } from "@/data/countries";
 import { WHATSAPP_URL } from "@/lib/socialLinks";
 
@@ -33,6 +34,12 @@ const contactCopy = {
     error:
       "No se pudo enviar el formulario. Inténtalo nuevamente o escríbenos por WhatsApp.",
     genericError: "No se pudo enviar el formulario.",
+    modalSuccessTitle: "Consulta enviada",
+    modalErrorTitle: "No pudimos confirmar el envío",
+    modalRetryTitle: "Espera unos segundos",
+    retry:
+      "Por favor, espera unos segundos y vuelve a intentarlo. Tus datos se conservarán.",
+    close: "Cerrar",
   },
   en: {
     title: "Book your adventure",
@@ -55,6 +62,12 @@ const contactCopy = {
     error:
       "The form could not be sent. Please try again or message us on WhatsApp.",
     genericError: "The form could not be sent.",
+    modalSuccessTitle: "Request sent",
+    modalErrorTitle: "We could not confirm the submission",
+    modalRetryTitle: "Please wait a moment",
+    retry:
+      "Please wait a few seconds and try again. Your details will be kept.",
+    close: "Close",
   },
   pt: {
     title: "Reserve sua aventura",
@@ -77,10 +90,17 @@ const contactCopy = {
     error:
       "Não foi possível enviar o formulário. Tente novamente ou escreva pelo WhatsApp.",
     genericError: "Não foi possível enviar o formulário.",
+    modalSuccessTitle: "Consulta enviada",
+    modalErrorTitle: "Não foi possível confirmar o envio",
+    modalRetryTitle: "Aguarde alguns segundos",
+    retry:
+      "Aguarde alguns segundos e tente novamente. Seus dados serão mantidos.",
+    close: "Fechar",
   },
 } as const;
 
 const copy = contactCopy[lang] ?? contactCopy.es;
+const resultDialogId = `contact-result-${lang}-${tourName ? encodeURIComponent(tourName).slice(0, 48) : "general"}`;
 const whatsappMessage = {
   es: tourName
     ? `Hola, me interesa el tour "${tourName}". Quisiera consultar sobre precios, disponibilidad y cómo reservar.`
@@ -109,6 +129,8 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
   data-success-message={copy.success}
   data-error-message={copy.error}
   data-generic-error-message={copy.genericError}
+  data-retry-message={copy.retry}
+  data-result-dialog-id={resultDialogId}
   aria-labelledby="contact-form-title"
   class="bg-white rounded-lg p-6 md:p-8 shadow-[0_8px_28px_-12px_rgba(15,23,42,0.18)] border border-transparent flex flex-col relative overflow-hidden"
 >
@@ -327,13 +349,17 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       </svg>
     </button>
 
-    <p
-      class="hidden rounded-sm border px-4 py-3 text-sm font-semibold"
-      data-contact-status
-      aria-live="polite"
-    >
-    </p>
     <FormSecurity client:load lang={lang} />
+    <FormResultModal
+      client:load
+      dialogId={resultDialogId}
+      messages={{
+        successTitle: copy.modalSuccessTitle,
+        errorTitle: copy.modalErrorTitle,
+        retryTitle: copy.modalRetryTitle,
+        closeLabel: copy.close,
+      }}
+    />
   </form>
 </section>
 
@@ -488,6 +514,10 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
 
   const windowWithContactForm = window as Window & {
     __dreamyContactFormPageLoadController?: AbortController;
+    __dreamyFormResultQueue?: Array<{
+      dialogId?: string;
+      result: { kind: "success" | "error" | "retry"; message: string };
+    }>;
   };
 
   function initContactForms() {
@@ -516,9 +546,6 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
         const submitLabel = root.querySelector<HTMLElement>(
           "[data-contact-submit-label]",
         );
-        const statusMessage = root.querySelector<HTMLElement>(
-          "[data-contact-status]",
-        );
         const submitText = root.dataset.submitLabel || "Send request";
         const submittingText = root.dataset.submittingLabel || "Sending...";
         const successText =
@@ -529,6 +556,10 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           "The form could not be sent. Please try again or message us on WhatsApp.";
         const genericErrorText =
           root.dataset.genericErrorMessage || "The form could not be sent.";
+        const retryText =
+          root.dataset.retryMessage ||
+          "Please wait a few seconds and try again.";
+        const resultDialogId = root.dataset.resultDialogId;
 
         if (!countrySelect || !phoneCodeSpan) return;
         const phoneCodeDisplay = phoneCodeSpan;
@@ -564,34 +595,6 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           updateWhatsAppLink();
         }
 
-        function setStatus(type: "success" | "error", message: string) {
-          if (!statusMessage) return;
-
-          statusMessage.textContent = message;
-          statusMessage.classList.remove(
-            "hidden",
-            "border-green-200",
-            "bg-green-50",
-            "text-green-700",
-            "border-secondary/25",
-            "bg-secondary/10",
-            "text-secondary",
-          );
-          statusMessage.classList.add(
-            ...(type === "success"
-              ? ["border-green-200", "bg-green-50", "text-green-700"]
-              : ["border-secondary/25", "bg-secondary/10", "text-secondary"]),
-          );
-          statusMessage.setAttribute(
-            "role",
-            type === "success" ? "status" : "alert",
-          );
-          statusMessage.setAttribute(
-            "aria-live",
-            type === "success" ? "polite" : "assertive",
-          );
-        }
-
         function setSubmitting(isSubmitting: boolean) {
           if (submitButton) {
             submitButton.disabled = isSubmitting;
@@ -606,6 +609,23 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           }
         }
 
+        function showResult(
+          kind: "success" | "error" | "retry",
+          message: string,
+        ) {
+          const detail = {
+            dialogId: resultDialogId,
+            result: { kind, message },
+          };
+          windowWithContactForm.__dreamyFormResultQueue ??= [];
+          windowWithContactForm.__dreamyFormResultQueue.push(detail);
+          document.dispatchEvent(
+            new CustomEvent("dreamy:form-result", {
+              detail,
+            }),
+          );
+        }
+
         async function handleSubmit(event: SubmitEvent) {
           if (!form) return;
 
@@ -614,7 +634,6 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
           if (!form.reportValidity()) return;
 
           setSubmitting(true);
-          statusMessage?.classList.add("hidden");
 
           try {
             const response = await fetch(form.action, {
@@ -626,16 +645,19 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
             });
             const result = await response.json().catch(() => ({}));
 
-            if (!response.ok || !result.success) {
-              throw new Error(result.error || genericErrorText);
+            if (!response.ok || !result.success || result.simulation) {
+              showResult(
+                result.code === "FORM_RETRY" ? "retry" : "error",
+                result.code === "FORM_RETRY" ? retryText : genericErrorText,
+              );
+              return;
             }
 
             form.reset();
             updatePhoneCode();
-            setStatus("success", successText);
-          } catch (error) {
-            console.error("Error al enviar formulario de tour:", error);
-            setStatus("error", errorText);
+            showResult("success", successText);
+          } catch {
+            showResult("error", errorText);
           } finally {
             resetFormSecurity(form);
             setSubmitting(false);
@@ -675,9 +697,6 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
     const submitLabel = form.querySelector<HTMLElement>(
       "[data-contact-submit-label]",
     );
-    const statusMessage = form.querySelector<HTMLElement>(
-      "[data-contact-status]",
-    );
     const root = form.closest<HTMLElement>("[data-contact-form-root]");
     const submitText = root?.dataset.submitLabel || "Send request";
     const submittingText = root?.dataset.submittingLabel || "Sending...";
@@ -689,13 +708,24 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       "The form could not be sent. Please try again or message us on WhatsApp.";
     const genericErrorText =
       root?.dataset.genericErrorMessage || "The form could not be sent.";
+    const retryText =
+      root?.dataset.retryMessage || "Please wait a few seconds and try again.";
+    const resultDialogId = root?.dataset.resultDialogId;
+    const showResult = (
+      kind: "success" | "error" | "retry",
+      message: string,
+    ) => {
+      const detail = { dialogId: resultDialogId, result: { kind, message } };
+      windowWithContactForm.__dreamyFormResultQueue ??= [];
+      windowWithContactForm.__dreamyFormResultQueue.push(detail);
+      document.dispatchEvent(new CustomEvent("dreamy:form-result", { detail }));
+    };
 
     if (submitButton) {
       submitButton.disabled = true;
       submitButton.classList.add("cursor-not-allowed", "opacity-75");
     }
     if (submitLabel) submitLabel.textContent = submittingText;
-    statusMessage?.classList.add("hidden");
 
     try {
       const response = await fetch(form.action, {
@@ -707,47 +737,18 @@ const countries = [...countriesWithPhoneCode].sort((a, b) =>
       });
       const result = await response.json().catch(() => ({}));
 
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || genericErrorText);
+      if (!response.ok || !result.success || result.simulation) {
+        showResult(
+          result.code === "FORM_RETRY" ? "retry" : "error",
+          result.code === "FORM_RETRY" ? retryText : genericErrorText,
+        );
+        return;
       }
 
       form.reset();
-
-      if (statusMessage) {
-        statusMessage.textContent = successText;
-        statusMessage.classList.remove(
-          "hidden",
-          "border-secondary/25",
-          "bg-secondary/10",
-          "text-secondary",
-        );
-        statusMessage.classList.add(
-          "border-green-200",
-          "bg-green-50",
-          "text-green-700",
-        );
-        statusMessage.setAttribute("role", "status");
-        statusMessage.setAttribute("aria-live", "polite");
-      }
-    } catch (error) {
-      console.error("Error al enviar formulario de tour:", error);
-
-      if (statusMessage) {
-        statusMessage.textContent = errorText;
-        statusMessage.classList.remove(
-          "hidden",
-          "border-green-200",
-          "bg-green-50",
-          "text-green-700",
-        );
-        statusMessage.classList.add(
-          "border-secondary/25",
-          "bg-secondary/10",
-          "text-secondary",
-        );
-        statusMessage.setAttribute("role", "alert");
-        statusMessage.setAttribute("aria-live", "assertive");
-      }
+      showResult("success", successText);
+    } catch {
+      showResult("error", errorText);
     } finally {
       resetFormSecurity(form);
       if (submitButton) {

@@ -1,13 +1,14 @@
 "use client";
 
-import { type ChangeEvent, useRef, useMemo, useState } from "react";
-import FormSecurity from "../ui/FormSecurity";
-import {
-	securityFields,
-	resetFormSecurity,
-	internationalPhone,
-} from "../../lib/formSecurityClient";
+import { type ChangeEvent, useMemo, useRef, useState } from "react";
 import { countries } from "@/data/countries";
+import {
+	internationalPhone,
+	resetFormSecurity,
+	securityFields,
+} from "../../lib/formSecurityClient";
+import FormResultModal, { type FormResult } from "../ui/FormResultModal";
+import FormSecurity from "../ui/FormSecurity";
 
 // Colores del theme (definidos en global.css)
 const colors = {
@@ -52,6 +53,14 @@ const complaintCopy = {
 		sent: "Enviado exitosamente",
 		sendFailed: "Error al enviar",
 		submit: "Enviar",
+		confirmationTitle: "Reclamación enviada",
+		confirm: "Aceptar",
+		errorTitle: "No pudimos confirmar el envío",
+		retryTitle: "Espera unos segundos",
+		retry:
+			"Por favor, espera unos segundos y vuelve a intentarlo. Tus datos se conservarán.",
+		unconfirmed:
+			"No pudimos confirmar el envío. Por favor, inténtalo nuevamente.",
 	},
 	en: {
 		consumerTitle: "CLAIMANT CONSUMER IDENTIFICATION",
@@ -85,6 +94,13 @@ const complaintCopy = {
 		sent: "Sent successfully",
 		sendFailed: "Error sending",
 		submit: "Submit",
+		confirmationTitle: "Complaint submitted",
+		confirm: "Accept",
+		errorTitle: "We could not confirm the submission",
+		retryTitle: "Please wait a moment",
+		retry:
+			"Please wait a few seconds and try again. Your details will be kept.",
+		unconfirmed: "We could not confirm the submission. Please try again.",
 	},
 	pt: {
 		consumerTitle: "IDENTIFICA\u00c7\u00c3O DO CONSUMIDOR RECLAMANTE",
@@ -119,6 +135,13 @@ const complaintCopy = {
 		sent: "Enviado com sucesso",
 		sendFailed: "Erro ao enviar",
 		submit: "Enviar",
+		confirmationTitle: "Reclamação enviada",
+		confirm: "Aceitar",
+		errorTitle: "Não foi possível confirmar o envio",
+		retryTitle: "Aguarde alguns segundos",
+		retry:
+			"Aguarde alguns segundos e tente novamente. Seus dados serão mantidos.",
+		unconfirmed: "Não foi possível confirmar o envio. Tente novamente.",
 	},
 } as const;
 
@@ -154,10 +177,7 @@ export default function LibroReclamaciones({
 	});
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [submitStatus, setSubmitStatus] = useState<
-		"idle" | "success" | "error"
-	>("idle");
-	const [statusMessage, setStatusMessage] = useState("");
+	const [modalResult, setModalResult] = useState<FormResult | null>(null);
 
 	const handleChange = (
 		e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -173,8 +193,6 @@ export default function LibroReclamaciones({
 	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 		setIsSubmitting(true);
-		setSubmitStatus("idle");
-		setStatusMessage("");
 
 		try {
 			const response = await fetch("/api/libro-reclamaciones", {
@@ -189,10 +207,9 @@ export default function LibroReclamaciones({
 				}),
 			});
 
-			const result = await response.json();
+			const result = await response.json().catch(() => ({}));
 
-			if (response.ok && result.success) {
-				setSubmitStatus("success");
+			if (response.ok && result.success && !result.simulation) {
 				setFormData({
 					nombres: "",
 					pais: "",
@@ -205,39 +222,25 @@ export default function LibroReclamaciones({
 					tipo: "reclamo",
 					detalle: "",
 				});
-				setStatusMessage(copy.success);
+				setModalResult({ kind: "success", message: copy.success });
 			} else {
-				throw new Error(result.error || copy.sendError);
+				setModalResult({
+					kind: result.code === "FORM_RETRY" ? "retry" : "error",
+					message: result.code === "FORM_RETRY" ? copy.retry : copy.unconfirmed,
+				});
 			}
-		} catch (error) {
-			console.error("Error:", error);
-			setSubmitStatus("error");
-			setStatusMessage(copy.error);
+		} catch {
+			setModalResult({ kind: "error", message: copy.unconfirmed });
 		} finally {
 			resetFormSecurity(securityForm.current);
 			setIsSubmitting(false);
 		}
 	};
 
-	const buttonStyle = () => {
-		if (submitStatus === "success") {
-			return {
-				background: "linear-gradient(to right, #22c55e, #16a34a)",
-				color: "#fff",
-			};
-		}
-		if (submitStatus === "error") {
-			return {
-				background:
-					"linear-gradient(to right, var(--secondary), var(--secondary))",
-				color: "#fff",
-			};
-		}
-		return {
-			background: `linear-gradient(to right, ${colors.primary}, oklch(0.6 0.15 148))`,
-			color: colors.primaryForeground,
-		};
-	};
+	const buttonStyle = () => ({
+		background: `linear-gradient(to right, ${colors.primary}, oklch(0.6 0.15 148))`,
+		color: colors.primaryForeground,
+	});
 
 	const inputStyle = {
 		borderColor: colors.border,
@@ -577,24 +580,6 @@ export default function LibroReclamaciones({
 				</div>
 			</div>
 
-			{statusMessage && (
-				<p
-					role={submitStatus === "error" ? "alert" : "status"}
-					aria-live={submitStatus === "error" ? "assertive" : "polite"}
-					className={`rounded-lg border px-4 py-3 text-sm font-medium ${
-						submitStatus === "error"
-							? "border-secondary/25 bg-secondary/10 text-secondary"
-							: "border-green-200 bg-green-50 text-green-700"
-					}`}
-				>
-					{submitStatus === "success"
-						? copy.success
-						: submitStatus === "error"
-							? copy.error
-							: statusMessage}
-				</p>
-			)}
-
 			<div className="mt-8">
 				<button
 					type="submit"
@@ -602,16 +587,25 @@ export default function LibroReclamaciones({
 					style={buttonStyle()}
 					className={`w-full font-bold py-4 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-75 disabled:cursor-not-allowed`}
 				>
-					{isSubmitting
-						? copy.submitting
-						: submitStatus === "success"
-							? copy.sent
-							: submitStatus === "error"
-								? copy.sendFailed
-								: copy.submit}
+					{isSubmitting ? copy.submitting : copy.submit}
 				</button>
 			</div>
 			<FormSecurity lang={lang} />
+			<FormResultModal
+				result={modalResult}
+				onClose={() => setModalResult(null)}
+				onConfirm={
+					modalResult?.kind === "success"
+						? () => window.location.reload()
+						: undefined
+				}
+				messages={{
+					successTitle: copy.confirmationTitle,
+					errorTitle: copy.errorTitle,
+					retryTitle: copy.retryTitle,
+					closeLabel: copy.confirm,
+				}}
+			/>
 		</form>
 	);
 }

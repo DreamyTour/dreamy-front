@@ -27,6 +27,7 @@ import {
 import {
 	getDreamyRecipients,
 	getDreamySender,
+	getMailDeliveryMode,
 	getResendClient,
 } from "../../lib/resend";
 
@@ -269,20 +270,6 @@ export const POST: APIRoute = async ({ request }) => {
 			request,
 			data as Record<string, unknown>,
 		);
-		if (security === "discard") {
-			const lang = data.cart?.lang;
-			return jsonResponse(
-				{
-					success: true,
-					reference: "DT-RECEIVED",
-					redirectUrl:
-						lang === "en"
-							? "/checkout/success"
-							: `/${lang === "pt" ? "pt" : "es"}/checkout/success`,
-				},
-				200,
-			);
-		}
 		if (security !== "allow") return securityError(security);
 		const { passengersInfo, contactInfo, cart } = data;
 		const passengers = Array.isArray(passengersInfo) ? passengersInfo : [];
@@ -437,6 +424,8 @@ export const POST: APIRoute = async ({ request }) => {
 			return jsonResponse({ error: errors.insufficientAvailability }, 409);
 		}
 
+		if ((await getMailDeliveryMode()) === "dry_run")
+			return jsonResponse({ error: errors.emailUnavailable }, 503);
 		const resend = await getResendClient();
 		if (!resend) {
 			return jsonResponse({ error: errors.emailUnavailable }, 503);

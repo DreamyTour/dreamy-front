@@ -54,14 +54,15 @@ try {
       (route) =>
         route.fulfill({
           contentType: "application/javascript",
-          body: `window.turnstile = {render(node, options) { const input = document.createElement('input'); input.type='hidden'; input.name='cf-turnstile-response'; input.value='browser-test-token'; node.append(input); return 'widget'; }, reset() { document.querySelectorAll('[name="cf-turnstile-response"]').forEach(input => input.value='browser-test-token'); }, remove() {} };`,
+      body: `window.turnstile = {render(node, options) { window.__turnstileOptions = options; const input = document.createElement('input'); input.type='hidden'; input.name='cf-turnstile-response'; input.value='browser-test-token'; node.append(input); return 'widget'; }, reset() { document.querySelectorAll('[name="cf-turnstile-response"]').forEach(input => input.value='browser-test-token'); }, remove() {} };`,
         }),
     );
     let sent;
+    let apiResponse = { status: 200, json: { success: true } };
     await page.route("**/api/**", (route) => {
       if (route.request().method() !== "POST") return route.continue();
       sent = route.request().postDataJSON();
-      return route.fulfill({ json: { success: true } });
+      return route.fulfill(apiResponse);
     });
     await page.goto(`http://127.0.0.1:4331${path}`);
     const form = page.locator('form[action^="/api/"]').first();
@@ -69,6 +70,10 @@ try {
     await form
       .locator('[name="cf-turnstile-response"]')
       .waitFor({ state: "attached" });
+    assert.equal(
+      await page.evaluate(() => window.__turnstileOptions.appearance),
+      "interaction-only",
+    );
     assert.equal(
       await form.locator('[name="website"]').getAttribute("tabindex"),
       "-1",
@@ -117,6 +122,32 @@ try {
     assert.equal(sent.website, "");
     assert.equal(sent.telefono, "+51987654321");
     assert(Number(sent.formRenderedAt) > 0);
+    const dialog = page.locator("dialog[open]");
+    await dialog.waitFor({ state: "visible" });
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
+
+    // A controlled retry must not clear the fields or make a success claim.
+    apiResponse = {
+      status: 409,
+      json: { code: "FORM_RETRY", error: "Please wait a few seconds." },
+    };
+    await form.locator('[name="nombres"]').fill("Ana Torres");
+    const retrySubmitted = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/") &&
+        response.request().method() === "POST",
+    );
+    await form.evaluate((element) =>
+      element.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      ),
+    );
+    await retrySubmitted;
+    await dialog.waitFor({ state: "visible" });
+    assert.equal(await form.locator('[name="nombres"]').inputValue(), "Ana Torres");
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
     console.log(
       `PASS browser: ${path} — widget, traps, token, phone and JSON submission`,
     );

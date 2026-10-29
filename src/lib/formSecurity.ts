@@ -16,7 +16,7 @@ export async function isMailDryRun() {
 	return (await formSecurityBindings()).DRY_RUN === "true";
 }
 
-export type SecurityResult = "allow" | "discard" | 403 | 429 | 503;
+export type SecurityResult = "allow" | 400 | 403 | 409 | 429 | 503;
 
 /** Logs only the security outcome. Request content, tokens and IP addresses stay out of logs. */
 function logSecurityOutcome(request: Request, outcome: string) {
@@ -29,7 +29,11 @@ function logSecurityOutcome(request: Request, outcome: string) {
 	);
 }
 
-/** Trap responses deliberately use the endpoint's normal success response. */
+/**
+ * Security responses deliberately avoid explaining which protection rejected a
+ * request. The time trap is the sole exception: a real browser needs a safe
+ * retry path when it submits immediately after hydration.
+ */
 export async function checkFormSecurity(
 	request: Request,
 	body: Record<string, unknown>,
@@ -63,7 +67,7 @@ export async function checkFormSecurity(
 		}
 		if (typeof body.website === "string" && body.website.trim()) {
 			logSecurityOutcome(request, "discarded_honeypot");
-			return "discard";
+			return 400;
 		}
 		const token = body["cf-turnstile-response"];
 		if (
@@ -83,7 +87,7 @@ export async function checkFormSecurity(
 			now - renderedAt < 3000
 		) {
 			logSecurityOutcome(request, "discarded_too_fast");
-			return "discard";
+			return 409;
 		}
 		try {
 			const response = await verifyFetch(
@@ -122,15 +126,20 @@ export async function checkFormSecurity(
 	}
 }
 
-export function securityError(status: 403 | 429 | 503) {
+export function securityError(status: Exclude<SecurityResult, "allow">) {
 	return Response.json(
 		{
 			error:
-				status === 429
-					? "Too many requests"
-					: status === 403
-						? "Verification failed"
-						: "Service unavailable",
+				status === 409
+					? "Please wait a few seconds and try again."
+					: status === 429
+						? "Too many requests"
+						: status === 403
+							? "Verification failed"
+							: status === 503
+								? "Service unavailable"
+								: "Unable to confirm the submission",
+			code: status === 409 ? "FORM_RETRY" : "FORM_NOT_CONFIRMED",
 		},
 		{
 			status,

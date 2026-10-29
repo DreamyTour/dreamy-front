@@ -12,6 +12,7 @@ import { bytesToBase64 } from "../../lib/prebookingPdf";
 import {
 	getDreamyRecipients,
 	getDreamySender,
+	getMailDeliveryMode,
 	getResendClient,
 } from "../../lib/resend";
 
@@ -49,8 +50,6 @@ export const POST: APIRoute = async ({ request }) => {
 		request,
 		payload as Record<string, unknown>,
 	);
-	if (security === "discard")
-		return json({ reference: "MP-RECEIVED", status: "pending_review" });
 	if (security !== "allow") return securityError(security);
 	const error = validateMachuPicchuPrebooking(payload);
 	if (error) return json({ error }, 400);
@@ -69,6 +68,14 @@ export const POST: APIRoute = async ({ request }) => {
 		)
 	)
 		return json({ error: "Invalid contact details" }, 400);
+	if ((await getMailDeliveryMode()) === "dry_run")
+		return json(
+			{
+				error:
+					"No pudimos confirmar el envío. Tus datos siguen en pantalla para volver a intentarlo.",
+			},
+			503,
+		);
 	const resend = await getResendClient();
 	if (!resend)
 		return json(

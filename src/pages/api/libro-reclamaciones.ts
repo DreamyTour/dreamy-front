@@ -2,11 +2,7 @@ import type { APIRoute } from "astro";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
 import { validateMailForm } from "../../lib/formValidation";
 import { escapeHtml } from "../../lib/html";
-import {
-	getMailDeliveryMode,
-	isResendConfigured,
-	sendDreamyEmail,
-} from "../../lib/resend";
+import { getMailDeliveryMode, sendDreamyEmail } from "../../lib/resend";
 
 export const prerender = false;
 
@@ -27,12 +23,6 @@ export const POST: APIRoute = async ({ request }) => {
 		if (!body || typeof body !== "object" || Array.isArray(body))
 			return Response.json({ error: "Invalid body" }, { status: 400 });
 		const security = await checkFormSecurity(request, body);
-		if (security === "discard") {
-			return Response.json({
-				success: true,
-				message: "Reclamacion enviada correctamente",
-			});
-		}
 		if (security !== "allow") return securityError(security);
 		const {
 			nombres,
@@ -68,7 +58,8 @@ export const POST: APIRoute = async ({ request }) => {
 			);
 		}
 
-		if (!(await isResendConfigured())) {
+		const deliveryMode = await getMailDeliveryMode();
+		if (deliveryMode === "unavailable") {
 			console.warn(
 				JSON.stringify({
 					event: "mail_delivery",
@@ -80,6 +71,23 @@ export const POST: APIRoute = async ({ request }) => {
 				{
 					error:
 						"Servicio de correo no disponible. Intenta nuevamente mÃ¡s tarde.",
+				},
+				{ status: 503, headers: { "Cache-Control": "no-store" } },
+			);
+		}
+		if (deliveryMode === "dry_run") {
+			console.info(
+				JSON.stringify({
+					event: "mail_delivery",
+					form: "libro-reclamaciones",
+					outcome: "dry_run_not_confirmed",
+				}),
+			);
+			return Response.json(
+				{
+					error: "Unable to confirm the submission",
+					code: "FORM_NOT_CONFIRMED",
+					simulation: true,
 				},
 				{ status: 503, headers: { "Cache-Control": "no-store" } },
 			);
@@ -174,7 +182,7 @@ export const POST: APIRoute = async ({ request }) => {
 			html: htmlContent,
 		});
 
-		if (error) {
+		if (error || !data?.id) {
 			console.error(
 				JSON.stringify({
 					event: "mail_delivery",
@@ -191,8 +199,7 @@ export const POST: APIRoute = async ({ request }) => {
 			JSON.stringify({
 				event: "mail_delivery",
 				form: "libro-reclamaciones",
-				outcome:
-					(await getMailDeliveryMode()) === "dry_run" ? "dry_run" : "accepted",
+				outcome: "accepted",
 			}),
 		);
 

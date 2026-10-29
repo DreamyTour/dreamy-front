@@ -17,7 +17,7 @@ for (const [index, endpoint] of [
 				headers: { "cf-connecting-ip": `192.0.${index + 10}.${attempt}` },
 			});
 		expect((await post({}, 1)).status()).toBe(403);
-		expect((await post({ website: "bot.example" }, 2)).status()).toBe(200);
+		expect((await post({ website: "bot.example" }, 2)).status()).toBe(400);
 		expect(
 			(
 				await post(
@@ -28,7 +28,7 @@ for (const [index, endpoint] of [
 					3,
 				)
 			).status(),
-		).toBe(200);
+		).toBe(409);
 		if (endpoint === "planea-tu-viaje" || endpoint === "libro-reclamaciones") {
 			const response = await post(
 				{
@@ -47,8 +47,8 @@ for (const [index, endpoint] of [
 				},
 				4,
 			);
-			expect(response.status()).toBe(200);
-			expect((await response.json()).id).toBe("dry-run");
+			expect(response.status()).toBe(503);
+			expect((await response.json()).simulation).toBe(true);
 		}
 	});
 }

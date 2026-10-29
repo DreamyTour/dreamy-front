@@ -6,6 +6,7 @@ const counts = new Map<string, number>();
 const bindings = {
 	DRY_RUN: "true",
 	TURNSTILE_SECRET_KEY: "test-secret",
+	RESEND_API_KEY: undefined as string | undefined,
 	FORM_RATE_LIMITER: {
 		idFromName: (key: string) => key,
 		get: (key: string) => ({
@@ -31,6 +32,7 @@ let verification: "pass" | "fail" | "timeout" | "wrong-host" = "pass";
 let mailCalls = 0;
 let verificationCalls = 0;
 let liveVerification = false;
+let liveMail = false;
 globalThis.fetch = (async (input, init) => {
 	const url = String(input);
 	if (url === "https://challenges.cloudflare.com/turnstile/v0/siteverify") {
@@ -43,7 +45,10 @@ globalThis.fetch = (async (input, init) => {
 			hostname: verification === "wrong-host" ? "evil.example" : "dreamy.tours",
 		});
 	}
-	if (url.includes("resend")) mailCalls++;
+	if (url.includes("resend")) {
+		mailCalls++;
+		if (liveMail) return Response.json({ id: "resend-live-fixture" });
+	}
 	throw new Error(`Unexpected outbound request: ${url}`);
 }) as typeof fetch;
 afterAll(() => {
@@ -54,6 +59,7 @@ beforeEach(() => {
 	verification = "pass";
 	mailCalls = 0;
 	verificationCalls = 0;
+	liveMail = false;
 });
 
 const valid = () => ({
@@ -117,8 +123,8 @@ test.skipIf(process.env.RUN_LIVE_TURNSTILE !== "true")(
 				const response = (await endpoint({
 					request,
 				} as APIContext)) as Response;
-				expect(response.status).toBe(200);
-				expect((await response.json()).id).toBe("dry-run");
+				expect(response.status).toBe(503);
+				expect((await response.json()).simulation).toBe(true);
 			}
 			expect(mailCalls).toBe(0);
 		} finally {
@@ -182,33 +188,45 @@ for (const [path, endpoint] of [
 		expect((await post(endpoint, path, data)).status).toBe(403);
 		expect(mailCalls).toBe(0);
 	});
-	test(`${path}: c) honeypot => normal success, zero verification/emails`, async () => {
+	test(`${path}: c) honeypot => no confirmation, zero verification/emails`, async () => {
 		const response = await post(endpoint, path, { website: "spam.example" });
-		expect(response.status).toBe(200);
-		expect(await response.json()).toEqual({
-			success: true,
-			message:
-				path === "planea-tu-viaje"
-					? "Solicitud enviada correctamente"
-					: "Reclamacion enviada correctamente",
+		expect(response.status).toBe(400);
+		expect((await response.json()).code).toBe("FORM_NOT_CONFIRMED");
+		expect(verificationCalls).toBe(0);
+		expect(mailCalls).toBe(0);
+	});
+	test(`${path}: time trap => controlled retry, zero emails`, async () => {
+		const response = await post(endpoint, path, {
+			...valid(),
+			formRenderedAt: Date.now(),
 		});
+		expect(response.status).toBe(409);
+		expect((await response.json()).code).toBe("FORM_RETRY");
 		expect(verificationCalls).toBe(0);
 		expect(mailCalls).toBe(0);
 	});
-	test(`${path}: time trap => success, zero emails`, async () => {
-		expect(
-			(await post(endpoint, path, { ...valid(), formRenderedAt: Date.now() }))
-				.status,
-		).toBe(200);
-		expect(verificationCalls).toBe(0);
-		expect(mailCalls).toBe(0);
-	});
-	test(`${path}: d) valid submission reaches provider DRY_RUN`, async () => {
+	test(`${path}: d) DRY_RUN never claims a confirmed submission`, async () => {
 		const response = await post(endpoint, path, valid());
-		expect(response.status).toBe(200);
-		expect((await response.json()).id).toBe("dry-run");
+		expect(response.status).toBe(503);
+		expect((await response.json()).simulation).toBe(true);
 		expect(verificationCalls).toBe(1);
 		expect(mailCalls).toBe(0);
+	});
+	test(`${path}: confirmed live provider acceptance is the only success`, async () => {
+		const originalDryRun = bindings.DRY_RUN;
+		const originalApiKey = bindings.RESEND_API_KEY;
+		bindings.DRY_RUN = "false";
+		bindings.RESEND_API_KEY = "re_test_fixture";
+		liveMail = true;
+		try {
+			const response = await post(endpoint, path, valid());
+			expect(response.status).toBe(200);
+			expect((await response.json()).success).toBe(true);
+			expect(mailCalls).toBe(1);
+		} finally {
+			bindings.DRY_RUN = originalDryRun;
+			bindings.RESEND_API_KEY = originalApiKey;
+		}
 	});
 	test(`${path}: invalid/expired token, timeout, wrong hostname fail closed`, async () => {
 		for (const mode of ["fail", "timeout", "wrong-host"] as const) {
@@ -219,15 +237,15 @@ for (const [path, endpoint] of [
 	});
 	test(`${path}: sixth attempt => 429`, async () => {
 		for (let i = 0; i < 5; i++)
-			expect((await post(endpoint, path, valid())).status).toBe(200);
+			expect((await post(endpoint, path, valid())).status).toBe(503);
 		expect((await post(endpoint, path, valid())).status).toBe(429);
 		expect(mailCalls).toBe(0);
 	});
 }
-test("native tour form keeps HTML success and traps", async () => {
+test("native tour form does not claim success in DRY_RUN", async () => {
 	const response = await post(trip, "planea-tu-viaje", valid(), true);
-	expect(response.status).toBe(200);
-	expect(await response.text()).toContain("Formulario enviado");
+	expect(response.status).toBe(503);
+	expect(await response.text()).toContain("No se pudo confirmar el envío");
 	expect(mailCalls).toBe(0);
 });
 for (const [path, endpoint] of [
@@ -238,7 +256,7 @@ for (const [path, endpoint] of [
 		expect((await post(endpoint, path, {})).status).toBe(403);
 		expect(
 			(await post(endpoint, path, { website: "spam.example" })).status,
-		).toBe(200);
+		).toBe(400);
 		expect(mailCalls).toBe(0);
 	});
 }
