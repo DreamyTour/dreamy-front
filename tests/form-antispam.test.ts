@@ -20,13 +20,11 @@ const bindings = {
 };
 mock.module("cloudflare:workers", () => ({ env: bindings }));
 const { POST: trip } = await import("../src/pages/api/planea-tu-viaje");
-const { POST: complaint } = await import(
-	"../src/pages/api/libro-reclamaciones"
-);
+const { POST: complaint } =
+	await import("../src/pages/api/libro-reclamaciones");
 const { POST: checkout } = await import("../src/pages/api/checkout");
-const { POST: machu } = await import(
-	"../src/pages/api/machu-picchu-prebooking"
-);
+const { POST: machu } =
+	await import("../src/pages/api/machu-picchu-prebooking");
 const realFetch = globalThis.fetch;
 let verification: "pass" | "fail" | "timeout" | "wrong-host" = "pass";
 let mailCalls = 0;
@@ -204,6 +202,29 @@ for (const [path, endpoint] of [
 		expect((await response.json()).code).toBe("FORM_RETRY");
 		expect(verificationCalls).toBe(0);
 		expect(mailCalls).toBe(0);
+	});
+	test(`${path}: the same rendered timestamp passes after the controlled three-second retry`, async () => {
+		const realNow = Date.now;
+		const renderedAt = 1_000_000;
+		try {
+			Date.now = () => renderedAt + 2_999;
+			expect(
+				(await post(endpoint, path, { ...valid(), formRenderedAt: renderedAt }))
+					.status,
+			).toBe(409);
+			expect(verificationCalls).toBe(0);
+
+			Date.now = () => renderedAt + 3_000;
+			const response = await post(endpoint, path, {
+				...valid(),
+				formRenderedAt: renderedAt,
+			});
+			expect(response.status).toBe(503);
+			expect((await response.json()).simulation).toBe(true);
+			expect(verificationCalls).toBe(1);
+		} finally {
+			Date.now = realNow;
+		}
 	});
 	test(`${path}: d) DRY_RUN never claims a confirmed submission`, async () => {
 		const response = await post(endpoint, path, valid());

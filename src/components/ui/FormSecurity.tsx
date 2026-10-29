@@ -11,12 +11,21 @@ export default function FormSecurity({ lang = "auto" }: { lang?: string }) {
 		let disposed = false;
 		let widget: string | undefined;
 		setRenderedAt(String(Date.now()));
-		const reset = () => {
-			setRenderedAt(String(Date.now()));
+		const reset = (event?: Event) => {
+			const renewTimestamp =
+				event instanceof CustomEvent && event.detail?.renewTimestamp === true;
+			if (renewTimestamp) setRenderedAt(String(Date.now()));
 			if (widget) window.turnstile?.reset(widget);
 		};
 		// Native reset runs before default values are restored.
-		const nativeReset = () => queueMicrotask(reset);
+		const nativeReset = () =>
+			queueMicrotask(() =>
+				reset(
+					new CustomEvent("security-reset", {
+						detail: { renewTimestamp: true },
+					}),
+				),
+			);
 		form.addEventListener("reset", nativeReset);
 		form.addEventListener("security-reset", reset);
 		const key = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
@@ -51,11 +60,7 @@ export default function FormSecurity({ lang = "auto" }: { lang?: string }) {
 				autoComplete="off"
 				aria-hidden="true"
 			/>
-			<input
-				type="hidden"
-				name="formRenderedAt"
-				value={renderedAt}
-			/>
+			<input type="hidden" name="formRenderedAt" value={renderedAt} />
 			<div ref={container} style={{ display: "contents" }} />
 		</div>
 	);

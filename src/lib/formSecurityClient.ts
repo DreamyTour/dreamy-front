@@ -41,8 +41,21 @@ export function securityFields(form: HTMLFormElement | null) {
 	);
 }
 
-export function resetFormSecurity(form: HTMLFormElement | null) {
-	form?.dispatchEvent(new Event("security-reset"));
+/**
+ * Gets a fresh Turnstile token after an attempted submission without
+ * restarting the elapsed-time check. Restarting that clock on every response
+ * made a FORM_RETRY response self-perpetuating when the user tried again.
+ *
+ * Pass `renewTimestamp` only when the form has genuinely been reset for a new
+ * entry, rather than when a user is retrying the same entry.
+ */
+export function resetFormSecurity(
+	form: HTMLFormElement | null,
+	{ renewTimestamp = false }: { renewTimestamp?: boolean } = {},
+) {
+	form?.dispatchEvent(
+		new CustomEvent("security-reset", { detail: { renewTimestamp } }),
+	);
 }
 
 // Preserve the existing separate calling-code control and formatted phone input.

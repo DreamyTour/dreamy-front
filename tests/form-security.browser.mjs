@@ -54,7 +54,7 @@ try {
       (route) =>
         route.fulfill({
           contentType: "application/javascript",
-      body: `window.turnstile = {render(node, options) { window.__turnstileOptions = options; const input = document.createElement('input'); input.type='hidden'; input.name='cf-turnstile-response'; input.value='browser-test-token'; node.append(input); return 'widget'; }, reset() { document.querySelectorAll('[name="cf-turnstile-response"]').forEach(input => input.value='browser-test-token'); }, remove() {} };`,
+          body: `window.turnstile = {render(node, options) { window.__turnstileOptions = options; const input = document.createElement('input'); input.type='hidden'; input.name='cf-turnstile-response'; input.value='browser-test-token'; node.append(input); return 'widget'; }, reset() { document.querySelectorAll('[name="cf-turnstile-response"]').forEach(input => input.value='browser-test-token'); }, remove() {} };`,
         }),
     );
     let sent;
@@ -145,7 +145,10 @@ try {
     );
     await retrySubmitted;
     await dialog.waitFor({ state: "visible" });
-    assert.equal(await form.locator('[name="nombres"]').inputValue(), "Ana Torres");
+    assert.equal(
+      await form.locator('[name="nombres"]').inputValue(),
+      "Ana Torres",
+    );
     await page.keyboard.press("Escape");
     await dialog.waitFor({ state: "hidden" });
     console.log(
@@ -153,6 +156,68 @@ try {
     );
     await page.close();
   }
+
+  // Reproduce the production sequence with a controlled browser clock. A
+  // FORM_RETRY response must renew Turnstile only; replacing formRenderedAt
+  // would make every retry begin another three-second wait.
+  const page = await browser.newPage();
+  await page.clock.install({ time: new Date("2026-01-01T12:00:00.000Z") });
+  await page.route(
+    "https://challenges.cloudflare.com/turnstile/v0/api.js**",
+    (route) =>
+      route.fulfill({
+        contentType: "application/javascript",
+        body: `window.turnstile = {render(node) { const input = document.createElement('input'); input.type='hidden'; input.name='cf-turnstile-response'; input.value='browser-test-token'; node.append(input); return 'widget'; }, reset() {}, remove() {}};`,
+      }),
+  );
+  const attempts = [];
+  await page.route("**/api/libro-reclamaciones", (route) => {
+    attempts.push(route.request().postDataJSON());
+    return route.fulfill(
+      attempts.length === 1
+        ? { status: 409, json: { code: "FORM_RETRY" } }
+        : { status: 200, json: { success: true, id: "accepted-fixture" } },
+    );
+  });
+  await page.goto("http://127.0.0.1:4331/es/libro-reclamaciones/");
+  const form = page.locator('form[action="/api/libro-reclamaciones"]');
+  await form
+    .locator('[name="cf-turnstile-response"]')
+    .waitFor({ state: "attached" });
+  const renderedAt = await form.locator('[name="formRenderedAt"]').inputValue();
+  await form.locator('[name="nombres"]').fill("Maria Garcia");
+  await form.locator('[name="pais"]').selectOption({ index: 1 });
+  await form.locator('[name="ciudad"]').fill("Lima");
+  await form.locator('[name="documento"]').fill("AB123456");
+  await form.locator('[name="email"]').fill("maria@example.com");
+  await form.locator('[name="telefono"]').fill("+51987654321");
+  await form
+    .locator('[name="detalle"]')
+    .fill("Please review the service received during my visit.");
+  await page.clock.fastForward(1);
+  await form.evaluate((element) =>
+    element.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    ),
+  );
+  await page.waitForFunction(() => document.querySelector("dialog[open]"));
+  assert.equal(
+    await form.locator('[name="formRenderedAt"]').inputValue(),
+    renderedAt,
+  );
+  await page.keyboard.press("Escape");
+  await page.clock.fastForward(3_000);
+  await form.evaluate((element) =>
+    element.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true }),
+    ),
+  );
+  await page.waitForFunction(() => document.querySelector("dialog[open]"));
+  assert.equal(attempts.length, 2);
+  assert.equal(String(attempts[0].formRenderedAt), renderedAt);
+  assert.equal(String(attempts[1].formRenderedAt), renderedAt);
+  console.log("PASS browser: retry keeps its original controlled timestamp");
+  await page.close();
 } finally {
   await browser.close();
   await server.close();

@@ -36,6 +36,16 @@ test("contact form keeps data on retry and only clears it after confirmation", a
 	await form.getByRole("button", { name: "Enviar solicitud" }).click();
 	const successDialog = page.getByRole("dialog", { name: "Consulta enviada" });
 	await expect(successDialog).toBeVisible();
+	const box = await successDialog.boundingBox();
+	const viewport = page.viewportSize();
+	expect(box).not.toBeNull();
+	expect(viewport).not.toBeNull();
+	if (box && viewport) {
+		expect(Math.abs(box.x - (viewport.width - box.width) / 2)).toBeLessThan(3);
+		expect(Math.abs(box.y - (viewport.height - box.height) / 2)).toBeLessThan(
+			3,
+		);
+	}
 	expect(await form.locator('[name="nombres"]').inputValue()).toBe("");
 	await page.keyboard.press("Escape");
 	expect(

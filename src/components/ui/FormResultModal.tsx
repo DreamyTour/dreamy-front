@@ -107,42 +107,69 @@ export default function FormResultModal({
 			: result?.kind === "retry"
 				? "text-amber-600"
 				: "text-secondary";
+	const description = result?.message.trim() ?? "";
+	const repeatsTitle =
+		description.localeCompare(title, undefined, {
+			sensitivity: "base",
+		}) === 0;
 
 	return (
-		<dialog
-			ref={dialog}
-			aria-labelledby={titleId}
-			onClose={close}
-			className="w-[min(92vw,31rem)] rounded-xl border-0 bg-white p-0 text-left text-foreground shadow-2xl backdrop:bg-slate-950/45"
-		>
-			<div className="p-6 sm:p-8">
-				<div className="flex items-start gap-4">
-					<Icon
-						className={`mt-0.5 size-8 shrink-0 ${iconClass}`}
-						aria-hidden="true"
-					/>
-					<div>
-						<h2 id={titleId} className="text-xl font-bold">
-							{title}
-						</h2>
-						<p className="mt-3 text-sm leading-6 text-slate-600">
-							{result?.message}
-						</p>
+		<>
+			<style>{`
+				dialog[data-form-result-modal]:modal { overscroll-behavior: contain; }
+				dialog[data-form-result-modal]::backdrop {
+					background: rgb(15 23 42 / 0.45);
+					overflow: hidden;
+					overscroll-behavior: contain;
+				}
+			`}</style>
+			<dialog
+				ref={dialog}
+				data-form-result-modal
+				aria-labelledby={titleId}
+				onClose={close}
+				style={{
+					position: "fixed",
+					inset: 0,
+					margin: "auto",
+					width: "min(92vw, 31rem)",
+					maxHeight: "calc(100dvh - 2rem)",
+					overflowY: "auto",
+				}}
+				className="rounded-xl border-0 bg-white p-0 text-left text-foreground shadow-2xl"
+			>
+				<div className="p-6 sm:p-8">
+					<div className="flex items-start gap-4">
+						<Icon
+							className={`mt-0.5 size-8 shrink-0 ${iconClass}`}
+							aria-hidden="true"
+						/>
+						<div>
+							<h2 id={titleId} className="text-xl font-bold">
+								{title}
+							</h2>
+							{description && !repeatsTitle ? (
+								<p className="mt-3 text-sm leading-6 text-slate-600">
+									{description}
+								</p>
+							) : null}
+						</div>
+					</div>
+					<div className="mt-7 flex justify-end">
+						<button
+							type="button"
+							autoFocus
+							onClick={() => {
+								if (onConfirm) onConfirm();
+								else dialog.current?.close();
+							}}
+							className="rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+						>
+							{messages.closeLabel}
+						</button>
 					</div>
 				</div>
-				<div className="mt-7 flex justify-end">
-					<button
-						type="button"
-						onClick={() => {
-							if (onConfirm) onConfirm();
-							else dialog.current?.close();
-						}}
-						className="rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-					>
-						{messages.closeLabel}
-					</button>
-				</div>
-			</div>
-		</dialog>
+			</dialog>
+		</>
 	);
 }
