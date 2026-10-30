@@ -180,6 +180,21 @@ for (const [path, endpoint] of [
 		}
 		expect(mailCalls).toBe(0);
 	});
+	if (path === "libro-reclamaciones") {
+		test("libro-reclamaciones: valid Turnstile exposes only a safe invalid field", async () => {
+			const response = await post(endpoint, path, {
+				...valid(),
+				telefono: "999999999",
+			});
+			expect(response.status).toBe(400);
+			expect(await response.json()).toEqual({
+				error: "Validation failed",
+				code: "VALIDATION_ERROR",
+				field: "telefono",
+			});
+			expect(mailCalls).toBe(0);
+		});
+	}
 	test(`${path}: b) missing token => 403, zero emails`, async () => {
 		const data = valid();
 		delete (data as Record<string, unknown>)["cf-turnstile-response"];

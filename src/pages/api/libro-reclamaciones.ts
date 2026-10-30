@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { checkFormSecurity, securityError } from "../../lib/formSecurity";
-import { validateMailForm } from "../../lib/formValidation";
+import { validateComplaintForm } from "../../lib/formValidation";
 import { escapeHtml } from "../../lib/html";
 import { getMailDeliveryMode, sendDreamyEmail } from "../../lib/resend";
 
@@ -39,22 +39,22 @@ export const POST: APIRoute = async ({ request }) => {
 		const emailValue = String(email || "").trim();
 		const typeValue = tipo === "reclamo" ? "reclamo" : "queja";
 
-		if (
-			!nombres ||
-			!pais ||
-			!ciudad ||
-			!documento ||
-			!emailValue ||
-			!validateMailForm(body, true, false) ||
-			!telefono ||
-			!tipo ||
-			!detalle
-		) {
-			return new Response(
+		const invalidField = validateComplaintForm(body);
+		if (invalidField) {
+			console.info(
 				JSON.stringify({
-					error: "Todos los campos requeridos deben ser completados",
+					event: "form_validation",
+					form: "libro-reclamaciones",
+					field: invalidField,
 				}),
-				{ status: 400, headers: { "Content-Type": "application/json" } },
+			);
+			return Response.json(
+				{
+					error: "Validation failed",
+					code: "VALIDATION_ERROR",
+					field: invalidField,
+				},
+				{ status: 400, headers: { "Cache-Control": "no-store" } },
 			);
 		}
 

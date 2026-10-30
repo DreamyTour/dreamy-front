@@ -82,16 +82,39 @@ try {
     assert(
       Number(await form.locator('[name="formRenderedAt"]').inputValue()) > 0,
     );
+    if (await form.locator('[name="detalle"]').count()) {
+      await form.evaluate((element) =>
+        element.dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true }),
+        ),
+      );
+      await form.locator("#lr-nombres-error").waitFor({ state: "visible" });
+      await form.locator("#lr-telefono-error").waitFor({ state: "visible" });
+      assert.equal(
+        await form.locator('[name="nombres"]').getAttribute("aria-invalid"),
+        "true",
+      );
+      await page.waitForFunction(
+        () => document.activeElement?.id === "lr-nombres",
+      );
+      assert.equal(sent, undefined);
+    }
     await form.locator('[name="nombres"]').fill("María García");
     await form
       .locator('[name="pais"]')
       .selectOption(path === "/complaints-book/" ? "Peru" : "Perú");
+    if (await form.locator('[name="codigoPais"]').count()) {
+      assert.equal(
+        await form.locator('[name="codigoPais"]').inputValue(),
+        "51",
+      );
+    }
     await form.locator('[name="email"]').fill("maria@example.com");
     await form
       .locator('[name="telefono"]')
       .fill(
         path.includes("reclam") || path.includes("complaints")
-          ? "+51 987 654 321"
+          ? "987 654 321"
           : "987 654 321",
       );
     if (await form.locator('[name="detalle"]').count()) {
@@ -132,6 +155,18 @@ try {
       status: 409,
       json: { code: "FORM_RETRY", error: "Please wait a few seconds." },
     };
+    if (await form.locator('[name="detalle"]').count()) {
+      await form
+        .locator('[name="pais"]')
+        .selectOption(path === "/complaints-book/" ? "Peru" : "Perú");
+      await form.locator('[name="ciudad"]').fill("Lima");
+      await form.locator('[name="documento"]').fill("AB123456");
+      await form.locator('[name="email"]').fill("maria@example.com");
+      await form.locator('[name="telefono"]').fill("987 654 321");
+      await form
+        .locator('[name="detalle"]')
+        .fill("Solicito revisar la atención recibida durante mi visita.");
+    }
     await form.locator('[name="nombres"]').fill("Ana Torres");
     const retrySubmitted = page.waitForResponse(
       (response) =>

@@ -224,6 +224,14 @@ function getReference(requestId: string) {
 	return `DT-${requestId.replaceAll("-", "").slice(0, 10).toUpperCase()}`;
 }
 
+/** A checkout is confirmed only after Resend returns a usable message id. */
+export function hasConfirmedEmailDelivery(
+	result: unknown,
+): result is { id: string } {
+	if (!result || typeof result !== "object" || !("id" in result)) return false;
+	return typeof result.id === "string" && result.id.trim().length > 0;
+}
+
 function formatLimaDateTime(date: Date) {
 	const parts = new Intl.DateTimeFormat("en-GB", {
 		timeZone: "America/Lima",
@@ -552,7 +560,7 @@ export const POST: APIRoute = async ({ request }) => {
 			{ idempotencyKey: `prebooking-${quoteRequestId}` },
 		);
 
-		if (resendError || !emailData) {
+		if (resendError || !hasConfirmedEmailDelivery(emailData)) {
 			console.error(
 				JSON.stringify({
 					message: "Unable to send pre-booking email",

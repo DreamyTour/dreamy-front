@@ -62,7 +62,8 @@ export function resetFormSecurity(
 export function internationalPhone(value: string, callingCode = "") {
 	const compact = value.replace(/[\s().-]/g, "");
 	if (!compact || compact.startsWith("+")) return compact;
-	return callingCode ? `+${callingCode.replace(/^\+/, "")}${compact}` : compact;
+	const prefix = callingCode.replace(/\D/g, "");
+	return prefix ? `+${prefix}${compact}` : compact;
 }
 
 export function protectedFormData(form: HTMLFormElement) {

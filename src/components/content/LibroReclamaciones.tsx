@@ -7,6 +7,7 @@ import {
 	resetFormSecurity,
 	securityFields,
 } from "../../lib/formSecurityClient";
+import type { ComplaintValidationField } from "../../lib/formValidation";
 import FormResultModal, { type FormResult } from "../ui/FormResultModal";
 import FormSecurity from "../ui/FormSecurity";
 
@@ -33,6 +34,7 @@ const complaintCopy = {
 		documentPlaceholder: "Ingrese su n\u00famero de documento",
 		email: "Email",
 		phone: "Tel\u00e9fono",
+		phoneCode: "C\u00f3digo",
 		isMinor: "\u00bfEres menor de edad?",
 		no: "No",
 		yes: "S\u00ed",
@@ -61,6 +63,17 @@ const complaintCopy = {
 			"Por favor, espera unos segundos y vuelve a intentarlo. Tus datos se conservarán.",
 		unconfirmed:
 			"No pudimos confirmar el envío. Por favor, inténtalo nuevamente.",
+		validation: {
+			nombres: "Ingresa tus nombres completos (mínimo 5 caracteres).",
+			pais: "Selecciona un país de la lista.",
+			ciudad: "Ingresa tu ciudad.",
+			documento: "Ingresa un documento alfanumérico de 8 a 15 caracteres.",
+			email: "Ingresa un correo electrónico válido.",
+			telefono: "Ingresa un teléfono internacional válido.",
+			datosApoderado: "Ingresa los datos del padre, madre o apoderado.",
+			tipo: "Selecciona el tipo de solicitud.",
+			detalle: "Describe tu reclamación con al menos 20 caracteres.",
+		},
 	},
 	en: {
 		consumerTitle: "CLAIMANT CONSUMER IDENTIFICATION",
@@ -74,6 +87,7 @@ const complaintCopy = {
 		documentPlaceholder: "Enter your document number",
 		email: "Email",
 		phone: "Phone",
+		phoneCode: "Country code",
 		isMinor: "Are you underage?",
 		no: "No",
 		yes: "Yes",
@@ -101,6 +115,17 @@ const complaintCopy = {
 		retry:
 			"Please wait a few seconds and try again. Your details will be kept.",
 		unconfirmed: "We could not confirm the submission. Please try again.",
+		validation: {
+			nombres: "Enter your full name (at least 5 characters).",
+			pais: "Choose a country from the list.",
+			ciudad: "Enter your city.",
+			documento: "Enter an 8 to 15 character alphanumeric document number.",
+			email: "Enter a valid email address.",
+			telefono: "Enter a valid international phone number.",
+			datosApoderado: "Enter the parent or guardian details.",
+			tipo: "Choose a request type.",
+			detalle: "Describe your claim in at least 20 characters.",
+		},
 	},
 	pt: {
 		consumerTitle: "IDENTIFICA\u00c7\u00c3O DO CONSUMIDOR RECLAMANTE",
@@ -114,6 +139,7 @@ const complaintCopy = {
 		documentPlaceholder: "Digite o n\u00famero do seu documento",
 		email: "E-mail",
 		phone: "Telefone",
+		phoneCode: "Código do país",
 		isMinor: "Voc\u00ea \u00e9 menor de idade?",
 		no: "N\u00e3o",
 		yes: "Sim",
@@ -142,8 +168,43 @@ const complaintCopy = {
 		retry:
 			"Aguarde alguns segundos e tente novamente. Seus dados serão mantidos.",
 		unconfirmed: "Não foi possível confirmar o envio. Tente novamente.",
+		validation: {
+			nombres: "Digite seu nome completo (no mínimo 5 caracteres).",
+			pais: "Selecione um país da lista.",
+			ciudad: "Digite sua cidade.",
+			documento: "Digite um documento alfanumérico de 8 a 15 caracteres.",
+			email: "Digite um e-mail válido.",
+			telefono: "Digite um telefone internacional válido.",
+			datosApoderado: "Digite os dados do pai, mãe ou responsável.",
+			tipo: "Selecione o tipo de solicitação.",
+			detalle: "Descreva sua reclamação com pelo menos 20 caracteres.",
+		},
 	},
 } as const;
+
+const complaintFields = [
+	"nombres",
+	"pais",
+	"ciudad",
+	"documento",
+	"email",
+	"telefono",
+	"datosApoderado",
+	"tipo",
+	"detalle",
+] as const satisfies readonly ComplaintValidationField[];
+
+const fieldElementIds: Record<ComplaintValidationField, string> = {
+	nombres: "lr-nombres",
+	pais: "lr-pais",
+	ciudad: "lr-ciudad",
+	documento: "lr-documento",
+	email: "lr-email",
+	telefono: "lr-telefono",
+	datosApoderado: "lr-datos-apoderado",
+	tipo: "lr-tipo-reclamo",
+	detalle: "lr-detalle",
+};
 
 interface LibroReclamacionesProps {
 	lang?: "es" | "en" | "pt";
@@ -163,6 +224,17 @@ export default function LibroReclamaciones({
 			),
 		[lang],
 	);
+	const callingCodes = useMemo(
+		() =>
+			[
+				...new Set(
+					countries.map((country) => country.phoneCode.replace(/\D/g, "")),
+				),
+			]
+				.filter(Boolean)
+				.sort((a, b) => Number(a) - Number(b)),
+		[],
+	);
 	const [formData, setFormData] = useState({
 		nombres: "",
 		pais: "",
@@ -175,23 +247,99 @@ export default function LibroReclamaciones({
 		tipo: "reclamo",
 		detalle: "",
 	});
+	const [codigoPais, setCodigoPais] = useState("");
+	const [fieldErrors, setFieldErrors] = useState<
+		Partial<Record<ComplaintValidationField, string>>
+	>({});
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [modalResult, setModalResult] = useState<FormResult | null>(null);
+
+	const clearFieldError = (field: ComplaintValidationField) => {
+		setFieldErrors((previous) => {
+			if (!previous[field]) return previous;
+			const next = { ...previous };
+			delete next[field];
+			return next;
+		});
+	};
 
 	const handleChange = (
 		e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
 	) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
+		if (complaintFields.includes(name as ComplaintValidationField))
+			clearFieldError(name as ComplaintValidationField);
 	};
 
 	const handleRadioChange = (name: string, value: string) => {
 		setFormData((prev) => ({ ...prev, [name]: value }));
+		if (complaintFields.includes(name as ComplaintValidationField))
+			clearFieldError(name as ComplaintValidationField);
+	};
+
+	const handleCountryChange = (pais: string) => {
+		const country = countries.find(
+			(item) => (lang === "en" ? item.nameEN : item.nameES) === pais,
+		);
+		setFormData((previous) => ({ ...previous, pais }));
+		setCodigoPais(country?.phoneCode.replace(/\D/g, "") ?? "");
+		clearFieldError("pais");
+		clearFieldError("telefono");
+	};
+
+	const focusField = (field: ComplaintValidationField) => {
+		requestAnimationFrame(() =>
+			document.getElementById(fieldElementIds[field])?.focus(),
+		);
+	};
+
+	const clientValidationErrors = (telefono: string) => {
+		const errors: Partial<Record<ComplaintValidationField, string>> = {};
+		const name = formData.nombres.trim();
+		if (
+			name.length < 5 ||
+			name.split(/\s+/).length < 2 ||
+			/^(test|testing|prueba)$/i.test(name)
+		)
+			errors.nombres = copy.validation.nombres;
+		if (
+			!countries.some(
+				(country) =>
+					country.nameES === formData.pais || country.nameEN === formData.pais,
+			)
+		)
+			errors.pais = copy.validation.pais;
+		if (!formData.ciudad.trim()) errors.ciudad = copy.validation.ciudad;
+		if (!/^[a-z0-9]{8,15}$/i.test(formData.documento.trim()))
+			errors.documento = copy.validation.documento;
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()))
+			errors.email = copy.validation.email;
+		if (!/^\+[1-9]\d{6,14}$/.test(telefono))
+			errors.telefono = copy.validation.telefono;
+		if (formData.menorEdad === "si" && !formData.datosApoderado.trim())
+			errors.datosApoderado = copy.validation.datosApoderado;
+		if (!["reclamo", "queja"].includes(formData.tipo))
+			errors.tipo = copy.validation.tipo;
+		if (formData.detalle.trim().length < 20)
+			errors.detalle = copy.validation.detalle;
+		return errors;
 	};
 
 	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
+		const telefono = internationalPhone(formData.telefono, codigoPais);
+		const validationErrors = clientValidationErrors(telefono);
+		const firstInvalidField = complaintFields.find(
+			(field) => validationErrors[field],
+		);
+		if (firstInvalidField) {
+			setFieldErrors(validationErrors);
+			setModalResult(null);
+			focusField(firstInvalidField);
+			return;
+		}
 		setIsSubmitting(true);
 
 		try {
@@ -202,7 +350,8 @@ export default function LibroReclamaciones({
 				},
 				body: JSON.stringify({
 					...formData,
-					telefono: internationalPhone(formData.telefono),
+					telefono,
+					codigoPais,
 					...securityFields(securityForm.current),
 				}),
 			});
@@ -222,7 +371,17 @@ export default function LibroReclamaciones({
 					tipo: "reclamo",
 					detalle: "",
 				});
+				setCodigoPais("");
+				setFieldErrors({});
 				setModalResult({ kind: "success", message: copy.success });
+			} else if (
+				result.code === "VALIDATION_ERROR" &&
+				complaintFields.includes(result.field as ComplaintValidationField)
+			) {
+				const field = result.field as ComplaintValidationField;
+				setFieldErrors({ [field]: copy.validation[field] });
+				setModalResult(null);
+				focusField(field);
 			} else {
 				setModalResult({
 					kind: result.code === "FORM_RETRY" ? "retry" : "error",
@@ -246,6 +405,24 @@ export default function LibroReclamaciones({
 		borderColor: colors.border,
 		color: colors.foreground,
 	};
+	const fieldErrorId = (field: ComplaintValidationField) => `lr-${field}-error`;
+	const fieldAria = (field: ComplaintValidationField) =>
+		fieldErrors[field]
+			? {
+					"aria-invalid": true,
+					"aria-describedby": fieldErrorId(field),
+				}
+			: {};
+	const renderFieldError = (field: ComplaintValidationField) =>
+		fieldErrors[field] ? (
+			<p
+				id={fieldErrorId(field)}
+				role="alert"
+				className="mt-2 text-sm font-medium text-red-700"
+			>
+				{fieldErrors[field]}
+			</p>
+		) : null;
 
 	return (
 		<form
@@ -253,6 +430,7 @@ export default function LibroReclamaciones({
 			action="/api/libro-reclamaciones"
 			method="post"
 			onSubmit={handleSubmit}
+			noValidate
 			className="space-y-6"
 		>
 			{/* Consumer identification */}
@@ -282,10 +460,12 @@ export default function LibroReclamaciones({
 							autoComplete="name"
 							enterKeyHint="next"
 							required
+							{...fieldAria("nombres")}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder={copy.fullNamePlaceholder}
 						/>
+						{renderFieldError("nombres")}
 					</div>
 
 					<div>
@@ -300,9 +480,10 @@ export default function LibroReclamaciones({
 							id="lr-pais"
 							name="pais"
 							value={formData.pais}
-							onChange={(e) => handleChange(e)}
+							onChange={(e) => handleCountryChange(e.target.value)}
 							autoComplete="country-name"
 							required
+							{...fieldAria("pais")}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all bg-white"
 						>
@@ -316,6 +497,7 @@ export default function LibroReclamaciones({
 								</option>
 							))}
 						</select>
+						{renderFieldError("pais")}
 					</div>
 
 					<div>
@@ -335,10 +517,12 @@ export default function LibroReclamaciones({
 							autoComplete="address-level2"
 							enterKeyHint="next"
 							required
+							{...fieldAria("ciudad")}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder={copy.cityPlaceholder}
 						/>
+						{renderFieldError("ciudad")}
 					</div>
 
 					<div>
@@ -358,10 +542,12 @@ export default function LibroReclamaciones({
 							autoComplete="off"
 							enterKeyHint="next"
 							required
+							{...fieldAria("documento")}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder={copy.documentPlaceholder}
 						/>
+						{renderFieldError("documento")}
 					</div>
 
 					<div>
@@ -382,10 +568,12 @@ export default function LibroReclamaciones({
 							inputMode="email"
 							enterKeyHint="next"
 							required
+							{...fieldAria("email")}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder="correo@ejemplo.com"
 						/>
+						{renderFieldError("email")}
 					</div>
 
 					<div>
@@ -396,20 +584,48 @@ export default function LibroReclamaciones({
 						>
 							{copy.phone} <span className="text-secondary">*</span>
 						</label>
-						<input
-							id="lr-telefono"
-							type="tel"
-							name="telefono"
-							value={formData.telefono}
-							onChange={handleChange}
-							autoComplete="tel"
-							inputMode="tel"
-							enterKeyHint="next"
-							required
-							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
-							placeholder="+51 999 999 999"
-						/>
+						<div className="flex overflow-hidden rounded-lg">
+							<select
+								id="lr-codigo-pais"
+								name="codigoPais"
+								value={codigoPais}
+								onChange={(event) => {
+									setCodigoPais(event.target.value);
+									clearFieldError("telefono");
+								}}
+								autoComplete="tel-country-code"
+								aria-label={copy.phoneCode}
+								style={inputStyle}
+								className="border border-r-0 px-3 py-3 text-sm focus:ring-2"
+							>
+								<option value="">+--</option>
+								{callingCodes.map((code) => (
+									<option key={code} value={code}>
+										+{code}
+									</option>
+								))}
+							</select>
+							<input
+								id="lr-telefono"
+								type="tel"
+								name="telefono"
+								value={formData.telefono}
+								onChange={handleChange}
+								autoComplete="tel-national"
+								inputMode="tel"
+								enterKeyHint="next"
+								required
+								{...fieldAria("telefono")}
+								style={{
+									...inputStyle,
+									borderTopLeftRadius: 0,
+									borderBottomLeftRadius: 0,
+								}}
+								className="w-full px-4 py-3 border rounded-r-lg focus:ring-2 transition-all"
+								placeholder="999 999 999"
+							/>
+						</div>
+						{renderFieldError("telefono")}
 					</div>
 
 					<div>
@@ -470,10 +686,13 @@ export default function LibroReclamaciones({
 							onChange={handleChange}
 							autoComplete="name"
 							enterKeyHint="next"
+							required={formData.menorEdad === "si"}
+							{...fieldAria("datosApoderado")}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder={copy.guardianPlaceholder}
 						/>
+						{renderFieldError("datosApoderado")}
 					</div>
 				</div>
 			</div>
@@ -517,6 +736,7 @@ export default function LibroReclamaciones({
 									value="reclamo"
 									checked={formData.tipo === "reclamo"}
 									onChange={() => handleRadioChange("tipo", "reclamo")}
+									{...fieldAria("tipo")}
 									style={{ accentColor: colors.primary }}
 								/>
 								<span
@@ -544,6 +764,7 @@ export default function LibroReclamaciones({
 									value="queja"
 									checked={formData.tipo === "queja"}
 									onChange={() => handleRadioChange("tipo", "queja")}
+									{...fieldAria("tipo")}
 									style={{ accentColor: colors.primary }}
 								/>
 								<span
@@ -554,6 +775,7 @@ export default function LibroReclamaciones({
 								</span>
 							</label>
 						</div>
+						{renderFieldError("tipo")}
 					</div>
 
 					<div>
@@ -571,11 +793,13 @@ export default function LibroReclamaciones({
 							onChange={handleChange}
 							enterKeyHint="send"
 							required
+							{...fieldAria("detalle")}
 							rows={6}
 							style={inputStyle}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
 							placeholder={copy.detailPlaceholder}
 						></textarea>
+						{renderFieldError("detalle")}
 					</div>
 				</div>
 			</div>
