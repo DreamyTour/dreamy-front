@@ -246,9 +246,13 @@ try {
   await machuForm.locator('input[autocomplete="section-traveler1 family-name"]').fill("Torres");
   await machuForm.locator('input[autocomplete="section-traveler1 bday"]').fill("1990-05-12");
   await machuForm.locator("fieldset select").first().selectOption("PE");
+	assert.equal(
+		await machuForm.locator('input[autocomplete="tel"]').inputValue(),
+		"+51 ",
+	);
   await machuForm.locator("fieldset input").nth(3).fill("P123456");
   await machuForm.locator('input[autocomplete="email"]').fill("maria@example.com");
-  await machuForm.locator('input[autocomplete="tel"]').fill("999 888 777");
+  await machuForm.locator('input[autocomplete="tel"]').fill("+51 999 888 777");
   await machuForm.getByRole("button", { name: "Continuar a pre-reserva" }).click();
   await machuForm.locator('input[type="checkbox"]').check();
   await machuForm.getByRole("button", { name: "Enviar pre-reserva" }).click();
@@ -258,6 +262,7 @@ try {
   assert.equal(machuAttempts[0].formChallenge, "machu-browser-challenge");
   assert.equal(machuAttempts[0]["cf-turnstile-response"], "browser-test-token");
   assert.equal(machuAttempts[0].preference, "advice");
+	assert.equal(machuAttempts[0].contact.phone, "+51999888777");
   await machuForm.getByRole("button", { name: "Enviar pre-reserva" }).click();
   await machuPage.getByText("Referencia: MP-TEST").waitFor({ state: "visible" });
   assert.equal(machuAttempts.length, 2);

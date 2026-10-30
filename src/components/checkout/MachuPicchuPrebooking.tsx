@@ -66,6 +66,7 @@ export default function MachuPicchuPrebooking() {
 	const [reference, setReference] = useState("");
 	const requestId = useRef("");
 	const lastRequest = useRef("");
+	const autoPhonePrefix = useRef("");
 	const heading = useRef<HTMLHeadingElement>(null);
 	useEffect(() => {
 		try {
@@ -109,6 +110,25 @@ export default function MachuPicchuPrebooking() {
 				i === index ? { ...traveler, [key]: value } : traveler,
 			),
 		);
+		if (index !== 0 || key !== "country") return;
+		const digits = countries
+			.find((country) => country.iso2 === value)
+			?.phoneCode.replace(/\D/g, "");
+		const nextPrefix = digits ? `+${digits}` : "";
+		const previousPrefix = autoPhonePrefix.current;
+		autoPhonePrefix.current = nextPrefix;
+		if (!nextPrefix) return;
+		setContact((current) => {
+			const phone = current.phone.trimStart();
+			if (!phone) return { ...current, phone: `${nextPrefix} ` };
+			if (previousPrefix && phone.startsWith(previousPrefix))
+				return {
+					...current,
+					phone: `${nextPrefix}${phone.slice(previousPrefix.length)}`,
+				};
+			if (phone.startsWith("+")) return current;
+			return { ...current, phone: `${nextPrefix} ${phone}` };
+		});
 	}
 	function payload(): Payload {
 		return {
