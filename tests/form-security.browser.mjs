@@ -20,6 +20,7 @@ const server = await createServer({
 });
 server.middlewares.use(async (request, response, next) => {
   if (!request.url?.endsWith("/")) return next();
+	const machuPicchu = request.url.startsWith("/machu-prebooking/");
   const complaint = /reclam|complaints/.test(request.url);
   const lang = request.url.startsWith("/es/")
     ? "es"
@@ -30,14 +31,14 @@ server.middlewares.use(async (request, response, next) => {
   response.end(
     await server.transformIndexHtml(
       request.url,
-      `<!doctype html><div id="root"></div><script type="module">import React from 'react'; import {createRoot} from 'react-dom/client'; import Form from '/src/components/content/${complaint ? "LibroReclamaciones" : "PlaneaTuViaje"}.tsx'; createRoot(document.getElementById('root')).render(React.createElement(Form,{lang:'${lang}'}));</script>`,
+		`<!doctype html><div id="root"></div><script type="module">import React from 'react'; import {createRoot} from 'react-dom/client'; import Form from '/src/components/${machuPicchu ? "checkout/MachuPicchuPrebooking" : `content/${complaint ? "LibroReclamaciones" : "PlaneaTuViaje"}`}.tsx'; createRoot(document.getElementById('root')).render(React.createElement(Form${machuPicchu ? "" : `,{lang:'${lang}'}`}));</script>`,
     ),
   );
 });
 await server.listen();
 const browser = await chromium.launch({ headless: true });
 try {
-  for (const path of [
+  for (const path of process.env.MACHU_ONLY === "true" ? [] : [
     "/es/planea-tu-viaje/",
     "/plan-your-trip/",
     "/pt/planeje-sua-viagem/",
@@ -202,6 +203,67 @@ try {
     );
     await page.close();
   }
+
+  // The Machu Picchu form has a multi-step UI. Its HMAC challenge must be
+  // requested for the API endpoint, not for the page that hosts the island.
+  const machuPage = await browser.newPage();
+  await machuPage.addInitScript(() =>
+    sessionStorage.setItem(
+      "machuPicchuSelection",
+      JSON.stringify({ date: "2027-06-10", route: "2A", time: "09:00" }),
+    ),
+  );
+  await machuPage.route(
+    "https://challenges.cloudflare.com/turnstile/v0/api.js**",
+    (route) =>
+      route.fulfill({
+        contentType: "application/javascript",
+        body: `window.turnstile = {render(node) { const input = document.createElement('input'); input.type = 'hidden'; input.name = 'cf-turnstile-response'; input.value = 'browser-test-token'; node.append(input); return 'widget'; }, reset() {}, remove() {}};`,
+      }),
+  );
+  const machuChallengePaths = [];
+  const machuAttempts = [];
+  await machuPage.route("**/api/form-challenge**", (route) => {
+    machuChallengePaths.push(new URL(route.request().url()).searchParams.get("path"));
+    return route.fulfill({ json: { challenge: "machu-browser-challenge" } });
+  });
+  await machuPage.route("**/api/machu-picchu-prebooking", (route) => {
+    machuAttempts.push(route.request().postDataJSON());
+    return route.fulfill(
+      machuAttempts.length === 1
+        ? { status: 409, json: { code: "FORM_RETRY" } }
+        : { status: 200, json: { status: "pending_review", reference: "MP-TEST" } },
+    );
+  });
+  await machuPage.goto("http://127.0.0.1:4331/machu-prebooking/");
+  await machuPage.getByRole("button", { name: "Continuar a viajeros" }).click();
+  const machuForm = machuPage.locator('form[action="/api/machu-picchu-prebooking"]');
+  await machuForm.locator('[name="formChallenge"]').waitFor({ state: "attached" });
+  await machuPage.waitForFunction(
+    () => document.querySelector('[name="formChallenge"]')?.value === "machu-browser-challenge",
+  );
+  await machuForm.locator('input[autocomplete="section-traveler1 given-name"]').fill("Ana");
+  await machuForm.locator('input[autocomplete="section-traveler1 family-name"]').fill("Torres");
+  await machuForm.locator('input[autocomplete="section-traveler1 bday"]').fill("1990-05-12");
+  await machuForm.locator("fieldset select").first().selectOption("PE");
+  await machuForm.locator("fieldset input").nth(3).fill("P123456");
+  await machuForm.locator('input[autocomplete="email"]').fill("maria@example.com");
+  await machuForm.locator('input[autocomplete="tel"]').fill("999 888 777");
+  await machuForm.getByRole("button", { name: "Continuar a pre-reserva" }).click();
+  await machuForm.locator('input[type="checkbox"]').check();
+  await machuForm.getByRole("button", { name: "Enviar pre-reserva" }).click();
+  await machuPage.waitForFunction(() => document.querySelector('[role="alert"]'));
+  assert.deepEqual(machuChallengePaths, ["/api/machu-picchu-prebooking"]);
+  assert.equal(machuAttempts.length, 1);
+  assert.equal(machuAttempts[0].formChallenge, "machu-browser-challenge");
+  assert.equal(machuAttempts[0]["cf-turnstile-response"], "browser-test-token");
+  assert.equal(machuAttempts[0].preference, "advice");
+  await machuForm.getByRole("button", { name: "Enviar pre-reserva" }).click();
+  await machuPage.getByText("Referencia: MP-TEST").waitFor({ state: "visible" });
+  assert.equal(machuAttempts.length, 2);
+  assert.equal(machuAttempts[1].formChallenge, "machu-browser-challenge");
+  console.log("PASS browser: Machu Picchu uses its API challenge and keeps data on retry");
+  await machuPage.close();
 
   // Reproduce the production sequence with a controlled browser clock. A
   // FORM_RETRY renews Turnstile only; the Worker-issued challenge is preserved.

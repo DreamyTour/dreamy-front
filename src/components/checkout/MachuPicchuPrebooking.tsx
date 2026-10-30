@@ -12,12 +12,6 @@ import {
 	Users,
 } from "lucide-react";
 import { type SubmitEvent, useEffect, useRef, useState } from "react";
-import FormSecurity from "../ui/FormSecurity";
-import {
-	securityFields,
-	resetFormSecurity,
-	internationalPhone,
-} from "../../lib/formSecurityClient";
 import { countries } from "@/data/countries";
 import {
 	MACHU_PICCHU_ROUTES,
@@ -32,6 +26,12 @@ import {
 	MAX_PASSENGERS_PER_BOOKING,
 } from "@/lib/prebooking";
 import { createRequestId } from "@/lib/requestId";
+import {
+	internationalPhone,
+	resetFormSecurity,
+	securityFields,
+} from "../../lib/formSecurityClient";
+import FormSecurity from "../ui/FormSecurity";
 
 type TravelerDraft = MachuPicchuTraveler & { id: string };
 const emptyTraveler = (): TravelerDraft => ({
@@ -361,7 +361,11 @@ export default function MachuPicchuPrebooking() {
 							</button>
 						</>
 					) : (
-						<form ref={securityForm} onSubmit={submit}>
+						<form
+							ref={securityForm}
+							action="/api/machu-picchu-prebooking"
+							onSubmit={submit}
+						>
 							{step === 1 ? (
 								<>
 									<p className="mb-6 text-sm leading-6 text-gray-500">

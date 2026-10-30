@@ -9,13 +9,7 @@ import {
 	Shield,
 	Users,
 } from "lucide-react";
-import { type SubmitEvent, useEffect, useRef, useState } from "react";
-import FormSecurity from "../ui/FormSecurity";
-import {
-	securityFields,
-	resetFormSecurity,
-	internationalPhone,
-} from "../../lib/formSecurityClient";
+import { type SubmitEvent, useEffect, useMemo, useRef, useState } from "react";
 import { countries } from "@/data/countries";
 import {
 	getDateKeyInTimeZone,
@@ -25,6 +19,12 @@ import {
 	MAX_PASSENGERS_PER_BOOKING,
 } from "@/lib/prebooking";
 import { createRequestId } from "@/lib/requestId";
+import {
+	internationalPhone,
+	resetFormSecurity,
+	securityFields,
+} from "../../lib/formSecurityClient";
+import FormSecurity from "../ui/FormSecurity";
 
 interface BookingCart {
 	quoteRequestId?: string;
@@ -102,8 +102,10 @@ const checkoutCopy = {
 		pendingContactName: "Completa los nombres y apellidos del Viajero 1",
 		emailAddress: "Correo electrónico",
 		countryCode: "Código de país",
-		countryFromHolder: "Tomado del país del Viajero 1",
+		countryFromHolder:
+			"Sugerido según el país del Viajero 1. Puedes modificarlo.",
 		phone: "Teléfono",
+		validationPhone: "Ingresa un teléfono internacional válido.",
 		termsPrefix: "He leído y acepto los",
 		terms: "Términos y condiciones",
 		termsMiddle: "y las",
@@ -183,8 +185,10 @@ const checkoutCopy = {
 		pendingContactName: "Complete Traveler 1's first and last name",
 		emailAddress: "Email address",
 		countryCode: "Country code",
-		countryFromHolder: "Taken from Traveler 1's country",
+		countryFromHolder:
+			"Suggested from Traveler 1's country. You can change it.",
 		phone: "Phone",
+		validationPhone: "Enter a valid international phone number.",
 		termsPrefix: "I have read and accept the",
 		terms: "Terms and Conditions",
 		termsMiddle: "and",
@@ -265,8 +269,10 @@ const checkoutCopy = {
 		pendingContactName: "Preencha o nome e sobrenome do Viajante 1",
 		emailAddress: "E-mail",
 		countryCode: "Código do país",
-		countryFromHolder: "Obtido do país do Viajante 1",
+		countryFromHolder:
+			"Sugerido com base no país do Viajante 1. Você pode alterá-lo.",
 		phone: "Telefone",
+		validationPhone: "Informe um telefone internacional válido.",
 		termsPrefix: "Li e aceito os",
 		terms: "Termos e condições",
 		termsMiddle: "e as",
@@ -326,6 +332,10 @@ export default function CheckoutSummary({
 		email: "",
 		phone: "",
 	});
+	const [selectedPhoneCode, setSelectedPhoneCode] = useState("");
+	const phoneCodeWasSelected = useRef(false);
+	const [phoneError, setPhoneError] = useState<string | null>(null);
+	const phoneInputRef = useRef<HTMLInputElement>(null);
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
 
 	// States for Payment Step
@@ -403,15 +413,44 @@ export default function CheckoutSummary({
 		}
 	}, [error]);
 
+	const holderPhoneCode = countries
+		.find((country) => country.iso2 === passengers[0]?.country)
+		?.phoneCode.replace(/\D/g, "");
+	const callingCodes = useMemo(
+		() =>
+			[
+				...new Set(
+					countries.map((country) => country.phoneCode.replace(/\D/g, "")),
+				),
+			]
+				.filter(Boolean)
+				.sort((left, right) => Number(left) - Number(right)),
+		[],
+	);
+
 	useEffect(() => {
-		if (step !== 2 || passengers.length === 0 || error) return;
+		if (!phoneCodeWasSelected.current)
+			setSelectedPhoneCode(holderPhoneCode || "");
+	}, [holderPhoneCode]);
+
+	useEffect(() => {
+		if (!phoneError || step !== 2) return;
+		const focusTimer = window.setTimeout(
+			() => phoneInputRef.current?.focus(),
+			0,
+		);
+		return () => window.clearTimeout(focusTimer);
+	}, [phoneError, step]);
+
+	useEffect(() => {
+		if (step !== 2 || passengers.length === 0 || error || phoneError) return;
 
 		const focusTimer = window.setTimeout(() => {
 			firstPassengerNameRef.current?.focus({ preventScroll: true });
 		}, 0);
 
 		return () => window.clearTimeout(focusTimer);
-	}, [step, passengers.length, error]);
+	}, [step, passengers.length, error, phoneError]);
 
 	// Loading state
 	if (loading) {
@@ -466,6 +505,7 @@ export default function CheckoutSummary({
 
 	const validateStep2 = () => {
 		setError(null);
+		setPhoneError(null);
 		for (let i = 0; i < passengers.length; i++) {
 			const p = passengers[i];
 			if (
@@ -486,8 +526,13 @@ export default function CheckoutSummary({
 				return false;
 			}
 		}
-		if (!contact.email.trim() || !contact.phone.trim()) {
+		if (!contact.email.trim()) {
 			setError(copy.validationContact);
+			return false;
+		}
+		const phone = internationalPhone(contact.phone, selectedPhoneCode);
+		if (!/^\+[1-9]\d{6,14}$/.test(phone)) {
+			setPhoneError(copy.validationPhone);
 			return false;
 		}
 		if (!acceptedTerms) {
@@ -520,7 +565,7 @@ export default function CheckoutSummary({
 					passengersInfo: passengers,
 					contactInfo: {
 						email: contact.email,
-						phone: internationalPhone(contact.phone),
+						phone: internationalPhone(contact.phone, selectedPhoneCode),
 					},
 				}),
 			});
@@ -528,6 +573,17 @@ export default function CheckoutSummary({
 			const data = contentType.includes("application/json")
 				? await response.json()
 				: { error: await response.text() };
+
+			if (
+				!response.ok &&
+				data?.code === "VALIDATION_ERROR" &&
+				data?.field === "telefono"
+			) {
+				setError(null);
+				setPhoneError(copy.validationPhone);
+				setStep(2);
+				return;
+			}
 
 			if (!response.ok) {
 				throw new Error(
@@ -615,17 +671,6 @@ export default function CheckoutSummary({
 		.map((namePart) => namePart?.trim())
 		.filter(Boolean)
 		.join(" ");
-	const bookingHolderCountry = countries.find(
-		(country) => country.iso2 === passengers[0]?.country,
-	);
-	const bookingHolderCountryName = bookingHolderCountry
-		? lang === "en"
-			? bookingHolderCountry.nameEN
-			: bookingHolderCountry.nameES
-		: "—";
-	const bookingHolderPhoneCode = bookingHolderCountry
-		? `+${bookingHolderCountry.phoneCode}`
-		: "—";
 	const fieldClass =
 		"min-h-12 rounded-sm border border-[#d8cec2] bg-white px-4 py-3 text-base text-[#1f2d29] outline-none transition focus:border-[#1f6c43] focus:ring-2 focus:ring-[#1f6c43]/15";
 	const labelClass = "text-xs font-bold uppercase tracking-wide text-[#5f5349]";
@@ -1076,12 +1121,25 @@ export default function CheckoutSummary({
 								<div className="flex flex-col gap-4 md:flex-row">
 									<div className="flex w-full flex-col gap-1 md:w-5/12">
 										<span className={labelClass}>{copy.countryCode}</span>
-										<div
-											data-holder-phone-country
-											className="flex min-h-12 items-center rounded-sm border border-[#b9ddc6] bg-[#edf8f1] px-4 py-3 text-base font-semibold text-[#244237]"
+										<select
+											id="contact-phone-code"
+											name="contact-phone-code"
+											autoComplete="tel-country-code"
+											value={selectedPhoneCode}
+											onChange={(event) => {
+												phoneCodeWasSelected.current = true;
+												setSelectedPhoneCode(event.target.value);
+												setPhoneError(null);
+											}}
+											className={`${fieldClass} border-[#b9ddc6] bg-[#edf8f1] font-semibold text-[#244237]`}
 										>
-											{bookingHolderCountryName} ({bookingHolderPhoneCode})
-										</div>
+											<option value="">+--</option>
+											{callingCodes.map((code) => (
+												<option key={code} value={code}>
+													+{code}
+												</option>
+											))}
+										</select>
 										<span className="text-xs font-medium text-[#6f6258]">
 											{copy.countryFromHolder}
 										</span>
@@ -1089,6 +1147,8 @@ export default function CheckoutSummary({
 									<label className="flex flex-col gap-1 flex-1">
 										<span className={labelClass}>{copy.phone} *</span>
 										<input
+											ref={phoneInputRef}
+											id="contact-phone"
 											type="tel"
 											name="contact-phone"
 											autoComplete="tel-national"
@@ -1099,11 +1159,24 @@ export default function CheckoutSummary({
 											pattern="[\\d\\s()+-]{6,25}"
 											placeholder="123 456 7890"
 											value={contact.phone}
-											onChange={(e) =>
-												setContact({ ...contact, phone: e.target.value })
+											aria-invalid={phoneError ? true : undefined}
+											aria-errormessage={
+												phoneError ? "contact-phone-error" : undefined
 											}
+											onChange={(e) => {
+												setContact({ ...contact, phone: e.target.value });
+												setPhoneError(null);
+											}}
 											className={fieldClass}
 										/>
+										{phoneError && (
+											<p
+												id="contact-phone-error"
+												className="text-sm font-medium text-secondary"
+											>
+												{phoneError}
+											</p>
+										)}
 									</label>
 								</div>
 							</div>

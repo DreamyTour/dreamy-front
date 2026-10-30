@@ -60,8 +60,8 @@ test("checkout passenger and holder contact fields keep focus while typing", asy
 	await page
 		.locator('select[name="passenger-1-issuing-country"]')
 		.selectOption("PE");
-	await expect(page.locator("[data-holder-phone-country]")).toContainText(
-		"Peru (+51)",
+	await expect(page.locator('select[name="contact-phone-code"]')).toHaveValue(
+		"51",
 	);
 
 	await typeAndKeepFocus(page, 'input[name="passenger-2-given-name"]', "Luis");
@@ -125,3 +125,90 @@ test("traveler 1 must be an adult to hold the pre-booking", async ({
 		page.getByRole("heading", { name: "Traveler information" }),
 	).toBeVisible();
 });
+
+for (const scenario of [
+	{
+		path: "/checkout",
+		lang: "en",
+		phoneError: "Enter a valid international phone number.",
+	},
+	{
+		path: "/es/checkout",
+		lang: "es",
+		phoneError: "Ingresa un teléfono internacional válido.",
+	},
+	{
+		path: "/pt/checkout",
+		lang: "pt",
+		phoneError: "Informe um telefone internacional válido.",
+	},
+] as const) {
+	test(`checkout ${scenario.lang} submits the selected calling code and returns a phone error to the contact step`, async ({
+		page,
+	}) => {
+		let sent: Record<string, unknown> | undefined;
+		await page.route(
+			"https://challenges.cloudflare.com/turnstile/v0/api.js**",
+			(route) =>
+				route.fulfill({
+					contentType: "application/javascript",
+					body: `window.turnstile = {render(node) { const input = document.createElement('input'); input.type = 'hidden'; input.name = 'cf-turnstile-response'; input.value = 'browser-test-token'; node.append(input); return 'widget'; }, reset() {}, remove() {}};`,
+				}),
+		);
+		await page.route("**/api/form-challenge**", (route) =>
+			route.fulfill({ json: { challenge: "checkout-browser-challenge" } }),
+		);
+		await page.route("**/api/checkout", (route) => {
+			if (route.request().method() !== "POST") return route.fallback();
+			sent = route.request().postDataJSON() as Record<string, unknown>;
+			return route.fulfill({
+				status: 400,
+				json: { code: "VALIDATION_ERROR", field: "telefono" },
+			});
+		});
+
+		await page.goto("/", { waitUntil: "domcontentloaded" });
+		await page.evaluate(
+			({ cartData, lang }) =>
+				window.localStorage.setItem(
+					"bookingCart",
+					JSON.stringify({ ...cartData, passengers: 1, totalPrice: 620, lang }),
+				),
+			{ cartData: cart, lang: scenario.lang },
+		);
+		await page.goto(scenario.path, { waitUntil: "domcontentloaded" });
+
+		await page.locator('input[name="passenger-1-given-name"]').fill("Ana");
+		await page.locator('input[name="passenger-1-family-name"]').fill("Torres");
+		await page
+			.locator('input[name="passenger-1-birthdate"]')
+			.fill("1990-05-12");
+		await page
+			.locator('input[name="passenger-1-document-number"]')
+			.fill("P123456");
+		await page
+			.locator('select[name="passenger-1-issuing-country"]')
+			.selectOption("PE");
+		await expect(page.locator('select[name="contact-phone-code"]')).toHaveValue(
+			"51",
+		);
+		await page.locator('input[name="contact-email"]').fill("maria@example.com");
+		await page.locator('input[name="contact-phone"]').fill("999 888 777");
+		await page.locator('input[name="acceptedTerms"]').check();
+		await page.locator('button[type="submit"]').click();
+		await page.locator('input[name="cf-turnstile-response"]').waitFor({
+			state: "attached",
+		});
+		await page.locator('button[type="submit"]').click();
+
+		await expect(page.locator("#contact-phone-error")).toHaveText(
+			scenario.phoneError,
+		);
+		await expect(page.locator('input[name="contact-phone"]')).toBeFocused();
+		expect(sent).toMatchObject({
+			contactInfo: { phone: "+51999888777" },
+			formChallenge: "checkout-browser-challenge",
+			"cf-turnstile-response": "browser-test-token",
+		});
+	});
+}

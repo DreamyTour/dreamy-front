@@ -78,6 +78,7 @@ const CALENDAR_REQUEST_TIMEOUT_MS = 8_000;
 const errorCopy = {
 	es: {
 		invalidContact: "Completa correctamente todos los datos de contacto.",
+		invalidPhone: "Ingresa un teléfono internacional válido.",
 		invalidPassenger: "Completa correctamente los datos de cada pasajero.",
 		invalidBirthDate: "Revisa las fechas de nacimiento ingresadas.",
 		adultHolder:
@@ -95,6 +96,7 @@ const errorCopy = {
 	},
 	en: {
 		invalidContact: "Please complete all contact details correctly.",
+		invalidPhone: "Enter a valid international phone number.",
 		invalidPassenger: "Please complete every traveler's details correctly.",
 		invalidBirthDate: "Please review the entered dates of birth.",
 		adultHolder:
@@ -112,6 +114,7 @@ const errorCopy = {
 	},
 	pt: {
 		invalidContact: "Preencha corretamente todos os dados de contato.",
+		invalidPhone: "Informe um telefone internacional válido.",
 		invalidPassenger: "Preencha corretamente os dados de cada viajante.",
 		invalidBirthDate: "Revise as datas de nascimento informadas.",
 		adultHolder:
@@ -195,7 +198,14 @@ function isValidContact(contactInfo: CheckoutPayload["contactInfo"]) {
 		typeof contactInfo.email === "string" &&
 		isValidEmail(contactInfo.email.trim()) &&
 		typeof contactInfo.phone === "string" &&
-		/^[\d\s()+-]{6,25}$/.test(contactInfo.phone.trim())
+		/^\+[1-9]\d{6,14}$/.test(contactInfo.phone.trim())
+	);
+}
+
+function hasInvalidContactPhone(contactInfo: CheckoutPayload["contactInfo"]) {
+	return (
+		typeof contactInfo?.phone !== "string" ||
+		!/^\+[1-9]\d{6,14}$/.test(contactInfo.phone.trim())
 	);
 }
 
@@ -316,6 +326,15 @@ export const POST: APIRoute = async ({ request }) => {
 			) ||
 			!isValidContact(contactInfo)
 		) {
+			if (hasInvalidContactPhone(contactInfo))
+				return jsonResponse(
+					{
+						error: errors.invalidPhone,
+						code: "VALIDATION_ERROR",
+						field: "telefono",
+					},
+					400,
+				);
 			return jsonResponse({ error: errors.invalidContact }, 400);
 		}
 
@@ -466,16 +485,10 @@ export const POST: APIRoute = async ({ request }) => {
 			documentNumber: normalizePrebookingText(passenger.documentNumber?.trim()),
 		}));
 		const bookingHolder = normalizedPassengers[0];
-		const bookingHolderCountry = countries.find(
-			(country) => country.iso2 === passengers[0]?.country,
-		);
 		const normalizedContact = {
 			firstname: bookingHolder.name,
 			lastname: bookingHolder.lastname,
 			email: contactInfo?.email?.trim() || "",
-			phoneCode: bookingHolderCountry
-				? `+${bookingHolderCountry.phoneCode}`
-				: "",
 			phone: contactInfo?.phone?.trim() || "",
 		};
 
@@ -497,7 +510,7 @@ export const POST: APIRoute = async ({ request }) => {
 				firstname: normalizedContact.firstname,
 				lastname: normalizedContact.lastname,
 				email: normalizedContact.email,
-				phone: `${normalizedContact.phoneCode} ${normalizedContact.phone}`,
+				phone: normalizedContact.phone,
 			},
 			passengers: normalizedPassengers,
 		});
@@ -518,9 +531,7 @@ export const POST: APIRoute = async ({ request }) => {
 				`${normalizedContact.firstname} ${normalizedContact.lastname}`,
 			),
 			contactEmail: escapeHtml(normalizedContact.email),
-			contactPhone: escapeHtml(
-				`${normalizedContact.phoneCode} ${normalizedContact.phone}`,
-			),
+			contactPhone: escapeHtml(normalizedContact.phone),
 		};
 
 		const { data: emailData, error: resendError } = await resend.emails.send(

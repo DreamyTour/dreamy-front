@@ -22,11 +22,13 @@ const bindings = {
 };
 mock.module("cloudflare:workers", () => ({ env: bindings }));
 const { POST: trip } = await import("../src/pages/api/planea-tu-viaje");
-const { POST: complaint } =
-	await import("../src/pages/api/libro-reclamaciones");
+const { POST: complaint } = await import(
+	"../src/pages/api/libro-reclamaciones"
+);
 const { POST: checkout } = await import("../src/pages/api/checkout");
-const { POST: machu } =
-	await import("../src/pages/api/machu-picchu-prebooking");
+const { POST: machu } = await import(
+	"../src/pages/api/machu-picchu-prebooking"
+);
 const realFetch = globalThis.fetch;
 let verification: "pass" | "fail" | "timeout" | "wrong-host" = "pass";
 let mailCalls = 0;
@@ -61,7 +63,12 @@ beforeEach(async () => {
 	mailCalls = 0;
 	verificationCalls = 0;
 	liveMail = false;
-	for (const path of ["/api/planea-tu-viaje", "/api/libro-reclamaciones"]) {
+	for (const path of [
+		"/api/planea-tu-viaje",
+		"/api/libro-reclamaciones",
+		"/api/checkout",
+		"/api/machu-picchu-prebooking",
+	]) {
 		const challenge = await issueFormChallenge({
 			secret: bindings.FORM_CHALLENGE_SECRET,
 			path,
@@ -85,6 +92,54 @@ const valid = (path = "planea-tu-viaje") => ({
 	website: "",
 	formChallenge: challengeByPath.get(`/api/${path}`) || "",
 	"cf-turnstile-response": "valid-fixture-token",
+});
+
+const futureDate = `${new Date().getFullYear() + 1}-06-10`;
+const validCheckout = (phone = "+51987654321") => ({
+	website: "",
+	formChallenge: challengeByPath.get("/api/checkout") || "",
+	"cf-turnstile-response": "valid-fixture-token",
+	passengersInfo: [
+		{
+			name: "María",
+			lastname: "García",
+			gender: "Female",
+			dob: "1990-05-12",
+			documentType: "Passport",
+			documentNumber: "P123456",
+			country: "PE",
+		},
+	],
+	contactInfo: { email: "maria@example.com", phone },
+	cart: {
+		quoteRequestId: "123e4567-e89b-42d3-a456-426614174000",
+		tourId: "test-inca-trail",
+		date: futureDate,
+		passengers: 1,
+		paymentPreference: "minimum",
+		lang: "es",
+	},
+});
+
+const validMachuPicchu = () => ({
+	website: "",
+	formChallenge: challengeByPath.get("/api/machu-picchu-prebooking") || "",
+	"cf-turnstile-response": "valid-fixture-token",
+	requestId: "123e4567-e89b-42d3-a456-426614174000",
+	selection: { date: futureDate, route: "2A", time: "09:00" },
+	travelers: [
+		{
+			name: "María",
+			lastname: "García",
+			dob: "1990-05-12",
+			country: "PE",
+			documentType: "passport",
+			documentNumber: "P123456",
+		},
+	],
+	contact: { email: "maria@example.com", phone: "+51987654321" },
+	preference: "advice",
+	acceptedTerms: true,
 });
 async function post(
 	endpoint: typeof trip,
@@ -126,7 +181,7 @@ test.skipIf(process.env.RUN_LIVE_TURNSTILE !== "true")(
 						"cf-connecting-ip": "192.0.2.123",
 					},
 					body: JSON.stringify({
-					...valid(path),
+						...valid(path),
 						"cf-turnstile-response": "XXXX.DUMMY.TOKEN.XXXX",
 					}),
 				});
@@ -245,8 +300,7 @@ for (const [path, endpoint] of [
 		try {
 			Date.now = () => issuedAt + 2_999;
 			expect(
-				(await post(endpoint, path, { ...valid(path), formChallenge }))
-					.status,
+				(await post(endpoint, path, { ...valid(path), formChallenge })).status,
 			).toBe(409);
 			expect(verificationCalls).toBe(0);
 
@@ -305,6 +359,69 @@ test("native tour form does not claim success in DRY_RUN", async () => {
 	expect(await response.text()).toContain("No se pudo confirmar el envío");
 	expect(mailCalls).toBe(0);
 });
+
+test("checkout returns a safe telephone field error after HMAC and Turnstile succeed", async () => {
+	const response = await post(checkout, "checkout", validCheckout("999888777"));
+	expect(response.status).toBe(400);
+	expect(await response.json()).toEqual({
+		error: "Ingresa un teléfono internacional válido.",
+		code: "VALIDATION_ERROR",
+		field: "telefono",
+	});
+	expect(verificationCalls).toBe(1);
+	expect(mailCalls).toBe(0);
+});
+
+test("Machu Picchu accepts a mature endpoint challenge and rejects invalid Turnstile", async () => {
+	const acceptedChallenge = await post(
+		machu,
+		"machu-picchu-prebooking",
+		validMachuPicchu(),
+	);
+	expect(acceptedChallenge.status).toBe(503);
+	expect(verificationCalls).toBe(1);
+	expect(mailCalls).toBe(0);
+
+	verification = "fail";
+	const rejectedTurnstile = await post(
+		machu,
+		"machu-picchu-prebooking",
+		validMachuPicchu(),
+	);
+	expect(rejectedTurnstile.status).toBe(403);
+	expect(mailCalls).toBe(0);
+});
+
+test("Machu Picchu reuses its endpoint challenge after the three-second wait", async () => {
+	const realNow = Date.now;
+	const issuedAt = 1_000_000;
+	const formChallenge = await issueFormChallenge({
+		secret: bindings.FORM_CHALLENGE_SECRET,
+		path: "/api/machu-picchu-prebooking",
+		now: issuedAt,
+	});
+	try {
+		Date.now = () => issuedAt + 2_999;
+		const tooYoung = await post(machu, "machu-picchu-prebooking", {
+			...validMachuPicchu(),
+			formChallenge,
+		});
+		expect(tooYoung.status).toBe(409);
+		expect(verificationCalls).toBe(0);
+
+		Date.now = () => issuedAt + 3_000;
+		const mature = await post(machu, "machu-picchu-prebooking", {
+			...validMachuPicchu(),
+			formChallenge,
+		});
+		expect(mature.status).toBe(503);
+		expect(verificationCalls).toBe(1);
+		expect(mailCalls).toBe(0);
+	} finally {
+		Date.now = realNow;
+	}
+});
+
 for (const [path, endpoint] of [
 	["checkout", checkout],
 	["machu-picchu-prebooking", machu],
