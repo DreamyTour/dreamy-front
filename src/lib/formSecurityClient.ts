@@ -34,7 +34,7 @@ export function securityFields(form: HTMLFormElement | null) {
 	if (!form) return {};
 	const data = new FormData(form);
 	return Object.fromEntries(
-		["website", "formRenderedAt", "cf-turnstile-response"].map((key) => [
+		["website", "formChallenge", "cf-turnstile-response"].map((key) => [
 			key,
 			data.get(key) ?? "",
 		]),
@@ -42,20 +42,11 @@ export function securityFields(form: HTMLFormElement | null) {
 }
 
 /**
- * Gets a fresh Turnstile token after an attempted submission without
- * restarting the elapsed-time check. Restarting that clock on every response
- * made a FORM_RETRY response self-perpetuating when the user tried again.
- *
- * Pass `renewTimestamp` only when the form has genuinely been reset for a new
- * entry, rather than when a user is retrying the same entry.
+ * Gets a fresh Turnstile token after an attempted submission without replacing
+ * the Worker-issued time challenge. A retry must keep its original challenge.
  */
-export function resetFormSecurity(
-	form: HTMLFormElement | null,
-	{ renewTimestamp = false }: { renewTimestamp?: boolean } = {},
-) {
-	form?.dispatchEvent(
-		new CustomEvent("security-reset", { detail: { renewTimestamp } }),
-	);
+export function resetFormSecurity(form: HTMLFormElement | null) {
+	form?.dispatchEvent(new CustomEvent("security-reset"));
 }
 
 // Preserve the existing separate calling-code control and formatted phone input.

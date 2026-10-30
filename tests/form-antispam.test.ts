@@ -1,11 +1,13 @@
 import { afterAll, beforeEach, expect, mock, test } from "bun:test";
 import type { APIContext } from "astro";
+import { issueFormChallenge } from "../src/lib/formChallenge";
 
 // Tests use the actual endpoint and Resend wrapper. No email network call is allowed.
 const counts = new Map<string, number>();
 const bindings = {
 	DRY_RUN: "true",
 	TURNSTILE_SECRET_KEY: "test-secret",
+	FORM_CHALLENGE_SECRET: "test-form-challenge-secret",
 	RESEND_API_KEY: undefined as string | undefined,
 	FORM_RATE_LIMITER: {
 		idFromName: (key: string) => key,
@@ -31,6 +33,7 @@ let mailCalls = 0;
 let verificationCalls = 0;
 let liveVerification = false;
 let liveMail = false;
+const challengeByPath = new Map<string, string>();
 globalThis.fetch = (async (input, init) => {
 	const url = String(input);
 	if (url === "https://challenges.cloudflare.com/turnstile/v0/siteverify") {
@@ -52,15 +55,24 @@ globalThis.fetch = (async (input, init) => {
 afterAll(() => {
 	globalThis.fetch = realFetch;
 });
-beforeEach(() => {
+beforeEach(async () => {
 	counts.clear();
 	verification = "pass";
 	mailCalls = 0;
 	verificationCalls = 0;
 	liveMail = false;
+	for (const path of ["/api/planea-tu-viaje", "/api/libro-reclamaciones"]) {
+		const challenge = await issueFormChallenge({
+			secret: bindings.FORM_CHALLENGE_SECRET,
+			path,
+			now: Date.now() - 10_000,
+		});
+		if (!challenge) throw new Error("Unable to create form challenge fixture");
+		challengeByPath.set(path, challenge);
+	}
 });
 
-const valid = () => ({
+const valid = (path = "planea-tu-viaje") => ({
 	nombres: "María García",
 	pais: "Perú",
 	email: "maria@example.com",
@@ -71,7 +83,7 @@ const valid = () => ({
 	detalle: "Solicito revisar la atención recibida durante mi visita.",
 	mensaje: "",
 	website: "",
-	formRenderedAt: Date.now() - 10_000,
+	formChallenge: challengeByPath.get(`/api/${path}`) || "",
 	"cf-turnstile-response": "valid-fixture-token",
 });
 async function post(
@@ -114,7 +126,7 @@ test.skipIf(process.env.RUN_LIVE_TURNSTILE !== "true")(
 						"cf-connecting-ip": "192.0.2.123",
 					},
 					body: JSON.stringify({
-						...valid(),
+					...valid(path),
 						"cf-turnstile-response": "XXXX.DUMMY.TOKEN.XXXX",
 					}),
 				});
@@ -139,7 +151,7 @@ for (const [path, endpoint] of [
 		const originalDryRun = bindings.DRY_RUN;
 		bindings.DRY_RUN = "false";
 		try {
-			const response = await post(endpoint, path, valid());
+			const response = await post(endpoint, path, valid(path));
 			expect(response.status).toBe(503);
 			expect((await response.json()).success).toBeUndefined();
 			expect(mailCalls).toBe(0);
@@ -175,7 +187,7 @@ for (const [path, endpoint] of [
 		]) {
 			counts.clear();
 			expect(
-				(await post(endpoint, path, { ...valid(), ...change })).status,
+				(await post(endpoint, path, { ...valid(path), ...change })).status,
 			).toBe(400);
 		}
 		expect(mailCalls).toBe(0);
@@ -183,7 +195,7 @@ for (const [path, endpoint] of [
 	if (path === "libro-reclamaciones") {
 		test("libro-reclamaciones: valid Turnstile exposes only a safe invalid field", async () => {
 			const response = await post(endpoint, path, {
-				...valid(),
+				...valid(path),
 				telefono: "999999999",
 			});
 			expect(response.status).toBe(400);
@@ -196,7 +208,7 @@ for (const [path, endpoint] of [
 		});
 	}
 	test(`${path}: b) missing token => 403, zero emails`, async () => {
-		const data = valid();
+		const data = valid(path);
 		delete (data as Record<string, unknown>)["cf-turnstile-response"];
 		expect((await post(endpoint, path, data)).status).toBe(403);
 		expect(mailCalls).toBe(0);
@@ -210,29 +222,38 @@ for (const [path, endpoint] of [
 	});
 	test(`${path}: time trap => controlled retry, zero emails`, async () => {
 		const response = await post(endpoint, path, {
-			...valid(),
-			formRenderedAt: Date.now(),
+			...valid(path),
+			formChallenge: await issueFormChallenge({
+				secret: bindings.FORM_CHALLENGE_SECRET,
+				path: `/api/${path}`,
+				now: Date.now(),
+			}),
 		});
 		expect(response.status).toBe(409);
 		expect((await response.json()).code).toBe("FORM_RETRY");
 		expect(verificationCalls).toBe(0);
 		expect(mailCalls).toBe(0);
 	});
-	test(`${path}: the same rendered timestamp passes after the controlled three-second retry`, async () => {
+	test(`${path}: the same Worker-issued challenge passes after the controlled three-second retry`, async () => {
 		const realNow = Date.now;
-		const renderedAt = 1_000_000;
+		const issuedAt = 1_000_000;
+		const formChallenge = await issueFormChallenge({
+			secret: bindings.FORM_CHALLENGE_SECRET,
+			path: `/api/${path}`,
+			now: issuedAt,
+		});
 		try {
-			Date.now = () => renderedAt + 2_999;
+			Date.now = () => issuedAt + 2_999;
 			expect(
-				(await post(endpoint, path, { ...valid(), formRenderedAt: renderedAt }))
+				(await post(endpoint, path, { ...valid(path), formChallenge }))
 					.status,
 			).toBe(409);
 			expect(verificationCalls).toBe(0);
 
-			Date.now = () => renderedAt + 3_000;
+			Date.now = () => issuedAt + 3_000;
 			const response = await post(endpoint, path, {
-				...valid(),
-				formRenderedAt: renderedAt,
+				...valid(path),
+				formChallenge,
 			});
 			expect(response.status).toBe(503);
 			expect((await response.json()).simulation).toBe(true);
@@ -242,7 +263,7 @@ for (const [path, endpoint] of [
 		}
 	});
 	test(`${path}: d) DRY_RUN never claims a confirmed submission`, async () => {
-		const response = await post(endpoint, path, valid());
+		const response = await post(endpoint, path, valid(path));
 		expect(response.status).toBe(503);
 		expect((await response.json()).simulation).toBe(true);
 		expect(verificationCalls).toBe(1);
@@ -255,7 +276,7 @@ for (const [path, endpoint] of [
 		bindings.RESEND_API_KEY = "re_test_fixture";
 		liveMail = true;
 		try {
-			const response = await post(endpoint, path, valid());
+			const response = await post(endpoint, path, valid(path));
 			expect(response.status).toBe(200);
 			expect((await response.json()).success).toBe(true);
 			expect(mailCalls).toBe(1);
@@ -267,14 +288,14 @@ for (const [path, endpoint] of [
 	test(`${path}: invalid/expired token, timeout, wrong hostname fail closed`, async () => {
 		for (const mode of ["fail", "timeout", "wrong-host"] as const) {
 			verification = mode;
-			expect((await post(endpoint, path, valid())).status).toBe(403);
+			expect((await post(endpoint, path, valid(path))).status).toBe(403);
 		}
 		expect(mailCalls).toBe(0);
 	});
 	test(`${path}: sixth attempt => 429`, async () => {
 		for (let i = 0; i < 5; i++)
-			expect((await post(endpoint, path, valid())).status).toBe(503);
-		expect((await post(endpoint, path, valid())).status).toBe(429);
+			expect((await post(endpoint, path, valid(path))).status).toBe(503);
+		expect((await post(endpoint, path, valid(path))).status).toBe(429);
 		expect(mailCalls).toBe(0);
 	});
 }

@@ -323,3 +323,20 @@ Referencias oficiales:
 - https://developers.cloudflare.com/workers/wrangler/configuration/
 - https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/#bindings
 - https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/
+
+## Desafío temporal firmado
+
+El control temporal usa un desafío emitido por el Worker y firmado con
+`FORM_CHALLENGE_SECRET`. No acepta relojes enviados por el navegador: la firma
+vincula la hora de emisión y la ruta, y el Worker exige una antigüedad de al
+menos tres segundos y un máximo de treinta minutos. Configurar
+`FORM_CHALLENGE_SECRET` como secreto runtime antes de publicar; generar un valor
+aleatorio de alta entropía localmente y cargarlo por el flujo seguro del panel o
+`wrangler secret put FORM_CHALLENGE_SECRET` interactivo. Nunca incluir su valor
+en Git, variables `PUBLIC_`/`VITE_` ni argumentos de comandos.
+
+La firma HMAC evita que se fabriquen o adelanten desafíos, pero un token válido
+no es de un solo uso sin almacenamiento del nonce. El rate limit por IP/ruta
+sigue limitando su reutilización. Para operaciones futuras más sensibles se
+debe añadir consumo de nonce en Durable Object, conservando su migración y
+bindings; no se implementa esa escritura de estado en esta versión.

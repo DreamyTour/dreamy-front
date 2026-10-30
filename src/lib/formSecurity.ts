@@ -1,5 +1,6 @@
 export interface FormSecurityBindings {
 	TURNSTILE_SECRET_KEY?: string;
+	FORM_CHALLENGE_SECRET?: string;
 	DRY_RUN?: string;
 	RESEND_API_KEY?: string;
 	RESEND_FROM_EMAIL?: string;
@@ -79,15 +80,24 @@ export async function checkFormSecurity(
 			logSecurityOutcome(request, "turnstile_rejected");
 			return 403;
 		}
-		const renderedAt = Number(body.formRenderedAt);
-		// Missing/invalid/future timestamps cannot bypass the time trap.
-		if (
-			!Number.isFinite(renderedAt) ||
-			renderedAt <= 0 ||
-			now - renderedAt < 3000
-		) {
+		const { validateFormChallenge } = await import("./formChallenge");
+		const challenge = await validateFormChallenge({
+			token: body.formChallenge,
+			secret: config.FORM_CHALLENGE_SECRET,
+			path: new URL(request.url).pathname,
+			now,
+		});
+		if (challenge === "unavailable") {
+			logSecurityOutcome(request, "unavailable");
+			return 503;
+		}
+		if (challenge === "too_young") {
 			logSecurityOutcome(request, "discarded_too_fast");
 			return 409;
+		}
+		if (challenge !== "valid") {
+			logSecurityOutcome(request, "challenge_rejected");
+			return 403;
 		}
 		try {
 			const response = await verifyFetch(

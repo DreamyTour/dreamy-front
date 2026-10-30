@@ -59,8 +59,11 @@ try {
     );
     let sent;
     let apiResponse = { status: 200, json: { success: true } };
+    await page.route("**/api/form-challenge**", (route) =>
+      route.fulfill({ json: { challenge: "browser-challenge", expiresAt: Date.now() + 1_800_000 } }),
+    );
     await page.route("**/api/**", (route) => {
-      if (route.request().method() !== "POST") return route.continue();
+      if (route.request().method() !== "POST") return route.fallback();
       sent = route.request().postDataJSON();
       return route.fulfill(apiResponse);
     });
@@ -70,6 +73,13 @@ try {
     await form
       .locator('[name="cf-turnstile-response"]')
       .waitFor({ state: "attached" });
+		await form.locator('[name="formChallenge"]').waitFor({ state: "attached" });
+		await page.waitForFunction(
+			() =>
+				Boolean(
+					document.querySelector('[name="formChallenge"]')?.value,
+				),
+		);
     assert.equal(
       await page.evaluate(() => window.__turnstileOptions.appearance),
       "interaction-only",
@@ -80,7 +90,8 @@ try {
     );
     assert.equal(await form.locator('[name="website"]').isVisible(), false);
     assert(
-      Number(await form.locator('[name="formRenderedAt"]').inputValue()) > 0,
+      await form.locator('[name="formChallenge"]').inputValue(),
+      "browser-challenge",
     );
     if (await form.locator('[name="detalle"]').count()) {
       await form.evaluate((element) =>
@@ -144,7 +155,7 @@ try {
     assert.equal(sent["cf-turnstile-response"], "browser-test-token");
     assert.equal(sent.website, "");
     assert.equal(sent.telefono, "+51987654321");
-    assert(Number(sent.formRenderedAt) > 0);
+    assert.equal(sent.formChallenge, "browser-challenge");
     const dialog = page.locator("dialog[open]");
     await dialog.waitFor({ state: "visible" });
     await page.keyboard.press("Escape");
@@ -193,8 +204,7 @@ try {
   }
 
   // Reproduce the production sequence with a controlled browser clock. A
-  // FORM_RETRY response must renew Turnstile only; replacing formRenderedAt
-  // would make every retry begin another three-second wait.
+  // FORM_RETRY renews Turnstile only; the Worker-issued challenge is preserved.
   const page = await browser.newPage();
   await page.clock.install({ time: new Date("2026-01-01T12:00:00.000Z") });
   await page.route(
@@ -214,12 +224,21 @@ try {
         : { status: 200, json: { success: true, id: "accepted-fixture" } },
     );
   });
+  await page.route("**/api/form-challenge**", (route) =>
+    route.fulfill({ json: { challenge: "retry-challenge", expiresAt: Date.now() + 1_800_000 } }),
+  );
   await page.goto("http://127.0.0.1:4331/es/libro-reclamaciones/");
   const form = page.locator('form[action="/api/libro-reclamaciones"]');
   await form
     .locator('[name="cf-turnstile-response"]')
     .waitFor({ state: "attached" });
-  const renderedAt = await form.locator('[name="formRenderedAt"]').inputValue();
+	await page.waitForFunction(
+		() =>
+			Boolean(
+				document.querySelector('[name="formChallenge"]')?.value,
+			),
+	);
+  const challenge = await form.locator('[name="formChallenge"]').inputValue();
   await form.locator('[name="nombres"]').fill("Maria Garcia");
   await form.locator('[name="pais"]').selectOption({ index: 1 });
   await form.locator('[name="ciudad"]').fill("Lima");
@@ -237,8 +256,8 @@ try {
   );
   await page.waitForFunction(() => document.querySelector("dialog[open]"));
   assert.equal(
-    await form.locator('[name="formRenderedAt"]').inputValue(),
-    renderedAt,
+    await form.locator('[name="formChallenge"]').inputValue(),
+    challenge,
   );
   await page.keyboard.press("Escape");
   await page.clock.fastForward(3_000);
@@ -249,9 +268,9 @@ try {
   );
   await page.waitForFunction(() => document.querySelector("dialog[open]"));
   assert.equal(attempts.length, 2);
-  assert.equal(String(attempts[0].formRenderedAt), renderedAt);
-  assert.equal(String(attempts[1].formRenderedAt), renderedAt);
-  console.log("PASS browser: retry keeps its original controlled timestamp");
+  assert.equal(String(attempts[0].formChallenge), challenge);
+  assert.equal(String(attempts[1].formChallenge), challenge);
+  console.log("PASS browser: retry keeps its Worker-issued challenge");
   await page.close();
 } finally {
   await browser.close();

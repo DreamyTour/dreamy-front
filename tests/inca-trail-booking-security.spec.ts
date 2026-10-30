@@ -154,7 +154,6 @@ const bookingCalendarTours = [
 function checkoutPayload(overrides = {}) {
 	return {
 		website: "",
-		formRenderedAt: Date.now() - 10_000,
 		"cf-turnstile-response": `e2e-fixture-${crypto.randomUUID()}`,
 		passengersInfo: [completePassenger, completePassenger],
 		contactInfo: completeContact,
@@ -168,6 +167,22 @@ function checkoutPayload(overrides = {}) {
 			lang: "en",
 		},
 		...overrides,
+	};
+}
+
+async function securedCheckoutPayload(
+	request: import("@playwright/test").APIRequestContext,
+	overrides = {},
+) {
+	const challenge = await request.get(
+		"/api/form-challenge?path=%2Fapi%2Fcheckout",
+	);
+	expect(challenge.ok()).toBeTruthy();
+	// The Worker, not the browser clock, enforces the three-second minimum.
+	await new Promise((resolve) => setTimeout(resolve, 3_000));
+	return {
+		...checkoutPayload(overrides),
+		formChallenge: (await challenge.json()).challenge,
 	};
 }
 
@@ -649,7 +664,7 @@ test("checkout API rejects client prices without an authoritative Strapi tour id
 }) => {
 	const response = await request.post("/api/checkout", {
 		headers: { "cf-connecting-ip": "192.0.2.11" },
-		data: checkoutPayload(),
+		data: await securedCheckoutPayload(request),
 	});
 
 	expect(response.status()).toBe(400);
@@ -662,7 +677,7 @@ test("checkout API rejects a child as the pre-booking holder", async ({
 }) => {
 	const response = await request.post("/api/checkout", {
 		headers: { "cf-connecting-ip": "192.0.2.12" },
-		data: checkoutPayload({
+		data: await securedCheckoutPayload(request, {
 			passengersInfo: [
 				{ ...completePassenger, dob: "2020-01-10" },
 				completePassenger,
@@ -686,8 +701,8 @@ test("checkout API rejects a child as the pre-booking holder", async ({
 test("checkout API rejects risky or incomplete booking payloads", async ({
 	request,
 }) => {
-	const invalidPayloads = [
-		checkoutPayload({
+	const invalidPayloads = await Promise.all([
+		securedCheckoutPayload(request, {
 			cart: {
 				quoteRequestId: "123e4567-e89b-42d3-a456-426614174000",
 				tourName: "Inca Trail 4 Days",
@@ -698,16 +713,16 @@ test("checkout API rejects risky or incomplete booking payloads", async ({
 				lang: "en",
 			},
 		}),
-		checkoutPayload({
+		securedCheckoutPayload(request, {
 			passengersInfo: [completePassenger],
 		}),
-		checkoutPayload({
+		securedCheckoutPayload(request, {
 			contactInfo: {
 				...completeContact,
 				email: "not-an-email",
 			},
 		}),
-		checkoutPayload({
+		securedCheckoutPayload(request, {
 			passengersInfo: [
 				{
 					...completePassenger,
@@ -716,7 +731,7 @@ test("checkout API rejects risky or incomplete booking payloads", async ({
 				completePassenger,
 			],
 		}),
-	];
+	]);
 
 	for (const payload of invalidPayloads) {
 		const response = await request.post("/api/checkout", {

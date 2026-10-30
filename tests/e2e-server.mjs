@@ -28,7 +28,7 @@ const server = new Miniflare({
   kvNamespaces: ["SESSION"],
   durableObjects: { FORM_RATE_LIMITER: { className: "FormRateLimiter", useSQLite: true } },
   fetchMock,
-  bindings: { DRY_RUN: "true", TURNSTILE_SECRET_KEY: "local-e2e-fixture-only" },
+  bindings: { DRY_RUN: "true", TURNSTILE_SECRET_KEY: "local-e2e-fixture-only", FORM_CHALLENGE_SECRET: "local-e2e-form-challenge-only" },
 });
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.once(signal, async () => { await server.dispose(); process.exit(0); });
