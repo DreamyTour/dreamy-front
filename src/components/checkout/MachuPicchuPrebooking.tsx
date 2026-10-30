@@ -66,8 +66,10 @@ export default function MachuPicchuPrebooking() {
 	const [reference, setReference] = useState("");
 	const requestId = useRef("");
 	const lastRequest = useRef("");
-	const autoPhonePrefix = useRef("");
 	const heading = useRef<HTMLHeadingElement>(null);
+	const holderCallingCode = countries
+		.find((country) => country.iso2 === travelers[0]?.country)
+		?.phoneCode.replace(/\D/g, "");
 	useEffect(() => {
 		try {
 			const value = JSON.parse(
@@ -110,25 +112,6 @@ export default function MachuPicchuPrebooking() {
 				i === index ? { ...traveler, [key]: value } : traveler,
 			),
 		);
-		if (index !== 0 || key !== "country") return;
-		const digits = countries
-			.find((country) => country.iso2 === value)
-			?.phoneCode.replace(/\D/g, "");
-		const nextPrefix = digits ? `+${digits}` : "";
-		const previousPrefix = autoPhonePrefix.current;
-		autoPhonePrefix.current = nextPrefix;
-		if (!nextPrefix) return;
-		setContact((current) => {
-			const phone = current.phone.trimStart();
-			if (!phone) return { ...current, phone: `${nextPrefix} ` };
-			if (previousPrefix && phone.startsWith(previousPrefix))
-				return {
-					...current,
-					phone: `${nextPrefix}${phone.slice(previousPrefix.length)}`,
-				};
-			if (phone.startsWith("+")) return current;
-			return { ...current, phone: `${nextPrefix} ${phone}` };
-		});
 	}
 	function payload(): Payload {
 		return {
@@ -179,7 +162,7 @@ export default function MachuPicchuPrebooking() {
 					...data,
 					contact: {
 						...data.contact,
-						phone: internationalPhone(data.contact.phone),
+						phone: internationalPhone(data.contact.phone, holderCallingCode),
 					},
 					...securityFields(securityForm.current),
 				}),
@@ -513,24 +496,38 @@ export default function MachuPicchuPrebooking() {
 													}
 												/>
 											</label>
-											<label className="text-xs font-medium text-gray-600">
-												Teléfono con código de país
-												<input
-													type="tel"
-													autoComplete="tel"
-													required
-													maxLength={30}
-													placeholder="+51 987 654 321"
-													className={fieldClass}
-													value={contact.phone}
-													onChange={(event) =>
-														setContact({
-															...contact,
-															phone: event.target.value,
-														})
-													}
-												/>
-											</label>
+											<div className="text-xs font-medium text-gray-600">
+												<span id="contact-phone-label">
+													Teléfono con código de país
+												</span>
+												<div className="mt-1.5 grid grid-cols-[5rem_minmax(0,1fr)] gap-2">
+													<input
+														aria-label="Código de país"
+														disabled
+														value={
+															holderCallingCode ? `+${holderCallingCode}` : ""
+														}
+														placeholder="+--"
+														className="h-11 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 text-sm text-gray-600 disabled:cursor-not-allowed"
+													/>
+													<input
+														type="tel"
+														autoComplete="tel"
+														aria-labelledby="contact-phone-label"
+														required
+														maxLength={30}
+														placeholder="987 654 321"
+														className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none focus:border-[#007020] focus:ring-2 focus:ring-[#007020]/15"
+														value={contact.phone}
+														onChange={(event) =>
+															setContact({
+																...contact,
+																phone: event.target.value,
+															})
+														}
+													/>
+												</div>
+											</div>
 										</div>
 									</div>
 								</>

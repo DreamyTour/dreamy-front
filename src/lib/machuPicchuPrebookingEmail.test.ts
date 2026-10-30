@@ -36,6 +36,8 @@ test("customer receipt includes selection and contact without claiming a confirm
 		expect(text).toContain(value);
 	expect(html).toContain("&lt;script&gt;");
 	expect(html).not.toContain("<script>");
+	expect(html).toContain('class="detail-column" width="50%"');
+	expect(html).toContain("@media only screen and (max-width:600px)");
 	expect(text).not.toContain("AB12345");
 	expect(text).not.toContain("1990-02-12");
 });
