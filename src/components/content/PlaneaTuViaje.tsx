@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Compass, MapPinned, ShieldCheck } from "lucide-react";
 import { type ChangeEvent, useRef, useState } from "react";
 import { countries } from "@/data/countries";
 import {
@@ -10,6 +10,7 @@ import {
 } from "../../lib/formSecurityClient";
 import FormResultModal, { type FormResult } from "../ui/FormResultModal";
 import FormSecurity from "../ui/FormSecurity";
+import { formClass, submitClass } from "../ui/formStyles";
 
 interface CountryOption {
 	nombre: string;
@@ -18,6 +19,13 @@ interface CountryOption {
 
 const i18n = {
 	es: {
+		planningEyebrow: "Diseña tu viaje a medida",
+		planningTitle: "Tu próxima gran historia empieza aquí.",
+		planningDescription:
+			"Comparte tu idea y crearemos una ruta que conecte tus tiempos, intereses y lugares soñados.",
+		highlightTailored: "Itinerario pensado para ti",
+		highlightLocal: "Asesoría local especializada",
+		highlightSafe: "Solicitud sin compromiso",
 		personalInfo: "INFORMACIÓN PERSONAL",
 		names: "Nombres",
 		namesPh: "Tu nombre completo",
@@ -62,6 +70,13 @@ const i18n = {
 		],
 	},
 	en: {
+		planningEyebrow: "Design your tailor-made trip",
+		planningTitle: "Your next great story starts here.",
+		planningDescription:
+			"Share your idea and we will create a route around your time, interests and dream places.",
+		highlightTailored: "An itinerary made for you",
+		highlightLocal: "Local expert guidance",
+		highlightSafe: "No-obligation request",
 		personalInfo: "PERSONAL INFORMATION",
 		names: "Full Name",
 		namesPh: "Your full name",
@@ -98,6 +113,13 @@ const i18n = {
 		hotelCatList: ["2 Stars", "3 Stars", "4 Stars", "5 Stars", "Not specified"],
 	},
 	pt: {
+		planningEyebrow: "Planeje uma viagem sob medida",
+		planningTitle: "Sua próxima grande história começa aqui.",
+		planningDescription:
+			"Conte sua ideia e criaremos uma rota para o seu tempo, interesses e lugares dos sonhos.",
+		highlightTailored: "Roteiro feito para você",
+		highlightLocal: "Assessoria local especializada",
+		highlightSafe: "Solicitação sem compromisso",
 		personalInfo: "INFORMAÇÃO PESSOAL",
 		names: "Nome Completo",
 		namesPh: "Seu nome completo",
@@ -289,13 +311,14 @@ export default function PlaneaTuViaje({
 	};
 
 	const inputStyle = {
-		backgroundColor: "rgba(255,255,255,0.88)",
+		backgroundColor: "#ffffff",
 	};
 
-	const buttonStyle = () => ({
-		background:
-			"linear-gradient(to right, var(--primary), oklch(0.6 0.15 148))",
-	});
+	const planningHighlights = [
+		{ icon: MapPinned, label: t.highlightTailored },
+		{ icon: Compass, label: t.highlightLocal },
+		{ icon: ShieldCheck, label: t.highlightSafe },
+	];
 
 	return (
 		<form
@@ -303,308 +326,328 @@ export default function PlaneaTuViaje({
 			action="/api/planea-tu-viaje"
 			method="post"
 			onSubmit={handleSubmit}
-			className="space-y-8 rounded-sm p-5  md:p-8"
+			className={formClass}
 		>
-			<div className="flex items-center gap-3 pb-5">
-				<div className="h-[2px] w-12 rounded-full bg-primary/70" />
-				<div className="h-px flex-1 bg-stone-200" />
-			</div>
-
-			{/* INFORMACION PERSONAL */}
-			<section className="bg-white rounded-sm p-5 shadow-[0_12px_32px_rgba(15,23,42,0.04)] md:p-6">
-				<div className="mb-5 flex items-end justify-between gap-4 pb-4">
-					<div>
-						<span className="mb-2 inline-flex text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-600">
-							01
-						</span>
-						<h2 className="text-lg font-semibold text-foreground">
-							{t.personalInfo}
-						</h2>
-					</div>
-					<div className="hidden h-px flex-1 bg-stone-100 md:block" />
+			<div className="border-b border-stone-200 pb-7">
+				<div className="relative max-w-2xl">
+					<p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-primary">
+						<Compass className="h-3.5 w-3.5" aria-hidden="true" />
+						{t.planningEyebrow}
+					</p>
+					<h2 className="font-heading text-2xl font-semibold leading-tight tracking-tight text-foreground md:text-3xl">
+						{t.planningTitle}
+					</h2>
+					<p className="mt-4 max-w-xl text-sm leading-6 text-stone-600 md:text-base">
+						{t.planningDescription}
+					</p>
 				</div>
 
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-					<div>
-						<label
-							htmlFor="nombres"
-							className="mb-2 block text-sm font-medium text-foreground"
+				<div className="relative mt-7 grid gap-2 sm:grid-cols-3">
+					{planningHighlights.map(({ icon: Icon, label }) => (
+						<div
+							key={label}
+							className="flex items-center gap-2.5 py-1 text-xs font-medium text-stone-600"
 						>
-							{t.names} <span className="text-secondary">*</span>
-						</label>
-						<input
-							id="nombres"
-							type="text"
-							name="nombres"
-							value={formData.nombres}
-							onChange={handleChange}
-							autoComplete="name"
-							enterKeyHint="next"
-							required
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-							placeholder={t.namesPh}
-						/>
-					</div>
+							<Icon
+								className="h-4 w-4 shrink-0 text-primary"
+								aria-hidden="true"
+							/>
+							<span>{label}</span>
+						</div>
+					))}
+				</div>
+			</div>
 
-					<div>
-						<label
-							htmlFor="pais"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.country} <span className="text-secondary">*</span>
-						</label>
-						<select
-							id="pais"
-							name="pais"
-							value={formData.pais}
-							onChange={(e) => handlePaisChange(e.target.value)}
-							autoComplete="country-name"
-							required
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
-						>
-							<option value="">{t.countryPh}</option>
-							{paises.map((pais) => (
-								<option key={pais.nombre} value={pais.nombre}>
-									{pais.nombre}
-								</option>
-							))}
-						</select>
-					</div>
-
-					<div>
-						<label
-							htmlFor="email"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.email} <span className="text-secondary">*</span>
-						</label>
-						<input
-							id="email"
-							type="email"
-							name="email"
-							value={formData.email}
-							onChange={handleChange}
-							autoComplete="email"
-							inputMode="email"
-							enterKeyHint="next"
-							required
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-							placeholder={t.emailPh}
-						/>
-					</div>
-
-					<div>
-						<label
-							htmlFor="telefono"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.whatsapp}
-						</label>
-						<div className="flex overflow-hidden rounded-sm shadow-sm">
-							<span className="flex items-center border border-r-0 border-border px-4 py-3 text-sm font-medium bg-muted text-foreground">
-								+{codigoPais || "51"}
+			<div className="space-y-8 pt-7">
+				{/* INFORMACION PERSONAL */}
+				<section className="space-y-5">
+					<div className="mb-5 flex items-end justify-between gap-4 border-b border-stone-200 pb-4">
+						<div>
+							<span className="mb-2 inline-flex text-[11px] font-bold uppercase tracking-[0.3em] text-primary">
+								01
 							</span>
-							<input
-								id="telefono"
-								type="tel"
-								name="telefono"
-								value={formData.telefono}
-								onChange={handleChange}
-								autoComplete="tel-national"
-								inputMode="tel"
-								enterKeyHint="next"
-								style={{
-									...inputStyle,
-									borderLeft: "none",
-									borderTopLeftRadius: 0,
-									borderBottomLeftRadius: 0,
-								}}
-								className="w-full rounded-r-sm border border-border px-4 py-3 text-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-								placeholder="999 999 999"
-							/>
+							<h2 className="text-lg font-semibold text-foreground">
+								{t.personalInfo}
+							</h2>
 						</div>
 					</div>
-				</div>
-			</section>
 
-			{/* DETALLES DEL VIAJE */}
-			<section className="bg-white/80 rounded-sm p-5 shadow-[0_12px_32px_rgba(15,23,42,0.04)] md:p-6">
-				<div className="mb-5 flex items-end justify-between gap-4 pb-4">
-					<div>
-						<span className="mb-2 inline-flex text-[11px] font-semibold uppercase tracking-[0.3em] text-stone-600">
-							02
-						</span>
-						<h2 className="text-lg font-semibold text-foreground">
-							{t.tripDetails}
-						</h2>
-					</div>
-					<div className="hidden h-px flex-1 bg-stone-100 md:block" />
-				</div>
-
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-					<div>
-						<label
-							htmlFor="adultos"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.adults}
-						</label>
-						<input
-							id="adultos"
-							type="number"
-							name="adultos"
-							value={formData.adultos}
-							onChange={handleChange}
-							inputMode="numeric"
-							min="1"
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
-						/>
-					</div>
-
-					<div>
-						<label
-							htmlFor="menores"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.minors}
-						</label>
-						<input
-							id="menores"
-							type="number"
-							name="menores"
-							value={formData.menores}
-							onChange={handleChange}
-							inputMode="numeric"
-							min="0"
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
-						/>
-					</div>
-
-					<div>
-						<label
-							htmlFor="fechaViaje"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.date}
-						</label>
-						<div className="relative">
-							<input
-								ref={dateInputRef}
-								id="fechaViaje"
-								type="date"
-								name="fechaViaje"
-								value={formData.fechaViaje}
-								onChange={handleChange}
-								min={todayDateValue}
-								style={inputStyle}
-								className="w-full cursor-text rounded-sm border border-border px-4 py-3 pr-12 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15 [&::-webkit-calendar-picker-indicator]:hidden"
-							/>
-							<button
-								type="button"
-								onClick={openDatePicker}
-								aria-label={t.date}
-								className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-sm text-primary transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+					<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+						<div>
+							<label
+								htmlFor="nombres"
+								className="mb-2 block text-sm font-medium text-foreground"
 							>
-								<CalendarDays className="h-5 w-5" aria-hidden="true" />
-							</button>
+								{t.names} <span className="text-secondary">*</span>
+							</label>
+							<input
+								id="nombres"
+								type="text"
+								name="nombres"
+								value={formData.nombres}
+								onChange={handleChange}
+								autoComplete="name"
+								enterKeyHint="next"
+								required
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+								placeholder={t.namesPh}
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor="pais"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.country} <span className="text-secondary">*</span>
+							</label>
+							<select
+								id="pais"
+								name="pais"
+								value={formData.pais}
+								onChange={(e) => handlePaisChange(e.target.value)}
+								autoComplete="country-name"
+								required
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+							>
+								<option value="">{t.countryPh}</option>
+								{paises.map((pais) => (
+									<option key={pais.nombre} value={pais.nombre}>
+										{pais.nombre}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div>
+							<label
+								htmlFor="email"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.email} <span className="text-secondary">*</span>
+							</label>
+							<input
+								id="email"
+								type="email"
+								name="email"
+								value={formData.email}
+								onChange={handleChange}
+								autoComplete="email"
+								inputMode="email"
+								enterKeyHint="next"
+								required
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+								placeholder={t.emailPh}
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor="telefono"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.whatsapp}
+							</label>
+							<div className="flex overflow-hidden rounded-lg shadow-sm">
+								<span className="flex items-center border border-r-0 border-border px-4 py-3 text-sm font-medium bg-white text-foreground">
+									+{codigoPais || "51"}
+								</span>
+								<input
+									id="telefono"
+									type="tel"
+									name="telefono"
+									value={formData.telefono}
+									onChange={handleChange}
+									autoComplete="tel-national"
+									inputMode="tel"
+									enterKeyHint="next"
+									style={{
+										...inputStyle,
+										borderLeft: "none",
+										borderTopLeftRadius: 0,
+										borderBottomLeftRadius: 0,
+									}}
+									className="w-full rounded-r-lg border border-border px-4 py-3 text-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+									placeholder="999 999 999"
+								/>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				{/* DETALLES DEL VIAJE */}
+				<section className="space-y-5">
+					<div className="mb-5 flex items-end justify-between gap-4 border-b border-stone-200 pb-4">
+						<div>
+							<span className="mb-2 inline-flex text-[11px] font-bold uppercase tracking-[0.3em] text-primary">
+								02
+							</span>
+							<h2 className="text-lg font-semibold text-foreground">
+								{t.tripDetails}
+							</h2>
 						</div>
 					</div>
 
-					<div>
-						<label
-							htmlFor="idioma"
-							className="mb-2 block text-sm font-medium text-foreground"
-						>
-							{t.langGuide}
-						</label>
-						<select
-							id="idioma"
-							name="idioma"
-							value={formData.idioma}
-							onChange={handleChange}
-							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
-						>
-							{idiomasList.map((idioma) => (
-								<option key={idioma} value={idioma}>
-									{idioma}
-								</option>
-							))}
-						</select>
+					<div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+						<div>
+							<label
+								htmlFor="adultos"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.adults}
+							</label>
+							<input
+								id="adultos"
+								type="number"
+								name="adultos"
+								value={formData.adultos}
+								onChange={handleChange}
+								inputMode="numeric"
+								min="1"
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor="menores"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.minors}
+							</label>
+							<input
+								id="menores"
+								type="number"
+								name="menores"
+								value={formData.menores}
+								onChange={handleChange}
+								inputMode="numeric"
+								min="0"
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+							/>
+						</div>
+
+						<div>
+							<label
+								htmlFor="fechaViaje"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.date}
+							</label>
+							<div className="relative">
+								<input
+									ref={dateInputRef}
+									id="fechaViaje"
+									type="date"
+									name="fechaViaje"
+									value={formData.fechaViaje}
+									onChange={handleChange}
+									min={todayDateValue}
+									style={inputStyle}
+									className="w-full cursor-text rounded-lg border border-border px-4 py-3 pr-12 text-base shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15 [&::-webkit-calendar-picker-indicator]:hidden"
+								/>
+								<button
+									type="button"
+									onClick={openDatePicker}
+									aria-label={t.date}
+									className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-lg text-primary transition-colors hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/25"
+								>
+									<CalendarDays className="h-5 w-5" aria-hidden="true" />
+								</button>
+							</div>
+						</div>
+
+						<div>
+							<label
+								htmlFor="idioma"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.langGuide}
+							</label>
+							<select
+								id="idioma"
+								name="idioma"
+								value={formData.idioma}
+								onChange={handleChange}
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+							>
+								{idiomasList.map((idioma) => (
+									<option key={idioma} value={idioma}>
+										{idioma}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div>
+							<label
+								htmlFor="categoriaHotel"
+								className="mb-2 block text-sm font-medium text-foreground"
+							>
+								{t.hotelCat}
+							</label>
+							<select
+								id="categoriaHotel"
+								name="categoriaHotel"
+								value={formData.categoriaHotel}
+								onChange={handleChange}
+								style={inputStyle}
+								className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+							>
+								{t.hotelCatList.map((cat) => (
+									<option key={cat} value={cat}>
+										{cat}
+									</option>
+								))}
+							</select>
+						</div>
 					</div>
 
-					<div>
+					{/* Mensaje */}
+					<div className="mt-5">
 						<label
-							htmlFor="categoriaHotel"
+							htmlFor="mensaje"
 							className="mb-2 block text-sm font-medium text-foreground"
 						>
-							{t.hotelCat}
+							{t.messageLabel}
 						</label>
-						<select
-							id="categoriaHotel"
-							name="categoriaHotel"
-							value={formData.categoriaHotel}
+						<textarea
+							id="mensaje"
+							name="mensaje"
+							value={formData.mensaje}
 							onChange={handleChange}
+							enterKeyHint="send"
+							rows={4}
 							style={inputStyle}
-							className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
-						>
-							{t.hotelCatList.map((cat) => (
-								<option key={cat} value={cat}>
-									{cat}
-								</option>
-							))}
-						</select>
+							className="w-full rounded-lg border border-border px-4 py-3 text-base shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+							placeholder={t.messagePh}
+						></textarea>
 					</div>
-				</div>
+				</section>
 
-				{/* Mensaje */}
-				<div className="mt-5">
-					<label
-						htmlFor="mensaje"
-						className="mb-2 block text-sm font-medium text-foreground"
-					>
-						{t.messageLabel}
-					</label>
-					<textarea
-						id="mensaje"
-						name="mensaje"
-						value={formData.mensaje}
-						onChange={handleChange}
-						enterKeyHint="send"
-						rows={4}
-						style={inputStyle}
-						className="w-full rounded-sm border border-border px-4 py-3 text-sm shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
-						placeholder={t.messagePh}
-					></textarea>
+				<div className="pt-1">
+					<button type="submit" disabled={isSubmitting} className={submitClass}>
+						{isSubmitting ? t.sending : t.submitText}
+					</button>
 				</div>
-			</section>
-
-			<div className="pt-2">
-				<button
-					type="submit"
-					disabled={isSubmitting}
-					style={buttonStyle()}
-					className="w-full rounded-sm px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-primary-foreground transition-all shadow-[0_18px_36px_rgba(15,23,42,0.14)] hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(15,23,42,0.18)] disabled:cursor-not-allowed disabled:opacity-75"
-				>
-					{isSubmitting ? t.sending : t.submitText}
-				</button>
+				<FormSecurity lang={lang} />
+				<FormResultModal
+					result={modalResult}
+					onClose={() => setModalResult(null)}
+					messages={{
+						successTitle: t.modalSuccessTitle,
+						errorTitle: t.modalErrorTitle,
+						retryTitle: t.modalRetryTitle,
+						closeLabel: t.modalClose,
+					}}
+				/>
 			</div>
-			<FormSecurity lang={lang} />
-			<FormResultModal
-				result={modalResult}
-				onClose={() => setModalResult(null)}
-				messages={{
-					successTitle: t.modalSuccessTitle,
-					errorTitle: t.modalErrorTitle,
-					retryTitle: t.modalRetryTitle,
-					closeLabel: t.modalClose,
-				}}
-			/>
 		</form>
 	);
 }

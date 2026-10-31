@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { getImageUrl } from "@/lib/helpers";
 import type { Lang } from "@/lib/i18n";
+import { localizePath } from "@/lib/i18n";
 import { cn, rewriteUrl } from "@/lib/utils";
 import type { Link, MenuItem, Menu as MenuType } from "@/types/global";
 
@@ -49,11 +50,13 @@ const megaMenuCopy: Record<
 		featured: string;
 		viewAll: string;
 		viewMore: string;
+		home: string;
 		trust: [string, string, string, string];
 		trustDetails: [string, string, string, string];
 	}
 > = {
 	es: {
+		home: "Dreamy Tours - Inicio",
 		navigation: "Menú principal",
 		routes: "RUTAS DESTACADAS",
 		featured: "EXPERIENCIA DREAMY",
@@ -73,6 +76,7 @@ const megaMenuCopy: Record<
 		],
 	},
 	en: {
+		home: "Dreamy Tours - Home",
 		navigation: "Main navigation",
 		routes: "FEATURED ROUTES",
 		featured: "A DREAMY EXPERIENCE",
@@ -92,6 +96,7 @@ const megaMenuCopy: Record<
 		],
 	},
 	pt: {
+		home: "Dreamy Tours - Início",
 		navigation: "Navegação principal",
 		routes: "ROTEIROS EM DESTAQUE",
 		featured: "EXPERIÊNCIA DREAMY",
@@ -266,7 +271,7 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 		topLevelClass,
 		"desktop-nav-item",
 		isSticky &&
-			"text-white hover:text-white focus-visible:ring-white/70 focus-visible:ring-offset-primary before:bg-white/75 data-[state=open]:text-white",
+			"text-[13px] xl:px-2 2xl:px-3 2xl:text-[14px] text-white hover:text-white focus-visible:ring-white/70 focus-visible:ring-offset-primary before:bg-white/75 data-[state=open]:text-white",
 	);
 
 	useEffect(() => {
@@ -341,6 +346,25 @@ export default function DesktopMenu({ menu, lang, overlay = false }: Props) {
 						aria-label={copy.navigation}
 					>
 						<NavigationMenuList className="h-[58px] w-full justify-between gap-0 px-1">
+							{isSticky && (
+								<NavigationMenuItem className="shrink-0">
+									<NavigationMenuLink asChild>
+										<a
+											href={localizePath("/", lang)}
+											aria-label={copy.home}
+											className="mx-1 flex h-11 items-center rounded-md px-2 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+										>
+											<img
+												src="/logo-dt.webp"
+												alt="Dreamy Tours"
+												width={400}
+												height={125}
+												className="h-8 w-auto"
+											/>
+										</a>
+									</NavigationMenuLink>
+								</NavigationMenuItem>
+							)}
 							{menu?.menuItems?.map((item: MenuItem) => {
 								const hasChildren = Boolean(item.item?.length);
 								const isPeruTours =

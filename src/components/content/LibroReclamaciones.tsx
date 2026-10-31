@@ -10,10 +10,11 @@ import {
 import type { ComplaintValidationField } from "../../lib/formValidation";
 import FormResultModal, { type FormResult } from "../ui/FormResultModal";
 import FormSecurity from "../ui/FormSecurity";
+import { formClass, submitClass } from "../ui/formStyles";
 
 // Colores del theme (definidos en global.css)
 const colors = {
-	primary: "oklch(0.66 0.18 148)",
+	primary: "var(--primary)",
 	secondary: "oklch(0.62 0.22 20)",
 	primaryForeground: "#ffffff",
 	muted: "oklch(0.92 0.02 240)",
@@ -23,7 +24,9 @@ const colors = {
 
 const complaintCopy = {
 	es: {
-		consumerTitle: "IDENTIFICACI\u00d3N DEL CONSUMIDOR RECLAMANTE",
+		consumerTitle: "Tus datos personales",
+		consumerHelp:
+			"Completa tus datos para que podamos identificarte y contactarte. Los campos con * son obligatorios.",
 		fullName: "Nombres",
 		fullNamePlaceholder: "Ingrese sus nombres completos",
 		country: "Pa\u00eds",
@@ -40,7 +43,12 @@ const complaintCopy = {
 		yes: "S\u00ed",
 		guardian: "Datos del padre, madre o apoderado",
 		guardianPlaceholder: "Nombre completo del padre, madre o apoderado",
-		claimTitle: "MANIFIESTO DEL CONSUMIDOR RECLAMANTE",
+		claimTitle: "Cu\u00e9ntanos qu\u00e9 ocurri\u00f3",
+		claimHelp:
+			"Selecciona reclamo o queja y describe lo ocurrido, el servicio y la soluci\u00f3n que solicitas.",
+		reviewTitle: "Revisa y env\u00eda",
+		reviewHelp:
+			"Comprueba tus datos y el detalle antes de enviar. Al finalizar, ver\u00e1s una confirmaci\u00f3n si el env\u00edo se complet\u00f3.",
 		type: "Tipo",
 		claim: "Reclamo",
 		complaint: "Queja",
@@ -54,7 +62,7 @@ const complaintCopy = {
 		submitting: "Enviando...",
 		sent: "Enviado exitosamente",
 		sendFailed: "Error al enviar",
-		submit: "Enviar",
+		submit: "Enviar reclamaci\u00f3n",
 		confirmationTitle: "Reclamación enviada",
 		confirm: "Aceptar",
 		errorTitle: "No pudimos confirmar el envío",
@@ -76,7 +84,9 @@ const complaintCopy = {
 		},
 	},
 	en: {
-		consumerTitle: "CLAIMANT CONSUMER IDENTIFICATION",
+		consumerTitle: "Your personal details",
+		consumerHelp:
+			"Enter your details so we can identify and contact you. Fields marked * are required.",
 		fullName: "Full name",
 		fullNamePlaceholder: "Enter your full name",
 		country: "Country",
@@ -93,7 +103,12 @@ const complaintCopy = {
 		yes: "Yes",
 		guardian: "Parent or guardian details",
 		guardianPlaceholder: "Full name of parent or guardian",
-		claimTitle: "CLAIMANT CONSUMER STATEMENT",
+		claimTitle: "Tell us what happened",
+		claimHelp:
+			"Choose a claim or complaint and describe what happened, the service and your requested resolution.",
+		reviewTitle: "Review and submit",
+		reviewHelp:
+			"Check your details and description before submitting. A confirmation will appear if your submission is successful.",
 		type: "Type",
 		claim: "Claim",
 		complaint: "Complaint",
@@ -107,7 +122,7 @@ const complaintCopy = {
 		submitting: "Sending...",
 		sent: "Sent successfully",
 		sendFailed: "Error sending",
-		submit: "Submit",
+		submit: "Submit complaint",
 		confirmationTitle: "Complaint submitted",
 		confirm: "Accept",
 		errorTitle: "We could not confirm the submission",
@@ -128,7 +143,9 @@ const complaintCopy = {
 		},
 	},
 	pt: {
-		consumerTitle: "IDENTIFICA\u00c7\u00c3O DO CONSUMIDOR RECLAMANTE",
+		consumerTitle: "Seus dados pessoais",
+		consumerHelp:
+			"Preencha seus dados para que possamos identificar e contatar voc\u00ea. Os campos com * s\u00e3o obrigat\u00f3rios.",
 		fullName: "Nome completo",
 		fullNamePlaceholder: "Digite seu nome completo",
 		country: "Pa\u00eds",
@@ -145,7 +162,12 @@ const complaintCopy = {
 		yes: "Sim",
 		guardian: "Dados do pai, m\u00e3e ou respons\u00e1vel",
 		guardianPlaceholder: "Nome completo do pai, m\u00e3e ou respons\u00e1vel",
-		claimTitle: "MANIFESTO DO CONSUMIDOR RECLAMANTE",
+		claimTitle: "Conte o que aconteceu",
+		claimHelp:
+			"Selecione reclama\u00e7\u00e3o ou queixa e descreva o ocorrido, o servi\u00e7o e a solu\u00e7\u00e3o que deseja.",
+		reviewTitle: "Revise e envie",
+		reviewHelp:
+			"Confira seus dados e a descri\u00e7\u00e3o antes de enviar. Uma confirma\u00e7\u00e3o aparecer\u00e1 se o envio for conclu\u00eddo.",
 		type: "Tipo",
 		claim: "Reclama\u00e7\u00e3o",
 		complaint: "Queixa",
@@ -160,7 +182,7 @@ const complaintCopy = {
 		submitting: "Enviando...",
 		sent: "Enviado com sucesso",
 		sendFailed: "Erro ao enviar",
-		submit: "Enviar",
+		submit: "Enviar reclama\u00e7\u00e3o",
 		confirmationTitle: "Reclamação enviada",
 		confirm: "Aceitar",
 		errorTitle: "Não foi possível confirmar o envio",
@@ -396,12 +418,8 @@ export default function LibroReclamaciones({
 		}
 	};
 
-	const buttonStyle = () => ({
-		background: `linear-gradient(to right, ${colors.primary}, oklch(0.6 0.15 148))`,
-		color: colors.primaryForeground,
-	});
-
 	const inputStyle = {
+		backgroundColor: "#ffffff",
 		borderColor: colors.border,
 		color: colors.foreground,
 	};
@@ -424,6 +442,26 @@ export default function LibroReclamaciones({
 			</p>
 		) : null;
 
+	const stepHeading = (number: number, title: string, description: string) => (
+		<div className="mb-6 flex items-start gap-3 sm:gap-4">
+			<span
+				aria-hidden="true"
+				className="flex size-9 shrink-0 items-center justify-center rounded-full border border-primary/30 text-sm font-semibold text-primary"
+			>
+				{number}
+			</span>
+			<div className="min-w-0">
+				<h2 className="text-lg font-semibold leading-9 text-foreground">
+					<span className="sr-only">{number}. </span>
+					{title}
+				</h2>
+				<p className="mt-1 max-w-2xl text-sm leading-6 text-stone-600">
+					{description}
+				</p>
+			</div>
+		</div>
+	);
+
 	return (
 		<form
 			ref={securityForm}
@@ -431,16 +469,11 @@ export default function LibroReclamaciones({
 			method="post"
 			onSubmit={handleSubmit}
 			noValidate
-			className="space-y-6"
+			className={`${formClass} space-y-8`}
 		>
 			{/* Consumer identification */}
 			<div>
-				<h2
-					className="text-lg font-semibold mb-4"
-					style={{ color: colors.foreground }}
-				>
-					{copy.consumerTitle}
-				</h2>
+				{stepHeading(1, copy.consumerTitle, copy.consumerHelp)}
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div className="md:col-span-2">
@@ -462,7 +495,7 @@ export default function LibroReclamaciones({
 							required
 							{...fieldAria("nombres")}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 							placeholder={copy.fullNamePlaceholder}
 						/>
 						{renderFieldError("nombres")}
@@ -485,7 +518,7 @@ export default function LibroReclamaciones({
 							required
 							{...fieldAria("pais")}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all bg-white"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow] bg-white"
 						>
 							<option value="">{copy.countryPlaceholder}</option>
 							{sortedCountries.map((country) => (
@@ -519,7 +552,7 @@ export default function LibroReclamaciones({
 							required
 							{...fieldAria("ciudad")}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 							placeholder={copy.cityPlaceholder}
 						/>
 						{renderFieldError("ciudad")}
@@ -544,7 +577,7 @@ export default function LibroReclamaciones({
 							required
 							{...fieldAria("documento")}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 							placeholder={copy.documentPlaceholder}
 						/>
 						{renderFieldError("documento")}
@@ -570,7 +603,7 @@ export default function LibroReclamaciones({
 							required
 							{...fieldAria("email")}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 							placeholder="correo@ejemplo.com"
 						/>
 						{renderFieldError("email")}
@@ -596,7 +629,7 @@ export default function LibroReclamaciones({
 								autoComplete="tel-country-code"
 								aria-label={copy.phoneCode}
 								style={inputStyle}
-								className="border border-r-0 px-3 py-3 text-sm focus:ring-2"
+								className="border border-r-0 px-3 py-3 text-base outline-none focus:ring-2 focus:ring-primary/20"
 							>
 								<option value="">+--</option>
 								{callingCodes.map((code) => (
@@ -621,7 +654,7 @@ export default function LibroReclamaciones({
 									borderTopLeftRadius: 0,
 									borderBottomLeftRadius: 0,
 								}}
-								className="w-full px-4 py-3 border rounded-r-lg focus:ring-2 transition-all"
+								className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-r-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 								placeholder="999 999 999"
 							/>
 						</div>
@@ -689,7 +722,7 @@ export default function LibroReclamaciones({
 							required={formData.menorEdad === "si"}
 							{...fieldAria("datosApoderado")}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 							placeholder={copy.guardianPlaceholder}
 						/>
 						{renderFieldError("datosApoderado")}
@@ -698,13 +731,8 @@ export default function LibroReclamaciones({
 			</div>
 
 			{/* Claim statement */}
-			<div>
-				<h2
-					className="text-lg font-semibold mb-4 pt-4 border-t"
-					style={{ color: colors.foreground, borderColor: colors.border }}
-				>
-					{copy.claimTitle}
-				</h2>
+			<div className="border-t border-stone-200 pt-8">
+				{stepHeading(2, copy.claimTitle, copy.claimHelp)}
 
 				<div className="space-y-6">
 					<div>
@@ -715,18 +743,15 @@ export default function LibroReclamaciones({
 						>
 							{copy.type} <span className="text-secondary">*</span>
 						</label>
-						<div className="flex gap-6 mt-2">
+						<div className="flex flex-wrap gap-3 mt-2">
 							<label
-								className="inline-flex items-center p-4 border rounded-lg cursor-pointer transition-all"
+								className="inline-flex items-center px-4 py-3 bg-white border rounded-lg cursor-pointer transition-all"
 								style={{
 									borderColor:
 										formData.tipo === "reclamo"
 											? colors.primary
 											: colors.border,
-									backgroundColor:
-										formData.tipo === "reclamo"
-											? `${colors.primary}10`
-											: "transparent",
+									backgroundColor: "#ffffff",
 								}}
 							>
 								<input
@@ -747,14 +772,11 @@ export default function LibroReclamaciones({
 								</span>
 							</label>
 							<label
-								className="inline-flex items-center p-4 border rounded-lg cursor-pointer transition-all"
+								className="inline-flex items-center px-4 py-3 bg-white border rounded-lg cursor-pointer transition-all"
 								style={{
 									borderColor:
 										formData.tipo === "queja" ? colors.primary : colors.border,
-									backgroundColor:
-										formData.tipo === "queja"
-											? `${colors.primary}10`
-											: "transparent",
+									backgroundColor: "#ffffff",
 								}}
 							>
 								<input
@@ -796,7 +818,7 @@ export default function LibroReclamaciones({
 							{...fieldAria("detalle")}
 							rows={6}
 							style={inputStyle}
-							className="w-full px-4 py-3 border rounded-lg focus:ring-2 transition-all"
+							className="w-full min-w-0 bg-white px-4 py-3 text-base shadow-sm border rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
 							placeholder={copy.detailPlaceholder}
 						></textarea>
 						{renderFieldError("detalle")}
@@ -804,13 +826,9 @@ export default function LibroReclamaciones({
 				</div>
 			</div>
 
-			<div className="mt-8">
-				<button
-					type="submit"
-					disabled={isSubmitting}
-					style={buttonStyle()}
-					className={`w-full font-bold py-4 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-75 disabled:cursor-not-allowed`}
-				>
+			<div className="border-t border-stone-200 pt-8">
+				{stepHeading(3, copy.reviewTitle, copy.reviewHelp)}
+				<button type="submit" disabled={isSubmitting} className={submitClass}>
 					{isSubmitting ? copy.submitting : copy.submit}
 				</button>
 			</div>
