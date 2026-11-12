@@ -24,6 +24,12 @@ import {
 	transportLabels,
 } from "@/lib/tour-map-transport";
 import {
+	ROUTE_PROTOCOL,
+	type RouteEditorIdentity,
+	routeContent,
+	sameRouteIdentity,
+} from "@/lib/tour-route-contract";
+import {
 	geometryMatchesEndpoints,
 	normalizeRoutePlace,
 	normalizeTourRoutePlan,
@@ -32,6 +38,13 @@ import {
 	routePlanVisits,
 	type TourRoutePlan,
 } from "@/lib/tour-route-plan";
+import {
+	affectedGeometries,
+	geometryNeedsReview,
+	preserveRouteGeometries,
+	routeDistanceMetres,
+	routeGpx,
+} from "@/lib/tour-route-safety";
 import TransportRoute from "./TransportRoute";
 
 const empty: TourRoutePlan = { version: 1, start: null, legs: [] };
@@ -40,10 +53,16 @@ const input =
 const button =
 	"inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-green-700";
 type Target = "start" | string;
-function ClickDestination({ onPick }: { onPick: (place: RoutePlace) => void }) {
+function ClickDestination({
+	onPick,
+	enabled,
+}: {
+	onPick: (place: RoutePlace) => void;
+	enabled: boolean;
+}) {
 	const { map } = useMap();
 	useEffect(() => {
-		if (!map) return;
+		if (!map || !enabled) return;
 		const pick = (event: { lngLat: { lng: number; lat: number } }) =>
 			onPick({
 				label: "Punto elegido en el mapa",
@@ -56,7 +75,7 @@ function ClickDestination({ onPick }: { onPick: (place: RoutePlace) => void }) {
 		return () => {
 			map.off("click", pick);
 		};
-	}, [map, onPick]);
+	}, [map, onPick, enabled]);
 	return null;
 }
 
@@ -74,12 +93,29 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 	const [searching, setSearching] = useState(false);
 	const [busy, setBusy] = useState(false);
 	const [notice, setNotice] = useState("");
+	const [changingLocation, setChangingLocation] = useState(false);
+	const [persistence, setPersistence] = useState<"pending" | "saved" | "error">(
+		"pending",
+	);
+	const [invalidPlan, setInvalidPlan] = useState(false);
+	const [pendingChange, setPendingChange] = useState<{
+		plan: TourRoutePlan;
+		revision: number;
+		count: number;
+	} | null>(null);
+	const confirmation = useRef<HTMLDialogElement>(null);
+	const identity = useRef<RouteEditorIdentity | null>(null);
+	const revision = useRef(0);
+	const parentSequence = useRef(-1);
+	const operation = useRef(0);
+	const persistedContent = useRef<string | null>(null);
 	const [statuses, setStatuses] = useState<Record<string, string>>({});
 	const map = useRef<LibreMap | null>(null);
 	const request = useRef<AbortController | null>(null);
 	const latest = useRef(plan);
 	latest.current = plan;
-	const disabled = readonly || busy;
+	const disabled =
+		readonly || busy || invalidPlan || (!connected && !standalone);
 	const start = inherited ?? plan.start;
 	const fitRoute = () => {
 		const points = [
@@ -102,22 +138,51 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		map.current?.fitBounds(bounds, { padding: 35, maxZoom: 13, duration: 500 });
 	};
 	const segments = routePlanSegments(plan, inherited);
-	const publish = useCallback(
+	const commit = useCallback(
 		(next: TourRoutePlan) => {
+			next = preserveRouteGeometries(latest.current, {
+				...next,
+				start: inherited ?? next.start,
+			});
+			if (!next.dayId)
+				next.dayId = identity.current?.dayKey ?? crypto.randomUUID();
+			revision.current++;
 			latest.current = next;
 			setPlan(next);
+			setPersistence("pending");
 			setStatuses({});
 			if (window.parent !== window)
 				window.parent.postMessage(
 					{
 						type: "dreamy-route-change",
-						value: next.legs.length || next.start ? next : null,
+						protocol: ROUTE_PROTOCOL,
+						identity: identity.current,
+						sequence: revision.current,
+						value: next,
 					},
 					cmsOrigin,
 				);
 		},
-		[cmsOrigin],
+		[cmsOrigin, inherited],
 	);
+	const publish = useCallback(
+		(next: TourRoutePlan) => {
+			const count = affectedGeometries(
+				{ ...latest.current, start: inherited ?? latest.current.start },
+				{ ...next, start: inherited ?? next.start },
+			);
+			if (count) {
+				setPendingChange({ plan: next, revision: revision.current, count });
+				return false;
+			}
+			commit(next);
+			return true;
+		},
+		[commit, inherited],
+	);
+	useEffect(() => {
+		if (pendingChange) confirmation.current?.showModal();
+	}, [pendingChange]);
 	useEffect(() => {
 		setStandalone(window.parent === window);
 		const receive = (event: MessageEvent) => {
@@ -127,7 +192,57 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 				event.data?.type !== "dreamy-route-init"
 			)
 				return;
-			const value = normalizeTourRoutePlan(event.data.value) ?? empty;
+			if (event.data.protocol !== ROUTE_PROTOCOL || !event.data.identity) {
+				setInvalidPlan(true);
+				setNotice(
+					"Actualiza el panel del CMS: esta versión necesita el protocolo seguro del editor.",
+				);
+				return;
+			}
+			const same = sameRouteIdentity(identity.current, event.data.identity);
+			if (identity.current && !same) return; // A different day/session needs a fresh iframe.
+			if (
+				!Number.isSafeInteger(event.data.sequence) ||
+				!Number.isSafeInteger(event.data.ackSequence)
+			)
+				return;
+			if (same && event.data.sequence <= parentSequence.current) return;
+			if (same && event.data.ackSequence < revision.current) return;
+			const value =
+				event.data.value == null
+					? empty
+					: normalizeTourRoutePlan(event.data.value);
+			if (!value) {
+				setInvalidPlan(true);
+				setNotice(
+					"El recorrido guardado contiene datos inválidos. Se conserva el original; no lo reemplaces por un plan vacío.",
+				);
+				return;
+			}
+			const incoming = routeContent(value);
+			const current = routeContent(latest.current);
+			if (
+				same &&
+				revision.current > 0 &&
+				incoming !== current &&
+				persistedContent.current !== current
+			) {
+				setPersistence("error");
+				setNotice(
+					"Conflicto: llegó otra versión. Tus cambios siguen en el editor; vuelve a abrir el documento después de descargarlos.",
+				);
+				return;
+			}
+			identity.current = event.data.identity;
+			parentSequence.current = event.data.sequence;
+			if (!same) revision.current = event.data.ackSequence ?? 0;
+			request.current?.abort();
+			operation.current++;
+			setBusy(false);
+			if (!same || event.data.disabled || incoming !== current)
+				setChangingLocation(false);
+			setPendingChange(null);
+			setInvalidPlan(false);
 			setPlan(value);
 			latest.current = value;
 			setInherited(normalizeRoutePlace(event.data.inheritedStart));
@@ -139,9 +254,16 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 			);
 			setReadonly(Boolean(event.data.disabled));
 			setConnected(true);
+			if (event.data.persisted) {
+				persistedContent.current = incoming;
+				setPersistence("saved");
+			} else setPersistence("pending");
 		};
 		window.addEventListener("message", receive);
-		window.parent.postMessage({ type: "dreamy-route-ready" }, cmsOrigin);
+		window.parent.postMessage(
+			{ type: "dreamy-route-ready", protocol: ROUTE_PROTOCOL },
+			cmsOrigin,
+		);
 		return () => {
 			window.removeEventListener("message", receive);
 			request.current?.abort();
@@ -149,18 +271,15 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 	}, [cmsOrigin]);
 	const pick = useCallback(
 		(place: RoutePlace) => {
-			if (disabled) return;
+			if (disabled || !changingLocation) return;
+			setChangingLocation(false);
 			const current = latest.current;
 			if (target === "start") {
 				if (inherited) return;
 				publish({
 					...current,
 					start: place,
-					legs: current.legs.map((leg) => ({
-						...leg,
-						geometry: undefined,
-						provider: undefined,
-					})),
+					legs: current.legs,
 				});
 			} else {
 				const index = current.legs.findIndex((leg) => leg.id === target);
@@ -170,9 +289,6 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 					legs: current.legs.map((leg, i) => ({
 						...leg,
 						...(i === index ? { destination: place } : {}),
-						...(i === index || i === index + 1
-							? { geometry: undefined, provider: undefined }
-							: {}),
 					})),
 				});
 			}
@@ -184,9 +300,10 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 				duration: 500,
 			});
 		},
-		[target, disabled, inherited, publish],
+		[target, disabled, changingLocation, inherited, publish],
 	);
 	const search = async () => {
+		const operationId = ++operation.current;
 		if (query.trim().length < 3) {
 			setNotice("Escribe al menos 3 letras del lugar.");
 			return;
@@ -204,6 +321,8 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 			);
 			if (!response.ok) throw Error();
 			const data = await response.json();
+			if (controller.signal.aborted || operationId !== operation.current)
+				return;
 			const found = (data.places ?? [])
 				.map(normalizeRoutePlace)
 				.filter((item: RoutePlace | null): item is RoutePlace => Boolean(item));
@@ -238,17 +357,12 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 					},
 				},
 				...(kind === "visit"
-					? plan.legs
-							.filter((leg) => leg.kind === "end")
-							.map((leg) => ({
-								...leg,
-								geometry: undefined,
-								provider: undefined,
-							}))
+					? plan.legs.filter((leg) => leg.kind === "end")
 					: []),
 			],
 		});
 		setTarget(id);
+		setChangingLocation(true);
 		setQuery("");
 		setNotice("Busca el destino del nuevo tramo o coloca un pin en el mapa.");
 	};
@@ -260,11 +374,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		];
 		publish({
 			...plan,
-			legs: legs.map((leg) => ({
-				...leg,
-				geometry: undefined,
-				provider: undefined,
-			})),
+			legs,
 		});
 	};
 	const check = async () => {
@@ -280,6 +390,9 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		const controller = new AbortController();
 		request.current = controller;
 		setBusy(true);
+		const operationRevision = revision.current;
+		const operationIdentity = identity.current;
+		const operationId = ++operation.current;
 		setNotice("Comprobando las conexiones…");
 		const next = { ...plan, start, legs: plan.legs.map((leg) => ({ ...leg })) };
 		const checked: Record<string, string> = {};
@@ -287,6 +400,13 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		let failures = 0;
 		for (const leg of next.legs) {
 			if (controller.signal.aborted) break;
+			if (leg.geometry && geometryNeedsReview(leg, previous.coordinates)) {
+				checked[leg.id] =
+					"Requiere revisión. El trazado anterior se conserva y no se recalcula automáticamente.";
+				failures++;
+				previous = leg.destination;
+				continue;
+			}
 			if (
 				leg.destination.label === "Elige el destino" ||
 				Math.hypot(
@@ -341,6 +461,11 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 						throw Error();
 					leg.geometry = geometry;
 					leg.provider = result.provider;
+					leg.geometryMeta = {
+						source: "routing",
+						status: "valid",
+						mode: leg.mode,
+					};
 					checked[leg.id] =
 						"✓ Ruta calculada. Confirma que sigue el recorrido contratado.";
 				} catch {
@@ -352,7 +477,12 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 			previous = leg.destination;
 			setStatuses({ ...checked });
 		}
-		if (!controller.signal.aborted) {
+		if (
+			!controller.signal.aborted &&
+			operationId === operation.current &&
+			operationRevision === revision.current &&
+			operationIdentity === identity.current
+		) {
 			publish(next);
 			setStatuses(checked);
 			setNotice(
@@ -366,6 +496,11 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 	};
 	const importGpx = async (index: number, file: File | null) => {
 		if (!file) return;
+		const operationRevision = revision.current;
+		const operationIdentity = identity.current;
+		const operationId = ++operation.current;
+		const legId = plan.legs[index]?.id;
+		setBusy(true);
 		try {
 			if (file.size > 5_000_000)
 				throw Error("El archivo debe pesar menos de 5 MB.");
@@ -373,11 +508,22 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 				await file.text(),
 				"application/xml",
 			);
+			if (
+				operationId !== operation.current ||
+				operationRevision !== revision.current ||
+				operationIdentity !== identity.current ||
+				latest.current.legs[index]?.id !== legId
+			)
+				throw Error(
+					"La lectura del archivo quedó desactualizada; vuelve a seleccionarlo.",
+				);
 			if (document.querySelector("parsererror"))
 				throw Error("No se pudo leer el GPX.");
+			if (document.documentElement.localName !== "gpx")
+				throw Error("El archivo no es un documento GPX.");
 			const tracks = document.querySelectorAll("trkseg");
 			const routes = document.querySelectorAll("rte");
-			if (tracks.length > 1 || routes.length > 1)
+			if (tracks.length + routes.length !== 1)
 				throw Error("Usa un GPX con un único tramo continuo.");
 			const nodes = tracks.length
 				? tracks[0].querySelectorAll("trkpt")
@@ -385,10 +531,13 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 					? routes[0].querySelectorAll("rtept")
 					: [];
 			let geometry = normalizeRouteGeometry(
-				Array.from(nodes).map((node) => [
-					Number(node.getAttribute("lon")),
-					Number(node.getAttribute("lat")),
-				]),
+				Array.from(nodes).map((node) => {
+					const lon = node.getAttribute("lon"),
+						lat = node.getAttribute("lat");
+					if (!lon?.trim() || !lat?.trim())
+						throw Error("Hay puntos GPX sin latitud o longitud.");
+					return [Number(lon), Number(lat)];
+				}),
 			);
 			if (!geometry)
 				throw Error("El GPX necesita entre 2 y 20.000 puntos válidos.");
@@ -416,7 +565,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 					"El GPX no empieza y termina cerca de los lugares elegidos. Revisa los destinos.",
 				);
 			const importedGeometry = geometry;
-			publish({
+			const importedPlan: TourRoutePlan = {
 				...plan,
 				legs: plan.legs.map((item, i) =>
 					i === index
@@ -424,15 +573,31 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 								...item,
 								geometry: importedGeometry,
 								provider: "GPX verificado por el editor",
+								geometryMeta: {
+									source: "gpx",
+									fileName: file.name,
+									importedAt: new Date().toISOString(),
+									status: "valid",
+									mode: item.mode,
+								},
 							}
 						: item,
 				),
-			});
+			};
+			if (leg.geometry)
+				setPendingChange({
+					plan: importedPlan,
+					revision: revision.current,
+					count: 1,
+				});
+			else publish(importedPlan);
 			setNotice("GPX cargado. Comprueba que corresponde al recorrido real.");
 		} catch (error) {
 			setNotice(
 				error instanceof Error ? error.message : "No se pudo cargar el GPX.",
 			);
+		} finally {
+			if (operationId === operation.current) setBusy(false);
 		}
 	};
 	const activePlace =
@@ -452,8 +617,97 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 				),
 			});
 	};
+	const download = (leg: (typeof plan.legs)[number]) => {
+		try {
+			const url = URL.createObjectURL(
+				new Blob([routeGpx(leg)], { type: "application/gpx+xml" }),
+			);
+			const anchor = document.createElement("a");
+			anchor.href = url;
+			anchor.download = (
+				leg.geometryMeta?.fileName ?? `recorrido-${leg.id}.gpx`
+			).replace(/[\\/]/g, "-");
+			anchor.click();
+			setTimeout(() => URL.revokeObjectURL(url), 1000);
+		} catch (error) {
+			setNotice(
+				error instanceof Error
+					? error.message
+					: "No se pudo descargar el recorrido.",
+			);
+		}
+	};
 	return (
 		<main className="bg-white p-4 text-slate-950">
+			{pendingChange && (
+				<dialog
+					ref={confirmation}
+					aria-labelledby="route-confirm-title"
+					className="max-w-lg rounded-xl border border-slate-300 p-5 text-slate-950 shadow-xl"
+					style={{ overscrollBehavior: "contain" }}
+					onCancel={() => {
+						setPendingChange(null);
+						setNotice("Cambio cancelado. Se conservó el recorrido anterior.");
+					}}
+				>
+					<h2 id="route-confirm-title" className="text-lg font-bold">
+						Confirmar cambio del recorrido
+					</h2>
+					<p className="my-3">
+						Este cambio afecta {pendingChange.count} trazado(s). Los anteriores
+						se conservarán como pendientes de revisión; no se borrarán.
+					</p>
+					<div className="flex justify-end gap-2">
+						<button
+							type="button"
+							className={button}
+							onClick={() => {
+								setPendingChange(null);
+								setNotice(
+									"Cambio cancelado. Se conservó el recorrido anterior.",
+								);
+							}}
+						>
+							Cancelar
+						</button>
+						<button
+							type="button"
+							className={button}
+							onClick={() => {
+								if (pendingChange.revision === revision.current)
+									commit(pendingChange.plan);
+								else
+									setNotice(
+										"El recorrido cambió mientras confirmabas. Repite la acción.",
+									);
+								setPendingChange(null);
+							}}
+						>
+							Conservar anterior y continuar
+						</button>
+					</div>
+				</dialog>
+			)}
+			<style>
+				{
+					"dialog::backdrop { background: #0f172a66; overflow: hidden; overscroll-behavior: contain; }"
+				}
+			</style>
+			<p role="status" className="mb-3 text-sm font-semibold">
+				{persistence === "saved"
+					? "Guardado · verificado mediante lectura del servidor"
+					: persistence === "error"
+						? "No se ha confirmado el guardado; conserva tus cambios"
+						: "Pendiente de guardar"}
+				{plan.legs.some((leg, i) =>
+					geometryNeedsReview(
+						leg,
+						i ? plan.legs[i - 1].destination.coordinates : start?.coordinates,
+					),
+				)
+					? " · Requiere revisión"
+					: ""}
+			</p>
 			<header className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<p className="text-xs font-bold uppercase tracking-widest text-green-700">
@@ -507,6 +761,24 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 				</div>
 			)}
 			<fieldset disabled={disabled} className="min-w-0">
+				<div className="mb-3 flex items-center gap-2">
+					<button
+						type="button"
+						className={button}
+						disabled={target === "start" && !!inherited}
+						aria-pressed={changingLocation}
+						onClick={() => setChangingLocation((value) => !value)}
+					>
+						{changingLocation
+							? "Cancelar cambio de ubicación"
+							: "Cambiar ubicación"}
+					</button>
+					<span className="text-xs">
+						{changingLocation
+							? "Elige un lugar o pulsa el mapa para cambiar el punto seleccionado."
+							: "Puedes explorar el mapa sin modificar los puntos."}
+					</span>
+				</div>
 				<div className="mb-3 flex gap-2">
 					<input
 						aria-label="Buscar lugar"
@@ -557,7 +829,10 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 							styles={{ light: tourMapStyles.map }}
 						>
 							<MapControls showZoom />
-							<ClickDestination onPick={pick} />
+							<ClickDestination
+								onPick={pick}
+								enabled={changingLocation && !disabled}
+							/>
 							{segments.map((segment) => (
 								<TransportRoute
 									key={segment.id}
@@ -578,7 +853,10 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 									longitude={item.place.coordinates[0]}
 									latitude={item.place.coordinates[1]}
 									onClick={() => {
-										if (!disabled) setTarget(item.id);
+										if (!disabled) {
+											setTarget(item.id);
+											setChangingLocation(false);
+										}
 									}}
 								>
 									<MarkerContent>
@@ -598,7 +876,10 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 						<button
 							type="button"
 							className={`${button} !justify-start ${target === "start" ? "!border-green-700" : ""}`}
-							onClick={() => setTarget("start")}
+							onClick={() => {
+								setTarget("start");
+								setChangingLocation(false);
+							}}
 						>
 							<MapPin size={16} />
 							<span className="text-left">
@@ -619,7 +900,10 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 									<button
 										type="button"
 										className="min-w-0 flex-1 text-left text-sm font-semibold"
-										onClick={() => setTarget(leg.id)}
+										onClick={() => {
+											setTarget(leg.id);
+											setChangingLocation(false);
+										}}
 									>
 										{index + 1}. {leg.destination.label}
 									</button>
@@ -646,13 +930,9 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 										aria-label={`Eliminar tramo ${index + 1}`}
 										className="rounded p-1 text-red-700 hover:bg-red-50"
 										onClick={() => {
-											const legs = plan.legs
-												.filter((item) => item.id !== leg.id)
-												.map((item) => ({
-													...item,
-													geometry: undefined,
-													provider: undefined,
-												}));
+											const legs = plan.legs.filter(
+												(item) => item.id !== leg.id,
+											);
 											publish({ ...plan, legs });
 											setTarget(legs.at(-1)?.id ?? "start");
 										}}
@@ -724,8 +1004,6 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 														? {
 																...item,
 																mode: event.target.value as TransportMode,
-																geometry: undefined,
-																provider: undefined,
 															}
 														: item,
 												),
@@ -747,9 +1025,73 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 									</p>
 								)}
 								{leg.geometry && (
-									<p className="mt-1 text-xs font-semibold text-green-700">
-										Trazado disponible
-									</p>
+									<div className="mt-2 flex flex-col gap-1 text-xs">
+										<p className="font-semibold">
+											{leg.geometryMeta?.source === "gpx" ||
+											leg.provider?.startsWith("GPX")
+												? persistence === "saved"
+													? "GPX guardado"
+													: "GPX cargado · pendiente de guardar"
+												: "Trazado disponible"}
+										</p>
+										<p>
+											{leg.geometryMeta?.fileName ??
+												"Nombre original no disponible"}{" "}
+											· {leg.geometry.length} puntos ·{" "}
+											{(routeDistanceMetres(leg.geometry) / 1000).toFixed(2)} km
+										</p>
+										<p>
+											{geometryNeedsReview(
+												leg,
+												index
+													? plan.legs[index - 1].destination.coordinates
+													: start?.coordinates,
+											)
+												? "Requiere revisión · trazado conservado"
+												: "Validación de estructura y extremos correcta; revisa el itinerario real."}
+										</p>
+										<button
+											type="button"
+											className={button}
+											onClick={() => download(leg)}
+										>
+											Descargar GPX
+										</button>
+										{geometryNeedsReview(
+											leg,
+											index
+												? plan.legs[index - 1].destination.coordinates
+												: start?.coordinates,
+										) && (
+											<button
+												type="button"
+												className={button}
+												onClick={() =>
+													setPendingChange({
+														revision: revision.current,
+														count: 1,
+														plan: {
+															...plan,
+															legs: plan.legs.map((item) =>
+																item.id === leg.id
+																	? {
+																			...item,
+																			geometryMeta: {
+																				...item.geometryMeta,
+																				status: "valid",
+																				mode: item.mode,
+																			},
+																		}
+																	: item,
+															),
+														},
+													})
+												}
+											>
+												Confirmar trazado para estos puntos
+											</button>
+										)}
+									</div>
 								)}
 								{leg.mode !== "flight" && (
 									<details className="mt-2 text-xs text-slate-600">
@@ -763,6 +1105,8 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 													? "Cargar mi recorrido en bus (GPX)"
 													: "Ruta especial: cargar GPX (opcional)"}
 											<input
+												id={`gpx-${leg.id}`}
+												hidden
 												type="file"
 												accept=".gpx,application/gpx+xml"
 												className="mt-1 w-full text-xs"
@@ -774,6 +1118,17 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 													event.target.value = "";
 												}}
 											/>
+											<button
+												type="button"
+												className={`${button} mt-2`}
+												onClick={() =>
+													document.getElementById(`gpx-${leg.id}`)?.click()
+												}
+											>
+												{leg.geometry
+													? "Reemplazar GPX…"
+													: "Elegir archivo GPX…"}
+											</button>
 											{leg.mode === "bus" && (
 												<span className="mt-1 block">
 													Si el cálculo automático no encuentra la carretera,
@@ -869,10 +1224,45 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 					/>
 				</label>
 				<p className="mt-2 text-xs text-slate-500">
-					Selecciona el tramo y busca su destino o haz clic en el mapa. La
-					salida de cada tramo es el destino anterior.
+					Selecciona el tramo y activa «Cambiar ubicación» para buscar su
+					destino o colocarlo en el mapa. La salida de cada tramo es el destino
+					anterior.
 				</p>
 			</fieldset>
+			{!!plan.archivedLegs?.length && (
+				<details className="mt-3 rounded-lg border border-amber-300 p-3 text-sm">
+					<summary>
+						Trazados anteriores conservados · {plan.archivedLegs.length} ·
+						Requieren revisión
+					</summary>
+					<p className="my-2">
+						Se mantienen en el día y se guardan con el tour. Puedes descargarlos
+						para revisarlos; no se dibujan como un recorrido vigente.
+					</p>
+					{plan.archivedLegs.map((leg, i) => (
+						<div
+							key={routeContent({
+								id: leg.id,
+								geometry: leg.geometry,
+								fileName: leg.geometryMeta?.fileName,
+							})}
+							className="my-2 flex flex-wrap items-center gap-2"
+						>
+							<span>
+								{leg.destination.label} ·{" "}
+								{leg.geometryMeta?.fileName ?? "Nombre original no disponible"}
+							</span>
+							<button
+								type="button"
+								className={button}
+								onClick={() => download(leg)}
+							>
+								Descargar GPX anterior {i + 1}
+							</button>
+						</div>
+					))}
+				</details>
+			)}
 			<p
 				role="status"
 				className="mt-3 min-h-5 text-sm font-medium text-green-800"

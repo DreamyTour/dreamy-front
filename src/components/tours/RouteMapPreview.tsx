@@ -159,6 +159,13 @@ export default function RouteMapPreview({
 						/>
 						{paths.map((path) => {
 							const coordinates = path.coordinates;
+							if (
+								!coordinates &&
+								path.mode &&
+								path.mode !== "flight" &&
+								path.mode !== "boat"
+							)
+								return null;
 							const stride = Math.max(
 								1,
 								Math.floor((coordinates?.length ?? 0) / 160),

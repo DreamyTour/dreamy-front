@@ -30,7 +30,7 @@ const cms = createServer((request, response) => {
 		let frame;
 		window.addEventListener('message',event=>{
 		 if(event.origin==='${frontend}'&&event.source===frame?.contentWindow&&event.data?.type==='dreamy-route-ready')
-		  frame.contentWindow.postMessage({type:'dreamy-route-init',value:{version:1,start:{label:'Origen de prueba',coordinates:[-71.978,-13.518]},legs:[]}},'${frontend}');
+		  frame.contentWindow.postMessage({type:'dreamy-route-init',protocol:2,identity:{documentId:'fixture',locale:'es',dayKey:'1',sessionId:'fixture-session'},sequence:1,ackSequence:0,persisted:true,value:{version:1,start:{label:'Origen de prueba',coordinates:[-71.978,-13.518]},legs:[]}},'${frontend}');
 		});
 		fetch('${frontend}/api/cms/session', {method:'POST',credentials:'include',headers:{Authorization:'Bearer fixture-admin','Content-Type':'application/json'}})
 		.then(response=>{if(!response.ok)throw Error(response.status);frame=document.createElement('iframe');frame.src='${frontend}/cms/map-editor/';document.body.append(frame);})

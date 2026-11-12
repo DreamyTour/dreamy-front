@@ -58,6 +58,7 @@ type TourMapStop = TourMapStopSource & {
 };
 
 interface TourRouteSegment {
+	requiresReview?: boolean;
 	id: string;
 	label: string;
 	from: [number, number];
@@ -536,10 +537,11 @@ export default function MapTab({
 		() =>
 			baseRouteSegments.map((segment) => ({
 				...segment,
-				coordinates:
-					segment.coordinates ??
-					calculatedRoutes[routeCalculationKey(segment)]?.coordinates ??
-					null,
+				coordinates: segment.requiresReview
+					? null
+					: (segment.coordinates ??
+						calculatedRoutes[routeCalculationKey(segment)]?.coordinates ??
+						null),
 			})),
 		[baseRouteSegments, calculatedRoutes],
 	);
@@ -1006,12 +1008,18 @@ export default function MapTab({
 									incoming.mode !== "boat" &&
 									!incoming.coordinates && (
 										<span className="mt-2 text-[0.65rem] font-medium text-amber-700 dark:text-amber-400">
-											{incoming.mode === "bus" || incoming.mode === "walking"
-												? calculatedRoutes[routeCalculationKey(incoming)]
-														?.status === "failed"
-													? transportLabels[lang].unavailable
-													: transportLabels[lang].calculating
-												: transportLabels[lang].unavailable}
+											{incoming.requiresReview
+												? lang === "en"
+													? "Route needs review"
+													: lang === "pt"
+														? "Percurso requer revisão"
+														: "Recorrido requiere revisión"
+												: incoming.mode === "bus" || incoming.mode === "walking"
+													? calculatedRoutes[routeCalculationKey(incoming)]
+															?.status === "failed"
+														? transportLabels[lang].unavailable
+														: transportLabels[lang].calculating
+													: transportLabels[lang].unavailable}
 										</span>
 									)}
 							</button>

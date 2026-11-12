@@ -10,6 +10,7 @@ interface Segment {
 	from: RouteCoordinate;
 	to: RouteCoordinate;
 	coordinates: RouteCoordinate[] | null;
+	requiresReview?: boolean;
 }
 export interface RouteCalculation {
 	status: "loading" | "ready" | "failed";
@@ -30,6 +31,7 @@ export function useCalculatedTourRoutes(segments: Segment[]) {
 				if (disposed) break;
 				if (
 					segment.coordinates ||
+					segment.requiresReview ||
 					(segment.mode !== "bus" && segment.mode !== "walking")
 				)
 					continue;

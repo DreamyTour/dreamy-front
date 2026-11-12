@@ -16,12 +16,23 @@ export interface RouteLeg {
 	geometry?: RouteCoordinate[];
 	provider?: string;
 	kind?: "visit" | "waypoint" | "end";
+	geometryMeta?: {
+		source?: "gpx" | "routing";
+		fileName?: string;
+		importedAt?: string;
+		status?: "review" | "valid";
+		mode?: TransportMode;
+		from?: RouteCoordinate;
+		to?: RouteCoordinate;
+	};
 }
 export interface TourRoutePlan {
 	version: 1;
 	start: RoutePlace | null;
 	legs: RouteLeg[];
 	primaryLegId?: string;
+	dayId?: string;
+	archivedLegs?: RouteLeg[];
 }
 
 export function normalizeRoutePlace(value: unknown): RoutePlace | null {
@@ -37,6 +48,18 @@ export function normalizeTourRoutePlan(value: unknown): TourRoutePlan | null {
 	const plan = value as Partial<TourRoutePlan>;
 	if (plan.version !== 1 || !Array.isArray(plan.legs) || plan.legs.length > 50)
 		return null;
+	if (plan.start != null && !normalizeRoutePlace(plan.start)) return null;
+	if (
+		plan.archivedLegs != null &&
+		(!Array.isArray(plan.archivedLegs) ||
+			plan.archivedLegs.some(
+				(leg) =>
+					!leg ||
+					!normalizeRoutePlace(leg.destination) ||
+					(leg.geometry != null && !normalizeRouteGeometry(leg.geometry)),
+			))
+	)
+		return null;
 	const legs: RouteLeg[] = [];
 	for (const item of plan.legs) {
 		if (!item || typeof item !== "object") return null;
@@ -50,7 +73,11 @@ export function normalizeTourRoutePlan(value: unknown): TourRoutePlan | null {
 			legs.some((leg) => leg.id === item.id)
 		)
 			return null;
+		// Invalid saved data must never silently become a geometry-less editable plan.
+		if (item.geometry != null && !normalizeRouteGeometry(item.geometry))
+			return null;
 		legs.push({
+			...item,
 			id: item.id.slice(0, 100),
 			destination,
 			kind:
@@ -66,6 +93,7 @@ export function normalizeTourRoutePlan(value: unknown): TourRoutePlan | null {
 		});
 	}
 	return {
+		...plan,
 		version: 1,
 		start: normalizeRoutePlace(plan.start),
 		legs,
@@ -104,6 +132,7 @@ export function geometryMatchesEndpoints(
 	to: RouteCoordinate,
 	mode: TransportMode,
 ) {
+	if (!normalizeRouteGeometry(geometry)) return false;
 	const tolerance = mode === "walking" ? 0.01 : 0.05;
 	return [from, to].every((point, index) => {
 		const actual = index === 0 ? geometry[0] : geometry[geometry.length - 1];
@@ -126,6 +155,14 @@ export function routePlanSegments(
 				mode: leg.mode,
 				coordinates:
 					leg.geometry &&
+					leg.geometryMeta?.status !== "review" &&
+					(!leg.geometryMeta?.mode || leg.geometryMeta.mode === leg.mode) &&
+					(!leg.geometryMeta?.from ||
+						JSON.stringify(leg.geometryMeta.from) ===
+							JSON.stringify(previous.coordinates)) &&
+					(!leg.geometryMeta?.to ||
+						JSON.stringify(leg.geometryMeta.to) ===
+							JSON.stringify(leg.destination.coordinates)) &&
 					geometryMatchesEndpoints(
 						leg.geometry,
 						previous.coordinates,
@@ -135,6 +172,26 @@ export function routePlanSegments(
 						? leg.geometry
 						: null,
 				provider: leg.provider,
+				requiresReview:
+					!!leg.geometry &&
+					(leg.geometryMeta?.status === "review" ||
+						!!(leg.geometryMeta?.mode && leg.geometryMeta.mode !== leg.mode) ||
+						!!(
+							leg.geometryMeta?.from &&
+							JSON.stringify(leg.geometryMeta.from) !==
+								JSON.stringify(previous.coordinates)
+						) ||
+						!!(
+							leg.geometryMeta?.to &&
+							JSON.stringify(leg.geometryMeta.to) !==
+								JSON.stringify(leg.destination.coordinates)
+						) ||
+						!geometryMatchesEndpoints(
+							leg.geometry,
+							previous.coordinates,
+							leg.destination.coordinates,
+							leg.mode,
+						)),
 			});
 		previous = leg.destination;
 	}
