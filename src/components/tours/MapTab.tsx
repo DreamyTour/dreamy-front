@@ -34,6 +34,7 @@ import {
 	transportColors,
 	transportLabels,
 } from "@/lib/tour-map-transport";
+import { pairReverseRoutes, roundTripLabels } from "@/lib/tour-round-trip";
 import {
 	normalizeTourRoutePlan,
 	routePlanDestination,
@@ -43,6 +44,7 @@ import {
 } from "@/lib/tour-route-plan";
 import { cn } from "@/lib/utils";
 import type { MapStop } from "@/types/tours";
+import RoundTripRoutes from "./RoundTripRoutes";
 import TransportRoute from "./TransportRoute";
 import {
 	routeCalculationKey,
@@ -58,6 +60,7 @@ type TourMapStop = TourMapStopSource & {
 };
 
 interface TourRouteSegment {
+	verifiedGpx?: boolean;
 	requiresReview?: boolean;
 	id: string;
 	label: string;
@@ -510,6 +513,9 @@ export default function MapTab({
 							: null,
 					).map((segment) => ({
 						...segment,
+						verifiedGpx:
+							plan.legs.find((leg) => leg.id === segment.id)?.geometryMeta
+								?.source === "gpx" || segment.provider?.startsWith("GPX"),
 						id: `${stop.id}-${segment.id}`,
 						fromStop: previousStop ?? stop,
 						toStop: stop,
@@ -592,6 +598,43 @@ export default function MapTab({
 		[routeBoundsPoints],
 	);
 	const [selectedId, setSelectedId] = React.useState<string | null>(null);
+	const directionMarkerPoints = React.useMemo(
+		() => [
+			...tourMapStops.map(
+				(stop) => [stop.longitude, stop.latitude] as RouteCoordinate,
+			),
+			...routeSegments.flatMap((segment) => [segment.from, segment.to]),
+		],
+		[tourMapStops, routeSegments],
+	);
+	const reversePairs = React.useMemo(
+		() => pairReverseRoutes(baseRouteSegments),
+		[baseRouteSegments],
+	);
+	const visibleSegments = React.useMemo(
+		() =>
+			routeSegments.filter(
+				(segment) => selectedId === null || segment.toStop.id === selectedId,
+			),
+		[routeSegments, selectedId],
+	);
+	const directionalSegments = React.useMemo(
+		() =>
+			visibleSegments.flatMap((segment) => {
+				const presentation = reversePairs[segment.id];
+				return presentation && segment.coordinates
+					? [
+							{
+								id: segment.id,
+								coordinates: segment.coordinates,
+								mode: segment.mode,
+								presentation,
+							},
+						]
+					: [];
+			}),
+		[visibleSegments, reversePairs],
+	);
 	const [activeSegmentId, setActiveSegmentId] = React.useState<string | null>(
 		null,
 	);
@@ -773,22 +816,29 @@ export default function MapTab({
 							<Scan className="size-5" aria-hidden="true" />
 						</button>
 					</div>
-					{routeSegments.map((segment) => (
-						<TransportRoute
-							key={segment.id}
-							id={segment.id}
-							from={segment.from}
-							to={segment.to}
-							mode={segment.mode}
-							coordinates={segment.coordinates}
-							active={
-								selectedId === segment.toStop.id ||
-								activeSegmentId === segment.id
-							}
-							satellite={mapMode === "satellite"}
-							dimmed={selectedId !== null && selectedId !== segment.toStop.id}
-						/>
-					))}
+					<RoundTripRoutes
+						segments={directionalSegments}
+						markerCoordinates={directionMarkerPoints}
+						satellite={mapMode === "satellite"}
+					/>
+					{visibleSegments
+						.filter((segment) => !reversePairs[segment.id])
+						.map((segment) => (
+							<TransportRoute
+								key={segment.id}
+								id={segment.id}
+								from={segment.from}
+								to={segment.to}
+								mode={segment.mode}
+								coordinates={segment.coordinates}
+								active={
+									selectedId === segment.toStop.id ||
+									activeSegmentId === segment.id
+								}
+								satellite={mapMode === "satellite"}
+								dimmed={selectedId !== null && selectedId !== segment.toStop.id}
+							/>
+						))}
 
 					<DayMarkers
 						stops={tourMapStops}
@@ -911,6 +961,31 @@ export default function MapTab({
 						);
 					})}
 				</section>
+			)}
+			{directionalSegments.length > 0 && (
+				<p className="px-1 text-sm text-slate-800">
+					{directionalSegments.some(
+						(segment) => segment.presentation.direction === "outbound",
+					) && (
+						<span className="mr-4">
+							<span aria-hidden="true" style={{ color: "#E77A28" }}>
+								━ →{" "}
+							</span>
+							{roundTripLabels[lang].outbound}
+						</span>
+					)}
+					{directionalSegments.some(
+						(segment) => segment.presentation.direction === "return",
+					) && (
+						<span className="mr-4">
+							<span aria-hidden="true" style={{ color: "#DB5260" }}>
+								━ ←{" "}
+							</span>
+							{roundTripLabels[lang].return}
+						</span>
+					)}
+					<span className="block text-xs">{roundTripLabels[lang].detail}</span>
+				</p>
 			)}
 			{routingProviders.length > 0 && (
 				<p className="px-1 text-[0.65rem] text-muted-foreground">

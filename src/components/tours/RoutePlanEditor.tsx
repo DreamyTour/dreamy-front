@@ -9,7 +9,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import type { Map as LibreMap } from "maplibre-gl";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	MapControls,
 	MapMarker,
@@ -23,6 +23,7 @@ import {
 	type TransportMode,
 	transportLabels,
 } from "@/lib/tour-map-transport";
+import { pairReverseRoutes } from "@/lib/tour-round-trip";
 import {
 	ROUTE_PROTOCOL,
 	type RouteEditorIdentity,
@@ -45,6 +46,7 @@ import {
 	routeDistanceMetres,
 	routeGpx,
 } from "@/lib/tour-route-safety";
+import RoundTripRoutes from "./RoundTripRoutes";
 import TransportRoute from "./TransportRoute";
 
 const empty: TourRoutePlan = { version: 1, start: null, legs: [] };
@@ -137,7 +139,43 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		);
 		map.current?.fitBounds(bounds, { padding: 35, maxZoom: 13, duration: 500 });
 	};
-	const segments = routePlanSegments(plan, inherited);
+	const segments = useMemo(
+		() => routePlanSegments(plan, inherited),
+		[plan, inherited],
+	);
+	const reversePairs = useMemo(
+		() =>
+			pairReverseRoutes(
+				segments.map((segment) => ({
+					...segment,
+					verifiedGpx:
+						plan.legs.find((leg) => leg.id === segment.id)?.geometryMeta
+							?.source === "gpx" || segment.provider?.startsWith("GPX"),
+				})),
+			),
+		[segments, plan],
+	);
+	const directionMarkerPoints = useMemo(
+		() => segments.flatMap((segment) => [segment.from, segment.to]),
+		[segments],
+	);
+	const directionalSegments = useMemo(
+		() =>
+			segments.flatMap((segment) => {
+				const presentation = reversePairs[segment.id];
+				return presentation && segment.coordinates
+					? [
+							{
+								id: segment.id,
+								coordinates: segment.coordinates,
+								mode: segment.mode,
+								presentation,
+							},
+						]
+					: [];
+			}),
+		[segments, reversePairs],
+	);
 	const commit = useCallback(
 		(next: TourRoutePlan) => {
 			next = preserveRouteGeometries(latest.current, {
@@ -840,14 +878,20 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 								onPick={pick}
 								enabled={changingLocation && !disabled}
 							/>
-							{segments.map((segment) => (
-								<TransportRoute
-									key={segment.id}
-									{...segment}
-									active={segment.id === target}
-									satellite={false}
-								/>
-							))}
+							<RoundTripRoutes
+								segments={directionalSegments}
+								markerCoordinates={directionMarkerPoints}
+							/>
+							{segments
+								.filter((segment) => !reversePairs[segment.id])
+								.map((segment) => (
+									<TransportRoute
+										key={segment.id}
+										{...segment}
+										active={segment.id === target}
+										satellite={false}
+									/>
+								))}
 							{[
 								...(start ? [{ id: "start", place: start }] : []),
 								...plan.legs.map((leg) => ({
