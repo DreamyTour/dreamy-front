@@ -270,10 +270,17 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		};
 	}, [cmsOrigin]);
 	const pick = useCallback(
-		(place: RoutePlace) => {
-			if (disabled || !changingLocation) return;
-			setChangingLocation(false);
+		(place: RoutePlace, source: "map" | "search" = "map") => {
 			const current = latest.current;
+			// Only an explicit search selection may initialize an empty start.
+			// Map clicks and replacements still require location change mode.
+			const initialStart =
+				source === "search" &&
+				target === "start" &&
+				!current.start &&
+				!inherited;
+			if (disabled || (!changingLocation && !initialStart)) return;
+			setChangingLocation(false);
 			if (target === "start") {
 				if (inherited) return;
 				publish({
@@ -811,7 +818,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 								<button
 									type="button"
 									className="w-full px-3 py-2 text-left text-sm hover:bg-green-50 focus-visible:outline-2 focus-visible:outline-green-700"
-									onClick={() => pick(place)}
+									onClick={() => pick(place, "search")}
 								>
 									{place.label}
 								</button>

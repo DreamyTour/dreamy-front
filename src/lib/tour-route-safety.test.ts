@@ -184,14 +184,18 @@ describe("preserving saved tour routes", () => {
 			routeContent(fixture()),
 		);
 		// The frontend can be checked out alone in CI; compare when both repos exist.
+		// Git may check out either copy with CRLF; compare content with LF endings.
 		if (existsSync("../dreamy-cms/src/shared/tour-route-contract.ts")) {
 			expect(
 				readFileSync(
 					new URL("./tour-route-contract.ts", import.meta.url),
 					"utf8",
-				),
+				).replace(/\r\n/g, "\n"),
 			).toBe(
-				readFileSync("../dreamy-cms/src/shared/tour-route-contract.ts", "utf8"),
+				readFileSync(
+					"../dreamy-cms/src/shared/tour-route-contract.ts",
+					"utf8",
+				).replace(/\r\n/g, "\n"),
 			);
 		}
 	});
