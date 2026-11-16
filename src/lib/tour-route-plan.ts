@@ -114,6 +114,12 @@ export function routePlanVisits(value: unknown): RouteLeg[] {
 		) ?? []
 	);
 }
+export function routePlanSecondaryStops(value: unknown): RouteLeg[] {
+	return (
+		normalizeTourRoutePlan(value)?.legs.filter((leg) => leg.kind !== "end") ??
+		[]
+	);
+}
 export function routePlanHighlight(value: unknown): RoutePlace | null {
 	const plan = normalizeTourRoutePlan(value);
 	const visits = routePlanVisits(plan);

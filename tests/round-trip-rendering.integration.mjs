@@ -9,7 +9,7 @@ import { Scanner } from "@tailwindcss/oxide";
 import { build } from "esbuild";
 
 const root = process.cwd();
-const evidence = path.join(root, "artifacts/round-trip-rendering");
+const evidence = path.join(root, "artifacts/railway-design/integration");
 await mkdir(evidence, { recursive: true });
 const forward = Array.from({ length: 81 }, (_, i) => {
 	const t = i / 80;
@@ -224,9 +224,14 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 
 	const routes = () =>
 		page.evaluate(() => {
-			const source = Object.entries(
+			const railway = Object.entries(
 				window.fixtureMap?.getStyle()?.sources || {},
-			).find(([id]) => id.startsWith("round-trip-"))?.[1];
+			).find(([id]) => id.startsWith("railway-"))?.[1];
+			const source =
+				railway ??
+				Object.entries(window.fixtureMap?.getStyle()?.sources || {}).find(
+					([id]) => id.startsWith("round-trip-"),
+				)?.[1];
 			return (
 				source?.data?.features?.filter(
 					(f) => f.geometry.type === "LineString",
@@ -260,7 +265,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 			throw error;
 		}
 	};
-	await count(2);
+	await count(1);
 	await page.evaluate(() => window.fixtureMap.jumpTo({ zoom: 10.5 }));
 	const cases = [];
 	const checkArrows = async () => {
@@ -268,6 +273,28 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		return page.evaluate(() => {
 			const m = window.fixtureMap,
 				style = m.getStyle();
+			const railway = style.layers.filter((l) => l.id.startsWith("railway-"));
+			if (railway.length) {
+				if (railway.length !== 3 || railway.some((l) => l.type !== "line"))
+					throw Error("Railway must use only three native lines");
+				const rails = railway.find((l) => l.id.endsWith("-rails"));
+				const sleepers = railway.find((l) => l.id.endsWith("-sleepers"));
+				if (
+					rails.paint["line-color"] !== "#343434" ||
+					!rails.paint["line-gap-width"] ||
+					!sleepers.paint["line-dasharray"] ||
+					sleepers.layout["line-cap"] !== "butt"
+				)
+					throw Error("Traditional railway style missing");
+				if (
+					style.layers.some(
+						(l) =>
+							l.id.startsWith("route-layer-") && /sleepers|rail-gap/.test(l.id),
+					)
+				)
+					throw Error("Duplicate legacy train layers");
+				return true;
+			}
 			const layers = style.layers.filter((l) => l.id.startsWith("round-trip-"));
 			const line = layers.find((l) => l.id.endsWith("-line"));
 			const arrow = layers.find((l) => l.id.endsWith("-arrows"));
@@ -297,6 +324,95 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	};
 	// Compare actual WebGL pixels with and without icons, not DOM substitutes.
 	const checkArrowPixels = async (directionProof = false) => {
+		const railway = await page.evaluate(() =>
+			window.fixtureMap
+				.getStyle()
+				.layers.some((l) => l.id.startsWith("railway-")),
+		);
+		if (railway) {
+			const screenshot = (
+				await page.locator(".maplibregl-canvas").screenshot()
+			).toString("base64");
+			const result = await page.evaluate(
+				async ({ screenshot, directionProof }) => {
+					const img = new Image();
+					img.src = `data:image/png;base64,${screenshot}`;
+					await img.decode();
+					const c = document.createElement("canvas");
+					c.width = img.width;
+					c.height = img.height;
+					const ctx = c.getContext("2d");
+					ctx.drawImage(img, 0, 0);
+					const p = ctx.getImageData(0, 0, c.width, c.height).data;
+					let dark = 0,
+						colored = 0;
+					for (let i = 0; i < p.length; i += 4) {
+						if (
+							[0, 1, 2].every(
+								(j) =>
+									p[i + j] < 175 &&
+									Math.max(p[i], p[i + 1], p[i + 2]) -
+										Math.min(p[i], p[i + 1], p[i + 2]) <
+										12,
+							)
+						)
+							dark++;
+						if (
+							[
+								[231, 122, 40],
+								[219, 82, 96],
+							].some((color) =>
+								color.every((v, j) => Math.abs(v - p[i + j]) < 12),
+							)
+						)
+							colored++;
+					}
+					let split = 0,
+						ties = 0;
+					if (directionProof) {
+						const y = Math.round(
+							window.fixtureMap.project(
+								window.fixtureData.horizontal[0].routePlan.start.coordinates,
+							).y,
+						);
+						for (let x = 80; x < c.width - 80; x++) {
+							const cells = [];
+							for (let dy = -7; dy <= 7; dy++) {
+								const i = ((y + dy) * c.width + x) * 4;
+								cells.push(
+									[0, 1, 2].every(
+										(j) =>
+											p[i + j] < 150 &&
+											Math.max(p[i], p[i + 1], p[i + 2]) -
+												Math.min(p[i], p[i + 1], p[i + 2]) <
+												12,
+									),
+								);
+							}
+							let runs = 0,
+								inside = false;
+							for (const value of cells) {
+								if (value && !inside) runs++;
+								inside = value;
+							}
+							if (runs === 2) split++;
+							if (runs === 1 && cells.filter(Boolean).length >= 4) ties++;
+						}
+					}
+					return { dark, colored, split, ties };
+				},
+				{ screenshot, directionProof },
+			);
+			assert.ok(result.dark > 10, JSON.stringify(result));
+			assert.equal(result.colored, 0);
+			if (directionProof) {
+				assert.ok(
+					result.split > 5 && result.ties > 0,
+					`Two rails and cross ties in real pixels: ${JSON.stringify(result)}`,
+				);
+			}
+			return;
+		}
 		await page.waitForTimeout(500);
 		const shown = (
 			await page.locator(".maplibregl-canvas").screenshot()
@@ -422,23 +538,15 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	};
 	await checkArrows();
 	const full = await routes();
-	assert.deepEqual(
-		full.map((f) => f.properties.color),
-		["#E77A28", "#DB5260"],
-	);
-	assert.deepEqual(
-		full.map((f) => f.properties.offset),
-		[4, 4],
-	);
-	assert.deepEqual(
-		full[0].geometry.coordinates,
-		[...full[1].geometry.coordinates].reverse(),
-	);
+	assert.equal(full.length, 1);
+	assert.deepEqual(full[0].geometry.coordinates, forward);
+	assert.equal(full[0].properties.segmentIds.length, 2);
+
 	await checkArrowPixels();
 
 	await page.screenshot({ path: path.join(evidence, "complete-desktop.png") });
 	cases.push(
-		"real MapLibre full view: reverse GPX pair, orange/coral and arrows on their own lines",
+		"real MapLibre full view: one charcoal railway for exact inverse GPX, no orange/coral or permanent arrows",
 	);
 	for (const [zoom, bearing] of [
 		[9.2, 0],
@@ -457,24 +565,35 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		});
 	}
 	cases.push(
-		"zoom 9.2/11/12 and bearing 0/65/170: native line-aligned icons remain over colored WebGL paths",
+		"zoom 9.2/11/12 and bearing 0/65/170: railway rails and sleepers remain visible",
 	);
 
-	for (const [day, direction] of [
+	for (const [day] of [
 		[1, "outbound"],
 		[2, "return"],
 	]) {
 		await page
 			.locator("button[aria-pressed]")
 			.filter({ hasText: new RegExp(`0${day}`) })
-			.click();
+			.focus();
+		await page
+			.locator("button[aria-pressed]")
+			.filter({ hasText: new RegExp(`0${day}`) })
+			.press("Enter");
 		await count(1);
 		await expect
-			.poll(async () => (await routes())[0]?.properties.direction)
-			.toBe(direction);
+			.poll(async () =>
+				(await routes())[0]?.properties.segmentIds[0]?.includes(
+					day === 1 ? "out" : "back",
+				),
+			)
+			.toBe(true);
 		const [route] = await routes();
-		assert.equal(route.properties.direction, direction);
-		assert.equal(route.properties.offset, 0);
+		assert.equal(route.properties.segmentIds.length, 1);
+		await expect(
+			page.getByRole("list", { name: "Sentido del viaje en tren" }),
+		).toContainText(day === 1 ? "Ollantaytambo" : "Aguas Calientes");
+
 		assert.deepEqual(
 			route.geometry.coordinates,
 			day === 1 ? forward : [...forward].reverse(),
@@ -489,7 +608,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	await page
 		.getByRole("button", { name: "Ver recorrido completo", exact: true })
 		.click();
-	await count(2);
+	await count(1);
 	await page.setViewportSize({ width: 390, height: 1000 });
 	await page.getByRole("button", { name: "Satélite", exact: true }).click();
 	await page.waitForTimeout(200);
@@ -516,7 +635,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	}
 	cases.push("verified inverse bus and boat GPX share the rendering behavior");
 	await choose("horizontal");
-	await count(2);
+	await count(1);
 	await page.setViewportSize({ width: 1100, height: 1100 });
 	await page.evaluate(() => window.fixtureMap.jumpTo({ zoom: 11, bearing: 0 }));
 	await checkArrows();
@@ -525,42 +644,25 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		path: path.join(evidence, "opposite-arrow-directions.png"),
 	});
 	cases.push(
-		"actual pixel chevrons point east on orange outbound and west on coral return",
+		"actual WebGL pixels show two thin rails, rectangular cross ties and no route colors",
 	);
 	await choose("variant");
-	await count(0);
-	await expect
-		.poll(() =>
-			page.evaluate(
-				() =>
-					window.fixtureMap
-						.getStyle()
-						.layers.filter((layer) => layer.id.startsWith("route-layer-"))
-						.length,
-			),
-		)
-		.toBe(8);
-	assert.equal(
-		await page.evaluate(() => {
-			const style = window.fixtureMap.getStyle();
-			return window.fixtureData.variant.every(
-				(stop, i) =>
-					JSON.stringify(
-						style.sources[
-							`route-source-map-stop-${i + 1}-${i ? "back" : "out"}`
-						].data.geometry.coordinates,
-					) === JSON.stringify(stop.routePlan.legs[0].geometry),
-			);
-		}),
-		true,
+	await page.waitForTimeout(500);
+	await count(2);
+	assert.deepEqual(
+		(await routes()).map((f) => f.geometry.coordinates),
+		await page.evaluate(() =>
+			window.fixtureData.variant.map((s) => s.routePlan.legs[0].geometry),
+		),
 	);
-	cases.push("different return route retains normal MapLibre route layers");
+
+	cases.push("different railway return remains a separate complete geometry");
 	if (realStops) {
 		await choose("real");
-		await count(2);
+		await count(1);
 		assert.deepEqual(
-			(await routes()).map((f) => f.geometry.coordinates),
-			realStops.map((stop) => stop.routePlan.legs[0].geometry),
+			(await routes())[0].geometry.coordinates,
+			realStops[0].routePlan.legs[0].geometry,
 		);
 		await page.evaluate(() => window.fixtureMap.jumpTo({ zoom: 10 }));
 		await page.waitForTimeout(200);
@@ -604,14 +706,14 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 			location.origin,
 		);
 	});
-	await count(2);
+	await count(1);
 	await checkArrows();
 	await page.screenshot({
 		path: path.join(evidence, "editor-same-day-pair.png"),
 	});
 	assert.deepEqual(await page.evaluate(() => window.fixtureChanges), []);
 	cases.push(
-		"editor shared renderer recognizes an intraday reverse pair without publishing route changes",
+		"editor deduplicates an intraday railway inverse pair without publishing route changes",
 	);
 	assert.deepEqual(await page.evaluate(() => window.fixtureMapErrors), []);
 	assert.deepEqual(errors, []);

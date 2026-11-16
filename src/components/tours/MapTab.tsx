@@ -10,6 +10,7 @@ import {
 	Scan,
 	Ship,
 	TrainFront,
+	X,
 } from "lucide-react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import * as React from "react";
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/map";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
 import type { Lang } from "@/lib/i18n";
+import { dayMarkerPlace } from "@/lib/tour-day-marker";
 import { isValidTourMapStop, normalizeTourMapCoordinate } from "@/lib/tour-map";
 import { type TourMapMode, tourMapStyles } from "@/lib/tour-map-styles";
 import {
@@ -37,13 +39,15 @@ import {
 import { pairReverseRoutes, roundTripLabels } from "@/lib/tour-round-trip";
 import {
 	normalizeTourRoutePlan,
+	type RoutePlace,
 	routePlanDestination,
 	routePlanHighlight,
+	routePlanSecondaryStops,
 	routePlanSegments,
-	routePlanVisits,
 } from "@/lib/tour-route-plan";
 import { cn } from "@/lib/utils";
 import type { MapStop } from "@/types/tours";
+import RailwayRoutes, { RailwayLegend } from "./RailwayRoutes";
 import RoundTripRoutes from "./RoundTripRoutes";
 import TransportRoute from "./TransportRoute";
 import {
@@ -53,6 +57,7 @@ import {
 
 type TourMapStopSource = Omit<MapStop, "id"> & {
 	id: string;
+	markerPlace: RoutePlace;
 };
 
 type TourMapStop = TourMapStopSource & {
@@ -80,10 +85,6 @@ const transportIcons = {
 	flight: Plane,
 	boat: Ship,
 };
-const POPUP_MIN_SCALE = 0.52;
-const POPUP_MAX_SCALE = 0.82;
-const POPUP_MIN_ZOOM = 5;
-const POPUP_MAX_ZOOM = 15;
 
 const dayPrefixes: Record<Lang, string> = {
 	es: "DÍA",
@@ -104,6 +105,7 @@ const mapLabels: Record<
 		reset: string;
 		empty: string;
 		layers: string;
+		close: string;
 	}
 > = {
 	es: {
@@ -117,6 +119,7 @@ const mapLabels: Record<
 		reset: "Ver recorrido completo",
 		empty: "El recorrido estará disponible próximamente.",
 		layers: "Vista del mapa",
+		close: "Cerrar detalles",
 	},
 	en: {
 		duration: "Travel time",
@@ -129,6 +132,7 @@ const mapLabels: Record<
 		reset: "Show full route",
 		empty: "The route will be available soon.",
 		layers: "Map view",
+		close: "Close details",
 	},
 	pt: {
 		duration: "Tempo de percurso",
@@ -141,59 +145,138 @@ const mapLabels: Record<
 		reset: "Ver percurso completo",
 		empty: "O percurso estará disponível em breve.",
 		layers: "Vista do mapa",
+		close: "Fechar detalhes",
 	},
 };
 
 const mapPopupClass =
 	"tour-map-popup !max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl bg-white p-0 text-slate-950 shadow-[0_24px_70px_-22px_rgba(15,23,42,0.6)]";
 
-function getPopupScale(zoom: number, minScale: number, maxScale: number) {
-	const progress = Math.min(
-		1,
-		Math.max(0, (zoom - POPUP_MIN_ZOOM) / (POPUP_MAX_ZOOM - POPUP_MIN_ZOOM)),
+function DayStopDetails({
+	stop,
+	image,
+}: {
+	stop: TourMapStop;
+	image: string | null;
+}) {
+	return (
+		<div
+			className={cn(
+				"grid min-h-[14rem] grid-cols-1",
+				image &&
+					"sm:min-h-[24rem] sm:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]",
+			)}
+		>
+			<div className="min-w-0 p-5">
+				<p className="text-2xl font-extrabold tracking-[0.02em] text-slate-950">
+					{stop.day}
+				</p>
+				<p className="mt-1 text-xl font-bold leading-snug text-slate-900">
+					{stop.title}
+				</p>
+				<p className="mt-6 whitespace-pre-line text-lg leading-[1.13] text-slate-800">
+					{stop.description}
+				</p>
+			</div>
+			{image && (
+				<div className="border-t-2 border-dotted border-slate-300 p-4 sm:border-l-2 sm:border-t-0 sm:pl-7">
+					<img
+						src={image}
+						alt={getImageAlt(stop.imagen, stop.title)}
+						width={640}
+						height={640}
+						loading="lazy"
+						decoding="async"
+						className="aspect-[4/3] w-full object-cover sm:aspect-square"
+					/>
+				</div>
+			)}
+		</div>
 	);
-
-	return minScale + (maxScale - minScale) * progress;
 }
 
-type ZoomResponsiveMapPopupProps = React.ComponentProps<typeof MapPopup> & {
-	minScale?: number;
-	maxScale?: number;
-};
-
-function ZoomResponsiveMapPopup({
-	minScale = POPUP_MIN_SCALE,
-	maxScale = POPUP_MAX_SCALE,
+/** Native automatic anchor, bounded content, and event-end viewport correction. */
+function DayMapPopup({
+	label,
 	...props
-}: ZoomResponsiveMapPopupProps) {
+}: React.ComponentProps<typeof MapPopup> & { label: string }) {
 	const { map } = useMap();
-	const [scale, setScale] = React.useState(() =>
-		map ? getPopupScale(map.getZoom(), minScale, maxScale) : minScale,
-	);
-	const { children, contentStyle: _contentStyle, ...popupProps } = props;
-
+	const content = React.useRef<HTMLElement>(null);
+	const [size, setSize] = React.useState({ width: 262, height: 260 });
 	React.useEffect(() => {
 		if (!map) return;
-
-		const syncScale = () =>
-			setScale(getPopupScale(map.getZoom(), minScale, maxScale));
-
-		syncScale();
-		map.on("zoomend", syncScale);
-
-		return () => {
-			map.off("zoomend", syncScale);
+		let frame = 0;
+		const resize = () => {
+			const { width, height } = map.getContainer().getBoundingClientRect();
+			setSize((previous) => {
+				const next = {
+					width: Math.max(160, Math.min(520, width - 128)),
+					height: Math.max(100, Math.min(320, height - 200)),
+				};
+				return previous.width === next.width && previous.height === next.height
+					? previous
+					: next;
+			});
 		};
-	}, [map, minScale, maxScale]);
-
+		const fit = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(() => {
+				const el = content.current?.closest(".maplibregl-popup");
+				if (!el || getComputedStyle(el).display === "none" || map.isMoving())
+					return;
+				const box = el.getBoundingClientRect(),
+					bounds = map.getContainer().getBoundingClientRect();
+				const dx =
+					box.left < bounds.left + 12
+						? box.left - bounds.left - 12
+						: box.right > bounds.right - 52
+							? box.right - bounds.right + 52
+							: 0;
+				const dy =
+					box.top < bounds.top + 82
+						? box.top - bounds.top - 82
+						: box.bottom > bounds.bottom - 64
+							? box.bottom - bounds.bottom + 64
+							: 0;
+				if (Math.abs(dx) > 1 || Math.abs(dy) > 1)
+					map.panBy([dx, dy], { duration: 0 });
+			});
+		};
+		const observer = new ResizeObserver(() => {
+			resize();
+			fit();
+		});
+		observer.observe(map.getContainer());
+		if (content.current) observer.observe(content.current);
+		map.on("moveend", fit);
+		resize();
+		fit();
+		return () => {
+			observer.disconnect();
+			map.off("moveend", fit);
+			cancelAnimationFrame(frame);
+		};
+	}, [map]);
 	return (
 		<MapPopup
-			{...popupProps}
-			contentStyle={{
-				zoom: scale,
-			}}
+			{...props}
+			offset={48}
+			contentStyle={{ width: size.width, maxWidth: size.width }}
 		>
-			{children}
+			{/* Keyboard focus allows scrolling the bounded popup without dragging the map. */}
+			<section
+				ref={content}
+				aria-label={label}
+				// biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard scrolling of bounded day information
+				tabIndex={0}
+				style={{
+					maxHeight: size.height,
+					overflowY: "auto",
+					overscrollBehavior: "contain",
+				}}
+			>
+				{props.children}
+			</section>
 		</MapPopup>
 	);
 }
@@ -216,7 +299,7 @@ function FitTourBounds({
 				if (!container.clientWidth || !container.clientHeight) return;
 				map.resize();
 				map.fitBounds(bounds, {
-					padding: { top: 96, right: 104, bottom: 96, left: 40 },
+					padding: { top: 120, right: 104, bottom: 96, left: 40 },
 					maxZoom: 8.4,
 					duration: 0,
 				});
@@ -249,6 +332,7 @@ function Pin({
 		<button
 			type="button"
 			aria-label={label}
+			data-day-marker
 			className={cn(
 				"relative flex h-12 w-12 flex-col items-center justify-center rounded-full border-2 border-white bg-primary text-primary-foreground shadow-[0_12px_24px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)] transition-[transform,box-shadow] duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-secondary/55 sm:h-[3.25rem] sm:w-[3.25rem]",
 				active
@@ -299,13 +383,21 @@ function DayMarkers({
 	}, [map]);
 	const groups: TourMapStop[][] = [];
 	for (const stop of stops) {
-		const point = map?.project([stop.longitude, stop.latitude]);
+		const point = map?.project([
+			stop.markerPlace.coordinates[0],
+			stop.markerPlace.coordinates[1],
+		]);
 		const group = groups.find((items) => {
-			const anchor = map?.project([items[0].longitude, items[0].latitude]);
+			const anchor = map?.project([
+				items[0].markerPlace.coordinates[0],
+				items[0].markerPlace.coordinates[1],
+			]);
 			return point && anchor
 				? Math.hypot(point.x - anchor.x, point.y - anchor.y) < 58
-				: stop.longitude === items[0].longitude &&
-						stop.latitude === items[0].latitude;
+				: stop.markerPlace.coordinates[0] ===
+						items[0].markerPlace.coordinates[0] &&
+						stop.markerPlace.coordinates[1] ===
+							items[0].markerPlace.coordinates[1];
 		});
 		if (group) group.push(stop);
 		else groups.push([stop]);
@@ -317,8 +409,8 @@ function DayMarkers({
 				return (
 					<MapMarker
 						key={stop.id}
-						longitude={stop.longitude}
-						latitude={stop.latitude}
+						longitude={stop.markerPlace.coordinates[0]}
+						latitude={stop.markerPlace.coordinates[1]}
 						onClick={(event) => {
 							const choice =
 								event.target instanceof Element
@@ -345,12 +437,26 @@ function DayMarkers({
 									<button
 										type="button"
 										aria-expanded={openGroup === stop.id}
-										aria-label={group.map((item) => item.day).join(", ")}
-										className="flex min-h-12 min-w-14 items-center justify-center rounded-2xl border-2 border-white bg-primary px-3 text-sm font-bold text-white shadow-lg"
+										aria-pressed={group.some((item) => item.id === selectedId)}
+										className={cn(
+											"flex min-h-12 min-w-14 items-center justify-center rounded-2xl border-2 border-white bg-primary px-3 text-sm font-bold text-white shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+											group.some((item) => item.id === selectedId) &&
+												"ring-4 ring-primary/50",
+										)}
 									>
-										{group
-											.map((item) => item.day.split(":").at(-1)?.trim())
-											.join(" · ")}
+										{group.map((item, index) => (
+											<React.Fragment key={item.id}>
+												{index > 0 && <span aria-hidden="true"> · </span>}
+												<span
+													className={cn(
+														item.id === selectedId &&
+															"rounded bg-white px-1 text-primary",
+													)}
+												>
+													{item.day.split(":").at(-1)?.trim()}
+												</span>
+											</React.Fragment>
+										))}
 									</button>
 									{openGroup === stop.id && (
 										<div className="absolute left-1/2 top-full z-20 mt-2 w-60 -translate-x-1/2 rounded-xl bg-white p-2 shadow-xl">
@@ -359,11 +465,15 @@ function DayMarkers({
 													type="button"
 													key={item.id}
 													data-map-day={item.id}
-													className="block w-full rounded-lg px-3 py-2 text-left text-xs text-slate-900 hover:bg-green-50"
+													aria-pressed={item.id === selectedId}
+													className={cn(
+														"block min-h-11 w-full rounded-lg px-3 py-2 text-left text-xs text-slate-900 hover:bg-green-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+														item.id === selectedId &&
+															"bg-green-50 font-semibold ring-2 ring-inset ring-primary",
+													)}
 												>
 													<strong>{item.day}</strong> ·{" "}
-													{routePlanHighlight(item.routePlan)?.label ??
-														item.title}
+													{item.markerPlace.label ?? item.title}
 												</button>
 											))}
 										</div>
@@ -375,7 +485,7 @@ function DayMarkers({
 							{group
 								.map(
 									(item) =>
-										`${item.day}: ${routePlanHighlight(item.routePlan)?.label ?? item.title}`,
+										`${item.day}: ${item.markerPlace.label ?? item.title}`,
 								)
 								.join(" · ")}
 						</MarkerTooltip>
@@ -390,16 +500,20 @@ function normalizeMapStops(mapStops: MapStop[]): TourMapStopSource[] {
 	return mapStops
 		.filter(isValidTourMapStop)
 		.map((stop) => {
-			const planned = routePlanHighlight(stop.routePlan);
+			const legacyPlace = routePlanHighlight(stop.routePlan);
 			const latitude =
-				planned?.coordinates[1] ??
+				legacyPlace?.coordinates[1] ??
 				(normalizeTourMapCoordinate(stop.latitude, 90) as number);
 			const longitude =
-				planned?.coordinates[0] ??
+				legacyPlace?.coordinates[0] ??
 				(normalizeTourMapCoordinate(stop.longitude, 180) as number);
 
 			return {
 				id: `map-stop-${stop.id}`,
+				markerPlace: {
+					label: stop.title ?? "",
+					coordinates: [longitude, latitude] as RouteCoordinate,
+				},
 				order: Number(stop.order),
 				title: stop.title?.trim() || "",
 				description: stop.description?.trim() || "",
@@ -413,7 +527,15 @@ function normalizeMapStops(mapStops: MapStop[]): TourMapStopSource[] {
 				longitude,
 			};
 		})
-		.sort((a, b) => a.order - b.order);
+		.sort((a, b) => a.order - b.order)
+		.map((stop, index, stops) => ({
+			...stop,
+			markerPlace: dayMarkerPlace(
+				stop.routePlan,
+				stop.markerPlace,
+				index > 0 ? routePlanDestination(stops[index - 1].routePlan) : null,
+			),
+		}));
 }
 
 export default function MapTab({
@@ -572,9 +694,7 @@ export default function MapTab({
 	];
 	const routeBoundsPoints = React.useMemo(
 		() => [
-			...tourMapStops.map(
-				(stop) => [stop.longitude, stop.latitude] as RouteCoordinate,
-			),
+			...tourMapStops.map((stop) => stop.markerPlace.coordinates),
 			...routeSegments.flatMap((segment) => segment.coordinates ?? []),
 			...routeSegments.flatMap((segment) => [segment.from, segment.to]),
 		],
@@ -600,9 +720,7 @@ export default function MapTab({
 	const [selectedId, setSelectedId] = React.useState<string | null>(null);
 	const directionMarkerPoints = React.useMemo(
 		() => [
-			...tourMapStops.map(
-				(stop) => [stop.longitude, stop.latitude] as RouteCoordinate,
-			),
+			...tourMapStops.map((stop) => stop.markerPlace.coordinates),
 			...routeSegments.flatMap((segment) => [segment.from, segment.to]),
 		],
 		[tourMapStops, routeSegments],
@@ -622,7 +740,7 @@ export default function MapTab({
 		() =>
 			visibleSegments.flatMap((segment) => {
 				const presentation = reversePairs[segment.id];
-				return presentation && segment.coordinates
+				return segment.mode !== "train" && presentation && segment.coordinates
 					? [
 							{
 								id: segment.id,
@@ -634,6 +752,33 @@ export default function MapTab({
 					: [];
 			}),
 		[visibleSegments, reversePairs],
+	);
+	const railwaySegments = React.useMemo(
+		() =>
+			visibleSegments.flatMap((segment) => {
+				if (segment.mode !== "train" || !segment.coordinates) return [];
+				const plan = normalizeTourRoutePlan(segment.toStop.routePlan);
+				const index =
+					plan?.legs.findIndex(
+						(leg) => `${segment.toStop.id}-${leg.id}` === segment.id,
+					) ?? -1;
+				const origin =
+					index > 0
+						? plan?.legs[index - 1].destination.label
+						: segment.fromStop.id !== segment.toStop.id
+							? routePlanDestination(segment.fromStop.routePlan)?.label
+							: plan?.start?.label;
+				return [
+					{
+						id: segment.id,
+						coordinates: segment.coordinates,
+						fromLabel: origin ?? segment.fromStop.title,
+						toLabel: segment.label,
+						day: segment.toStop.day,
+					},
+				];
+			}),
+		[visibleSegments],
 	);
 	const [activeSegmentId, setActiveSegmentId] = React.useState<string | null>(
 		null,
@@ -664,7 +809,7 @@ export default function MapTab({
 			setActiveSegmentId(relatedSegment?.id ?? null);
 
 			const points = [
-				[stop.longitude, stop.latitude] as RouteCoordinate,
+				stop.markerPlace.coordinates,
 				...routeSegments
 					.filter((segment) => segment.toStop.id === stop.id)
 					.flatMap(
@@ -682,7 +827,7 @@ export default function MapTab({
 				],
 			);
 			mapRef.current?.fitBounds(bounds, {
-				padding: { top: 96, right: 104, bottom: 96, left: 40 },
+				padding: { top: 120, right: 104, bottom: 96, left: 40 },
 				maxZoom: 12,
 				duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
 					? 0
@@ -732,6 +877,16 @@ export default function MapTab({
 					box-shadow: none;
 				}
 
+				.tour-map-tab .maplibregl-marker:has([data-day-marker]) {
+					z-index: 1 !important;
+				}
+
+				@media (max-width: 767px) {
+					.tour-map-tab .maplibregl-popup:has(.tour-map-popup-desktop) {
+						display: none !important;
+					}
+				}
+
 				.tour-map-stops-scroll {
 					--tour-map-scrollbar-thumb: var(--primary);
 					--tour-map-scrollbar-track: color-mix(in oklab, var(--primary) 14%, transparent);
@@ -755,7 +910,6 @@ export default function MapTab({
 					}
 				}
 			`}</style>
-
 			<div className="relative isolate h-[clamp(260px,calc(100svh-340px),560px)] lg:h-[var(--tour-map-aligned-height,clamp(260px,calc(100svh-340px),560px))] shrink-0 overflow-hidden rounded-2xl bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]">
 				<TourMap
 					ref={mapRef}
@@ -803,7 +957,7 @@ export default function MapTab({
 								setSelectedId(null);
 								setActiveSegmentId(null);
 								mapRef.current?.fitBounds(tourMapBounds, {
-									padding: { top: 96, right: 104, bottom: 96, left: 40 },
+									padding: { top: 120, right: 104, bottom: 96, left: 40 },
 									maxZoom: 8.4,
 									duration: window.matchMedia(
 										"(prefers-reduced-motion: reduce)",
@@ -816,13 +970,24 @@ export default function MapTab({
 							<Scan className="size-5" aria-hidden="true" />
 						</button>
 					</div>
-					<RoundTripRoutes
-						segments={directionalSegments}
-						markerCoordinates={directionMarkerPoints}
-						satellite={mapMode === "satellite"}
-					/>
+					{directionalSegments.length > 0 && (
+						<RoundTripRoutes
+							segments={directionalSegments}
+							markerCoordinates={directionMarkerPoints}
+							satellite={mapMode === "satellite"}
+						/>
+					)}
+					{railwaySegments.length > 0 && (
+						<RailwayRoutes
+							segments={railwaySegments}
+							satellite={mapMode === "satellite"}
+						/>
+					)}
 					{visibleSegments
-						.filter((segment) => !reversePairs[segment.id])
+						.filter(
+							(segment) =>
+								segment.mode !== "train" && !reversePairs[segment.id],
+						)
 						.map((segment) => (
 							<TransportRoute
 								key={segment.id}
@@ -848,8 +1013,16 @@ export default function MapTab({
 					/>
 					{selectedStart &&
 						selectedStop &&
-						(selectedStart.coordinates[0] !== selectedStop.longitude ||
-							selectedStart.coordinates[1] !== selectedStop.latitude) && (
+						!tourMapStops.some((stop) =>
+							stop.markerPlace.coordinates.every(
+								(coordinate, index) =>
+									coordinate === selectedStart.coordinates[index],
+							),
+						) &&
+						(selectedStart.coordinates[0] !==
+							selectedStop.markerPlace.coordinates[0] ||
+							selectedStart.coordinates[1] !==
+								selectedStop.markerPlace.coordinates[1]) && (
 							<MapMarker
 								longitude={selectedStart.coordinates[0]}
 								latitude={selectedStart.coordinates[1]}
@@ -869,11 +1042,22 @@ export default function MapTab({
 							</MapMarker>
 						)}
 					{selectedStop &&
-						routePlanVisits(selectedStop.routePlan)
+						routePlanSecondaryStops(selectedStop.routePlan)
 							.filter(
-								(leg) =>
-									leg.destination.coordinates[0] !== selectedStop.longitude ||
-									leg.destination.coordinates[1] !== selectedStop.latitude,
+								(leg, index, legs) =>
+									legs.findIndex((other) =>
+										other.destination.coordinates.every(
+											(n, i) => n === leg.destination.coordinates[i],
+										),
+									) === index &&
+									!leg.destination.coordinates.every(
+										(n, i) => n === selectedStop.markerPlace.coordinates[i],
+									) &&
+									!tourMapStops.some((stop) =>
+										stop.markerPlace.coordinates.every(
+											(n, i) => n === leg.destination.coordinates[i],
+										),
+									),
 							)
 							.map((leg, index) => (
 								<MapMarker
@@ -891,57 +1075,43 @@ export default function MapTab({
 							))}
 
 					{selectedStop && (
-						<ZoomResponsiveMapPopup
-							longitude={selectedStop.longitude}
-							latitude={selectedStop.latitude}
+						<DayMapPopup
+							label={selectedStop.day}
+							longitude={selectedStop.markerPlace.coordinates[0]}
+							latitude={selectedStop.markerPlace.coordinates[1]}
 							offset={34}
 							closeButton
 							closeOnClick
 							onClose={() => setSelectedId(null)}
-							minScale={selectedStopImage ? POPUP_MIN_SCALE : 0.75}
-							maxScale={selectedStopImage ? POPUP_MAX_SCALE : 1}
 							className={cn(
 								mapPopupClass,
-								selectedStopImage ? "w-[46.5rem]" : "w-[22rem]",
+								"tour-map-popup-desktop",
+								"[&_button]:min-h-8 [&_button]:min-w-8",
 							)}
 							focusAfterOpen={false}
 						>
-							<div
-								className={cn(
-									"grid min-h-[14rem] grid-cols-1",
-									selectedStopImage &&
-										"sm:min-h-[24rem] sm:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]",
-								)}
-							>
-								<div className="min-w-0 p-5">
-									<p className="text-2xl font-extrabold tracking-[0.02em] text-slate-950">
-										{selectedStop.day}
-									</p>
-									<p className="mt-1 text-xl font-bold leading-snug text-slate-900">
-										{selectedStop.title}
-									</p>
-									<p className="mt-6 whitespace-pre-line text-lg leading-[1.13] text-slate-800">
-										{selectedStop.description}
-									</p>
-								</div>
-								{selectedStopImage && (
-									<div className="border-t-2 border-dotted border-slate-300 p-4 sm:border-l-2 sm:border-t-0 sm:pl-7">
-										<img
-											src={selectedStopImage}
-											alt={getImageAlt(selectedStop.imagen, selectedStop.title)}
-											width={640}
-											height={640}
-											loading="lazy"
-											decoding="async"
-											className="aspect-[4/3] w-full object-cover sm:aspect-square"
-										/>
-									</div>
-								)}
-							</div>
-						</ZoomResponsiveMapPopup>
+							<DayStopDetails stop={selectedStop} image={selectedStopImage} />
+						</DayMapPopup>
 					)}
 				</TourMap>
 			</div>
+			{selectedStop && (
+				<section
+					data-day-details-mobile
+					aria-label={selectedStop.day}
+					className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-[0_16px_40px_-24px_rgba(15,23,42,0.45)] md:hidden"
+				>
+					<button
+						type="button"
+						aria-label={labels.close}
+						className="absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+						onClick={() => setSelectedId(null)}
+					>
+						<X className="size-5" aria-hidden="true" />
+					</button>
+					<DayStopDetails stop={selectedStop} image={selectedStopImage} />
+				</section>
+			)}
 			{routeModes.length > 0 && (
 				<section
 					aria-label={transportLabels[lang].legend}
@@ -953,7 +1123,9 @@ export default function MapTab({
 							<span key={mode} className="flex items-center gap-1.5">
 								<Icon
 									className="size-4"
-									style={{ color: transportColors[mode] }}
+									style={{
+										color: mode === "train" ? "#343434" : transportColors[mode],
+									}}
 									aria-hidden="true"
 								/>
 								{transportLabels[lang][mode]}
@@ -987,6 +1159,7 @@ export default function MapTab({
 					<span className="block text-xs">{roundTripLabels[lang].detail}</span>
 				</p>
 			)}
+			<RailwayLegend segments={railwaySegments} lang={lang} />
 			{routingProviders.length > 0 && (
 				<p className="px-1 text-[0.65rem] text-muted-foreground">
 					{routingProviders.join(" / ")} · © OpenStreetMap contributors ·{" "}

@@ -6,10 +6,11 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import { loadEnv } from "vite";
-import { isExcludedFromSitemap } from "./src/lib/sitemapPolicy";
 import localizedRouteMap from "./src/integrations/localizedRouteMap";
+import { isExcludedFromSitemap } from "./src/lib/sitemapPolicy";
 
-const devEnv = loadEnv("development", process.cwd(), "");
+const envDir = process.env.DREAMY_BUILD_ENV_DIR ?? process.cwd();
+const devEnv = loadEnv("development", envDir, "");
 const cmsOrigin = new URL(
 	process.env.VITE_STRAPI_URL ||
 		devEnv.VITE_STRAPI_URL ||
@@ -46,6 +47,7 @@ export default defineConfig({
 		allowedHosts: true,
 	},
 	vite: {
+		envDir,
 		plugins: [tailwindcss()],
 		server: {
 			cors: { origin: cmsOrigin, credentials: true },

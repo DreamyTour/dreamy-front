@@ -148,10 +148,14 @@ export default function localizedRouteMap(): AstroIntegration {
 		hooks: {
 			"astro:config:setup": ({ command, config, updateConfig }) => {
 				const root = fileURLToPath(config.root);
+				const envDir = process.env.DREAMY_BUILD_ENV_DIR ?? root;
 				const base =
 					process.env.VITE_STRAPI_URL ??
-					loadEnv(command === "build" ? "production" : "development", root, "")
-						.VITE_STRAPI_URL;
+					loadEnv(
+						command === "build" ? "production" : "development",
+						envDir,
+						"",
+					).VITE_STRAPI_URL;
 				if (!base)
 					throw new Error(
 						"VITE_STRAPI_URL is required for the published route catalogue",

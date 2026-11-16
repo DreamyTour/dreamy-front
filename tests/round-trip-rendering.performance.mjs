@@ -12,6 +12,36 @@ import { Scanner } from "@tailwindcss/oxide";
 import { build } from "esbuild";
 
 const root = path.resolve(process.argv[2] || process.cwd());
+const publishedItinerary = process.argv.includes("--published-itinerary");
+const publishedStops = publishedItinerary
+	? JSON.parse(
+			await readFile(
+				path.join(
+					process.cwd(),
+					"artifacts/railway-review-2026-11-14/public-map-stops.json",
+				),
+				"utf8",
+			),
+		).mapStops
+	: null;
+const initialZoom = publishedItinerary ? 9 : 10.5;
+const initialCenter = publishedItinerary
+	? [-72.25, -13.34]
+	: [-72.3975, -13.2095];
+const views = process.argv[4]
+	? process.argv[4].split(",")
+	: ["full", "day1", "day2", "multi"];
+const motions = process.argv[5]
+	? process.argv[5].split(",")
+	: ["rotate", "zoom", "pan"];
+assert.ok(
+	views.length &&
+		views.every((view) => ["full", "day1", "day2", "multi"].includes(view)),
+);
+assert.ok(
+	motions.length &&
+		motions.every((motion) => ["rotate", "zoom", "pan"].includes(motion)),
+);
 const evidence = path.join(
 	process.cwd(),
 	"artifacts/round-trip-rendering/final-review",
@@ -74,6 +104,15 @@ const makeStops = (mode = "train", variant = false) => [
 const bundles = {};
 const server = createServer((request, response) => {
 	const url = new URL(request.url, "http://fixture");
+	if (url.pathname === "/api/tour-route") {
+		response.statusCode = 503;
+		response.setHeader("Content-Type", "application/json");
+		return response.end(
+			JSON.stringify({
+				error: "Saved geometry unavailable in read-only fixture",
+			}),
+		);
+	}
 	if (bundles[url.pathname]) {
 		response.setHeader(
 			"Content-Type",
@@ -108,7 +147,7 @@ try {
 			contents: `
 import React,{useState}from'react';import{createRoot}from'react-dom/client';import MapTab from'./src/components/tours/MapTab';import Editor from './src/components/tours/RoutePlanEditor';
 const fixtures=${JSON.stringify({
-				train: makeStops(),
+				train: publishedStops ?? makeStops(),
 				bus: makeStops("bus"),
 				boat: makeStops("boat"),
 				variant: makeStops("train", true),
@@ -139,15 +178,30 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 			{
 				name: "local-map-fixture",
 				setup(b) {
-					b.onLoad({ filter: /RoundTripRoutes\.tsx$/ }, async (args) => {
+					b.onLoad(
+						{ filter: /(?:RoundTripRoutes|RailwayRoutes)\.tsx$/ },
+						async (args) => {
+							let contents = await readFile(args.path, "utf8");
+							contents = contents.replace(
+								"const { map, isLoaded } = useMap();",
+								"window.rtStats ??= {renders:0,pairs:0,features:0}; window.rtStats.renders++; const { map, isLoaded } = useMap();",
+							);
+							return {
+								contents,
+								loader: "tsx",
+								resolveDir: path.dirname(args.path),
+							};
+						},
+					);
+					b.onLoad({ filter: /tour-railway\.ts$/ }, async (args) => {
 						let contents = await readFile(args.path, "utf8");
 						contents = contents.replace(
-							"const { map, isLoaded } = useMap();",
-							"window.rtStats ??= {renders:0,pairs:0,features:0}; window.rtStats.renders++; const { map, isLoaded } = useMap();",
+							'const features: FeatureCollection<LineString>["features"] = [];',
+							'if(window.rtStats)window.rtStats.features++; const features: FeatureCollection<LineString>["features"] = [];',
 						);
 						return {
 							contents,
-							loader: "tsx",
+							loader: "ts",
 							resolveDir: path.dirname(args.path),
 						};
 					});
@@ -231,6 +285,19 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		external = [];
 	page.on("pageerror", (error) => errors.push(error.message));
 	await page.route("**/*", (route) => {
+		if (
+			publishedItinerary &&
+			new URL(route.request().url()).hostname === "cdn.dreamy.tours"
+		) {
+			return route.fulfill({
+				status: 200,
+				contentType: "image/png",
+				body: Buffer.from(
+					"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jGDkAAAAASUVORK5CYII=",
+					"base64",
+				),
+			});
+		}
 		if (new URL(route.request().url()).origin === origin)
 			return route.continue();
 		external.push(route.request().url());
@@ -240,7 +307,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 
 	await page.waitForFunction(() => window.fixtureMap?.isStyleLoaded());
 	const measurements = [];
-	for (const view of ["full", "day1", "day2", "multi"]) {
+	for (const view of views) {
 		await page.evaluate(
 			(v) => window.chooseFixture(v === "multi" ? "multi" : "train"),
 			view,
@@ -258,14 +325,14 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 				.click();
 			await page.waitForTimeout(650);
 		}
-		for (const motion of ["rotate", "zoom", "pan"]) {
+		for (const motion of motions) {
 			const passes = [];
 			for (let pass = 0; pass < 3; pass++) {
 				const stats = await page.evaluate(
-					async ({ motion }) => {
+					async ({ motion, initialZoom, initialCenter }) => {
 						const m = window.fixtureMap;
 						m.stop();
-						m.jumpTo({ zoom: 10.5, bearing: 0, center: [-72.3975, -13.2095] });
+						m.jumpTo({ zoom: initialZoom, bearing: 0, center: initialCenter });
 						await new Promise((r) => setTimeout(r, 400));
 						window.rtStats = { renders: 0, pairs: 0, features: 0 };
 						const calls = {};
@@ -301,12 +368,12 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 						for (let i = 0; i < 80; i++) {
 							if (motion === "rotate") m.jumpTo({ bearing: i * 2 });
 							if (motion === "zoom")
-								m.jumpTo({ zoom: 10.5 + 0.4 * Math.sin(i / 15) });
+								m.jumpTo({ zoom: initialZoom + 0.4 * Math.sin(i / 15) });
 							if (motion === "pan")
 								m.jumpTo({
 									center: [
-										-72.3975 + 0.025 * Math.sin(i / 15),
-										-13.2095 + 0.015 * Math.cos(i / 15),
+										initialCenter[0] + 0.025 * Math.sin(i / 15),
+										initialCenter[1] + 0.015 * Math.cos(i / 15),
 									],
 								});
 							await new Promise(requestAnimationFrame);
@@ -326,7 +393,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 							derived: window.rtStats,
 						};
 					},
-					{ motion },
+					{ motion, initialZoom, initialCenter },
 				);
 				passes.push(stats);
 			}
@@ -356,7 +423,8 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 						root,
 						browser: browser.version(),
 						viewport: { width: 1100, height: 1100 },
-						zoom: 10.5,
+						zoom: initialZoom,
+						publishedItinerary,
 						pointsPerRoute: 1431,
 						multiRoutes: 8,
 						warmupFrames: 20,
@@ -393,7 +461,8 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 				root,
 				browser: browser.version(),
 				viewport: { width: 1100, height: 1100 },
-				zoom: 10.5,
+				zoom: initialZoom,
+				publishedItinerary,
 				pointsPerRoute: 1431,
 				multiRoutes: 8,
 				warmupFrames: 20,

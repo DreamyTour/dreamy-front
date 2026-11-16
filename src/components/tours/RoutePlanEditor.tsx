@@ -46,6 +46,7 @@ import {
 	routeDistanceMetres,
 	routeGpx,
 } from "@/lib/tour-route-safety";
+import RailwayRoutes, { RailwayLegend } from "./RailwayRoutes";
 import RoundTripRoutes from "./RoundTripRoutes";
 import TransportRoute from "./TransportRoute";
 
@@ -163,7 +164,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		() =>
 			segments.flatMap((segment) => {
 				const presentation = reversePairs[segment.id];
-				return presentation && segment.coordinates
+				return segment.mode !== "train" && presentation && segment.coordinates
 					? [
 							{
 								id: segment.id,
@@ -175,6 +176,25 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 					: [];
 			}),
 		[segments, reversePairs],
+	);
+	const railwaySegments = useMemo(
+		() =>
+			segments.flatMap((segment) => {
+				if (segment.mode !== "train" || !segment.coordinates) return [];
+				const index = plan.legs.findIndex((leg) => leg.id === segment.id);
+				return [
+					{
+						id: segment.id,
+						coordinates: segment.coordinates,
+						fromLabel:
+							(index > 0
+								? plan.legs[index - 1].destination.label
+								: (inherited ?? plan.start)?.label) ?? "",
+						toLabel: segment.label,
+					},
+				];
+			}),
+		[segments, plan, inherited],
 	);
 	const commit = useCallback(
 		(next: TourRoutePlan) => {
@@ -878,12 +898,20 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 								onPick={pick}
 								enabled={changingLocation && !disabled}
 							/>
-							<RoundTripRoutes
-								segments={directionalSegments}
-								markerCoordinates={directionMarkerPoints}
-							/>
+							{directionalSegments.length > 0 && (
+								<RoundTripRoutes
+									segments={directionalSegments}
+									markerCoordinates={directionMarkerPoints}
+								/>
+							)}
+							{railwaySegments.length > 0 && (
+								<RailwayRoutes segments={railwaySegments} />
+							)}
 							{segments
-								.filter((segment) => !reversePairs[segment.id])
+								.filter(
+									(segment) =>
+										segment.mode !== "train" && !reversePairs[segment.id],
+								)
 								.map((segment) => (
 									<TransportRoute
 										key={segment.id}
@@ -922,6 +950,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 								</MapMarker>
 							))}
 						</MapView>
+						<RailwayLegend segments={railwaySegments} />
 					</div>
 					<div className="flex max-h-[300px] flex-col gap-2 overflow-auto rounded-xl bg-slate-50 p-3">
 						<button
