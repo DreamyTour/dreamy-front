@@ -607,13 +607,6 @@ export default function TourTabs({ tour, lang, children }: Props) {
 							onToggle={(event) => {
 								const accordion = event.currentTarget;
 								setIsMapOpenMobile(accordion.open);
-								if (accordion.open)
-									requestAnimationFrame(() => {
-										accordion.scrollIntoView({
-											block: "start",
-											behavior: "instant",
-										});
-									});
 							}}
 						>
 							{renderMobileSummary("maps", mapsTitle, MapIcon)}
@@ -639,7 +632,7 @@ export default function TourTabs({ tour, lang, children }: Props) {
 						{children}
 						{hasMaps && (activeTab === "maps" || isMapOpenMobile) && (
 							<div
-								className={`${isMapOpenMobile ? "contents" : "hidden"} ${activeTab === "maps" ? "lg:contents" : "lg:hidden"}`}
+								className={`hidden ${activeTab === "maps" ? "lg:contents" : "lg:hidden"}`}
 							>
 								<RouteMapPreview
 									fitHeight={activeTab === "maps"}

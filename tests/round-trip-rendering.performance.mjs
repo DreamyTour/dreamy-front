@@ -278,7 +278,10 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		],
 	});
 	const page = await browser.newPage({
-		viewport: { width: 1100, height: 1100 },
+		viewport: process.argv.includes("--mobile")
+			? { width: 390, height: 844 }
+			: { width: 1100, height: 1100 },
+		hasTouch: process.argv.includes("--mobile"),
 	});
 	page.setDefaultTimeout(10000);
 	const errors = [],
@@ -320,11 +323,25 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		);
 		await page.waitForTimeout(650);
 		if (view.startsWith("day")) {
-			await page
-				.getByRole("button", { name: new RegExp(`^D.A: 0${view.at(-1)}`) })
-				.click();
+			const marker = page.getByRole("button", {
+				name: new RegExp(`^Ver detalles de D.A: 0${view.at(-1)}$`),
+			});
+			if (await marker.count()) await marker.press("Enter");
+			else
+				await page
+					.getByRole("button", { name: new RegExp(`^D.A: 0${view.at(-1)}`) })
+					.click();
 			await page.waitForTimeout(650);
 		}
+		if (process.argv.includes("--expanded") && view.startsWith("day")) {
+			const details = page.getByRole("button", {
+				name: "Ver detalles",
+				exact: true,
+			});
+			if (await details.count()) await details.click();
+			await page.waitForTimeout(400);
+		}
+
 		for (const motion of motions) {
 			const passes = [];
 			for (let pass = 0; pass < 3; pass++) {
@@ -422,7 +439,10 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 					{
 						root,
 						browser: browser.version(),
-						viewport: { width: 1100, height: 1100 },
+						viewport: process.argv.includes("--mobile")
+							? { width: 390, height: 844 }
+							: { width: 1100, height: 1100 },
+						hasTouch: process.argv.includes("--mobile"),
 						zoom: initialZoom,
 						publishedItinerary,
 						pointsPerRoute: 1431,
@@ -460,7 +480,10 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 			{
 				root,
 				browser: browser.version(),
-				viewport: { width: 1100, height: 1100 },
+				viewport: process.argv.includes("--mobile")
+					? { width: 390, height: 844 }
+					: { width: 1100, height: 1100 },
+				hasTouch: process.argv.includes("--mobile"),
 				zoom: initialZoom,
 				publishedItinerary,
 				pointsPerRoute: 1431,

@@ -152,6 +152,31 @@ const mapLabels: Record<
 const mapPopupClass =
 	"tour-map-popup !max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl bg-white p-0 text-slate-950 shadow-[0_24px_70px_-22px_rgba(15,23,42,0.6)]";
 
+function TouchMapMode({ active }: { active: boolean }) {
+	const { map } = useMap();
+	React.useEffect(() => {
+		if (!map) return;
+		const mobile = window.matchMedia("(max-width: 767px)");
+		const sync = () => {
+			if (mobile.matches && !active && !document.fullscreenElement)
+				map.cooperativeGestures?.enable();
+			else map.cooperativeGestures?.disable();
+		};
+		const resizeFullscreen = () => {
+			sync();
+			map.resize();
+		};
+		sync();
+		mobile.addEventListener("change", sync);
+		document.addEventListener("fullscreenchange", resizeFullscreen);
+		return () => {
+			mobile.removeEventListener("change", sync);
+			document.removeEventListener("fullscreenchange", resizeFullscreen);
+		};
+	}, [map, active]);
+	return null;
+}
+
 function DayStopDetails({
 	stop,
 	image,
@@ -210,8 +235,8 @@ function DayMapPopup({
 			const { width, height } = map.getContainer().getBoundingClientRect();
 			setSize((previous) => {
 				const next = {
-					width: Math.max(160, Math.min(520, width - 128)),
-					height: Math.max(100, Math.min(320, height - 200)),
+					width: Math.max(160, Math.min(420, width - 128)),
+					height: Math.max(100, Math.min(260, height - 200)),
 				};
 				return previous.width === next.width && previous.height === next.height
 					? previous
@@ -546,6 +571,53 @@ export default function MapTab({
 	mapStops: MapStop[];
 }) {
 	const mapRef = React.useRef<MapLibreMap | null>(null);
+	const viewportRef = React.useRef<HTMLDivElement>(null);
+	const sheetRef = React.useRef<HTMLElement>(null);
+	const [touchActive, setTouchActive] = React.useState(false);
+	const [expandedDay, setExpandedDay] = React.useState<string | null>(null);
+	const mobileLabels = {
+		es: {
+			activate: "Explorar mapa",
+			done: "Volver al scroll",
+			details: "Ver detalles",
+			less: "Ocultar detalles",
+			full: "Pantalla completa",
+			exit: "Salir de pantalla completa",
+			hint: "Usa dos dedos para mover el mapa",
+		},
+		en: {
+			activate: "Explore map",
+			done: "Scroll page",
+			details: "View details",
+			less: "Hide details",
+			full: "Fullscreen",
+			exit: "Exit fullscreen",
+			hint: "Use two fingers to move the map",
+		},
+		pt: {
+			activate: "Explorar mapa",
+			done: "Rolar p\u00e1gina",
+			details: "Ver detalhes",
+			less: "Ocultar detalhes",
+			full: "Tela cheia",
+			exit: "Sair da tela cheia",
+			hint: "Use dois dedos para mover o mapa",
+		},
+	}[lang];
+	const [fullscreen, setFullscreen] = React.useState(false);
+	React.useEffect(() => {
+		const sync = () =>
+			setFullscreen(document.fullscreenElement === viewportRef.current);
+		document.addEventListener("fullscreenchange", sync);
+		return () => document.removeEventListener("fullscreenchange", sync);
+	}, []);
+	const closeDay = () => {
+		setSelectedId(null);
+		setExpandedDay(null);
+		viewportRef.current
+			?.querySelector<HTMLButtonElement>("[data-day-marker]")
+			?.focus({ preventScroll: true });
+	};
 	const layoutRef = React.useRef<HTMLDivElement>(null);
 	const headingRef = React.useRef<HTMLDivElement>(null);
 	React.useEffect(() => {
@@ -799,6 +871,45 @@ export default function MapTab({
 	const selectedStopImage = selectedStop?.imagen
 		? getImageUrl(selectedStop.imagen, "medium")
 		: null;
+	React.useEffect(() => {
+		const map = mapRef.current,
+			sheet = sheetRef.current,
+			viewport = viewportRef.current;
+		if (
+			!map ||
+			!sheet ||
+			!viewport ||
+			!selectedStop ||
+			!window.matchMedia("(max-width:767px)").matches
+		)
+			return;
+		let frame = 0;
+		const point = selectedStop.markerPlace.coordinates;
+		const fit = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(() => {
+				if (map.isMoving()) {
+					map.once("moveend", fit);
+					return;
+				}
+				const panel = sheet.getBoundingClientRect(),
+					box = viewport.getBoundingClientRect(),
+					pin = map.project(point);
+				const bottom = panel.top - box.top - 36;
+				if (pin.y > bottom) map.panBy([0, pin.y - bottom], { duration: 0 });
+			});
+		};
+		const observer = new ResizeObserver(fit);
+		observer.observe(sheet);
+		observer.observe(viewport);
+		fit();
+		return () => {
+			observer.disconnect();
+			map.off("moveend", fit);
+			cancelAnimationFrame(frame);
+		};
+	}, [selectedStop]);
+
 	const selectStop = React.useCallback(
 		(stop: TourMapStop) => {
 			const relatedSegment = routeSegments.find(
@@ -806,6 +917,7 @@ export default function MapTab({
 			);
 
 			setSelectedId(stop.id);
+			setExpandedDay(null);
 			setActiveSegmentId(relatedSegment?.id ?? null);
 
 			const points = [
@@ -827,7 +939,17 @@ export default function MapTab({
 				],
 			);
 			mapRef.current?.fitBounds(bounds, {
-				padding: { top: 120, right: 104, bottom: 96, left: 40 },
+				padding: window.matchMedia("(max-width:767px)").matches
+					? {
+							top: 150,
+							right: 48,
+							bottom: Math.min(
+								280,
+								(mapRef.current?.getContainer().clientHeight ?? 500) * 0.4 + 60,
+							),
+							left: 40,
+						}
+					: { top: 100, right: 80, bottom: 100, left: 40 },
 				maxZoom: 12,
 				duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches
 					? 0
@@ -848,7 +970,7 @@ export default function MapTab({
 		<div ref={layoutRef} className="tour-map-tab flex flex-col gap-3">
 			<div
 				ref={headingRef}
-				className="flex items-center justify-between gap-4 px-1"
+				className="hidden items-center justify-between gap-4 px-1 md:flex"
 			>
 				<div>
 					<p className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-primary">
@@ -864,6 +986,7 @@ export default function MapTab({
 				</span>
 			</div>
 			<style>{`
+				[data-map-viewport]:fullscreen { width:100vw; height:100dvh !important; border-radius:0; }
 				.tour-map-tab,
 				.tour-map-tab .maplibregl-map,
 				.tour-map-tab .maplibregl-popup,
@@ -910,7 +1033,11 @@ export default function MapTab({
 					}
 				}
 			`}</style>
-			<div className="relative isolate h-[clamp(260px,calc(100svh-340px),560px)] lg:h-[var(--tour-map-aligned-height,clamp(260px,calc(100svh-340px),560px))] shrink-0 overflow-hidden rounded-2xl bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]">
+			<div
+				ref={viewportRef}
+				data-map-viewport
+				className="relative isolate h-[clamp(380px,68svh,560px)] md:h-[clamp(260px,calc(100svh-340px),560px)] lg:h-[var(--tour-map-aligned-height,clamp(260px,calc(100svh-340px),560px))] shrink-0 overflow-hidden rounded-2xl bg-slate-900 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.5)]"
+			>
 				<TourMap
 					ref={mapRef}
 					center={tourMapCenter}
@@ -920,7 +1047,30 @@ export default function MapTab({
 					theme="light"
 					styles={styles}
 				>
-					<MapControls showFullscreen showCompass className="!bottom-10" />
+					<TouchMapMode active={touchActive} />
+					<MapControls className="!bottom-10 hidden md:flex" />
+					<div className="absolute right-3 top-3 z-10 flex gap-2">
+						<button
+							type="button"
+							aria-label={fullscreen ? mobileLabels.exit : mobileLabels.full}
+							className="flex size-11 items-center justify-center rounded-xl bg-white text-slate-800 shadow-md"
+							onClick={async () => {
+								if (document.fullscreenElement) await document.exitFullscreen();
+								else await viewportRef.current?.requestFullscreen?.();
+							}}
+						>
+							<Scan className="size-5" aria-hidden="true" />
+						</button>
+					</div>
+					<button
+						type="button"
+						aria-pressed={touchActive}
+						title={mobileLabels.hint}
+						className="absolute left-3 top-[4.5rem] z-10 min-h-11 rounded-xl bg-white px-3 text-xs font-semibold text-slate-800 shadow-md md:hidden"
+						onClick={() => setTouchActive(!touchActive)}
+					>
+						{touchActive ? mobileLabels.done : mobileLabels.activate}
+					</button>
 					<FitTourBounds bounds={tourMapBounds} />
 					<div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2 sm:left-5 sm:top-5">
 						<fieldset
@@ -952,7 +1102,7 @@ export default function MapTab({
 							type="button"
 							title={labels.reset}
 							aria-label={labels.reset}
-							className="flex size-14 items-center justify-center rounded-2xl bg-white/95 text-slate-800 shadow-xl hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+							className="hidden size-11 items-center justify-center md:flex rounded-2xl bg-white/95 text-slate-800 shadow-xl hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 							onClick={() => {
 								setSelectedId(null);
 								setActiveSegmentId(null);
@@ -1094,187 +1244,275 @@ export default function MapTab({
 						</DayMapPopup>
 					)}
 				</TourMap>
-			</div>
-			{selectedStop && (
-				<section
-					data-day-details-mobile
-					aria-label={selectedStop.day}
-					className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-[0_16px_40px_-24px_rgba(15,23,42,0.45)] md:hidden"
-				>
-					<button
-						type="button"
-						aria-label={labels.close}
-						className="absolute right-3 top-3 z-10 flex size-11 items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-md hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-						onClick={() => setSelectedId(null)}
+				{selectedStop && (
+					<section
+						data-day-details-mobile
+						ref={sheetRef}
+						style={{
+							maxHeight:
+								expandedDay === selectedStop.id
+									? "min(65%, calc(100% - 210px))"
+									: "40%",
+						}}
+						aria-label={selectedStop.day}
+						onKeyDown={(e) => {
+							if (e.key === "Escape") closeDay();
+						}}
+						className="absolute bottom-9 left-3 right-3 z-20 flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-xl md:hidden"
 					>
-						<X className="size-5" aria-hidden="true" />
-					</button>
-					<DayStopDetails stop={selectedStop} image={selectedStopImage} />
-				</section>
-			)}
-			{routeModes.length > 0 && (
-				<section
-					aria-label={transportLabels[lang].legend}
-					className="flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs font-semibold text-muted-foreground"
-				>
-					{routeModes.map((mode) => {
-						const Icon = transportIcons[mode];
-						return (
-							<span key={mode} className="flex items-center gap-1.5">
-								<Icon
-									className="size-4"
-									style={{
-										color: mode === "train" ? "#343434" : transportColors[mode],
-									}}
-									aria-hidden="true"
-								/>
-								{transportLabels[lang][mode]}
-							</span>
-						);
-					})}
-				</section>
-			)}
-			{directionalSegments.length > 0 && (
-				<p className="px-1 text-sm text-slate-800">
-					{directionalSegments.some(
-						(segment) => segment.presentation.direction === "outbound",
-					) && (
-						<span className="mr-4">
-							<span aria-hidden="true" style={{ color: "#E77A28" }}>
-								━ →{" "}
-							</span>
-							{roundTripLabels[lang].outbound}
-						</span>
-					)}
-					{directionalSegments.some(
-						(segment) => segment.presentation.direction === "return",
-					) && (
-						<span className="mr-4">
-							<span aria-hidden="true" style={{ color: "#DB5260" }}>
-								━ ←{" "}
-							</span>
-							{roundTripLabels[lang].return}
-						</span>
-					)}
-					<span className="block text-xs">{roundTripLabels[lang].detail}</span>
-				</p>
-			)}
-			<RailwayLegend segments={railwaySegments} lang={lang} />
-			{routingProviders.length > 0 && (
-				<p className="px-1 text-[0.65rem] text-muted-foreground">
-					{routingProviders.join(" / ")} · © OpenStreetMap contributors ·{" "}
-					<a
-						href="https://www.openstreetmap.org/fixthemap"
-						target="_blank"
-						rel="noreferrer"
-						className="underline"
-					>
-						{lang === "en"
-							? "Improve the map"
-							: lang === "pt"
-								? "Corrigir o mapa"
-								: "Corregir el mapa"}
-					</a>
-				</p>
-			)}
-			<aside className="min-w-0 overflow-hidden rounded-2xl bg-muted/50 p-2.5">
-				<div className="tour-map-stops-scroll flex gap-2.5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2">
-					{tourMapStops.map((stop) => {
-						const active = stop.id === selectedId;
-						const incoming = routeSegments.find(
-							(segment) => segment.toStop.id === stop.id,
-						);
-						const TransportIcon = incoming?.mode
-							? transportIcons[incoming.mode]
-							: null;
-
-						return (
-							<button
-								key={stop.id}
-								type="button"
-								aria-pressed={active}
-								className={cn(
-									"relative flex h-44 min-w-[17rem] max-w-[17rem] shrink-0 flex-col items-start overflow-hidden rounded-xl border-2 bg-background px-4 py-3 text-left text-foreground shadow-sm transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none",
-									active ? "border-primary" : "border-border/60",
+						<header className="flex shrink-0 items-center justify-between gap-2 border-b border-slate-100 bg-white px-4 py-1">
+							<p className="text-xs font-extrabold text-primary">
+								{selectedStop.day}
+							</p>
+							<div className="flex items-center">
+								{expandedDay === selectedStop.id && (
+									<button
+										type="button"
+										aria-expanded={true}
+										aria-controls="mobile-map-full-details"
+										className="min-h-11 px-2 text-xs font-bold text-primary underline"
+										onClick={() => setExpandedDay(null)}
+									>
+										{mobileLabels.less}
+									</button>
 								)}
-								onClick={() => {
-									selectStop(stop);
-								}}
+								<button
+									type="button"
+									aria-label={labels.close}
+									onClick={closeDay}
+									className="flex size-11 shrink-0 items-center justify-center rounded-full text-slate-700"
+								>
+									<X className="size-5" aria-hidden="true" />
+								</button>
+							</div>
+						</header>
+						<div
+							data-day-sheet-scroll
+							className="min-h-0 overflow-y-auto overscroll-contain px-4 pb-3 pt-2"
+						>
+							<h4 className="mt-1 line-clamp-2 pr-8 text-sm font-bold leading-snug">
+								{selectedStop.title}
+							</h4>
+							<p className="mt-1 line-clamp-1 text-xs text-slate-600">
+								{selectedStart?.label} &rarr;{" "}
+								{routePlanDestination(selectedStop.routePlan)?.label ??
+									selectedStop.markerPlace.label}
+							</p>
+							<p className="mt-1 text-xs font-semibold text-primary">
+								{[...new Set(visibleSegments.map((s) => s.mode))]
+									.filter((m): m is TransportMode => !!m)
+									.map((m) => transportLabels[lang][m])
+									.join(" \u00b7 ")}
+							</p>
+							<p className="mt-2 line-clamp-2 text-xs leading-relaxed">
+								{selectedStop.description}
+							</p>
+							<button
+								type="button"
+								aria-expanded={expandedDay === selectedStop.id}
+								aria-controls="mobile-map-full-details"
+								onClick={() =>
+									setExpandedDay(
+										expandedDay === selectedStop.id ? null : selectedStop.id,
+									)
+								}
+								className={cn(
+									"mt-1 min-h-11 text-xs font-bold text-primary underline underline-offset-4",
+									expandedDay === selectedStop.id && "hidden",
+								)}
 							>
-								<span className="relative flex w-full items-center justify-between gap-3">
+								{expandedDay === selectedStop.id
+									? mobileLabels.less
+									: mobileLabels.details}
+							</button>
+							{expandedDay === selectedStop.id && (
+								<div id="mobile-map-full-details" className="border-t pt-3">
+									<p className="whitespace-pre-line text-sm leading-relaxed">
+										{selectedStop.description}
+									</p>
+									{selectedStopImage && (
+										<img
+											src={getImageUrl(selectedStop.imagen)}
+											alt={getImageAlt(selectedStop.imagen, selectedStop.title)}
+											className="mt-3 w-full rounded-lg"
+											loading="lazy"
+										/>
+									)}
+								</div>
+							)}
+						</div>
+					</section>
+				)}
+			</div>
+			<div className="hidden space-y-3 md:block">
+				{routeModes.length > 0 && (
+					<section
+						aria-label={transportLabels[lang].legend}
+						className="flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs font-semibold text-muted-foreground"
+					>
+						{routeModes.map((mode) => {
+							const Icon = transportIcons[mode];
+							return (
+								<span key={mode} className="flex items-center gap-1.5">
+									<Icon
+										className="size-4"
+										style={{
+											color:
+												mode === "train" ? "#343434" : transportColors[mode],
+										}}
+										aria-hidden="true"
+									/>
+									{transportLabels[lang][mode]}
+								</span>
+							);
+						})}
+					</section>
+				)}
+				{directionalSegments.length > 0 && (
+					<p className="px-1 text-sm text-slate-800">
+						{directionalSegments.some(
+							(segment) => segment.presentation.direction === "outbound",
+						) && (
+							<span className="mr-4">
+								<span aria-hidden="true" style={{ color: "#E77A28" }}>
+									━ →{" "}
+								</span>
+								{roundTripLabels[lang].outbound}
+							</span>
+						)}
+						{directionalSegments.some(
+							(segment) => segment.presentation.direction === "return",
+						) && (
+							<span className="mr-4">
+								<span aria-hidden="true" style={{ color: "#DB5260" }}>
+									━ ←{" "}
+								</span>
+								{roundTripLabels[lang].return}
+							</span>
+						)}
+						<span className="block text-xs">
+							{roundTripLabels[lang].detail}
+						</span>
+					</p>
+				)}
+				<RailwayLegend segments={railwaySegments} lang={lang} />
+				{routingProviders.length > 0 && (
+					<p className="px-1 text-[0.65rem] text-muted-foreground">
+						· © OpenStreetMap contributors ·{" "}
+						<a
+							href="https://www.openstreetmap.org/fixthemap"
+							target="_blank"
+							rel="noreferrer"
+							className="underline"
+						>
+							{lang === "en"
+								? "Improve the map"
+								: lang === "pt"
+									? "Corrigir o mapa"
+									: "Corregir el mapa"}
+						</a>
+					</p>
+				)}
+				<aside className="min-w-0 overflow-hidden rounded-2xl bg-muted/50 p-2.5">
+					<div className="tour-map-stops-scroll flex gap-2.5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2">
+						{tourMapStops.map((stop) => {
+							const active = stop.id === selectedId;
+							const incoming = routeSegments.find(
+								(segment) => segment.toStop.id === stop.id,
+							);
+							const TransportIcon = incoming?.mode
+								? transportIcons[incoming.mode]
+								: null;
+
+							return (
+								<button
+									key={stop.id}
+									type="button"
+									aria-pressed={active}
+									className={cn(
+										"relative flex h-44 min-w-[17rem] max-w-[17rem] shrink-0 flex-col items-start overflow-hidden rounded-xl border-2 bg-background px-4 py-3 text-left text-foreground shadow-sm transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none",
+										active ? "border-primary" : "border-border/60",
+									)}
+									onClick={() => {
+										selectStop(stop);
+									}}
+								>
+									<span className="relative flex w-full items-center justify-between gap-3">
+										<span
+											className={cn(
+												"rounded-full px-2.5 py-1 text-xs font-extrabold",
+												active
+													? "bg-primary text-primary-foreground"
+													: "bg-primary/10 text-primary",
+											)}
+										>
+											{stop.day}
+										</span>
+										{TransportIcon && incoming?.mode && (
+											<span
+												className="flex items-center gap-1.5 text-xs font-semibold"
+												style={{ color: transportColors[incoming.mode] }}
+											>
+												<TransportIcon className="size-4" aria-hidden="true" />
+												{transportLabels[lang][incoming.mode]}
+											</span>
+										)}
+									</span>
+
 									<span
 										className={cn(
-											"rounded-full px-2.5 py-1 text-xs font-extrabold",
-											active
-												? "bg-primary text-primary-foreground"
-												: "bg-primary/10 text-primary",
+											"relative mt-2 block overflow-hidden text-base font-bold leading-snug text-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]",
 										)}
 									>
-										{stop.day}
+										{stop.title}
 									</span>
-									{TransportIcon && incoming?.mode && (
-										<span
-											className="flex items-center gap-1.5 text-xs font-semibold"
-											style={{ color: transportColors[incoming.mode] }}
-										>
-											<TransportIcon className="size-4" aria-hidden="true" />
-											{transportLabels[lang][incoming.mode]}
-										</span>
-									)}
-								</span>
 
-								<span
-									className={cn(
-										"relative mt-2 block overflow-hidden text-base font-bold leading-snug text-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]",
-									)}
-								>
-									{stop.title}
-								</span>
-
-								<span className="relative mt-2 block space-y-1.5 overflow-hidden text-xs text-muted-foreground">
-									{stop.duration && (
-										<span className="flex items-center gap-1.5 truncate">
-											<Clock
-												className="h-3.5 w-3.5 shrink-0 text-secondary"
-												aria-hidden="true"
-											/>
-											{labels.duration}: {stop.duration}
-										</span>
-									)}
-									{stop.routeText && (
-										<span className="flex items-center gap-1.5 truncate">
-											<Route
-												className="h-3.5 w-3.5 shrink-0 text-secondary"
-												aria-hidden="true"
-											/>
-											{labels.route}: {stop.routeText}
-										</span>
-									)}
-								</span>
-								{incoming?.mode &&
-									incoming.mode !== "flight" &&
-									incoming.mode !== "boat" &&
-									!incoming.coordinates && (
-										<span className="mt-2 text-[0.65rem] font-medium text-amber-700 dark:text-amber-400">
-											{incoming.requiresReview
-												? lang === "en"
-													? "Route needs review"
-													: lang === "pt"
-														? "Percurso requer revisão"
-														: "Recorrido requiere revisión"
-												: incoming.mode === "bus" || incoming.mode === "walking"
-													? calculatedRoutes[routeCalculationKey(incoming)]
-															?.status === "failed"
-														? transportLabels[lang].unavailable
-														: transportLabels[lang].calculating
-													: transportLabels[lang].unavailable}
-										</span>
-									)}
-							</button>
-						);
-					})}
-				</div>
-			</aside>
+									<span className="relative mt-2 block space-y-1.5 overflow-hidden text-xs text-muted-foreground">
+										{stop.duration && (
+											<span className="flex items-center gap-1.5 truncate">
+												<Clock
+													className="h-3.5 w-3.5 shrink-0 text-secondary"
+													aria-hidden="true"
+												/>
+												{labels.duration}: {stop.duration}
+											</span>
+										)}
+										{stop.routeText && (
+											<span className="flex items-center gap-1.5 truncate">
+												<Route
+													className="h-3.5 w-3.5 shrink-0 text-secondary"
+													aria-hidden="true"
+												/>
+												{labels.route}: {stop.routeText}
+											</span>
+										)}
+									</span>
+									{incoming?.mode &&
+										incoming.mode !== "flight" &&
+										incoming.mode !== "boat" &&
+										!incoming.coordinates && (
+											<span className="mt-2 text-[0.65rem] font-medium text-amber-700 dark:text-amber-400">
+												{incoming.requiresReview
+													? lang === "en"
+														? "Route needs review"
+														: lang === "pt"
+															? "Percurso requer revisão"
+															: "Recorrido requiere revisión"
+													: incoming.mode === "bus" ||
+															incoming.mode === "walking"
+														? calculatedRoutes[routeCalculationKey(incoming)]
+																?.status === "failed"
+															? transportLabels[lang].unavailable
+															: transportLabels[lang].calculating
+														: transportLabels[lang].unavailable}
+											</span>
+										)}
+								</button>
+							);
+						})}
+					</div>
+				</aside>
+			</div>
 		</div>
 	);
 }
