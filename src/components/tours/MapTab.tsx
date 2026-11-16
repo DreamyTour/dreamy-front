@@ -1,7 +1,6 @@
 import {
 	BusFront,
 	Clock,
-	Compass,
 	Footprints,
 	Map as MapIcon,
 	Plane,
@@ -36,7 +35,7 @@ import {
 	transportColors,
 	transportLabels,
 } from "@/lib/tour-map-transport";
-import { pairReverseRoutes, roundTripLabels } from "@/lib/tour-round-trip";
+import { pairReverseRoutes } from "@/lib/tour-round-trip";
 import {
 	normalizeTourRoutePlan,
 	type RoutePlace,
@@ -47,7 +46,7 @@ import {
 } from "@/lib/tour-route-plan";
 import { cn } from "@/lib/utils";
 import type { MapStop } from "@/types/tours";
-import RailwayRoutes, { RailwayLegend } from "./RailwayRoutes";
+import RailwayRoutes from "./RailwayRoutes";
 import RoundTripRoutes from "./RoundTripRoutes";
 import TransportRoute from "./TransportRoute";
 import {
@@ -100,8 +99,6 @@ const mapLabels: Record<
 		viewDetails: string;
 		map: string;
 		satellite: string;
-		explore: string;
-		stops: string;
 		reset: string;
 		empty: string;
 		layers: string;
@@ -114,8 +111,6 @@ const mapLabels: Record<
 		viewDetails: "Ver detalles de",
 		map: "Mapa",
 		satellite: "Satélite",
-		explore: "Tu próxima aventura, en el mapa",
-		stops: "destinos por descubrir",
 		reset: "Ver recorrido completo",
 		empty: "El recorrido estará disponible próximamente.",
 		layers: "Vista del mapa",
@@ -127,8 +122,6 @@ const mapLabels: Record<
 		viewDetails: "View details for",
 		map: "Map",
 		satellite: "Satellite",
-		explore: "Your next adventure, on the map",
-		stops: "destinations to discover",
 		reset: "Show full route",
 		empty: "The route will be available soon.",
 		layers: "Map view",
@@ -140,8 +133,6 @@ const mapLabels: Record<
 		viewDetails: "Ver detalhes de",
 		map: "Mapa",
 		satellite: "Satélite",
-		explore: "Sua próxima aventura, no mapa",
-		stops: "destinos para descobrir",
 		reset: "Ver percurso completo",
 		empty: "O percurso estará disponível em breve.",
 		layers: "Vista do mapa",
@@ -151,6 +142,36 @@ const mapLabels: Record<
 
 const mapPopupClass =
 	"tour-map-popup !max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl bg-white p-0 text-slate-950 shadow-[0_24px_70px_-22px_rgba(15,23,42,0.6)]";
+
+/** Collapse only the initial attribution; keep MapLibre's native toggle and links. */
+function InitialCompactAttribution() {
+	const { map } = useMap();
+	React.useEffect(() => {
+		if (!map) return;
+		const container = map.getContainer();
+		const collapse = () => {
+			const control = container.querySelector<HTMLDetailsElement>(
+				"details.maplibregl-ctrl-attrib.maplibregl-compact:not(.maplibregl-attrib-empty)",
+			);
+			if (!control) return false;
+			control.open = false;
+			control.classList.remove("maplibregl-compact-show");
+			return true;
+		};
+		if (collapse()) return;
+		const observer = new MutationObserver(() => {
+			if (collapse()) observer.disconnect();
+		});
+		observer.observe(container, {
+			subtree: true,
+			childList: true,
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+		return () => observer.disconnect();
+	}, [map]);
+	return null;
+}
 
 function TouchMapMode({ active }: { active: boolean }) {
 	const { map } = useMap();
@@ -180,31 +201,55 @@ function TouchMapMode({ active }: { active: boolean }) {
 function DayStopDetails({
 	stop,
 	image,
+	lang,
 }: {
 	stop: TourMapStop;
 	image: string | null;
+	lang: Lang;
 }) {
 	return (
 		<div
 			className={cn(
-				"grid min-h-[14rem] grid-cols-1",
-				image &&
-					"sm:min-h-[24rem] sm:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)]",
+				"grid grid-cols-1",
+				image && "grid-cols-[minmax(0,1fr)_42%]",
 			)}
 		>
-			<div className="min-w-0 p-5">
-				<p className="text-2xl font-extrabold tracking-[0.02em] text-slate-950">
+			<div className="min-w-0 p-4">
+				<p className="text-lg font-extrabold tracking-tight text-slate-950">
 					{stop.day}
 				</p>
-				<p className="mt-1 text-xl font-bold leading-snug text-slate-900">
+				<p className="mt-1 text-base font-bold leading-snug text-slate-900">
 					{stop.title}
 				</p>
-				<p className="mt-6 whitespace-pre-line text-lg leading-[1.13] text-slate-800">
-					{stop.description}
-				</p>
+				<details className="group mt-3">
+					<summary className="cursor-pointer list-none text-xs font-bold text-primary [&::-webkit-details-marker]:hidden">
+						<span className="mb-2 block font-normal leading-relaxed text-slate-700 group-open:hidden">
+							{stop.description.length > 150
+								? `${stop.description.slice(0, 150).replace(/\s+\S*$/, "")}\u2026`
+								: stop.description}
+						</span>
+						<span className="group-open:hidden">
+							{lang === "en"
+								? "Read more"
+								: lang === "pt"
+									? "Ver mais"
+									: "Ver m\u00e1s"}
+						</span>
+						<span className="hidden group-open:inline">
+							{lang === "en"
+								? "Read less"
+								: lang === "pt"
+									? "Ver menos"
+									: "Ver menos"}
+						</span>
+					</summary>
+					<p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-700">
+						{stop.description}
+					</p>
+				</details>
 			</div>
 			{image && (
-				<div className="border-t-2 border-dotted border-slate-300 p-4 sm:border-l-2 sm:border-t-0 sm:pl-7">
+				<div className="self-start border-l border-dotted border-slate-300 p-4">
 					<img
 						src={image}
 						alt={getImageAlt(stop.imagen, stop.title)}
@@ -212,7 +257,7 @@ function DayStopDetails({
 						height={640}
 						loading="lazy"
 						decoding="async"
-						className="aspect-[4/3] w-full object-cover sm:aspect-square"
+						className="aspect-square w-full rounded-xl object-cover"
 					/>
 				</div>
 			)}
@@ -227,20 +272,17 @@ function DayMapPopup({
 }: React.ComponentProps<typeof MapPopup> & { label: string }) {
 	const { map } = useMap();
 	const content = React.useRef<HTMLElement>(null);
-	const [size, setSize] = React.useState({ width: 262, height: 260 });
+	const [size, setSize] = React.useState({ width: 420 });
 	React.useEffect(() => {
 		if (!map) return;
 		let frame = 0;
 		const resize = () => {
-			const { width, height } = map.getContainer().getBoundingClientRect();
+			const { width } = map.getContainer().getBoundingClientRect();
 			setSize((previous) => {
 				const next = {
-					width: Math.max(160, Math.min(420, width - 128)),
-					height: Math.max(100, Math.min(260, height - 200)),
+					width: Math.max(240, Math.min(460, width - 96)),
 				};
-				return previous.width === next.width && previous.height === next.height
-					? previous
-					: next;
+				return previous.width === next.width ? previous : next;
 			});
 		};
 		const fit = () => {
@@ -258,11 +300,13 @@ function DayMapPopup({
 							? box.right - bounds.right + 52
 							: 0;
 				const dy =
-					box.top < bounds.top + 82
+					box.height > bounds.height - 146
 						? box.top - bounds.top - 82
-						: box.bottom > bounds.bottom - 64
-							? box.bottom - bounds.bottom + 64
-							: 0;
+						: box.top < bounds.top + 82
+							? box.top - bounds.top - 82
+							: box.bottom > bounds.bottom - 64
+								? box.bottom - bounds.bottom + 64
+								: 0;
 				if (Math.abs(dx) > 1 || Math.abs(dy) > 1)
 					map.panBy([dx, dy], { duration: 0 });
 			});
@@ -273,12 +317,10 @@ function DayMapPopup({
 		});
 		observer.observe(map.getContainer());
 		if (content.current) observer.observe(content.current);
-		map.on("moveend", fit);
 		resize();
 		fit();
 		return () => {
 			observer.disconnect();
-			map.off("moveend", fit);
 			cancelAnimationFrame(frame);
 		};
 	}, [map]);
@@ -288,18 +330,7 @@ function DayMapPopup({
 			offset={48}
 			contentStyle={{ width: size.width, maxWidth: size.width }}
 		>
-			{/* Keyboard focus allows scrolling the bounded popup without dragging the map. */}
-			<section
-				ref={content}
-				aria-label={label}
-				// biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard scrolling of bounded day information
-				tabIndex={0}
-				style={{
-					maxHeight: size.height,
-					overflowY: "auto",
-					overscrollBehavior: "contain",
-				}}
-			>
+			<section ref={content} aria-label={label}>
 				{props.children}
 			</section>
 		</MapPopup>
@@ -619,34 +650,27 @@ export default function MapTab({
 			?.focus({ preventScroll: true });
 	};
 	const layoutRef = React.useRef<HTMLDivElement>(null);
-	const headingRef = React.useRef<HTMLDivElement>(null);
 	React.useEffect(() => {
 		const layout = layoutRef.current;
-		const heading = headingRef.current;
 		const card = layout
 			?.closest("[data-tour-layout]")
 			?.querySelector<HTMLElement>(
 				"#tour-contact-form .booking-summary, #tour-contact-form [data-contact-form-root]",
 			);
-		if (!layout || !heading || !card) return;
+		if (!layout || !card) return;
 		const desktop = window.matchMedia("(min-width: 1024px)");
 		const alignMap = () => {
 			if (!desktop.matches) {
 				layout.style.removeProperty("--tour-map-aligned-height");
 				return;
 			}
-			const gap = Number.parseFloat(getComputedStyle(layout).rowGap) || 0;
-			const height =
-				card.getBoundingClientRect().height -
-				heading.getBoundingClientRect().height -
-				gap;
+			const height = card.getBoundingClientRect().height;
 			if (height > 0) {
 				layout.style.setProperty("--tour-map-aligned-height", `${height}px`);
 			}
 		};
 		const observer = new ResizeObserver(alignMap);
 		observer.observe(card);
-		observer.observe(heading);
 		desktop.addEventListener("change", alignMap);
 		alignMap();
 		return () => {
@@ -745,25 +769,6 @@ export default function MapTab({
 			})),
 		[baseRouteSegments, calculatedRoutes],
 	);
-	const routingProviders = [
-		...new Set(
-			[
-				...Object.values(calculatedRoutes),
-				...baseRouteSegments.map((segment) => ({
-					provider: "provider" in segment ? segment.provider : undefined,
-				})),
-			]
-				.map((result) => result.provider)
-				.filter(Boolean),
-		),
-	];
-	const routeModes = [
-		...new Set(
-			routeSegments
-				.map((segment) => segment.mode)
-				.filter((mode): mode is TransportMode => mode !== null),
-		),
-	];
 	const routeBoundsPoints = React.useMemo(
 		() => [
 			...tourMapStops.map((stop) => stop.markerPlace.coordinates),
@@ -968,23 +973,6 @@ export default function MapTab({
 
 	return (
 		<div ref={layoutRef} className="tour-map-tab flex flex-col gap-3">
-			<div
-				ref={headingRef}
-				className="hidden items-center justify-between gap-4 px-1 md:flex"
-			>
-				<div>
-					<p className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-primary">
-						<Compass className="size-4" aria-hidden="true" />
-						{tourMapStops.length} {labels.stops}
-					</p>
-					<h3 className="text-lg font-bold tracking-tight text-foreground sm:text-2xl">
-						{labels.explore}
-					</h3>
-				</div>
-				<span className="hidden size-12 items-center justify-center rounded-full bg-primary/10 text-primary sm:flex">
-					<Route className="size-6" aria-hidden="true" />
-				</span>
-			</div>
 			<style>{`
 				[data-map-viewport]:fullscreen { width:100vw; height:100dvh !important; border-radius:0; }
 				.tour-map-tab,
@@ -1047,6 +1035,7 @@ export default function MapTab({
 					theme="light"
 					styles={styles}
 				>
+					<InitialCompactAttribution />
 					<TouchMapMode active={touchActive} />
 					<MapControls className="!bottom-10 hidden md:flex" />
 					<div className="absolute right-3 top-3 z-10 flex gap-2">
@@ -1240,7 +1229,11 @@ export default function MapTab({
 							)}
 							focusAfterOpen={false}
 						>
-							<DayStopDetails stop={selectedStop} image={selectedStopImage} />
+							<DayStopDetails
+								stop={selectedStop}
+								image={selectedStopImage}
+								lang={lang}
+							/>
 						</DayMapPopup>
 					)}
 				</TourMap>
@@ -1345,74 +1338,6 @@ export default function MapTab({
 				)}
 			</div>
 			<div className="hidden space-y-3 md:block">
-				{routeModes.length > 0 && (
-					<section
-						aria-label={transportLabels[lang].legend}
-						className="flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs font-semibold text-muted-foreground"
-					>
-						{routeModes.map((mode) => {
-							const Icon = transportIcons[mode];
-							return (
-								<span key={mode} className="flex items-center gap-1.5">
-									<Icon
-										className="size-4"
-										style={{
-											color:
-												mode === "train" ? "#343434" : transportColors[mode],
-										}}
-										aria-hidden="true"
-									/>
-									{transportLabels[lang][mode]}
-								</span>
-							);
-						})}
-					</section>
-				)}
-				{directionalSegments.length > 0 && (
-					<p className="px-1 text-sm text-slate-800">
-						{directionalSegments.some(
-							(segment) => segment.presentation.direction === "outbound",
-						) && (
-							<span className="mr-4">
-								<span aria-hidden="true" style={{ color: "#E77A28" }}>
-									━ →{" "}
-								</span>
-								{roundTripLabels[lang].outbound}
-							</span>
-						)}
-						{directionalSegments.some(
-							(segment) => segment.presentation.direction === "return",
-						) && (
-							<span className="mr-4">
-								<span aria-hidden="true" style={{ color: "#DB5260" }}>
-									━ ←{" "}
-								</span>
-								{roundTripLabels[lang].return}
-							</span>
-						)}
-						<span className="block text-xs">
-							{roundTripLabels[lang].detail}
-						</span>
-					</p>
-				)}
-				<RailwayLegend segments={railwaySegments} lang={lang} />
-				{routingProviders.length > 0 && (
-					<p className="px-1 text-[0.65rem] text-muted-foreground">
-						· © OpenStreetMap contributors ·{" "}
-						<a
-							href="https://www.openstreetmap.org/fixthemap"
-							target="_blank"
-							rel="noreferrer"
-							className="underline"
-						>
-							{lang === "en"
-								? "Improve the map"
-								: lang === "pt"
-									? "Corrigir o mapa"
-									: "Corregir el mapa"}
-						</a>
-					</p>
-				)}
 				<aside className="min-w-0 overflow-hidden rounded-2xl bg-muted/50 p-2.5">
 					<div className="tour-map-stops-scroll flex gap-2.5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2">
 						{tourMapStops.map((stop) => {

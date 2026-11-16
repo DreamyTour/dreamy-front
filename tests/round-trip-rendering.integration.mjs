@@ -592,7 +592,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		assert.equal(route.properties.segmentIds.length, 1);
 		await expect(
 			page.getByRole("list", { name: "Sentido del viaje en tren" }),
-		).toContainText(day === 1 ? "Ollantaytambo" : "Aguas Calientes");
+		).toHaveCount(0);
 
 		assert.deepEqual(
 			route.geometry.coordinates,

@@ -360,9 +360,33 @@ export default function TourTabs({ tour, lang, children }: Props) {
         .tour-tabs-list::-webkit-scrollbar {
           display: none;
         }
+
+ @media (min-width:1024px) {
+ [data-tour-layout][data-map-active="true"] .booking-summary header {padding:.75rem 1.25rem .6rem;border-bottom-width:3px}
+ [data-tour-layout][data-map-active="true"] .booking-summary h2 {font-size:1.05rem;margin:.3rem 0;line-height:1.2}
+ [data-tour-layout][data-map-active="true"] .booking-summary .ribbon {margin:-.75rem -1.25rem .5rem;padding:.3rem 1.25rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .heading-row img {width:56px}
+ [data-tour-layout][data-map-active="true"] .booking-summary .card-body {padding:.7rem 1.15rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .price-row {gap:.85rem;padding-bottom:.65rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .price {font-size:1.8rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .price-mark {width:2.75rem;height:2.75rem;font-size:1.5rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .benefits {margin:.4rem 0;gap:.5rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .benefits>div {padding:.55rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .availability {margin-bottom:.55rem;font-size:.8rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .availability a {padding-block:.4rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .actions a,
+ [data-tour-layout][data-map-active="true"] .booking-summary .actions button {min-height:48px;padding:.5rem;gap:.35rem}
+ [data-tour-layout][data-map-active="true"] .booking-summary .note {margin-top:.5rem;font-size:.65rem}
+ [data-tour-layout][data-map-active="true"] .tour-map-stops-scroll>button {height:168px;padding:.85rem 1rem}
+ [data-tour-layout][data-map-active="true"] .tour-map-stops-scroll>button>span:nth-child(2) {font-size:.85rem;margin-top:.35rem}
+ [data-tour-layout][data-map-active="true"] [data-route-map-preview] {height:180px;min-height:0;flex:none;margin-top:12px}
+ [data-tour-layout][data-map-active="true"] [data-route-map-preview]>span:first-child,
+ [data-tour-layout][data-map-active="true"] [data-route-map-preview]>svg {min-height:0;height:140px;flex:1}
+ }
       `}</style>
 			<div
 				data-tour-layout
+				data-map-active={activeTab === "maps" ? "true" : "false"}
 				className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,30%)] lg:gap-8"
 			>
 				{/* Desktop Layout */}

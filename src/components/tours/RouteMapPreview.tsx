@@ -91,6 +91,7 @@ export default function RouteMapPreview({
 	return (
 		<>
 			<button
+				data-route-map-preview
 				type="button"
 				onClick={() => (previewImage ? dialog.current?.showModal() : onOpen())}
 				className={`group mt-4 w-full overflow-hidden rounded-xl border border-primary/20 bg-[#eef5ee] text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary ${fitHeight ? "lg:flex lg:min-h-0 lg:flex-1 lg:basis-0 lg:flex-col" : ""}`}
