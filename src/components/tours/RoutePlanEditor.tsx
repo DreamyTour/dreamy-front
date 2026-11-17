@@ -17,6 +17,7 @@ import {
 	MarkerContent,
 	useMap,
 } from "@/components/ui/map";
+import { singleBusTracks } from "@/lib/tour-bus-rendering";
 import { tourMapStyles } from "@/lib/tour-map-styles";
 import {
 	normalizeRouteGeometry,
@@ -144,9 +145,9 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		() => routePlanSegments(plan, inherited),
 		[plan, inherited],
 	);
-	const reversePairs = useMemo(
+	const busPresentation = useMemo(
 		() =>
-			pairReverseRoutes(
+			singleBusTracks(
 				segments.map((segment) => ({
 					...segment,
 					verifiedGpx:
@@ -156,6 +157,21 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 			),
 		[segments, plan],
 	);
+	const reversePairs = useMemo(
+		() =>
+			pairReverseRoutes(
+				segments
+					.map((segment) => ({
+						...segment,
+						verifiedGpx:
+							plan.legs.find((leg) => leg.id === segment.id)?.geometryMeta
+								?.source === "gpx" || segment.provider?.startsWith("GPX"),
+					}))
+					.filter((s) => !busPresentation.matchedIds.has(s.id)),
+			),
+		[segments, plan, busPresentation],
+	);
+
 	const directionMarkerPoints = useMemo(
 		() => segments.flatMap((segment) => [segment.from, segment.to]),
 		[segments],
@@ -907,7 +923,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 							{railwaySegments.length > 0 && (
 								<RailwayRoutes segments={railwaySegments} />
 							)}
-							{segments
+							{busPresentation.segments
 								.filter(
 									(segment) =>
 										segment.mode !== "train" && !reversePairs[segment.id],

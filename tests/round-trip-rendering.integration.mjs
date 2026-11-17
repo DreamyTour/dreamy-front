@@ -107,6 +107,27 @@ try {
 } catch (error) {
 	if (error.code !== "ENOENT") throw error;
 }
+let realBusStops;
+try {
+	const coordinates = JSON.parse(
+		await readFile(
+			path.join(
+				root,
+				"artifacts/aguas-calientes-control-machu-picchu-bus/coordinates.json",
+			),
+			"utf8",
+		),
+	);
+	realBusStops = structuredClone(makeStops("bus"));
+	for (let i = 0; i < 2; i++) {
+		const c = i ? [...coordinates].reverse() : coordinates;
+		realBusStops[i].routePlan.start.coordinates = c[0];
+		realBusStops[i].routePlan.legs[0].destination.coordinates = c.at(-1);
+		realBusStops[i].routePlan.legs[0].geometry = c;
+	}
+} catch (error) {
+	if (error.code !== "ENOENT") throw error;
+}
 const bundles = {};
 const server = createServer((request, response) => {
 	const url = new URL(request.url, "http://fixture");
@@ -143,7 +164,7 @@ try {
 			loader: "tsx",
 			contents: `
 import React,{useState}from'react';import{createRoot}from'react-dom/client';import MapTab from'./src/components/tours/MapTab';import Editor from './src/components/tours/RoutePlanEditor';
-const fixtures=${JSON.stringify({ train: makeStops(), horizontal: horizontalStops, bus: makeStops("bus"), boat: makeStops("boat"), variant: makeStops("train", true), ...(realStops ? { real: realStops } : {}) })};
+const fixtures=${JSON.stringify({ train: makeStops(), horizontal: horizontalStops, bus: realBusStops ?? makeStops("bus"), boat: makeStops("boat"), variant: makeStops("train", true), ...(realStops ? { real: realStops } : {}) })};
 // Capture the MapLibre constructor through the public ref exposed by the fixture-only module adapter.
 window.fixtureOriginal=JSON.stringify(fixtures);window.fixtureChanges=[];window.addEventListener('message',e=>{if(e.data?.type==='dreamy-route-change')window.fixtureChanges.push(e.data)});
 function App(){const [name,setName]=useState('train');window.chooseFixture=setName;window.fixtureData=fixtures;return name==='editor'?<Editor cmsOrigin={location.origin}/>:<MapTab key={name} lang="es" mapStops={fixtures[name]}/>};createRoot(document.getElementById('root')).render(<App/>);`,
@@ -627,13 +648,54 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	cases.push(
 		"390px mobile and satellite toggle with local dark style (external satellite tiles deliberately blocked)",
 	);
-	for (const mode of ["bus", "boat"]) {
-		await choose(mode);
-		await count(2);
-		assert.ok((await routes()).every((f) => f.properties.mode === mode));
-		await checkArrows();
-	}
-	cases.push("verified inverse bus and boat GPX share the rendering behavior");
+	await choose("bus");
+	const blueRoutes = () =>
+		page.evaluate(() => {
+			const style = window.fixtureMap.getStyle();
+			return style.layers
+				.filter(
+					(l) => l.type === "line" && l.paint?.["line-color"] === "#2563eb",
+				)
+				.map((l) => style.sources[l.source].data.geometry.coordinates);
+		});
+	await expect.poll(async () => (await blueRoutes()).length).toBe(1);
+	assert.deepEqual(
+		(await blueRoutes())[0],
+		(realBusStops ?? makeStops("bus"))[0].routePlan.legs[0].geometry,
+	);
+	assert.equal((await routes()).length, 0);
+	await page.evaluate(() => {
+		const c = window.fixtureData.bus[0].routePlan.legs[0].geometry;
+		const xs = c.map((p) => p[0]),
+			ys = c.map((p) => p[1]);
+		window.fixtureMap.fitBounds(
+			[
+				[Math.min(...xs), Math.min(...ys)],
+				[Math.max(...xs), Math.max(...ys)],
+			],
+			{ padding: 55, duration: 0, maxZoom: 14 },
+		);
+	});
+	await page.waitForTimeout(400);
+	await page.screenshot({
+		path: path.join(evidence, "bus-single-blue-mobile.png"),
+	});
+	await page.setViewportSize({ width: 1100, height: 1100 });
+	await page.getByRole("button", { name: /^D.A: 02/ }).press("Enter");
+	await expect.poll(async () => (await blueRoutes()).length).toBe(1);
+	assert.deepEqual(
+		(await blueRoutes())[0],
+		(realBusStops ?? makeStops("bus"))[1].routePlan.legs[0].geometry,
+	);
+	cases.push(
+		"exact inverse verified bus: single normal blue line; independent day 2 geometry unchanged",
+	);
+	await choose("boat");
+	await count(2);
+	assert.ok((await routes()).every((f) => f.properties.mode === "boat"));
+	await checkArrows();
+	cases.push("boat inverse rendering unchanged");
+
 	await choose("horizontal");
 	await count(1);
 	await page.setViewportSize({ width: 1100, height: 1100 });
@@ -714,6 +776,39 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	assert.deepEqual(await page.evaluate(() => window.fixtureChanges), []);
 	cases.push(
 		"editor deduplicates an intraday railway inverse pair without publishing route changes",
+	);
+	await choose("bus");
+	await choose("editor");
+	await page.getByRole("button", { name: /^Cambiar ubicaci.n$/ }).waitFor();
+	await page.evaluate(() => {
+		const a = window.fixtureData.bus[0].routePlan,
+			b = window.fixtureData.bus[1].routePlan;
+		window.postMessage(
+			{
+				type: "dreamy-route-init",
+				protocol: 2,
+				identity: {
+					documentId: "bus-fixture",
+					locale: "es",
+					dayKey: "2",
+					sessionId: "bus-fixture",
+				},
+				sequence: 0,
+				ackSequence: 0,
+				value: { ...a, legs: [a.legs[0], b.legs[0]] },
+			},
+			location.origin,
+		);
+	});
+	await expect.poll(async () => (await blueRoutes()).length).toBe(1);
+	assert.deepEqual(
+		(await blueRoutes())[0],
+		(realBusStops ?? makeStops("bus"))[0].routePlan.legs[0].geometry,
+	);
+	await count(0);
+	assert.deepEqual(await page.evaluate(() => window.fixtureChanges), []);
+	cases.push(
+		"editor exact inverse bus pair: one normal blue line, no route change messages",
 	);
 	assert.deepEqual(await page.evaluate(() => window.fixtureMapErrors), []);
 	assert.deepEqual(errors, []);

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/map";
 import { getImageAlt, getImageUrl } from "@/lib/helpers";
 import type { Lang } from "@/lib/i18n";
+import { singleBusTracks } from "@/lib/tour-bus-rendering";
 import { dayMarkerPlace } from "@/lib/tour-day-marker";
 import { isValidTourMapStop, normalizeTourMapCoordinate } from "@/lib/tour-map";
 import { type TourMapMode, tourMapStyles } from "@/lib/tour-map-styles";
@@ -802,15 +803,19 @@ export default function MapTab({
 		],
 		[tourMapStops, routeSegments],
 	);
-	const reversePairs = React.useMemo(
-		() => pairReverseRoutes(baseRouteSegments),
-		[baseRouteSegments],
-	);
+	const reversePairs = React.useMemo(() => {
+		const bus = singleBusTracks(baseRouteSegments);
+		return pairReverseRoutes(
+			baseRouteSegments.filter((s) => !bus.matchedIds.has(s.id)),
+		);
+	}, [baseRouteSegments]);
 	const visibleSegments = React.useMemo(
 		() =>
-			routeSegments.filter(
-				(segment) => selectedId === null || segment.toStop.id === selectedId,
-			),
+			singleBusTracks(
+				routeSegments.filter(
+					(segment) => selectedId === null || segment.toStop.id === selectedId,
+				),
+			).segments,
 		[routeSegments, selectedId],
 	);
 	const directionalSegments = React.useMemo(
