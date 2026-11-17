@@ -594,11 +594,11 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		[2, "return"],
 	]) {
 		await page
-			.locator("button[aria-pressed]")
+			.locator(".tour-map-stops-scroll button[aria-pressed]")
 			.filter({ hasText: new RegExp(`0${day}`) })
 			.focus();
 		await page
-			.locator("button[aria-pressed]")
+			.locator(".tour-map-stops-scroll button[aria-pressed]")
 			.filter({ hasText: new RegExp(`0${day}`) })
 			.press("Enter");
 		await count(1);

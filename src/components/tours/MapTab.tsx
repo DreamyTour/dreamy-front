@@ -378,38 +378,72 @@ function Pin({
 	active,
 	day,
 	label,
+	groupSize = 1,
+	expanded,
 }: {
 	active: boolean;
 	day: string;
 	label: string;
+	groupSize?: number;
+	expanded?: boolean;
 }) {
-	const [dayLabel, dayNumber = day] = day.split(": ");
-
+	const dayNumber = day.split(":").at(-1)?.trim() ?? day;
 	return (
 		<button
 			type="button"
 			aria-label={label}
+			aria-pressed={active}
+			aria-expanded={expanded}
 			data-day-marker
-			className={cn(
-				"relative flex h-12 w-12 flex-col items-center justify-center rounded-full border-2 border-white bg-primary text-primary-foreground shadow-[0_12px_24px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)] transition-[transform,box-shadow] duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-secondary/55 sm:h-[3.25rem] sm:w-[3.25rem]",
-				active
-					? "scale-105 ring-4 ring-primary/25"
-					: "hover:scale-105 hover:shadow-[0_16px_28px_-16px_color-mix(in_oklab,var(--foreground)_68%,transparent)]",
-			)}
+			data-day-number={dayNumber}
+			data-day-group={groupSize > 1 ? groupSize : undefined}
+			className="relative block size-12 shrink-0 rounded-full text-[#007A32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#007A32]"
 		>
-			<span className="absolute top-[calc(100%-0.28rem)] left-1/2 z-0 h-3 w-3 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-white bg-primary" />
-			<span
-				className="relative z-10 text-[0.58rem] font-extrabold leading-none tracking-[0.06em]"
+			<svg
 				aria-hidden="true"
+				viewBox="0 0 48 48"
+				className="pointer-events-none absolute inset-0 size-12 overflow-visible"
 			>
-				{dayLabel}:
-			</span>
+				{active && (
+					<circle
+						data-day-halo
+						cx="24"
+						cy="22"
+						r="20"
+						fill="none"
+						stroke="currentColor"
+						strokeOpacity="0.2"
+						strokeWidth="5"
+					/>
+				)}
+				<path
+					d="M28 38.52A17 17 0 1 0 20 38.52L24 47Z"
+					fill="white"
+					stroke="white"
+					strokeWidth="4"
+				/>
+				<path
+					d="M28 38.52A17 17 0 1 0 20 38.52L24 47Z"
+					fill="white"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinejoin="round"
+				/>
+			</svg>
 			<span
-				className="relative z-10 mt-0.5 text-base font-extrabold leading-none"
 				aria-hidden="true"
+				className="pointer-events-none absolute left-[7px] top-[5px] flex size-[34px] items-center justify-center text-base font-bold leading-none tabular-nums"
 			>
 				{dayNumber}
 			</span>
+			{groupSize > 1 && (
+				<span
+					aria-hidden="true"
+					className="pointer-events-none absolute -right-1 top-0 flex min-h-5 min-w-5 items-center justify-center rounded-full border border-[#007A32] bg-white px-1 text-[0.625rem] font-bold leading-none"
+				>
+					+{groupSize - 1}
+				</span>
+			)}
 		</button>
 	);
 }
@@ -466,6 +500,7 @@ function DayMarkers({
 				return (
 					<MapMarker
 						key={stop.id}
+						anchor="bottom"
 						longitude={stop.markerPlace.coordinates[0]}
 						latitude={stop.markerPlace.coordinates[1]}
 						onClick={(event) => {
@@ -491,32 +526,17 @@ function DayMarkers({
 								/>
 							) : (
 								<div className="relative">
-									<button
-										type="button"
-										aria-expanded={openGroup === stop.id}
-										aria-pressed={group.some((item) => item.id === selectedId)}
-										className={cn(
-											"flex min-h-12 min-w-14 items-center justify-center rounded-2xl border-2 border-white bg-primary px-3 text-sm font-bold text-white shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-											group.some((item) => item.id === selectedId) &&
-												"ring-4 ring-primary/50",
-										)}
-									>
-										{group.map((item, index) => (
-											<React.Fragment key={item.id}>
-												{index > 0 && <span aria-hidden="true"> · </span>}
-												<span
-													className={cn(
-														item.id === selectedId &&
-															"rounded bg-white px-1 text-primary",
-													)}
-												>
-													{item.day.split(":").at(-1)?.trim()}
-												</span>
-											</React.Fragment>
-										))}
-									</button>
+									<Pin
+										active={group.some((item) => item.id === selectedId)}
+										day={
+											(group.find((item) => item.id === selectedId) ?? stop).day
+										}
+										label={`${labels.viewDetails} ${(group.find((item) => item.id === selectedId) ?? stop).day} (+${group.length - 1})`}
+										groupSize={group.length}
+										expanded={openGroup === stop.id}
+									/>
 									{openGroup === stop.id && (
-										<div className="absolute left-1/2 top-full z-20 mt-2 w-60 -translate-x-1/2 rounded-xl bg-white p-2 shadow-xl">
+										<div className="absolute left-1/2 top-full z-20 mt-2 max-h-56 w-60 -translate-x-1/2 overflow-y-auto overscroll-contain rounded-xl bg-white p-2 shadow-xl">
 											{group.map((item) => (
 												<button
 													type="button"
@@ -905,7 +925,8 @@ export default function MapTab({
 				const panel = sheet.getBoundingClientRect(),
 					box = viewport.getBoundingClientRect(),
 					pin = map.project(point);
-				const bottom = panel.top - box.top - 36;
+				// Day pins are bottom-anchored: reserve space below their tip.
+				const bottom = panel.top - box.top - 8;
 				if (pin.y > bottom) map.panBy([0, pin.y - bottom], { duration: 0 });
 			});
 		};
@@ -921,7 +942,7 @@ export default function MapTab({
 	}, [selectedStop]);
 
 	const selectStop = React.useCallback(
-		(stop: TourMapStop) => {
+		(stop: TourMapStop, frameRoute = false) => {
 			const relatedSegment = routeSegments.find(
 				(segment) => segment.toStop.id === stop.id,
 			);
@@ -929,6 +950,7 @@ export default function MapTab({
 			setSelectedId(stop.id);
 			setExpandedDay(null);
 			setActiveSegmentId(relatedSegment?.id ?? null);
+			if (!frameRoute) return;
 
 			const points = [
 				stop.markerPlace.coordinates,
@@ -1364,7 +1386,7 @@ export default function MapTab({
 										active ? "border-primary" : "border-border/60",
 									)}
 									onClick={() => {
-										selectStop(stop);
+										selectStop(stop, true);
 									}}
 								>
 									<span className="relative flex w-full items-center justify-between gap-3">
