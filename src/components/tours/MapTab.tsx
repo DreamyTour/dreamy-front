@@ -42,13 +42,14 @@ import {
 	type RoutePlace,
 	routePlanDestination,
 	routePlanHighlight,
-	routePlanSecondaryStops,
 	routePlanSegments,
 } from "@/lib/tour-route-plan";
+import { secondaryStopsForDays } from "@/lib/tour-secondary-stops";
 import { cn } from "@/lib/utils";
 import type { MapStop } from "@/types/tours";
 import RailwayRoutes from "./RailwayRoutes";
 import RoundTripRoutes from "./RoundTripRoutes";
+import SecondaryStops from "./SecondaryStops";
 import TransportRoute from "./TransportRoute";
 import {
 	routeCalculationKey,
@@ -77,6 +78,9 @@ interface TourRouteSegment {
 	coordinates: RouteCoordinate[] | null;
 	provider?: string;
 }
+
+// Stop-sheet state must not recreate unchanged native line sources.
+const StableTransportRoute = React.memo(TransportRoute);
 
 const transportIcons = {
 	walking: Footprints,
@@ -627,6 +631,11 @@ export default function MapTab({
 	const sheetRef = React.useRef<HTMLElement>(null);
 	const [touchActive, setTouchActive] = React.useState(false);
 	const [expandedDay, setExpandedDay] = React.useState<string | null>(null);
+	const [selectedSecondaryId, setSelectedSecondaryId] = React.useState<
+		string | null
+	>(null);
+	const [dayDetailsVisible, setDayDetailsVisible] = React.useState(false);
+	const [selectedId, setSelectedId] = React.useState<string | null>(null);
 	const mobileLabels = {
 		es: {
 			activate: "Explorar mapa",
@@ -664,6 +673,7 @@ export default function MapTab({
 		return () => document.removeEventListener("fullscreenchange", sync);
 	}, []);
 	const closeDay = () => {
+		setDayDetailsVisible(false);
 		setSelectedId(null);
 		setExpandedDay(null);
 		viewportRef.current
@@ -717,6 +727,25 @@ export default function MapTab({
 			day: `${prefix}: ${String(index + 1).padStart(2, "0")}`,
 		}));
 	}, [lang, tourMapStopsSource]);
+	const secondaryStops = React.useMemo(
+		() => secondaryStopsForDays(tourMapStops),
+		[tourMapStops],
+	);
+	const primaryPoints = React.useMemo(
+		() => tourMapStops.map((stop) => stop.markerPlace.coordinates),
+		[tourMapStops],
+	);
+	const visibleSecondaryStops = React.useMemo(
+		() =>
+			secondaryStops.filter(
+				(stop) => selectedId === null || stop.dayId === selectedId,
+			),
+		[secondaryStops, selectedId],
+	);
+	const selectSecondary = React.useCallback((id: string | null) => {
+		setSelectedSecondaryId(id);
+		setDayDetailsVisible(false);
+	}, []);
 	const tourMapCenter = React.useMemo<[number, number]>(() => {
 		const longitudeSum = tourMapStops.reduce(
 			(sum, stop) => sum + stop.longitude,
@@ -815,7 +844,6 @@ export default function MapTab({
 			),
 		[routeBoundsPoints],
 	);
-	const [selectedId, setSelectedId] = React.useState<string | null>(null);
 	const directionMarkerPoints = React.useMemo(
 		() => [
 			...tourMapStops.map((stop) => stop.markerPlace.coordinates),
@@ -910,6 +938,7 @@ export default function MapTab({
 			!sheet ||
 			!viewport ||
 			!selectedStop ||
+			!dayDetailsVisible ||
 			!window.matchMedia("(max-width:767px)").matches
 		)
 			return;
@@ -939,7 +968,7 @@ export default function MapTab({
 			map.off("moveend", fit);
 			cancelAnimationFrame(frame);
 		};
-	}, [selectedStop]);
+	}, [selectedStop, dayDetailsVisible]);
 
 	const selectStop = React.useCallback(
 		(stop: TourMapStop, frameRoute = false) => {
@@ -947,6 +976,8 @@ export default function MapTab({
 				(segment) => segment.toStop.id === stop.id,
 			);
 
+			setSelectedSecondaryId(null);
+			setDayDetailsVisible(true);
 			setSelectedId(stop.id);
 			setExpandedDay(null);
 			setActiveSegmentId(relatedSegment?.id ?? null);
@@ -1019,6 +1050,7 @@ export default function MapTab({
 					z-index: 1 !important;
 				}
 
+                .tour-map-tab .maplibregl-marker:has([data-secondary-marker]) { z-index: 0 !important; }
 				@media (max-width: 767px) {
 					.tour-map-tab .maplibregl-popup:has(.tour-map-popup-desktop) {
 						display: none !important;
@@ -1155,7 +1187,7 @@ export default function MapTab({
 								segment.mode !== "train" && !reversePairs[segment.id],
 						)
 						.map((segment) => (
-							<TransportRoute
+							<StableTransportRoute
 								key={segment.id}
 								id={segment.id}
 								from={segment.from}
@@ -1207,40 +1239,15 @@ export default function MapTab({
 								</MarkerContent>
 							</MapMarker>
 						)}
-					{selectedStop &&
-						routePlanSecondaryStops(selectedStop.routePlan)
-							.filter(
-								(leg, index, legs) =>
-									legs.findIndex((other) =>
-										other.destination.coordinates.every(
-											(n, i) => n === leg.destination.coordinates[i],
-										),
-									) === index &&
-									!leg.destination.coordinates.every(
-										(n, i) => n === selectedStop.markerPlace.coordinates[i],
-									) &&
-									!tourMapStops.some((stop) =>
-										stop.markerPlace.coordinates.every(
-											(n, i) => n === leg.destination.coordinates[i],
-										),
-									),
-							)
-							.map((leg, index) => (
-								<MapMarker
-									key={leg.id}
-									longitude={leg.destination.coordinates[0]}
-									latitude={leg.destination.coordinates[1]}
-								>
-									<MarkerContent>
-										<span className="flex size-7 items-center justify-center rounded-full border-2 border-white bg-primary text-xs font-bold text-white shadow-md">
-											{index + 1}
-										</span>
-									</MarkerContent>
-									<MarkerTooltip>{leg.destination.label}</MarkerTooltip>
-								</MapMarker>
-							))}
+					<SecondaryStops
+						stops={visibleSecondaryStops}
+						primaryPoints={primaryPoints}
+						selectedId={selectedSecondaryId}
+						onSelect={selectSecondary}
+						lang={lang}
+					/>
 
-					{selectedStop && (
+					{selectedStop && dayDetailsVisible && (
 						<DayMapPopup
 							label={selectedStop.day}
 							longitude={selectedStop.markerPlace.coordinates[0]}
@@ -1264,7 +1271,7 @@ export default function MapTab({
 						</DayMapPopup>
 					)}
 				</TourMap>
-				{selectedStop && (
+				{selectedStop && dayDetailsVisible && (
 					<section
 						data-day-details-mobile
 						ref={sheetRef}
