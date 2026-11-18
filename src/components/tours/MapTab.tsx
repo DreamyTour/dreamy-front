@@ -926,6 +926,8 @@ export default function MapTab({
 				] as RouteCoordinate,
 			})
 		: normalizeTourRoutePlan(selectedStop?.routePlan)?.start;
+	const departureLabel =
+		lang === "en" ? "Departure" : lang === "pt" ? "Saída" : "Salida del día";
 	const selectedStopImage = selectedStop?.imagen
 		? getImageUrl(selectedStop.imagen, "medium")
 		: null;
@@ -1226,17 +1228,22 @@ export default function MapTab({
 								latitude={selectedStart.coordinates[1]}
 							>
 								<MarkerContent>
-									<span className="block max-w-40 rounded-lg border border-white bg-slate-900 px-2 py-1 text-center text-xs font-semibold text-white shadow-lg">
-										{selectedStart.label}
-										<small className="block font-normal">
-											{lang === "en"
-												? "Departure"
-												: lang === "pt"
-													? "Saída"
-													: "Salida del día"}
-										</small>
-									</span>
+									<button
+										type="button"
+										data-day-departure
+										aria-label={`${departureLabel}: ${selectedStart.label}`}
+										className="flex size-11 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+									>
+										<span
+											aria-hidden="true"
+											className="size-3.5 rounded-full border-2 border-white bg-slate-900 shadow-md"
+										/>
+									</button>
 								</MarkerContent>
+								<MarkerTooltip offset={18}>
+									{selectedStart.label}
+									<small className="block font-normal">{departureLabel}</small>
+								</MarkerTooltip>
 							</MapMarker>
 						)}
 					<SecondaryStops
