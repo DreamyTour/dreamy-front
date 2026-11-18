@@ -8,6 +8,8 @@ import {
 	type SecondaryStop,
 } from "@/lib/tour-secondary-stops";
 
+import TourMarkerTooltip from "./TourMarkerTooltip";
+
 const labels = {
 	es: {
 		view: "Ver parada",
@@ -56,12 +58,14 @@ export default function SecondaryStops({
 	selectedId,
 	onSelect,
 	lang,
+	suppressTooltips = false,
 }: {
 	stops: SecondaryStop[];
 	primaryPoints: RouteCoordinate[];
 	selectedId: string | null;
 	onSelect: (id: string | null) => void;
 	lang: Lang;
+	suppressTooltips?: boolean;
 }) {
 	const { map } = useMap();
 	const [revision, setRevision] = useState(0);
@@ -183,26 +187,36 @@ export default function SecondaryStops({
 						}}
 					>
 						<MarkerContent>
-							<button
-								type="button"
-								data-secondary-marker={group.id}
-								data-secondary-count={group.items.length}
-								aria-label={
-									group.items.length === 1
-										? `${text.view}: ${group.items[0].label}, ${group.items[0].day}`
-										: `${text.nearby}: ${group.items[0].label}, ${group.items[0].day} (${group.items.length})`
+							<TourMarkerTooltip
+								label={
+									group.items[0].label +
+									(group.items.length > 1
+										? ` (+${group.items.length - 1})`
+										: "")
 								}
-								aria-pressed={active}
-								aria-expanded={active}
-								className="flex size-11 items-center justify-center rounded-full text-[#007A32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#007A32]"
+								disabled={suppressTooltips}
 							>
-								<span
-									aria-hidden="true"
-									className={`flex items-center justify-center rounded-full border-2 border-[#007A32] bg-white shadow-[0_0_0_1px_white] ${presentation.detailed ? "size-3.5" : "size-2.5"} ${active ? "ring-4 ring-[#007A32]/20" : ""}`}
+								<button
+									type="button"
+									data-secondary-marker={group.id}
+									data-secondary-count={group.items.length}
+									aria-label={
+										group.items.length === 1
+											? `${text.view}: ${group.items[0].label}, ${group.items[0].day}`
+											: `${text.nearby}: ${group.items[0].label}, ${group.items[0].day} (${group.items.length})`
+									}
+									aria-pressed={active}
+									aria-expanded={active}
+									className="flex size-11 items-center justify-center rounded-full text-[#007A32] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#007A32]"
 								>
-									<span className="size-1 rounded-full bg-[#007A32]" />
-								</span>
-							</button>
+									<span
+										aria-hidden="true"
+										className={`flex items-center justify-center rounded-full border-2 border-[#007A32] bg-white shadow-[0_0_0_1px_white] ${presentation.detailed ? "size-3.5" : "size-2.5"} ${active ? "ring-4 ring-[#007A32]/20" : ""}`}
+									>
+										<span className="size-1 rounded-full bg-[#007A32]" />
+									</span>
+								</button>
+							</TourMarkerTooltip>
 						</MarkerContent>
 					</MapMarker>
 				);

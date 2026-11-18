@@ -128,6 +128,17 @@ try {
 } catch (error) {
 	if (error.code !== "ENOENT") throw error;
 }
+const selectionTours = {};
+for (const [index, file] of process.argv
+	.filter((arg) => arg.startsWith("--selection-tour="))
+	.entries()) {
+	const body = JSON.parse(
+		await readFile(file.slice("--selection-tour=".length), "utf8"),
+	);
+	selectionTours[`tour${index}`] = body.data[0].tab.maps.mapstops.map(
+		(stop) => ({ ...stop, imagen: null }),
+	);
+}
 const bundles = {};
 const server = createServer((request, response) => {
 	const url = new URL(request.url, "http://fixture");
@@ -149,6 +160,7 @@ let browser;
 try {
 	const result = await build({
 		bundle: true,
+		loader: { ".woff2": "dataurl" },
 		write: false,
 		outdir: "fixture",
 		format: "esm",
@@ -164,7 +176,7 @@ try {
 			loader: "tsx",
 			contents: `
 import React,{useState}from'react';import{createRoot}from'react-dom/client';import MapTab from'./src/components/tours/MapTab';import Editor from './src/components/tours/RoutePlanEditor';
-const fixtures=${JSON.stringify({ train: makeStops(), horizontal: horizontalStops, bus: realBusStops ?? makeStops("bus"), boat: makeStops("boat"), variant: makeStops("train", true), ...(realStops ? { real: realStops } : {}) })};
+const fixtures=${JSON.stringify({ train: makeStops(), horizontal: horizontalStops, bus: realBusStops ?? makeStops("bus"), boat: makeStops("boat"), variant: makeStops("train", true), ...(realStops ? { real: realStops } : {}), ...selectionTours })};
 // Capture the MapLibre constructor through the public ref exposed by the fixture-only module adapter.
 window.fixtureOriginal=JSON.stringify(fixtures);window.fixtureChanges=[];window.addEventListener('message',e=>{if(e.data?.type==='dreamy-route-change')window.fixtureChanges.push(e.data)});
 function App(){const [name,setName]=useState('train');window.chooseFixture=setName;window.fixtureData=fixtures;return name==='editor'?<Editor cmsOrigin={location.origin}/>:<MapTab key={name} lang="es" mapStops={fixtures[name]}/>};createRoot(document.getElementById('root')).render(<App/>);`,
@@ -232,6 +244,10 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		viewport: { width: 1100, height: 1100 },
 	});
 	page.setDefaultTimeout(10000);
+	const evidenceScreenshot = (options) =>
+		process.argv.includes("--no-screenshots")
+			? Promise.resolve()
+			: page.screenshot(options);
 	const errors = [],
 		external = [];
 	page.on("pageerror", (error) => errors.push(error.message));
@@ -286,6 +302,105 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 			throw error;
 		}
 	};
+	if (process.argv.includes("--selection-only")) {
+		const state = () =>
+			page.evaluate(() => {
+				const style = window.fixtureMap.getStyle();
+				const geometries = Object.values(style.sources)
+					.flatMap((source) =>
+						source.data?.type === "Feature"
+							? [source.data]
+							: (source.data?.features ?? []),
+					)
+					.filter((feature) => feature.geometry.type === "LineString")
+					.map((feature) => {
+						const coordinates = feature.geometry.coordinates;
+						return [
+							JSON.stringify(coordinates),
+							JSON.stringify([...coordinates].reverse()),
+						].sort()[0];
+					})
+					.sort();
+				return {
+					geometries,
+					paint: style.layers
+						.filter(
+							(layer) => layer.type === "line" || layer.id.endsWith("-arrows"),
+						)
+						.map((layer) => ({
+							width: layer.paint?.["line-width"],
+							opacity:
+								layer.paint?.[
+									layer.type === "line" ? "line-opacity" : "icon-opacity"
+								],
+						})),
+				};
+			});
+		const tested = [];
+		for (const name of [
+			"variant",
+			"bus",
+			"boat",
+			...Object.keys(selectionTours),
+		]) {
+			await choose(name);
+			await expect
+				.poll(async () => (await state()).geometries.length, { message: name })
+				.toBeGreaterThan(0);
+			const original = await state();
+			assert.ok(original.geometries.length > 0);
+			const cards = page.locator(".tour-map-stops-scroll button[aria-pressed]");
+			for (let day = 0; day < (await cards.count()); day++) {
+				await cards.nth(day).click();
+				await expect
+					.poll(async () => (await state()).geometries)
+					.toEqual(original.geometries);
+				// A bus shared by both days is entirely selected; it must stay fully opaque.
+				await expect
+					.poll(async () =>
+						(await state()).paint.some(({ opacity, width }) =>
+							name === "bus"
+								? opacity === 1 && width === 5
+								: opacity === 0.7 || Array.isArray(opacity),
+						),
+					)
+					.toBe(true);
+				await page
+					.getByRole("button", { name: "Close popup", exact: true })
+					.click();
+				await expect.poll(state).toEqual(original);
+			}
+			tested.push({
+				name,
+				days: await cards.count(),
+				preservedLines: original.geometries.length,
+			});
+		}
+		assert.deepEqual(errors, []);
+		assert.deepEqual(await page.evaluate(() => window.fixtureMapErrors), []);
+		assert.equal(
+			await page.evaluate(
+				() => JSON.stringify(window.fixtureData) === window.fixtureOriginal,
+			),
+			true,
+		);
+		console.log(
+			JSON.stringify(
+				{
+					result: "PASS",
+					webgl: true,
+					tested,
+					allRoutesPreserved: true,
+					closeRestoresPaint: true,
+				},
+				null,
+				2,
+			),
+		);
+		await browser.close();
+		await new Promise((resolve) => server.close(resolve));
+		process.exit(0);
+	}
 	await count(1);
 	await page.evaluate(() => window.fixtureMap.jumpTo({ zoom: 10.5 }));
 	const cases = [];
@@ -565,7 +680,9 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 
 	await checkArrowPixels();
 
-	await page.screenshot({ path: path.join(evidence, "complete-desktop.png") });
+	await evidenceScreenshot({
+		path: path.join(evidence, "complete-desktop.png"),
+	});
 	cases.push(
 		"real MapLibre full view: one charcoal railway for exact inverse GPX, no orange/coral or permanent arrows",
 	);
@@ -581,7 +698,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		await page.waitForTimeout(150);
 		await checkArrows();
 		await checkArrowPixels();
-		await page.screenshot({
+		await evidenceScreenshot({
 			path: path.join(evidence, `zoom-${zoom}-bearing-${bearing}.png`),
 		});
 	}
@@ -603,28 +720,30 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 			.press("Enter");
 		await count(1);
 		await expect
-			.poll(async () =>
-				(await routes())[0]?.properties.segmentIds[0]?.includes(
-					day === 1 ? "out" : "back",
-				),
-			)
-			.toBe(true);
+			.poll(async () => (await routes())[0]?.properties.segmentIds.length)
+			.toBe(2);
 		const [route] = await routes();
-		assert.equal(route.properties.segmentIds.length, 1);
+		assert.equal(route.properties.segmentIds.length, 2);
+		assert.deepEqual(
+			[...route.properties.segmentIds].sort(),
+			[...full[0].properties.segmentIds].sort(),
+			"Both original segments remain represented after day selection",
+		);
 		await expect(
 			page.getByRole("list", { name: "Sentido del viaje en tren" }),
 		).toHaveCount(0);
 
+		// The single shared feature follows the selected day's original GPX order.
 		assert.deepEqual(
 			route.geometry.coordinates,
 			day === 1 ? forward : [...forward].reverse(),
 		);
 		await checkArrows();
-		await page.screenshot({ path: path.join(evidence, `day${day}.png`) });
+		await evidenceScreenshot({ path: path.join(evidence, `day${day}.png`) });
 	}
 
 	cases.push(
-		"day selection hides other days, shows only its own direction without paired offset",
+		"day selection preserves both directions in one deduplicated railway",
 	);
 	await page
 		.getByRole("button", { name: "Ver recorrido completo", exact: true })
@@ -634,7 +753,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	await page.getByRole("button", { name: "Satélite", exact: true }).click();
 	await page.waitForTimeout(200);
 	await checkArrows();
-	await page.screenshot({
+	await evidenceScreenshot({
 		path: path.join(evidence, "mobile-satellite-fixture.png"),
 	});
 	await page.evaluate(() =>
@@ -642,7 +761,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	);
 	await checkArrowPixels();
 	await checkArrows();
-	await page.screenshot({
+	await evidenceScreenshot({
 		path: path.join(evidence, "mobile-satellite-detail.png"),
 	});
 	cases.push(
@@ -677,7 +796,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		);
 	});
 	await page.waitForTimeout(400);
-	await page.screenshot({
+	await evidenceScreenshot({
 		path: path.join(evidence, "bus-single-blue-mobile.png"),
 	});
 	await page.setViewportSize({ width: 1100, height: 1100 });
@@ -702,7 +821,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	await page.evaluate(() => window.fixtureMap.jumpTo({ zoom: 11, bearing: 0 }));
 	await checkArrows();
 	await checkArrowPixels(true);
-	await page.screenshot({
+	await evidenceScreenshot({
 		path: path.join(evidence, "opposite-arrow-directions.png"),
 	});
 	cases.push(
@@ -729,7 +848,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 		await page.evaluate(() => window.fixtureMap.jumpTo({ zoom: 10 }));
 		await page.waitForTimeout(200);
 		await checkArrows();
-		await page.screenshot({
+		await evidenceScreenshot({
 			path: path.join(evidence, "actual-1431-point-gpx.png"),
 		});
 		cases.push(
@@ -770,7 +889,7 @@ function App(){const [name,setName]=useState('train');window.chooseFixture=setNa
 	});
 	await count(1);
 	await checkArrows();
-	await page.screenshot({
+	await evidenceScreenshot({
 		path: path.join(evidence, "editor-same-day-pair.png"),
 	});
 	assert.deepEqual(await page.evaluate(() => window.fixtureChanges), []);

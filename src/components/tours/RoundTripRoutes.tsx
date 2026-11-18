@@ -13,10 +13,12 @@ export default function RoundTripRoutes({
 	segments,
 	markerCoordinates = noMarkers,
 	satellite = false,
+	highlightedIds,
 }: {
 	segments: DirectionalSegment[];
 	markerCoordinates?: RouteCoordinate[];
 	satellite?: boolean;
+	highlightedIds?: string[];
 }) {
 	const { map, isLoaded } = useMap();
 	const instance = useId().replace(/[^a-zA-Z0-9-]/g, "");
@@ -135,11 +137,21 @@ export default function RoundTripRoutes({
 	}, [map, isLoaded, prefix, data]);
 	useEffect(() => {
 		if (!map || !isLoaded || !map.getLayer(`${prefix}-outer`)) return;
-		map.setPaintProperty(
-			`${prefix}-outer`,
-			"line-opacity",
-			satellite ? 0.9 : 1,
-		);
-	}, [map, isLoaded, prefix, satellite]);
+		for (const suffix of ["outer", "halo", "line", "arrows"]) {
+			const opacity = suffix === "outer" && satellite ? 0.9 : 1;
+			map.setPaintProperty(
+				`${prefix}-${suffix}`,
+				suffix === "arrows" ? "icon-opacity" : "line-opacity",
+				highlightedIds
+					? [
+							"case",
+							["in", ["get", "id"], ["literal", highlightedIds]],
+							opacity,
+							opacity * 0.7,
+						]
+					: opacity,
+			);
+		}
+	}, [map, isLoaded, prefix, satellite, highlightedIds]);
 	return null;
 }

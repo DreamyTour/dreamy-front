@@ -103,6 +103,7 @@ let browser;
 try {
 	const built = await build({
 		bundle: true,
+		loader: { ".woff2": "dataurl" },
 		write: false,
 		outdir: "fixture",
 		format: "esm",
@@ -302,6 +303,14 @@ try {
 				const dot = await visibleDot(),
 					prior = await camera(),
 					geometry = await geometries();
+				const tooltip = page.locator("[data-tour-marker-tooltip]");
+				await dot.hover();
+				await expect(tooltip).toBeVisible();
+				await expect(tooltip).toHaveCSS("background-color", "rgb(0, 122, 50)");
+				// A fast jump must not leave the pointer grace area open indefinitely.
+				await page.mouse.move(width - 1, 899);
+				await expect(tooltip).toHaveCount(0);
+				assert.deepEqual(await camera(), prior);
 				await dot.tap();
 				await page.waitForTimeout(150);
 				const panel = page.locator("[data-secondary-details]");
@@ -486,7 +495,14 @@ try {
 	await page.evaluate(() =>
 		window.map.jumpTo({ center: [-72.396, -13.397], zoom: 14, bearing: 25 }),
 	);
-	await page.waitForTimeout(250);
+	// Wait for the debounced grouping after MapLibre settles, not a fixed frame budget.
+	await expect
+		.poll(async () =>
+			page
+				.locator("[data-secondary-marker]")
+				.evaluateAll((es) => es.map((e) => Number(e.dataset.secondaryCount))),
+		)
+		.toContain(2);
 	const closeGroups = await page
 		.locator("[data-secondary-marker]")
 		.evaluateAll((es) => es.map((e) => Number(e.dataset.secondaryCount)));

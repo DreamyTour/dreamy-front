@@ -47,7 +47,7 @@ export default function TransportRoute({
 					paint={{
 						"line-color": outline,
 						"line-width": width + 4,
-						"line-opacity": dimmed ? 0.15 : 0.85,
+						"line-opacity": dimmed ? 0.6 : 0.85,
 					}}
 					interactive={false}
 				/>
@@ -59,7 +59,7 @@ export default function TransportRoute({
 					paint={{
 						"line-color": color,
 						"line-width": width,
-						"line-opacity": dimmed ? 0.2 : 1,
+						"line-opacity": dimmed ? 0.7 : 1,
 						...(mode === "boat" ? { "line-dasharray": [2, 2] } : {}),
 					}}
 					interactive={false}
@@ -78,7 +78,7 @@ export default function TransportRoute({
 				color={outline}
 				width={width + 4}
 				dashArray={dashArray}
-				opacity={dimmed ? 0.15 : 0.9}
+				opacity={dimmed ? 0.6 : 0.9}
 				interactive={false}
 			/>
 			<MapRoute
@@ -87,7 +87,7 @@ export default function TransportRoute({
 				color={color}
 				width={width}
 				dashArray={dashArray}
-				opacity={dimmed ? 0.2 : 1}
+				opacity={dimmed ? 0.7 : 1}
 				interactive={false}
 			/>
 			{mode === "train" && (
@@ -97,7 +97,7 @@ export default function TransportRoute({
 						coordinates={path}
 						color={outline}
 						width={1.5}
-						opacity={dimmed ? 0.2 : 1}
+						opacity={dimmed ? 0.7 : 1}
 						interactive={false}
 					/>
 					<MapRoute
@@ -107,7 +107,7 @@ export default function TransportRoute({
 						width={width + 6}
 						dashArray={[0.1, 1]}
 						lineCap="butt"
-						opacity={dimmed ? 0.2 : 1}
+						opacity={dimmed ? 0.7 : 1}
 						interactive={false}
 					/>
 				</>

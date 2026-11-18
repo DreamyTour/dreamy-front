@@ -133,6 +133,7 @@ let browser;
 try {
 	const result = await build({
 		bundle: true,
+		loader: { ".woff2": "dataurl" },
 		write: false,
 		outdir: "fixture",
 		format: "esm",

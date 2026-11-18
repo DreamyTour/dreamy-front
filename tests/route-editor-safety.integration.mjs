@@ -138,6 +138,8 @@ const plugin = {
 };
 const options = {
 	bundle: true,
+	// This fixture adapts MapLibre and tests persistence, not visual presentation.
+	loader: { ".css": "empty" },
 	write: false,
 	format: "esm",
 	platform: "browser",

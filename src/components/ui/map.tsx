@@ -1206,7 +1206,7 @@ function MapRoute({
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isLoaded, map, color, opacity, sourceId, width, dashArray, layerId]);
+	}, [isLoaded, map, sourceId, layerId]);
 
 	// When coordinates change, update the source data
 	useEffect(() => {

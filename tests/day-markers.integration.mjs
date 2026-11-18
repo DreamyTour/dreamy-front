@@ -86,6 +86,7 @@ let browser;
 try {
 	const built = await build({
 		bundle: true,
+		loader: { ".woff2": "dataurl" },
 		write: false,
 		outdir: "fixture",
 		format: "esm",
@@ -271,6 +272,18 @@ try {
 			await pin.focus();
 			await expect(pin).toBeFocused();
 			const prior = await camera();
+			if (!before) {
+				const tooltip = page.locator("[data-tour-marker-tooltip]");
+				await expect(tooltip).toBeVisible();
+				await expect(tooltip).toContainText(
+					`Día 01: ${fixtures["days" + count][0].title}`,
+				);
+				await expect(tooltip).toHaveCSS("background-color", "rgb(0, 122, 50)");
+				assert.deepEqual(await camera(), prior);
+				await pin.press("Escape");
+				await expect(tooltip).toHaveCount(0);
+				await expect(pin).toBeFocused();
+			}
 			await pin.press("Enter");
 			await page.waitForTimeout(450);
 			if (!before) {

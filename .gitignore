@@ -20,6 +20,20 @@ playwright-report/
 ############################
 # Local diagnostics / screenshots
 ############################
+# Generated evidence stays local; retain inputs read by map regression tests.
+/artifacts/*
+!/artifacts/ollantaytambo-aguas-calientes-tren/
+/artifacts/ollantaytambo-aguas-calientes-tren/*
+!/artifacts/ollantaytambo-aguas-calientes-tren/ollantaytambo-aguas-calientes-tren.gpx
+!/artifacts/aguas-calientes-ollantaytambo-tren/
+/artifacts/aguas-calientes-ollantaytambo-tren/*
+!/artifacts/aguas-calientes-ollantaytambo-tren/aguas-calientes-ollantaytambo-tren.gpx
+!/artifacts/aguas-calientes-control-machu-picchu-bus/
+/artifacts/aguas-calientes-control-machu-picchu-bus/*
+!/artifacts/aguas-calientes-control-machu-picchu-bus/coordinates.json
+!/artifacts/railway-review-2026-11-14/
+/artifacts/railway-review-2026-11-14/*
+!/artifacts/railway-review-2026-11-14/public-map-stops.json
 .codex-trust-preview/
 /tmp*.png
 /home-stats*.png

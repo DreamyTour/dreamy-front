@@ -17,9 +17,11 @@ const zoom = (general: number, close: number): ExpressionSpecification => [
 export default function RailwayRoutes({
 	segments,
 	satellite = false,
+	highlightedIds,
 }: {
 	segments: RailwaySegment[];
 	satellite?: boolean;
+	highlightedIds?: string[];
 }) {
 	const { map, isLoaded } = useMap();
 	const id = `railway-${useId().replace(/[^a-zA-Z0-9-]/g, "")}`;
@@ -85,13 +87,26 @@ export default function RailwayRoutes({
 			(map.getSource(id) as GeoJSONSource | undefined)?.setData(data);
 	}, [map, isLoaded, id, data]);
 	useEffect(() => {
-		if (map && isLoaded && map.getLayer(`${id}-contrast`))
+		if (!map || !isLoaded || !map.getLayer(`${id}-contrast`)) return;
+		const selected: ExpressionSpecification = [
+			"any",
+			...(highlightedIds ?? []).map(
+				(segmentId): ExpressionSpecification => [
+					"in",
+					segmentId,
+					["get", "segmentIds"],
+				],
+			),
+		];
+		for (const suffix of ["contrast", "rails", "sleepers"]) {
+			const opacity = suffix === "contrast" ? (satellite ? 0.85 : 0.4) : 1;
 			map.setPaintProperty(
-				`${id}-contrast`,
+				`${id}-${suffix}`,
 				"line-opacity",
-				satellite ? 0.85 : 0.4,
+				highlightedIds ? ["case", selected, opacity, opacity * 0.7] : opacity,
 			);
-	}, [map, isLoaded, id, satellite]);
+		}
+	}, [map, isLoaded, id, satellite, highlightedIds]);
 	return null;
 }
 
