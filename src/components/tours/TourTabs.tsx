@@ -377,8 +377,8 @@ export default function TourTabs({ tour, lang, children }: Props) {
  [data-tour-layout][data-map-active="true"] .booking-summary .actions a,
  [data-tour-layout][data-map-active="true"] .booking-summary .actions button {min-height:48px;padding:.5rem;gap:.35rem}
  [data-tour-layout][data-map-active="true"] .booking-summary .note {margin-top:.5rem;font-size:.65rem}
- [data-tour-layout][data-map-active="true"] .tour-map-stops-scroll>button {height:168px;padding:.85rem 1rem}
- [data-tour-layout][data-map-active="true"] .tour-map-stops-scroll>button>span:nth-child(2) {font-size:.85rem;margin-top:.35rem}
+ [data-tour-layout][data-map-active="true"] .tour-map-stops-scroll>button {height:auto;min-height:168px;padding:.85rem 1rem}
+ [data-tour-layout][data-map-active="true"] .tour-map-stops-scroll [data-day-card-title] {font-size:.85rem;margin-top:.35rem}
  [data-tour-layout][data-map-active="true"] [data-route-map-preview] {height:180px;min-height:0;flex:none;margin-top:12px}
  [data-tour-layout][data-map-active="true"] [data-route-map-preview]>span:first-child,
  [data-tour-layout][data-map-active="true"] [data-route-map-preview]>svg {min-height:0;height:140px;flex:1}

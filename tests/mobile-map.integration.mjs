@@ -27,6 +27,12 @@ const snapshot = JSON.parse(
 	),
 );
 const realStops = snapshot.mapStops;
+if (process.argv.includes("--cards-only")) {
+	// Reproduce a real long multi-transport card without editing published content.
+	realStops[0].title =
+		"Cusco – Km 104 – Wiñay Wayna – Inti Punku – Aguas Calientes";
+	realStops[0].routeText = "Transporte turístico, tren, trekking y bus";
+}
 const geometries = realStops.map(
 	(stop) => stop.routePlan.legs.find((leg) => leg.mode === "train").geometry,
 );
@@ -196,6 +202,72 @@ window.fixtureData=fixtures;function App(){return <><div style={{height:150}}>Lo
 		return route.abort();
 	});
 	await page.goto(origin);
+	if (process.argv.includes("--cards-only")) {
+		await page.setViewportSize({ width: 1280, height: 1000 });
+		await page.getByRole("tab", { name: "Mapa", exact: true }).click();
+		await page.waitForFunction(() => window.fixtureMap?.isStyleLoaded());
+		const row = page.locator(".tour-map-stops-scroll:visible");
+		const cards = row.locator("[data-map-day-card]");
+		await cards.first().waitFor();
+		const cases = [];
+		for (const width of [1024, 1280]) {
+			await page.setViewportSize({ width, height: 1000 });
+			for (const textSize of [16, 20]) {
+				await page.evaluate((size) => {
+					document.documentElement.style.fontSize = `${size}px`;
+				}, textSize);
+				await page.waitForTimeout(100);
+				const sizes = await cards.evaluateAll((elements) =>
+					elements.map((element) => {
+						const box = element.getBoundingClientRect();
+						const text = document.createRange();
+						text.selectNodeContents(element);
+						const rects = [...text.getClientRects()];
+						return {
+							height: box.height,
+							fits:
+								element.scrollHeight <= element.clientHeight + 1 &&
+								element.scrollWidth <= element.clientWidth + 1 &&
+								rects.every(
+									(r) =>
+										r.top >= box.top &&
+										r.bottom <= box.bottom &&
+										r.left >= box.left &&
+										r.right <= box.right,
+								),
+						};
+					}),
+				);
+				assert.ok(
+					sizes.every((size) => size.fits),
+					`All text must fit inside cards: ${JSON.stringify({ width, textSize, sizes })}`,
+				);
+				assert.ok(
+					Math.max(...sizes.map((s) => s.height)) -
+						Math.min(...sizes.map((s) => s.height)) <=
+						1,
+					"Card heights stay balanced",
+				);
+				cases.push({
+					width,
+					textSize,
+					textInsideCards: true,
+					balancedHeights: true,
+				});
+			}
+		}
+		assert.equal(
+			await page.locator('input[name="name"]').inputValue(),
+			"unchanged",
+		);
+		assert.deepEqual(errors, []);
+		console.log(
+			JSON.stringify({ result: "PASS", cases, bookingFormUnchanged: true }),
+		);
+		await browser.close();
+		await new Promise((resolve) => server.close(resolve));
+		process.exit(0);
+	}
 	const results = [];
 	const accordion = page.locator("[data-tour-mobile-map]");
 	await accordion.locator("summary").tap();
