@@ -45,6 +45,7 @@ import {
 	routeCalculationKey,
 	useCalculatedTourRoutes,
 } from "./useCalculatedTourRoutes";
+import { useMouseDragScroll } from "./useMouseDragScroll";
 
 type TourMapStopSource = Omit<MapStop, "id"> & {
 	id: string;
@@ -636,6 +637,7 @@ export default function MapTab({
 	mapStops: MapStop[];
 }) {
 	const mapRef = React.useRef<MapLibreMap | null>(null);
+	const dayCardsScroll = useMouseDragScroll();
 	const viewportRef = React.useRef<HTMLDivElement>(null);
 	const sheetRef = React.useRef<HTMLElement>(null);
 	const [touchActive, setTouchActive] = React.useState(false);
@@ -1097,10 +1099,19 @@ export default function MapTab({
 				}
 
 				.tour-map-stops-scroll {
+					cursor: grab;
 					--tour-map-scrollbar-thumb: color-mix(in oklab, var(--primary) 35%, transparent);
 					--tour-map-scrollbar-track: color-mix(in oklab, var(--primary) 5%, transparent);
 					scrollbar-color: var(--tour-map-scrollbar-thumb) var(--tour-map-scrollbar-track);
 					scrollbar-width: thin;
+				}
+				.tour-map-stops-scroll[data-mouse-dragging] {
+					cursor: grabbing;
+					user-select: none;
+					-webkit-user-select: none;
+				}
+				.tour-map-stops-scroll [data-map-day-card] {
+					cursor: inherit;
 				}
 
 				@supports not (scrollbar-color: auto) {
@@ -1429,7 +1440,10 @@ export default function MapTab({
 			</div>
 			<div className="hidden space-y-3 md:block">
 				<aside className="min-w-0 overflow-hidden rounded-2xl bg-muted/50 p-2.5">
-					<div className="tour-map-stops-scroll flex items-stretch gap-2.5 overflow-x-auto overflow-y-hidden overscroll-x-contain p-1 pb-2">
+					<div
+						ref={dayCardsScroll}
+						className="tour-map-stops-scroll flex items-stretch gap-2.5 overflow-x-auto overflow-y-hidden overscroll-x-contain p-1 pb-2"
+					>
 						{tourMapStops.map((stop) => {
 							const active = stop.id === selectedId;
 							const incoming = routeSegments.find(

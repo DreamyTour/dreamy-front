@@ -235,7 +235,91 @@ try {
 		page
 			.locator("[data-map-viewport]")
 			.screenshot({ path: path.join(evidence, name + ".png") });
-	for (const width of [1100, 320, 375, 390]) {
+	if (process.argv.includes("--drag-only")) {
+		await choose("days7");
+		const row = page.locator(".tour-map-stops-scroll");
+		await row.scrollIntoViewIfNeeded();
+		const scroll = () => row.evaluate((element) => element.scrollLeft);
+		const cards = row.locator("[data-map-day-card]");
+		const box = await row.boundingBox();
+		const prior = await camera();
+		await page.mouse.move(box.x + 220, box.y + 60);
+		await page.mouse.down();
+		await page.mouse.move(box.x + 80, box.y + 60, { steps: 8 });
+		await expect(row).toHaveAttribute("data-mouse-dragging", "true");
+		await expect(cards.first()).toHaveCSS("cursor", "grabbing");
+		await page.mouse.move(box.x - 25, box.y + 60, { steps: 4 });
+		await page.mouse.up();
+		assert.ok((await scroll()) >= 230, "Mouse drag continues outside the row");
+		await expect(row).not.toHaveAttribute("data-mouse-dragging", "true");
+		await expect(row.locator('[aria-pressed="true"]')).toHaveCount(0);
+		await expect(page.locator(".tour-map-popup-desktop:visible")).toHaveCount(
+			0,
+		);
+		assert.deepEqual(
+			await camera(),
+			prior,
+			"Dragging cards must not move the map",
+		);
+		// Drag back in the opposite direction, then verify normal card activation.
+		const left = await scroll();
+		await page.mouse.move(box.x + 80, box.y + 70);
+		await page.mouse.down();
+		await page.mouse.move(box.x + 200, box.y + 70, { steps: 8 });
+		await page.mouse.up();
+		assert.ok((await scroll()) < left - 100, "Dragging right scrolls back");
+		await cards.nth(1).click();
+		await expect(cards.nth(1)).toHaveAttribute("aria-pressed", "true");
+		await page
+			.getByRole("button", { name: "Close popup", exact: true })
+			.click();
+		await cards.nth(5).focus();
+		await cards.nth(5).press("Enter");
+		await expect(cards.nth(5)).toHaveAttribute("aria-pressed", "true");
+		await page
+			.getByRole("button", { name: "Close popup", exact: true })
+			.click();
+		await row.evaluate((element) => {
+			element.scrollLeft = 0;
+		});
+		// Touch gestures remain native; no mouse capture handler handles them.
+		await row.dispatchEvent("pointerdown", {
+			pointerType: "touch",
+			pointerId: 90,
+			button: 0,
+			clientX: box.x + 200,
+			clientY: box.y + 60,
+		});
+		await row.dispatchEvent("pointermove", {
+			pointerType: "touch",
+			pointerId: 90,
+			buttons: 1,
+			clientX: box.x + 40,
+			clientY: box.y + 60,
+		});
+		assert.equal(await scroll(), 0);
+		await row.dispatchEvent("pointercancel", {
+			pointerType: "touch",
+			pointerId: 90,
+		});
+		await page.mouse.move(box.x + 200, box.y + 60);
+		await page.mouse.down();
+		await page.mouse.move(box.x + 100, box.y + 60, { steps: 4 });
+		await row.dispatchEvent("pointercancel");
+		await page.mouse.up();
+		await expect(row).not.toHaveAttribute("data-mouse-dragging", "true");
+		cases.push({
+			mouseDragBothDirections: true,
+			pointerCapture: true,
+			dragDoesNotSelect: true,
+			clickAndKeyboardSelection: true,
+			touchUntouched: true,
+			pointerCancel: true,
+		});
+	}
+	for (const width of process.argv.includes("--drag-only")
+		? []
+		: [1100, 320, 375, 390]) {
 		await page.setViewportSize({ width, height: 900 });
 		for (const count of real || before ? [2] : [2, 4, 7, 15]) {
 			await choose("days" + count);
