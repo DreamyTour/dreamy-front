@@ -94,6 +94,7 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 	const [target, setTarget] = useState<Target>("start");
 	const [query, setQuery] = useState("");
 	const [places, setPlaces] = useState<RoutePlace[]>([]);
+	const [searchNotice, setSearchNotice] = useState("");
 	const [searching, setSearching] = useState(false);
 	const [busy, setBusy] = useState(false);
 	const [notice, setNotice] = useState("");
@@ -384,38 +385,49 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 		[target, disabled, changingLocation, inherited, publish],
 	);
 	const search = async () => {
+		const text = query.trim();
 		const operationId = ++operation.current;
-		if (query.trim().length < 3) {
-			setNotice("Escribe al menos 3 letras del lugar.");
+		request.current?.abort();
+		setPlaces([]);
+		if (text.length < 3) {
+			setSearching(false);
+			setSearchNotice("Escribe al menos 3 letras del lugar.");
 			return;
 		}
-		request.current?.abort();
 		const controller = new AbortController();
 		request.current = controller;
 		setSearching(true);
-		setPlaces([]);
-		setNotice("");
+		setSearchNotice("");
 		try {
 			const response = await fetch(
-				`/api/tour-places?${new URLSearchParams({ q: query.trim() })}`,
+				`/api/tour-places?${new URLSearchParams({ q: text })}`,
 				{ signal: controller.signal },
 			);
+			if (controller.signal.aborted || operationId !== operation.current)
+				return;
+			if (response.status === 401 || response.status === 403) {
+				setSearchNotice(
+					"No se pudo validar tu sesión. Vuelve a abrir el editor desde Strapi e intenta buscar de nuevo.",
+				);
+				return;
+			}
 			if (!response.ok) throw Error();
 			const data = await response.json();
 			if (controller.signal.aborted || operationId !== operation.current)
 				return;
-			const found = (data.places ?? [])
+			if (!Array.isArray(data?.places)) throw Error();
+			const found = data.places
 				.map(normalizeRoutePlace)
 				.filter((item: RoutePlace | null): item is RoutePlace => Boolean(item));
 			setPlaces(found);
 			if (!found.length)
-				setNotice(
+				setSearchNotice(
 					"No se encontró el lugar. Prueba con el nombre del pueblo o elige un pin en el mapa.",
 				);
 		} catch {
-			if (!controller.signal.aborted)
-				setNotice(
-					"No se pudo buscar ahora. Puedes elegir el destino en el mapa.",
+			if (!controller.signal.aborted && operationId === operation.current)
+				setSearchNotice(
+					"El servicio de búsqueda no está disponible. Intenta de nuevo o elige un pin en el mapa.",
 				);
 		} finally {
 			if (!controller.signal.aborted) setSearching(false);
@@ -885,6 +897,12 @@ export default function RoutePlanEditor({ cmsOrigin }: { cmsOrigin: string }) {
 						{searching ? "Buscando…" : "Buscar"}
 					</button>
 				</div>
+				<p
+					role="status"
+					className={searchNotice ? "mb-3 text-sm text-slate-700" : "sr-only"}
+				>
+					{searchNotice}
+				</p>
 				{places.length > 0 && (
 					<ul className="mb-3 max-h-40 overflow-auto rounded-lg border border-slate-200">
 						{places.map((place) => (

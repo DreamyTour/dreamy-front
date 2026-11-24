@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ url, request }) => {
 	const search = async (source: "ors" | "photon") => {
 		const endpoint = new URL(
 			source === "ors"
-				? "https://api.openrouteservice.org/geocode/search"
+				? "https://api.heigit.org/pelias/v1/search"
 				: "https://photon.komoot.io/api/",
 		);
 		const params: Record<string, string> =

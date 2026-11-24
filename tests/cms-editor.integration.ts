@@ -164,6 +164,59 @@ try {
 		(await context.request.get(`${frontend}/api/tour-places?q=x`)).status(),
 		400,
 	);
+	const editorFrame = page.frameLocator("iframe");
+	const searchInput = editorFrame.getByRole("textbox", {
+		name: "Buscar lugar",
+	});
+	const searchButton = editorFrame.getByRole("button", {
+		name: "Buscar",
+		exact: true,
+	});
+	const searchUrl = "**/api/tour-places?*";
+	for (const [status, json, message] of [
+		[401, { error: "unauthorized" }, /No se pudo validar tu sesión/],
+		[
+			502,
+			{ error: "unavailable" },
+			/El servicio de búsqueda no está disponible/,
+		],
+		[200, { places: [] }, /No se encontró el lugar/],
+	] as const) {
+		await page.route(searchUrl, (route) => route.fulfill({ status, json }), {
+			times: 1,
+		});
+		await searchInput.fill("Cusco");
+		await searchButton.click();
+		await editorFrame
+			.getByRole("status")
+			.filter({ hasText: message })
+			.waitFor();
+		assert(await searchButton.isEnabled());
+	}
+	await page.route(
+		searchUrl,
+		(route) => {
+			assert.equal(route.request().headers().authorization, undefined);
+			assert.equal(
+				new URL(route.request().url()).searchParams.get("q"),
+				"Plaza Regocijo",
+			);
+			return route.fulfill({
+				json: {
+					places: [
+						{ label: "Plaza Regocijo, Cusco", coordinates: [-71.979, -13.517] },
+					],
+				},
+			});
+		},
+		{ times: 1 },
+	);
+	await searchInput.fill("Plaza Regocijo");
+	await searchButton.click();
+	await editorFrame
+		.getByRole("button", { name: "Plaza Regocijo, Cusco" })
+		.waitFor();
+	console.log("CMS fixture: distinct search messages and result verified");
 	assert.equal(
 		(
 			await context.request.delete(`${frontend}/api/cms/session`, {
